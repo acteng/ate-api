@@ -125,6 +125,26 @@ Run the tests:
 
 1. Store the new Terraform state in Bitwarden as "API tf-backend State"
 
+### Provision the Docker repository
+
+1. Change directory:
+
+   ```bash
+   cd cloud/docker-repository
+   ```
+
+1. Initialise Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+1. Apply the changes:
+
+   ```bash
+   terraform apply
+   ```
+
 ## See also
 
 * [Architecture](docs/architecture)
