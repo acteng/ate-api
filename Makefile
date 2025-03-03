@@ -7,7 +7,10 @@ black-check:
 isort-check:
 	$(bin)/isort --check-only $(packages)
 
-format-check: black-check isort-check
+terraform-fmt-check:
+	terraform -chdir=cloud fmt -check -recursive
+
+format-check: black-check isort-check terraform-fmt-check
 
 black:
 	$(bin)/black $(packages)
@@ -15,7 +18,10 @@ black:
 isort:
 	$(bin)/isort $(packages)
 
-format: black isort
+terraform-fmt:
+	terraform -chdir=cloud fmt -recursive
+
+format: black isort terraform-fmt
 
 mypy:
 	$(bin)/mypy $(packages)

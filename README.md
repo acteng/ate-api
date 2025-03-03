@@ -7,6 +7,11 @@ Operational data API for Active Travel England.
 ## Prerequisites
 
 1. Install Python 3.13
+1. Install Google Cloud CLI and authenticate using ADCs:
+   ```bash
+   gcloud auth application-default login
+   ```
+1. Install Terraform 1.11
 
 ## Running locally
 
@@ -89,6 +94,36 @@ Run the tests:
    ```bash
    make test
    ```
+
+## Provisioning infrastructure
+
+### Provision the Terraform backend
+
+1. Change directory:
+
+   ```bash
+   cd cloud/tf-backend
+   ```
+
+1. Initialise Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+1. Fetch the previous Terraform state from Bitwarden, if any:
+
+   ```bash
+   bw get notes "API tf-backend State" > terraform.tfstate
+   ```
+
+1. Apply the changes:
+
+   ```bash
+   terraform apply
+   ```
+
+1. Store the new Terraform state in Bitwarden as "API tf-backend State"
 
 ## See also
 
