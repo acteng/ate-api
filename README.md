@@ -2,6 +2,8 @@
 
 Operational data API for Active Travel England.
 
+[![CI](https://github.com/acteng/ate-api/actions/workflows/ci.yml/badge.svg)](https://github.com/acteng/ate-api/actions/workflows/ci.yml)
+
 ## Prerequisites
 
 1. Install Python 3.13
