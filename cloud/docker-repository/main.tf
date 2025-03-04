@@ -19,6 +19,11 @@ resource "google_project_service" "container_scanning" {
   service = "containerscanning.googleapis.com"
 }
 
+resource "google_project_service" "iam_credentials" {
+  project = var.project
+  service = "iamcredentials.googleapis.com"
+}
+
 resource "google_project_iam_audit_config" "artifact_registry_data_write" {
   project = var.project
   service = "artifactregistry.googleapis.com"
