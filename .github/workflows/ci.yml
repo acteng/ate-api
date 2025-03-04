@@ -5,6 +5,12 @@ on:
     branches: [ main ]
     tags: [ '*' ]
 
+env:
+  GCP_PROJECT: ${{ vars.GCP_PROJECT || 'dft-ate-api-common' }}
+  GCP_LOCATION: ${{ vars.GCP_LOCATION || 'europe-west1' }}
+  GCP_REPOSITORY_ID: docker
+  IMAGE_NAME: ate-api
+
 jobs:
 
   build:
@@ -38,7 +44,33 @@ jobs:
       - name: Test
         run: make test
 
-      - name: Build image
+      - id: auth
+        name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          credentials_json: '${{ secrets.GCP_CREDENTIALS_PUSH }}'
+
+      - name: Login to Docker repository
+        uses: docker/login-action@v3
+        with:
+          registry: ${GCP_LOCATION}-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.auth.outputs.access_token }}
+
+      - id: meta
+        name: Extract metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ${GCP_LOCATION}-docker.pkg.dev/${GCP_PROJECT}/${GCP_REPOSITORY_ID}/${IMAGE_NAME}
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push image
         uses: docker/build-push-action@v6
         with:
           context: .
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true

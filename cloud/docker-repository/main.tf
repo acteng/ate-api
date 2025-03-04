@@ -53,3 +53,8 @@ resource "google_artifact_registry_repository" "main" {
 
   depends_on = [google_project_service.artifact_registry]
 }
+
+module "github_action_push" {
+  source  = "./github-action-push"
+  project = var.project
+}
