@@ -153,6 +153,40 @@ Run the tests:
    
 1. [Set the GitHub Actions repository secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository) `GCP_CREDENTIALS_PUSH` to the private key
 
+### Provision the service
+
+For each environment required (dev, test, prod):
+
+1. Change directory:
+
+   ```bash
+   cd cloud/service
+   ```
+
+1. Initialise Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+1. Create a Terraform workspace for the environment:
+
+   ```bash
+   terraform workspace new $ENVIRONMENT
+   ```
+
+1. Apply the changes:
+
+   ```bash
+   terraform apply
+   ```
+
+1. Invoke the server:
+
+   ```bash
+   curl $(terraform output -raw url)
+   ```
+
 ## See also
 
 * [Architecture](docs/architecture)
