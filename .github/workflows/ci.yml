@@ -10,7 +10,6 @@ env:
   GCP_LOCATION: ${{ vars.GCP_LOCATION || 'europe-west1' }}
   GCP_REPOSITORY_ID: docker
   IMAGE_NAME: ate-api
-  IMAGE_REFERENCE: ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
   GCP_SERVICE_NAME: ate-api
 
 jobs:
@@ -64,7 +63,7 @@ jobs:
         name: Extract metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE_REFERENCE }}
+          images: ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
@@ -90,5 +89,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.GCP_SERVICE_NAME }}
-          image: ${{ env.IMAGE_REFERENCE }}
+          image: ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
           region: ${{ env.GCP_LOCATION }}
