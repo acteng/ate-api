@@ -6,11 +6,12 @@ on:
     tags: [ '*' ]
 
 env:
-  GCP_PROJECT: ${{ vars.GCP_PROJECT || 'dft-ate-api-common' }}
-  GCP_LOCATION: ${{ vars.GCP_LOCATION || 'europe-west1' }}
-  GCP_REPOSITORY_ID: docker
+  IMAGE_PROJECT: ${{ vars.IMAGE_PROJECT || 'dft-ate-api-common' }}
+  IMAGE_LOCATION: ${{ vars.IMAGE_LOCATION || 'europe-west1' }}
+  IMAGE_REPOSITORY_ID: docker
   IMAGE_NAME: ate-api
-  GCP_SERVICE_NAME: ate-api
+  SERVICE_LOCATION: europe-west1
+  SERVICE_NAME: ate-api
 
 jobs:
 
@@ -55,7 +56,7 @@ jobs:
       - name: Login to Docker repository
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.GCP_LOCATION }}-docker.pkg.dev
+          registry: ${{ env.IMAGE_LOCATION }}-docker.pkg.dev
           username: oauth2accesstoken
           password: ${{ steps.auth.outputs.access_token }}
 
@@ -63,7 +64,7 @@ jobs:
         name: Extract metadata
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_LOCATION }}-docker.pkg.dev/${{ env.IMAGE_PROJECT }}/${{ env.IMAGE_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
@@ -89,6 +90,6 @@ jobs:
       - name: Deploy image
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ env.GCP_SERVICE_NAME }}
-          image: ${{ env.GCP_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.GCP_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
-          region: ${{ env.GCP_LOCATION }}
+          service: ${{ env.SERVICE_NAME }}
+          image: ${{ env.IMAGE_LOCATION }}-docker.pkg.dev/${{ env.IMAGE_PROJECT }}/${{ env.IMAGE_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}
+          region: ${{ env.SERVICE_LOCATION }}
