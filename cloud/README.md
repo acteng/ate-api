@@ -1,5 +1,7 @@
 # Cloud infrastructure
 
+This service is hosted on [Google Cloud Platform](https://console.cloud.google.com/).
+
 ## Provisioning
 
 To provision the cloud infrastructure:

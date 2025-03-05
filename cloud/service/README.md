@@ -1,5 +1,7 @@
 # Service
 
+This root module provisions the resources required for a service environment.
+
 ## Provisioning
 
 For each environment required (dev, test, prod):

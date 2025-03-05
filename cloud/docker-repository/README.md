@@ -1,5 +1,8 @@
 # Docker repository
 
+This root module provisions an [Artifact Registry](https://cloud.google.com/artifact-registry/docs/overview) to store
+Docker images for this service.
+
 ## Provisioning
 
 1. Change directory:
