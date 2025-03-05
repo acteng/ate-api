@@ -1,4 +1,6 @@
-# Provision the service
+# Service
+
+## Provisioning
 
 For each environment required (dev, test, prod):
 

@@ -98,4 +98,4 @@ Run the tests:
 ## See also
 
 * [Architecture](docs/architecture)
-* [Provisioning](cloud/README.md)
+* [Cloud infrastructure](cloud/README.md)

@@ -1,4 +1,6 @@
-# Provision the Terraform backend
+# Terraform backend
+
+## Provisioning
 
 1. Change directory:
 

@@ -1,4 +1,6 @@
-# Provision the Docker repository
+# Docker repository
+
+## Provisioning
 
 1. Change directory:
 
