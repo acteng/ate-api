@@ -2,6 +2,10 @@ data "google_project" "main" {
   project_id = var.project
 }
 
+resource "google_service_account" "cloud_run_ate_api" {
+  account_id = "cloud-run-ate-api"
+}
+
 resource "google_cloud_run_v2_service" "ate_api" {
   name     = "ate-api"
   project  = var.project
@@ -11,6 +15,7 @@ resource "google_cloud_run_v2_service" "ate_api" {
     containers {
       image = "${var.docker_repository_url}/ate-api:latest"
     }
+    service_account = google_service_account.cloud_run_ate_api.email
   }
 }
 
