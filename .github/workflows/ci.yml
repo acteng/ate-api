@@ -7,7 +7,7 @@ on:
 
 env:
   IMAGE_PROJECT: ${{ vars.IMAGE_PROJECT || 'dft-ate-api-common' }}
-  IMAGE_LOCATION: ${{ vars.IMAGE_LOCATION || 'europe-west1' }}
+  IMAGE_LOCATION: europe-west1
   IMAGE_REPOSITORY_ID: docker
   IMAGE_NAME: ate-api
   SERVICE_LOCATION: europe-west1
