@@ -25,7 +25,7 @@ Docker images for this service.
 
 ## Configuring GitHub Actions
 
-To configure the [CI workflow](../../.github/workflows/ci.yml) with credentials to push built images to the repository:
+To configure the [CI workflow](../../.github/workflows/ci.yml) with credentials to push images to the repository:
 
 1. Obtain the Docker repository service account private key:
 
