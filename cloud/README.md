@@ -1,6 +1,6 @@
-## Provisioning infrastructure
+# Provisioning infrastructure
 
-### Provision the Terraform backend
+## Provision the Terraform backend
 
 1. Change directory:
 
@@ -28,7 +28,7 @@
 
 1. Store the new Terraform state in Bitwarden as "API tf-backend State"
 
-### Provision the Docker repository
+## Provision the Docker repository
 
 1. Change directory:
 
@@ -56,7 +56,7 @@
    
 1. [Set the GitHub Actions repository secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository) `GCP_CREDENTIALS_PUSH` to the private key
 
-### Provision the service
+## Provision the service
 
 For each environment required (dev, test, prod):
 
