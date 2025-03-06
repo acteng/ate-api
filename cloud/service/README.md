@@ -33,7 +33,7 @@ For each environment required (dev, test, prod):
 1. Invoke the server:
 
    ```bash
-   curl $(terraform output -raw url)
+   curl -H 'Authorization: Bearer 123' $(terraform output -raw url)
    ```
 
 ## Configuring GitHub Actions
