@@ -27,7 +27,7 @@ For each environment required (dev, test, prod):
 1. Create a Terraform workspace for the environment:
 
    ```bash
-   terraform workspace new $ENVIRONMENT
+   terraform workspace new ${ENVIRONMENT}
    ```
 
 1. Apply the changes:
