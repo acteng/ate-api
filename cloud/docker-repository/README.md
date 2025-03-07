@@ -11,6 +11,12 @@ Docker images for this service.
    cd cloud/docker-repository
    ```
 
+1. Authenticate with Google Cloud:
+
+   ```bash
+   gcloud auth application-default login
+   ```
+
 1. Initialise Terraform:
 
    ```bash

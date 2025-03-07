@@ -13,6 +13,12 @@ As the state for this root module cannot be easily stored within itself, we stor
    cd cloud/tf-backend
    ```
 
+1. Authenticate with Google Cloud:
+
+   ```bash
+   gcloud auth application-default login
+   ```
+
 1. Initialise Terraform:
 
    ```bash

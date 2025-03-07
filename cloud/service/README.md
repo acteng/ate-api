@@ -12,6 +12,12 @@ For each environment required (dev, test, prod):
    cd cloud/service
    ```
 
+1. Authenticate with Google Cloud:
+
+   ```bash
+   gcloud auth application-default login
+   ```
+
 1. Initialise Terraform:
 
    ```bash
