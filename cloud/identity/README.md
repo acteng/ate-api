@@ -2,9 +2,15 @@
 
 This root module provisions OAuth clients for the API in [Auth0](https://auth0.com/).
 
-## Provisioning
+There are multiple environments that replicate the resources which are represented as Terraform workspaces:
 
-For each environment required (dev, test, prod):
+* `dev`
+* `test`
+* `prod`
+
+Repeat the steps below for each environment as required. The target environment is denoted as `${ENVIRONMENT}`.
+
+## Provisioning
 
 ### Terraform provider
 
@@ -73,8 +79,6 @@ To create an OAuth client for the Auth0 Terraform provider:
    ```
 
 ## Destroying
-
-For each environment required (dev, test, prod):
 
 ### Resources
 

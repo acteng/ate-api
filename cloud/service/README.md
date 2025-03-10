@@ -1,10 +1,16 @@
 # Service
 
-This root module provisions the resources required for a service environment.
+This root module provisions the resources required for the service.
+
+There are multiple environments that replicate the resources which are represented as Terraform workspaces:
+
+* `dev`
+* `test`
+* `prod`
+
+Repeat the steps below for each environment as required. The target environment is denoted as `${ENVIRONMENT}`.
 
 ## Provisioning
-
-For each environment required (dev, test, prod):
 
 1. Change directory:
 
