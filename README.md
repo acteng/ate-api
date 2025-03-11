@@ -35,11 +35,7 @@ Operational data API for Active Travel England.
    make run
    ```
 
-1. Invoke the server:
-
-   ```bash
-   curl -H 'Authorization: Bearer 123' http://localhost:8000
-   ```
+1. Invoke the server at http://localhost:8000
 
 ## Running locally using Docker
 
@@ -57,17 +53,21 @@ To run the server as a container:
    docker run --rm -it -p 8000:8000 ate-api
    ```
    
-1. Invoke the server:
-
-   ```bash
-   curl -H 'Authorization: Bearer 123' http://localhost:8000
-   ```
+1. Invoke the server at http://localhost:8000
 
 The server can also be run on a different port by specifying the `PORT` environment variable:
 
 ```bash
 docker run --rm -it -e PORT=8001 -p 8001:8001 ate-api
 ```
+
+## Invoking
+
+To invoke the server running at http://localhost:8000:
+
+   ```bash
+   curl -H 'Authorization: Bearer 123' http://localhost:8000
+   ```
 
 ## Running formatters and linters
 

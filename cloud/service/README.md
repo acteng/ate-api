@@ -44,10 +44,10 @@ Repeat the steps below for each environment as required. The target environment 
    terraform apply
    ```
 
-1. Invoke the server:
+1. Invoke the server at:
 
    ```bash
-   curl -H 'Authorization: Bearer 123' $(terraform output -raw url)
+   terraform output -raw url
    ```
 
 ## Configuring GitHub Actions
