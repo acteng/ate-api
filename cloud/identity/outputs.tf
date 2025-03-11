@@ -3,13 +3,13 @@ output "resource_server_identifier" {
   value       = module.resource_server.identifier
 }
 
-output "ate_client_id" {
-  description = "ATE client ID"
-  value       = module.ate_client.client_id
+output "example_client_id" {
+  description = "Example client ID"
+  value       = module.example_client.client_id
 }
 
-output "ate_client_secret" {
-  description = "ATE client secret"
-  value       = module.ate_client.client_secret
+output "example_client_secret" {
+  description = "Example client secret"
+  value       = module.example_client.client_secret
   sensitive   = true
 }

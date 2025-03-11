@@ -27,9 +27,9 @@ module "resource_server" {
   identifier = local.config[local.env].resource_server_identifier
 }
 
-module "ate_client" {
+module "example_client" {
   source      = "./client"
-  name        = "ATE"
+  name        = "Example"
   description = "Client used for API development."
   audience    = module.resource_server.identifier
 }
