@@ -2,6 +2,8 @@
 
 This root module provisions the resources required for the service.
 
+## Environments
+
 There are multiple environments that replicate the resources which are represented as Terraform workspaces:
 
 * `dev`

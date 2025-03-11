@@ -2,6 +2,8 @@
 
 This root module provisions OAuth clients for the API in [Auth0](https://auth0.com/).
 
+## Environments
+
 There are multiple environments that replicate the resources which are represented as Terraform workspaces:
 
 * `dev`
