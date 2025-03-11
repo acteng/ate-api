@@ -12,7 +12,7 @@ unselect_client () {
 
 	echo "Auth0 credentials unset."
 
-	unset -f unset_client
+	unset -f unselect_client
 }
 
 if [ $# -ne 1 ]
