@@ -17,3 +17,8 @@ variable "docker_repository_url" {
   description = "Docker repository URL"
   type        = string
 }
+
+variable "oidc_server_metadata_url" {
+  description = "OIDC configuration URL"
+  type        = string
+}

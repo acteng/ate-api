@@ -22,6 +22,15 @@ data "terraform_remote_state" "docker_repository" {
   }
 }
 
+data "terraform_remote_state" "identity" {
+  backend = "gcs"
+  config = {
+    bucket = "${var.project_prefix}-common-tf-backend"
+    prefix = "identity"
+  }
+  workspace = local.env
+}
+
 resource "google_project_service" "run" {
   project = local.project
   service = "run.googleapis.com"
@@ -33,6 +42,7 @@ module "application" {
   region                    = var.location
   docker_repository_project = data.terraform_remote_state.docker_repository.outputs.project
   docker_repository_url     = data.terraform_remote_state.docker_repository.outputs.url
+  oidc_server_metadata_url  = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
 
   depends_on = [google_project_service.run]
 }

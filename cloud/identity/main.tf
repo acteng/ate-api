@@ -22,6 +22,9 @@ locals {
   }
 }
 
+data "auth0_tenant" "main" {
+}
+
 module "resource_server" {
   source     = "./resource-server"
   identifier = local.config[local.env].resource_server_identifier

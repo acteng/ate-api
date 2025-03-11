@@ -14,6 +14,10 @@ resource "google_cloud_run_v2_service" "ate_api" {
   template {
     containers {
       image = "${var.docker_repository_url}/ate-api:latest"
+      env {
+        name  = "OIDC_SERVER_METADATA_URL"
+        value = var.oidc_server_metadata_url
+      }
     }
     service_account = google_service_account.cloud_run_ate_api.email
   }

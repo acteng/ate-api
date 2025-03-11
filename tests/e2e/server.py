@@ -10,7 +10,7 @@ from fastapi import FastAPI
 class Server:
     def __init__(self, app: FastAPI, port: int | None = None) -> None:
         self._app = app
-        self._host = "127.0.0.1"
+        self._host = "localhost"
         self._port = port or self._get_random_port()
         self._process = Process(
             target=uvicorn.run, kwargs={"app": self._app, "host": self._host, "port": self._port}, daemon=True
@@ -22,6 +22,10 @@ class Server:
 
     def stop(self) -> None:
         self._process.kill()
+
+    @property
+    def app(self) -> FastAPI:
+        return self._app
 
     @property
     def url(self) -> str:

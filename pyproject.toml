@@ -4,7 +4,9 @@ version = "1.0.0"
 description = "Operational data API for Active Travel England."
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard]~=0.115.0"
+    "authlib~=1.5.0",
+    "fastapi[standard]~=0.115.0",
+    "pydantic-settings~=2.8.0"
 ]
 
 [project.optional-dependencies]
@@ -13,6 +15,7 @@ dev = [
     "isort~=6.0.0",
     "mypy~=1.15.0",
     "pytest~=8.3.0",
+    "respx~=0.22.0",
     "ruff~=0.9.0"
 ]
 
@@ -34,6 +37,12 @@ profile = "black"
 
 [tool.mypy]
 strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "authlib.*"
+]
+ignore_missing_imports = true
 
 # ruff
 

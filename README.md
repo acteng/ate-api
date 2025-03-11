@@ -63,10 +63,32 @@ docker run --rm -it -e PORT=8001 -p 8001:8001 ate-api
 
 ## Invoking
 
-To invoke the server running at http://localhost:8000:
+To invoke the server running locally at http://localhost:8000:
+
+1. Obtain the OAuth client credentials:
 
    ```bash
-   curl -H 'Authorization: Bearer 123' http://localhost:8000
+   cd cloud/identity
+   terraform workspace select dev
+   CLIENT_ID=$(terraform output -raw example_client_id)
+   CLIENT_SECRET=$(terraform output -raw example_client_secret)
+   ```
+
+1. Obtain an access token from the identity provider:
+
+   ```bash
+   ACCESS_TOKEN=$(curl -s https://ate-api-dev.uk.auth0.com/oauth/token \
+      -H 'Content-Type: application/x-www-form-urlencoded' \
+      -d 'grant_type=client_credentials' \
+      -d 'audience=https://dev.api.activetravelengland.gov.uk' \
+      -d "client_id=${CLIENT_ID}" \
+      -d "client_secret=${CLIENT_SECRET}" | jq -r .access_token)
+   ```
+
+1. Invoke the server with the access token:
+
+   ```bash
+   curl -H "Authorization: Bearer ${ACCESS_TOKEN}" http://localhost:8000
    ```
 
 ## Running formatters and linters
