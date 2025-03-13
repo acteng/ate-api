@@ -1,13 +1,8 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends
-from fastapi.security import HTTPAuthorizationCredentials
-
-from ate_api.auth import bearer_scheme
+from fastapi import APIRouter
 
 router = APIRouter()
 
 
 @router.get("/")
-async def index(authorization: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)]) -> dict[str, str]:
+async def index() -> dict[str, str]:
     return {"message": "Hello World"}
