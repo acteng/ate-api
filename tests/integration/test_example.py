@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Generator
 
 import pytest
@@ -92,6 +93,18 @@ def test_cannot_get_index_with_expired_access_token(
 
     assert response.status_code == 403
     assert response.json() == {"detail": "expired_token: The token is expired"}
+
+
+@respx.mock
+def test_cannot_get_index_with_access_token_issued_in_future(
+    authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    access_token = authorization_server.create_access_token(issued_at=int(datetime(3000, 1, 1).timestamp()))
+
+    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "invalid_token: The token is not valid as it was issued in the future"}
 
 
 def test_cannot_get_index_without_bearer(client: TestClient) -> None:

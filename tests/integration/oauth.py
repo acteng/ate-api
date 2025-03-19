@@ -31,10 +31,11 @@ class StubAuthorizationServer:
         issuer: str | None = None,
         audience: str | None = None,
         expiration_time: int | None = None,
+        issued_at: int | None = None,
         signature: bytes | None = None,
     ) -> str:
         subject = "stub_client_id"
-        now = time()
+        now = int(time())
 
         header = {
             "kid": self._key_id,
@@ -45,7 +46,8 @@ class StubAuthorizationServer:
             "iss": issuer or self._url,
             "sub": subject,
             "aud": audience or self._resource_server_identifier,
-            "exp": expiration_time or int(now + 60),
+            "exp": expiration_time or now + 60,
+            "iat": issued_at or now,
         }
 
         access_token: str = jwt.encode(header, payload, self._private_key).decode()
