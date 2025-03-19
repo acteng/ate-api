@@ -18,6 +18,10 @@ resource "google_cloud_run_v2_service" "ate_api" {
         name  = "OIDC_SERVER_METADATA_URL"
         value = var.oidc_server_metadata_url
       }
+      env {
+        name  = "RESOURCE_SERVER_IDENTIFIER"
+        value = var.resource_server_identifier
+      }
     }
     service_account = google_service_account.cloud_run_ate_api.email
   }

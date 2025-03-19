@@ -1,22 +1,32 @@
-from typing import Any
+from functools import lru_cache
+from typing import Annotated, Any
 
 from authlib.jose import KeySet, RSAKey
-from fastapi import FastAPI
+from authlib.oauth2 import AuthorizationServer
+from fastapi import Depends, FastAPI
 from starlette.requests import Request
 from starlette.responses import Response
 
 from tests.e2e.oauth.clients import ClientRepository
 from tests.e2e.oauth.grants import ClientSecretPostClientCredentialsGrant
 from tests.e2e.oauth.server import StarletteAuthorizationServer
+from tests.e2e.oauth.settings import Settings, get_settings
 from tests.e2e.oauth.tokens import StubJWTBearerTokenGenerator
 
 app = FastAPI()
 clients = ClientRepository()
 _issuer = "https://stub.example"
 _key = RSAKey.generate_key(is_private=True)
-_authorization_server = StarletteAuthorizationServer(clients.get)
-_authorization_server.register_grant(ClientSecretPostClientCredentialsGrant)
-_authorization_server.register_token_generator("default", StubJWTBearerTokenGenerator(_issuer, KeySet([_key])))
+
+
+@lru_cache
+def _get_authorization_server(settings: Annotated[Settings, Depends(get_settings)]) -> AuthorizationServer:
+    authorization_server = StarletteAuthorizationServer(clients.get)
+    authorization_server.register_grant(ClientSecretPostClientCredentialsGrant)
+    authorization_server.register_token_generator(
+        "default", StubJWTBearerTokenGenerator(_issuer, settings.resource_server_identifier, KeySet([_key]))
+    )
+    return authorization_server
 
 
 @app.get("/.well-known/openid-configuration")
@@ -30,6 +40,8 @@ async def key_set() -> Any:
 
 
 @app.post("/token")
-def token(request: Request) -> Response:
-    response: Response = _authorization_server.create_token_response(request)
+def token(
+    authorization_server: Annotated[AuthorizationServer, Depends(_get_authorization_server)], request: Request
+) -> Response:
+    response: Response = authorization_server.create_token_response(request)
     return response

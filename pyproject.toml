@@ -37,6 +37,7 @@ profile = "black"
 
 [tool.mypy]
 strict = true
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = [

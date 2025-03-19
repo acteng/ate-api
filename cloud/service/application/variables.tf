@@ -22,3 +22,8 @@ variable "oidc_server_metadata_url" {
   description = "OIDC configuration URL"
   type        = string
 }
+
+variable "resource_server_identifier" {
+  description = "Resource server identifier"
+  type        = string
+}

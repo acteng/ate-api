@@ -4,8 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    oidc_server_metadata_url: str = "https://ate-api-dev.uk.auth0.com/.well-known/openid-configuration"
-    resource_server_identifier: str = "https://dev.api.activetravelengland.gov.uk"
+    resource_server_identifier: str
 
     model_config = SettingsConfigDict(frozen=True)
 

@@ -20,6 +20,7 @@ def get_oauth(settings: Annotated[Settings, Depends(get_settings)]) -> OAuth:
 
 
 async def authorize(
+    settings: Annotated[Settings, Depends(get_settings)],
     oauth: Annotated[OAuth, Depends(get_oauth)],
     authorization: Annotated[HTTPAuthorizationCredentials, Depends(bearer_scheme)],
 ) -> None:
@@ -29,7 +30,14 @@ async def authorize(
 
     # validate signature
     try:
-        claims = jwt.decode(token, key=jwks, claims_options={"iss": {"value": server_metadata.get("issuer")}})
+        claims = jwt.decode(
+            token,
+            key=jwks,
+            claims_options={
+                "iss": {"value": server_metadata.get("issuer")},
+                "aud": {"value": settings.resource_server_identifier},
+            },
+        )
     except Exception as error:
         raise HTTPException(status.HTTP_403_FORBIDDEN, str(error))
 

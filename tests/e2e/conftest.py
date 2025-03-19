@@ -6,10 +6,14 @@ from fastapi import FastAPI
 from httpx import Client
 
 import ate_api
-from ate_api.settings import Settings, get_settings
 from tests.e2e import oauth
 from tests.e2e.oauth import StubClient, clients
 from tests.e2e.server import Server
+
+
+@pytest.fixture(name="resource_server_identifier")
+def resource_server_identifier_fixture() -> str:
+    return "https://api.example"
 
 
 @pytest.fixture(name="stub_client")
@@ -17,11 +21,20 @@ def stub_client_fixture() -> StubClient:
     return StubClient(client_id="stub_client_id", client_secret="stub_client_secret")
 
 
+@pytest.fixture(name="authorization_server_settings")
+def authorization_server_settings_fixture(resource_server_identifier: str) -> oauth.Settings:
+    return oauth.Settings(resource_server_identifier=resource_server_identifier)
+
+
 @pytest.fixture(name="authorization_server_app")
-def authorization_server_app_fixture(stub_client: StubClient) -> Generator[FastAPI, None, None]:
+def authorization_server_app_fixture(
+    authorization_server_settings: oauth.Settings, stub_client: StubClient
+) -> Generator[FastAPI, None, None]:
+    oauth.app.dependency_overrides[oauth.get_settings] = lambda: authorization_server_settings
     clients.add(stub_client)
     yield oauth.app
     clients.clear()
+    oauth.app.dependency_overrides = {}
 
 
 @pytest.fixture(name="authorization_server")
@@ -42,14 +55,16 @@ def oauth_client_fixture(stub_client: StubClient) -> OAuth2Client:
 
 
 @pytest.fixture(name="settings")
-def settings_fixture(authorization_server: Server) -> Settings:
+def settings_fixture(authorization_server: Server, resource_server_identifier: str) -> ate_api.Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
-    return Settings(oidc_server_metadata_url=oidc_server_metadata_url)
+    return ate_api.Settings(
+        oidc_server_metadata_url=oidc_server_metadata_url, resource_server_identifier=resource_server_identifier
+    )
 
 
 @pytest.fixture(name="app")
-def app_fixture(settings: Settings) -> Generator[FastAPI, None, None]:
-    ate_api.app.dependency_overrides[get_settings] = lambda: settings
+def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI, None, None]:
+    ate_api.app.dependency_overrides[ate_api.get_settings] = lambda: settings
     yield ate_api.app
     ate_api.app.dependency_overrides = {}
 

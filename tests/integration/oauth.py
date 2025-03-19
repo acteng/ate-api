@@ -15,16 +15,19 @@ from httpx import Response
 
 
 class StubAuthorizationServer:
-    def __init__(self) -> None:
+    def __init__(self, resource_server_identifier: str) -> None:
         self._url = "https://stub.example"
         self._key_id = "stub_key"
         self._private_key, self._public_key = self._generate_key_pair()
+        self._resource_server_identifier = resource_server_identifier
 
     @property
     def configuration_endpoint(self) -> str:
         return f"{self._url}/.well-known/openid-configuration"
 
-    def create_access_token(self, issuer: str | None = None, signature: bytes | None = None) -> str:
+    def create_access_token(
+        self, issuer: str | None = None, audience: str | None = None, signature: bytes | None = None
+    ) -> str:
         subject = "stub_client_id"
 
         header = {
@@ -35,6 +38,7 @@ class StubAuthorizationServer:
         payload = {
             "iss": issuer or self._url,
             "sub": subject,
+            "aud": audience or self._resource_server_identifier,
         }
 
         access_token: str = jwt.encode(header, payload, self._private_key).decode()

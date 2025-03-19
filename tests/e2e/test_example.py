@@ -4,9 +4,13 @@ from httpx import Client
 from tests.e2e.server import Server
 
 
-def test_get_index(authorization_server: Server, oauth_client: OAuth2Client, client: Client) -> None:
+def test_get_index(
+    authorization_server: Server, resource_server_identifier: str, oauth_client: OAuth2Client, client: Client
+) -> None:
     token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
-    token = oauth_client.fetch_token(token_endpoint, grant_type="client_credentials")
+    token = oauth_client.fetch_token(
+        token_endpoint, grant_type="client_credentials", audience=resource_server_identifier
+    )
 
     response = client.get("/", headers={"Authorization": f"Bearer {token["access_token"]}"})
 

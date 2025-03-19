@@ -37,12 +37,13 @@ resource "google_project_service" "run" {
 }
 
 module "application" {
-  source                    = "./application"
-  project                   = local.project
-  region                    = var.location
-  docker_repository_project = data.terraform_remote_state.docker_repository.outputs.project
-  docker_repository_url     = data.terraform_remote_state.docker_repository.outputs.url
-  oidc_server_metadata_url  = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
+  source                     = "./application"
+  project                    = local.project
+  region                     = var.location
+  docker_repository_project  = data.terraform_remote_state.docker_repository.outputs.project
+  docker_repository_url      = data.terraform_remote_state.docker_repository.outputs.url
+  oidc_server_metadata_url   = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
+  resource_server_identifier = data.terraform_remote_state.identity.outputs.resource_server_identifier
 
   depends_on = [google_project_service.run]
 }
