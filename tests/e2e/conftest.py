@@ -5,7 +5,7 @@ from authlib.integrations.httpx_client import OAuth2Client
 from fastapi import FastAPI
 from httpx import Client
 
-from ate_api import main
+import ate_api
 from ate_api.settings import Settings, get_settings
 from tests.e2e import oauth
 from tests.e2e.oauth import StubClient, clients
@@ -49,9 +49,9 @@ def settings_fixture(authorization_server: Server) -> Settings:
 
 @pytest.fixture(name="app")
 def app_fixture(settings: Settings) -> Generator[FastAPI, None, None]:
-    main.app.dependency_overrides[get_settings] = lambda: settings
-    yield main.app
-    main.app.dependency_overrides = {}
+    ate_api.app.dependency_overrides[get_settings] = lambda: settings
+    yield ate_api.app
+    ate_api.app.dependency_overrides = {}
 
 
 @pytest.fixture(name="server")
