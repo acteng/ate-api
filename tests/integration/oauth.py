@@ -1,4 +1,5 @@
 from base64 import urlsafe_b64encode
+from time import time
 from typing import Any
 
 import respx
@@ -26,9 +27,14 @@ class StubAuthorizationServer:
         return f"{self._url}/.well-known/openid-configuration"
 
     def create_access_token(
-        self, issuer: str | None = None, audience: str | None = None, signature: bytes | None = None
+        self,
+        issuer: str | None = None,
+        audience: str | None = None,
+        expiration_time: int | None = None,
+        signature: bytes | None = None,
     ) -> str:
         subject = "stub_client_id"
+        now = time()
 
         header = {
             "kid": self._key_id,
@@ -39,6 +45,7 @@ class StubAuthorizationServer:
             "iss": issuer or self._url,
             "sub": subject,
             "aud": audience or self._resource_server_identifier,
+            "exp": expiration_time or int(now + 60),
         }
 
         access_token: str = jwt.encode(header, payload, self._private_key).decode()

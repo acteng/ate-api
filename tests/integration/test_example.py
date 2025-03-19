@@ -82,6 +82,18 @@ def test_cannot_get_index_with_invalid_audience(
     assert response.json() == {"detail": 'invalid_claim: Invalid claim "aud"'}
 
 
+@respx.mock
+def test_cannot_get_index_with_expired_access_token(
+    authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    access_token = authorization_server.create_access_token(expiration_time=1)
+
+    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "expired_token: The token is expired"}
+
+
 def test_cannot_get_index_without_bearer(client: TestClient) -> None:
     response = client.get("/")
 
