@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter
+from fastapi.params import Depends
 from pydantic import AliasGenerator, BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
@@ -21,6 +24,25 @@ class Authority:
         return self._full_name
 
 
+class AuthorityRepository:
+    def add(self, authority: Authority) -> None:
+        raise NotImplementedError()
+
+    def get_by_abbreviation(self, abbreviation: str) -> Authority:
+        raise NotImplementedError()
+
+
+class MemoryAuthorityRepository(AuthorityRepository):
+    def __init__(self) -> None:
+        self._authorities = dict[str, Authority]()
+
+    def add(self, authority: Authority) -> None:
+        self._authorities[authority.abbreviation] = authority
+
+    def get_by_abbreviation(self, abbreviation: str) -> Authority:
+        return self._authorities[abbreviation]
+
+
 class AuthorityModel(BaseModel):
     abbreviation: str
     full_name: str
@@ -32,7 +54,15 @@ class AuthorityModel(BaseModel):
         return AuthorityModel(abbreviation=authority.abbreviation, full_name=authority.full_name)
 
 
+async def get_authority_repository() -> AuthorityRepository:
+    authorities = MemoryAuthorityRepository()
+    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+    return authorities
+
+
 @router.get("/authorities/{abbreviation}")
-async def get_authority(abbreviation: str) -> AuthorityModel:
-    authority = Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority")
+async def get_authority(
+    authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], abbreviation: str
+) -> AuthorityModel:
+    authority = authorities.get_by_abbreviation(abbreviation)
     return AuthorityModel.from_domain(authority)
