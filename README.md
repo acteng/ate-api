@@ -63,13 +63,15 @@ docker run --rm -it -e PORT=8001 -p 8001:8001 ate-api
 
 ## Invoking
 
-To invoke the server running locally at http://localhost:8000:
+To invoke the server running in an environment:
 
-1. Obtain the OAuth client credentials:
+1. Obtain the identity provider details:
 
    ```bash
    cd cloud/identity
-   terraform workspace select dev
+   terraform workspace select ${ENVIRONMENT}
+   TOKEN_ENDPOINT=$(curl -s $(terraform output -raw oidc_server_metadata_url) | jq -r .token_endpoint)
+   RESOURCE_SERVER_IDENTIFIER=$(terraform output -raw resource_server_identifier)
    CLIENT_ID=$(terraform output -raw example_client_id)
    CLIENT_SECRET=$(terraform output -raw example_client_secret)
    ```
@@ -77,18 +79,26 @@ To invoke the server running locally at http://localhost:8000:
 1. Obtain an access token from the identity provider:
 
    ```bash
-   ACCESS_TOKEN=$(curl -s https://ate-api-dev.uk.auth0.com/oauth/token \
+   ACCESS_TOKEN=$(curl -s ${TOKEN_ENDPOINT} \
       -H 'Content-Type: application/x-www-form-urlencoded' \
       -d 'grant_type=client_credentials' \
-      -d 'audience=https://dev.api.activetravelengland.gov.uk' \
+      -d "audience=${RESOURCE_SERVER_IDENTIFIER}" \
       -d "client_id=${CLIENT_ID}" \
       -d "client_secret=${CLIENT_SECRET}" | jq -r .access_token)
+   ```
+
+1. Obtain the server details:
+
+   ```bash
+   cd cloud/service
+   terraform workspace select ${ENVIRONMENT}
+   SERVER_URL=$(terraform output -raw url)
    ```
 
 1. Invoke the server with the access token:
 
    ```bash
-   curl -H "Authorization: Bearer ${ACCESS_TOKEN}" http://localhost:8000
+   curl -H "Authorization: Bearer ${ACCESS_TOKEN}" ${SERVER_URL}
    ```
 
 ## Running formatters and linters
