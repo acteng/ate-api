@@ -9,7 +9,7 @@ from starlette.responses import Response
 
 from tests.e2e.oauth.clients import ClientRepository
 from tests.e2e.oauth.grants import ClientSecretPostClientCredentialsGrant
-from tests.e2e.oauth.server import StarletteAuthorizationServer
+from tests.e2e.oauth.servers import StarletteAuthorizationServer
 from tests.e2e.oauth.settings import Settings, get_settings
 from tests.e2e.oauth.tokens import StubJWTBearerTokenGenerator
 
