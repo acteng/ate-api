@@ -6,6 +6,12 @@ import respx
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from ate_api.authorities import (
+    Authority,
+    AuthorityRepository,
+    MemoryAuthorityRepository,
+    get_authority_repository,
+)
 from ate_api.settings import Settings, get_settings
 from tests.integration.oauth import StubAuthorizationServer
 
@@ -30,15 +36,24 @@ def settings_fixture(authorization_server: StubAuthorizationServer, resource_ser
     )
 
 
+@pytest.fixture(name="authorities")
+def authorities_fixture() -> AuthorityRepository:
+    return MemoryAuthorityRepository()
+
+
 @pytest.fixture(name="app")
-def app_fixture(app: FastAPI, settings: Settings) -> Generator[FastAPI, None, None]:
+def app_fixture(app: FastAPI, settings: Settings, authorities: AuthorityRepository) -> Generator[FastAPI, None, None]:
     app.dependency_overrides[get_settings] = lambda: settings
+    app.dependency_overrides[get_authority_repository] = lambda: authorities
     yield app
     app.dependency_overrides = {}
 
 
 @respx.mock
-def test_get_authority(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
+def test_get_authority(
+    authorities: AuthorityRepository, authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
     access_token = authorization_server.create_access_token()
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
