@@ -12,6 +12,6 @@ class AuthorityModel(BaseModel):
     model_config = ConfigDict(alias_generator=AliasGenerator(serialization_alias=to_camel))
 
 
-@router.get("/authorities/{authority_abbreviation}")
-async def get_authority(authority_abbreviation: str) -> AuthorityModel:
+@router.get("/authorities/{abbreviation}")
+async def get_authority(abbreviation: str) -> AuthorityModel:
     return AuthorityModel(abbreviation="LIV", full_name="Liverpool City Region Combined Authority")
