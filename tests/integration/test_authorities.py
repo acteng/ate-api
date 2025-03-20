@@ -38,76 +38,76 @@ def app_fixture(app: FastAPI, settings: Settings) -> Generator[FastAPI, None, No
 
 
 @respx.mock
-def test_get_index(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
+def test_get_authority(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
     access_token = authorization_server.create_access_token()
 
-    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
-    assert response.json() == {"message": "Hello World"}
+    assert response.json() == {"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"}
 
 
 @respx.mock
-def test_cannot_get_index_with_invalid_signature(
+def test_cannot_get_authority_with_invalid_signature(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
     access_token = authorization_server.create_access_token(signature="invalid_signature".encode())
 
-    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
     assert response.json() == {"detail": "bad_signature: "}
 
 
 @respx.mock
-def test_cannot_get_index_with_invalid_issuer(
+def test_cannot_get_authority_with_invalid_issuer(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
     access_token = authorization_server.create_access_token(issuer="https://malicious.example/")
 
-    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
     assert response.json() == {"detail": 'invalid_claim: Invalid claim "iss"'}
 
 
 @respx.mock
-def test_cannot_get_index_with_invalid_audience(
+def test_cannot_get_authority_with_invalid_audience(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
     access_token = authorization_server.create_access_token(audience="https://malicious.example/")
 
-    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
     assert response.json() == {"detail": 'invalid_claim: Invalid claim "aud"'}
 
 
 @respx.mock
-def test_cannot_get_index_with_expired_access_token(
+def test_cannot_get_authority_with_expired_access_token(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
     access_token = authorization_server.create_access_token(expiration_time=1)
 
-    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
     assert response.json() == {"detail": "expired_token: The token is expired"}
 
 
 @respx.mock
-def test_cannot_get_index_with_access_token_issued_in_future(
+def test_cannot_get_authority_with_access_token_issued_in_future(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
     access_token = authorization_server.create_access_token(issued_at=int(datetime(3000, 1, 1).timestamp()))
 
-    response = client.get("/", headers={"Authorization": f"Bearer {access_token}"})
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
     assert response.json() == {"detail": "invalid_token: The token is not valid as it was issued in the future"}
 
 
-def test_cannot_get_index_without_bearer(client: TestClient) -> None:
-    response = client.get("/")
+def test_cannot_get_authority_without_bearer(client: TestClient) -> None:
+    response = client.get("/authorities/LIV")
 
     assert response.status_code == 403
