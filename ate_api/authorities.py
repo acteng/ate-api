@@ -71,10 +71,13 @@ async def get_authority_repository() -> AuthorityRepository:
     return _authorities
 
 
-@router.get("/authorities/{abbreviation}", responses={HTTP_404_NOT_FOUND: {}})
+@router.get("/authorities/{abbreviation}", summary="Get authority", responses={HTTP_404_NOT_FOUND: {}})
 async def get_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], abbreviation: str
 ) -> AuthorityModel:
+    """
+    Gets an authority.
+    """
     authority = authorities.get_by_abbreviation(abbreviation)
 
     if not authority:
