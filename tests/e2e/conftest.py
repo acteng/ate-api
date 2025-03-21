@@ -2,11 +2,13 @@ from typing import Generator
 
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
+from authlib.oauth2.rfc6749 import OAuth2Token
 from fastapi import FastAPI
 from httpx import Client
 
 import ate_api
 from tests.e2e import oauth, routes
+from tests.e2e.app_client import AppClient
 from tests.e2e.oauth import StubClient, clients
 from tests.e2e.server import Server
 
@@ -54,6 +56,17 @@ def oauth_client_fixture(stub_client: StubClient) -> OAuth2Client:
     )
 
 
+@pytest.fixture(name="access_token")
+def access_token_fixture(
+    authorization_server: Server, resource_server_identifier: str, oauth_client: OAuth2Client
+) -> str:
+    token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
+    token: OAuth2Token = oauth_client.fetch_token(
+        token_endpoint, grant_type="client_credentials", audience=resource_server_identifier
+    )
+    return str(token["access_token"])
+
+
 @pytest.fixture(name="settings", scope="package")
 def settings_fixture(authorization_server: Server, resource_server_identifier: str) -> ate_api.Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
@@ -81,3 +94,8 @@ def server_fixture(app: FastAPI) -> Generator[Server, None, None]:
 @pytest.fixture(name="client")
 def client_fixture(server: Server) -> Client:
     return Client(base_url=server.url)
+
+
+@pytest.fixture(name="app_client")
+def app_client_fixture(server: Server, access_token: str) -> AppClient:
+    return AppClient(server.url, access_token)
