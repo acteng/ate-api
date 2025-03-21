@@ -7,8 +7,6 @@ from fastapi.params import Depends
 from pydantic import AliasGenerator, BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-router = APIRouter()
-
 
 class Authority:
     def __init__(self, abbreviation: str, full_name: str):
@@ -52,6 +50,9 @@ class AuthorityModel(BaseModel):
     @classmethod
     def from_domain(cls, authority: Authority) -> AuthorityModel:
         return AuthorityModel(abbreviation=authority.abbreviation, full_name=authority.full_name)
+
+
+router = APIRouter()
 
 
 async def get_authority_repository() -> AuthorityRepository:
