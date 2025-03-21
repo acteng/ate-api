@@ -39,3 +39,10 @@ class TestAuthorityModel:
             authority_model.abbreviation == "LIV"
             and authority_model.full_name == "Liverpool City Region Combined Authority"
         )
+
+    def test_to_domain(self) -> None:
+        authority_model = AuthorityModel(abbreviation="LIV", full_name="Liverpool City Region Combined Authority")
+
+        authority = authority_model.to_domain()
+
+        assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool City Region Combined Authority"

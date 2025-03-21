@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
 from authlib.oauth2.rfc6749 import OAuth2Token
@@ -18,7 +20,16 @@ def access_token_fixture(
 
 
 def test_get_authority(access_token: str, client: Client) -> None:
+    _create_authority(
+        client, access_token, {"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"}
+    )
+
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
     assert response.json() == {"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"}
+
+
+def _create_authority(client: Client, access_token: str, authority: Any) -> None:
+    response = client.post("/test/authorities", headers={"Authorization": f"Bearer {access_token}"}, json=authority)
+    response.raise_for_status()

@@ -98,7 +98,7 @@ To invoke the server running in an environment:
 1. Invoke the server with the access token:
 
    ```bash
-   curl -H "Authorization: Bearer ${ACCESS_TOKEN}" ${SERVER_URL}/authorities/LIV
+   curl -H "Authorization: Bearer ${ACCESS_TOKEN}" ${SERVER_URL}/authorities/GMA
    ```
 
 ## Running formatters and linters

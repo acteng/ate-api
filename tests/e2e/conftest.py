@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from httpx import Client
 
 import ate_api
-from tests.e2e import oauth
+from tests.e2e import oauth, routes
 from tests.e2e.oauth import StubClient, clients
 from tests.e2e.server import Server
 
@@ -65,6 +65,7 @@ def settings_fixture(authorization_server: Server, resource_server_identifier: s
 @pytest.fixture(name="app")
 def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI, None, None]:
     ate_api.app.dependency_overrides[ate_api.get_settings] = lambda: settings
+    ate_api.app.include_router(routes.router)
     yield ate_api.app
     ate_api.app.dependency_overrides = {}
 

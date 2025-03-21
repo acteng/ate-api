@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi.params import Depends
-from pydantic import AliasGenerator, BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
 
@@ -45,16 +45,19 @@ class AuthorityModel(BaseModel):
     abbreviation: str
     full_name: str
 
-    model_config = ConfigDict(alias_generator=AliasGenerator(serialization_alias=to_camel))
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     @classmethod
     def from_domain(cls, authority: Authority) -> AuthorityModel:
         return AuthorityModel(abbreviation=authority.abbreviation, full_name=authority.full_name)
 
+    def to_domain(self) -> Authority:
+        return Authority(abbreviation=self.abbreviation, full_name=self.full_name)
+
 
 router = APIRouter()
 _authorities = MemoryAuthorityRepository()
-_authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+_authorities.add(Authority(abbreviation="GMA", full_name="Greater Manchester Combined Authority"))
 
 
 async def get_authority_repository() -> AuthorityRepository:
