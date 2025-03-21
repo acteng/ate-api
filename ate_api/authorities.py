@@ -62,7 +62,7 @@ class AuthorityModel(BaseModel):
         return Authority(abbreviation=self.abbreviation, full_name=self.full_name)
 
 
-router = APIRouter()
+router = APIRouter(tags=["authorities"])
 _authorities = MemoryAuthorityRepository()
 _authorities.add(Authority(abbreviation="GMA", full_name="Greater Manchester Combined Authority"))
 
