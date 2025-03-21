@@ -71,7 +71,7 @@ async def get_authority_repository() -> AuthorityRepository:
     return _authorities
 
 
-@router.get("/authorities/{abbreviation}")
+@router.get("/authorities/{abbreviation}", responses={HTTP_404_NOT_FOUND: {}})
 async def get_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], abbreviation: str
 ) -> AuthorityModel:
