@@ -97,5 +97,7 @@ def client_fixture(server: Server) -> Client:
 
 
 @pytest.fixture(name="app_client")
-def app_client_fixture(server: Server, access_token: str) -> AppClient:
-    return AppClient(server.url, access_token)
+def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient, None, None]:
+    app_client = AppClient(server.url, access_token)
+    yield app_client
+    app_client.delete_authorities()

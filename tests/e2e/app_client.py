@@ -10,3 +10,7 @@ class AppClient:
     def create_authority(self, authority: Any) -> None:
         response = self._client.post("/test/authorities", json=authority)
         response.raise_for_status()
+
+    def delete_authorities(self) -> None:
+        response = self._client.delete("/test/authorities")
+        response.raise_for_status()

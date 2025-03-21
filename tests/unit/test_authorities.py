@@ -25,6 +25,13 @@ class TestMemoryAuthorityRepository:
             and authority.full_name == "Liverpool City Region Combined Authority"
         )
 
+    def test_clear(self, authorities: MemoryAuthorityRepository) -> None:
+        authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+
+        authorities.clear()
+
+        assert not authorities.get_by_abbreviation("LIV")
+
     def test_get_by_abbreviation(self, authorities: MemoryAuthorityRepository) -> None:
         authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
 

@@ -27,6 +27,9 @@ class AuthorityRepository:
     def add(self, authority: Authority) -> None:
         raise NotImplementedError()
 
+    def clear(self) -> None:
+        raise NotImplementedError()
+
     def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
         raise NotImplementedError()
 
@@ -37,6 +40,9 @@ class MemoryAuthorityRepository(AuthorityRepository):
 
     def add(self, authority: Authority) -> None:
         self._authorities[authority.abbreviation] = authority
+
+    def clear(self) -> None:
+        self._authorities.clear()
 
     def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
         return self._authorities.get(abbreviation)
