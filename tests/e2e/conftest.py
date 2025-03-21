@@ -11,22 +11,22 @@ from tests.e2e.oauth import StubClient, clients
 from tests.e2e.server import Server
 
 
-@pytest.fixture(name="resource_server_identifier")
+@pytest.fixture(name="resource_server_identifier", scope="package")
 def resource_server_identifier_fixture() -> str:
     return "https://api.example"
 
 
-@pytest.fixture(name="stub_client")
+@pytest.fixture(name="stub_client", scope="package")
 def stub_client_fixture() -> StubClient:
     return StubClient(client_id="stub_client_id", client_secret="stub_client_secret")
 
 
-@pytest.fixture(name="authorization_server_settings")
+@pytest.fixture(name="authorization_server_settings", scope="package")
 def authorization_server_settings_fixture(resource_server_identifier: str) -> oauth.Settings:
     return oauth.Settings(resource_server_identifier=resource_server_identifier)
 
 
-@pytest.fixture(name="authorization_server_app")
+@pytest.fixture(name="authorization_server_app", scope="package")
 def authorization_server_app_fixture(
     authorization_server_settings: oauth.Settings, stub_client: StubClient
 ) -> Generator[FastAPI, None, None]:
@@ -37,7 +37,7 @@ def authorization_server_app_fixture(
     oauth.app.dependency_overrides = {}
 
 
-@pytest.fixture(name="authorization_server")
+@pytest.fixture(name="authorization_server", scope="package")
 def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator[Server, None, None]:
     server = Server(authorization_server_app)
     server.start()
@@ -54,7 +54,7 @@ def oauth_client_fixture(stub_client: StubClient) -> OAuth2Client:
     )
 
 
-@pytest.fixture(name="settings")
+@pytest.fixture(name="settings", scope="package")
 def settings_fixture(authorization_server: Server, resource_server_identifier: str) -> ate_api.Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
     return ate_api.Settings(
@@ -62,7 +62,7 @@ def settings_fixture(authorization_server: Server, resource_server_identifier: s
     )
 
 
-@pytest.fixture(name="app")
+@pytest.fixture(name="app", scope="package")
 def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI, None, None]:
     ate_api.app.dependency_overrides[ate_api.get_settings] = lambda: settings
     ate_api.app.include_router(routes.router)
@@ -70,7 +70,7 @@ def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI, None, None]:
     ate_api.app.dependency_overrides = {}
 
 
-@pytest.fixture(name="server")
+@pytest.fixture(name="server", scope="package")
 def server_fixture(app: FastAPI) -> Generator[Server, None, None]:
     server = Server(app)
     server.start()
