@@ -53,12 +53,12 @@ class AuthorityModel(BaseModel):
 
 
 router = APIRouter()
+_authorities = MemoryAuthorityRepository()
+_authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
 
 
 async def get_authority_repository() -> AuthorityRepository:
-    authorities = MemoryAuthorityRepository()
-    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
-    return authorities
+    return _authorities
 
 
 @router.get("/authorities/{abbreviation}")
