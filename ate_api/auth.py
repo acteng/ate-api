@@ -9,7 +9,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from ate_api.settings import Settings, get_settings
 
-bearer_scheme = HTTPBearer()
+bearer_scheme = HTTPBearer(bearerFormat="JWT")
 
 
 @lru_cache
