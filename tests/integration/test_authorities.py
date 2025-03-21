@@ -16,3 +16,14 @@ def test_get_authority(
 
     assert response.status_code == 200
     assert response.json() == {"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"}
+
+
+@respx.mock
+def test_get_authority_when_not_found(
+    authorities: AuthorityRepository, authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    access_token = authorization_server.create_access_token()
+
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 404

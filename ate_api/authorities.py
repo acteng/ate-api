@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+from starlette.status import HTTP_404_NOT_FOUND
 
 
 class Authority:
@@ -26,7 +27,7 @@ class AuthorityRepository:
     def add(self, authority: Authority) -> None:
         raise NotImplementedError()
 
-    def get_by_abbreviation(self, abbreviation: str) -> Authority:
+    def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
         raise NotImplementedError()
 
 
@@ -37,8 +38,8 @@ class MemoryAuthorityRepository(AuthorityRepository):
     def add(self, authority: Authority) -> None:
         self._authorities[authority.abbreviation] = authority
 
-    def get_by_abbreviation(self, abbreviation: str) -> Authority:
-        return self._authorities[abbreviation]
+    def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
+        return self._authorities.get(abbreviation)
 
 
 class AuthorityModel(BaseModel):
@@ -69,4 +70,8 @@ async def get_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], abbreviation: str
 ) -> AuthorityModel:
     authority = authorities.get_by_abbreviation(abbreviation)
+
+    if not authority:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
     return AuthorityModel.from_domain(authority)

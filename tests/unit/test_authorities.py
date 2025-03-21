@@ -19,14 +19,27 @@ class TestMemoryAuthorityRepository:
         authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
 
         authority = authorities.get_by_abbreviation("LIV")
-        assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool City Region Combined Authority"
+        assert (
+            authority
+            and authority.abbreviation == "LIV"
+            and authority.full_name == "Liverpool City Region Combined Authority"
+        )
 
     def test_get_by_abbreviation(self, authorities: MemoryAuthorityRepository) -> None:
         authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
 
         authority = authorities.get_by_abbreviation("LIV")
 
-        assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool City Region Combined Authority"
+        assert (
+            authority
+            and authority.abbreviation == "LIV"
+            and authority.full_name == "Liverpool City Region Combined Authority"
+        )
+
+    def test_get_by_abbreviation_when_not_found(self, authorities: MemoryAuthorityRepository) -> None:
+        authority = authorities.get_by_abbreviation("LIV")
+
+        assert not authority
 
 
 class TestAuthorityModel:
