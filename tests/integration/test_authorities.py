@@ -2,15 +2,11 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.authorities import Authority, AuthorityRepository
-from tests.integration.oauth import StubAuthorizationServer
 
 
 @respx.mock
-def test_get_authority(
-    authorities: AuthorityRepository, authorization_server: StubAuthorizationServer, client: TestClient
-) -> None:
+def test_get_authority(authorities: AuthorityRepository, client: TestClient, access_token: str) -> None:
     authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
-    access_token = authorization_server.create_access_token()
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -19,11 +15,7 @@ def test_get_authority(
 
 
 @respx.mock
-def test_get_authority_when_not_found(
-    authorities: AuthorityRepository, authorization_server: StubAuthorizationServer, client: TestClient
-) -> None:
-    access_token = authorization_server.create_access_token()
-
+def test_get_authority_when_not_found(authorities: AuthorityRepository, client: TestClient, access_token: str) -> None:
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 404

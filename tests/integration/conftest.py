@@ -26,6 +26,11 @@ def authorization_server_fixture(resource_server_identifier: str) -> StubAuthori
     return authorization_server
 
 
+@pytest.fixture(name="access_token")
+def access_token_fixture(authorization_server: StubAuthorizationServer) -> str:
+    return authorization_server.create_access_token()
+
+
 @pytest.fixture(name="settings")
 def settings_fixture(authorization_server: StubAuthorizationServer, resource_server_identifier: str) -> Settings:
     return Settings(
