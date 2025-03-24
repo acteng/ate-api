@@ -9,20 +9,7 @@ from pydantic.alias_generators import to_camel
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain import Authority, AuthorityRepository
-
-
-class MemoryAuthorityRepository(AuthorityRepository):
-    def __init__(self) -> None:
-        self._authorities = dict[str, Authority]()
-
-    def add(self, authority: Authority) -> None:
-        self._authorities[authority.abbreviation] = authority
-
-    def clear(self) -> None:
-        self._authorities.clear()
-
-    def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
-        return self._authorities.get(abbreviation)
+from ate_api.infrastructure.memory import MemoryAuthorityRepository
 
 
 class AuthorityModel(BaseModel):
