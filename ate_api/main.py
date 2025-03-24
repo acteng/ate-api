@@ -2,8 +2,8 @@ from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from starlette.status import HTTP_403_FORBIDDEN
 
-from ate_api import authorities
 from ate_api.auth import authorize
+from ate_api.routes import authorities
 
 
 class HTTPError(BaseModel):

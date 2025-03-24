@@ -1,5 +1,5 @@
-from ate_api.authorities import AuthorityModel
 from ate_api.domain import Authority
+from ate_api.routes import AuthorityModel
 
 
 class TestAuthorityModel:
