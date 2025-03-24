@@ -1,7 +1,7 @@
 import pytest
 
 from ate_api.domain import Authority
-from ate_api.infrastructure.memory import MemoryAuthorityRepository
+from tests.integration.memory import MemoryAuthorityRepository
 
 
 class TestMemoryAuthorityRepository:

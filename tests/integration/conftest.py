@@ -5,10 +5,10 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from ate_api.domain import AuthorityRepository
-from ate_api.infrastructure.memory import MemoryAuthorityRepository
 from ate_api.main import app
 from ate_api.routes import get_authority_repository
 from ate_api.settings import Settings, get_settings
+from tests.integration.memory import MemoryAuthorityRepository
 from tests.integration.oauth import StubAuthorizationServer
 
 
