@@ -31,7 +31,7 @@ def authorization_server_settings_fixture(resource_server_identifier: str) -> oa
 @pytest.fixture(name="authorization_server_app", scope="package")
 def authorization_server_app_fixture(
     authorization_server_settings: oauth.Settings, stub_client: StubClient
-) -> Generator[FastAPI, None, None]:
+) -> Generator[FastAPI]:
     oauth.app.dependency_overrides[oauth.get_settings] = lambda: authorization_server_settings
     clients.add(stub_client)
     yield oauth.app
@@ -40,7 +40,7 @@ def authorization_server_app_fixture(
 
 
 @pytest.fixture(name="authorization_server", scope="package")
-def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator[Server, None, None]:
+def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator[Server]:
     server = Server(authorization_server_app)
     server.start()
     yield server
@@ -76,7 +76,7 @@ def settings_fixture(authorization_server: Server, resource_server_identifier: s
 
 
 @pytest.fixture(name="app", scope="package")
-def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI, None, None]:
+def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI]:
     ate_api.app.dependency_overrides[ate_api.get_settings] = lambda: settings
     ate_api.app.include_router(routes.router)
     yield ate_api.app
@@ -84,7 +84,7 @@ def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI, None, None]:
 
 
 @pytest.fixture(name="server", scope="package")
-def server_fixture(app: FastAPI) -> Generator[Server, None, None]:
+def server_fixture(app: FastAPI) -> Generator[Server]:
     server = Server(app)
     server.start()
     yield server
@@ -97,7 +97,7 @@ def client_fixture(server: Server) -> Client:
 
 
 @pytest.fixture(name="app_client")
-def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient, None, None]:
+def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient]:
     app_client = AppClient(server.url, access_token)
     yield app_client
     app_client.delete_authorities()

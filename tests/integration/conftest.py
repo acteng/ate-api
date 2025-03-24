@@ -43,7 +43,7 @@ def authorities_fixture() -> AuthorityRepository:
 
 
 @pytest.fixture(name="app")
-def app_fixture(settings: Settings, authorities: AuthorityRepository) -> Generator[FastAPI, None, None]:
+def app_fixture(settings: Settings, authorities: AuthorityRepository) -> Generator[FastAPI]:
     app.dependency_overrides[get_settings] = lambda: settings
     app.dependency_overrides[get_authority_repository] = lambda: authorities
     yield app
