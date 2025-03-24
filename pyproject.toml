@@ -6,7 +6,9 @@ requires-python = ">=3.13"
 dependencies = [
     "authlib~=1.5.0",
     "fastapi[standard]~=0.115.0",
-    "pydantic-settings~=2.8.0"
+    "pg8000~=1.31.0",
+    "pydantic-settings~=2.8.0",
+    "sqlalchemy~=2.0.0"
 ]
 
 [project.optional-dependencies]
@@ -16,7 +18,8 @@ dev = [
     "mypy~=1.15.0",
     "pytest~=8.3.0",
     "respx~=0.22.0",
-    "ruff~=0.9.0"
+    "ruff~=0.9.0",
+    "testcontainers~=4.9.0"
 ]
 
 [build-system]
@@ -41,7 +44,8 @@ plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = [
-    "authlib.*"
+    "authlib.*",
+    "testcontainers.postgres.*"
 ]
 ignore_missing_imports = true
 
