@@ -107,6 +107,8 @@ The server can be configured with the following environment variables:
 
 | Name                       | Value                                                                                   |
 |----------------------------|-----------------------------------------------------------------------------------------|
+| DATABASE_URL               | [Database URL](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)       |
+| CREATE_DATABASE_SCHEMA     | `true` to create the database schema                                                    |
 | OIDC_SERVER_METADATA_URL   | Authorisation server configuration endpoint                                             |
 | RESOURCE_SERVER_IDENTIFIER | Resource server identifier (this must match the audience claim in the JWT access token) |
 

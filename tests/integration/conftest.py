@@ -31,7 +31,9 @@ def access_token_fixture(authorization_server: StubAuthorizationServer) -> str:
 
 @pytest.fixture(name="settings")
 def settings_fixture(authorization_server: StubAuthorizationServer, resource_server_identifier: str) -> Settings:
+    dummy_database_url = "sqlite:///:memory:"
     return Settings(
+        database_url=dummy_database_url,
         oidc_server_metadata_url=authorization_server.configuration_endpoint,
         resource_server_identifier=resource_server_identifier,
     )
