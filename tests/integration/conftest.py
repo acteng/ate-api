@@ -4,11 +4,8 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from ate_api.authorities import (
-    AuthorityRepository,
-    MemoryAuthorityRepository,
-    get_authority_repository,
-)
+from ate_api.authorities import MemoryAuthorityRepository, get_authority_repository
+from ate_api.domain import AuthorityRepository
 from ate_api.main import app
 from ate_api.settings import Settings, get_settings
 from tests.integration.oauth import StubAuthorizationServer

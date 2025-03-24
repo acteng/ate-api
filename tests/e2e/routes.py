@@ -6,11 +6,8 @@ from fastapi import APIRouter, Response
 from fastapi.params import Depends
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
-from ate_api.authorities import (
-    AuthorityModel,
-    AuthorityRepository,
-    get_authority_repository,
-)
+from ate_api.authorities import AuthorityModel, get_authority_repository
+from ate_api.domain import AuthorityRepository
 
 router = APIRouter()
 

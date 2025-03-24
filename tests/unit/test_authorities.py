@@ -1,13 +1,7 @@
 import pytest
 
-from ate_api.authorities import Authority, AuthorityModel, MemoryAuthorityRepository
-
-
-class TestAuthority:
-    def test_create(self) -> None:
-        authority = Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority")
-
-        assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool City Region Combined Authority"
+from ate_api.authorities import AuthorityModel, MemoryAuthorityRepository
+from ate_api.domain import Authority
 
 
 class TestMemoryAuthorityRepository:

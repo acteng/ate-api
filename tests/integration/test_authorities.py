@@ -1,7 +1,7 @@
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.authorities import Authority, AuthorityRepository
+from ate_api.domain import Authority, AuthorityRepository
 
 
 @respx.mock
