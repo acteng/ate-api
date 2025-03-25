@@ -31,6 +31,9 @@ resource "google_cloud_run_v2_service" "ate_api" {
         name  = "RESOURCE_SERVER_IDENTIFIER"
         value = var.resource_server_identifier
       }
+      ports {
+        container_port = 8080
+      }
     }
     containers {
       image = "gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.15.2"
