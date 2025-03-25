@@ -43,6 +43,11 @@ resource "google_project_service" "secret_manager" {
   service = "secretmanager.googleapis.com"
 }
 
+resource "google_project_service" "sql_admin" {
+  project = local.project
+  service = "sqladmin.googleapis.com"
+}
+
 module "application" {
   source                     = "./application"
   project                    = local.project
