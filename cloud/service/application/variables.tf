@@ -18,6 +18,11 @@ variable "docker_repository_url" {
   type        = string
 }
 
+variable "image_tag" {
+  description = "Docker image tag"
+  type        = string
+}
+
 variable "database_project" {
   description = "Database GCP project"
   type        = string

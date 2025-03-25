@@ -17,12 +17,15 @@ locals {
 
   config = {
     dev = {
+      image_tag            = "latest"
       github_action_deploy = true
     }
     test = {
+      image_tag            = "0.1.0-rc1"
       github_action_deploy = false
     }
     prod = {
+      image_tag            = "0.1.0"
       github_action_deploy = false
     }
   }
@@ -66,6 +69,7 @@ module "application" {
   region                     = var.location
   docker_repository_project  = data.terraform_remote_state.docker_repository.outputs.project
   docker_repository_url      = data.terraform_remote_state.docker_repository.outputs.url
+  image_tag                  = local.config[local.env].image_tag
   database_project           = local.database_project
   database_connection_name   = local.database_connection_name
   database_url_secret_id     = "database-url"

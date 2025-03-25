@@ -13,7 +13,7 @@ resource "google_cloud_run_v2_service" "ate_api" {
 
   template {
     containers {
-      image = "${var.docker_repository_url}/ate-api:latest"
+      image = "${var.docker_repository_url}/ate-api:${var.image_tag}"
       env {
         name = "DATABASE_URL"
         value_source {
