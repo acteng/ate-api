@@ -110,6 +110,8 @@ The server can be configured with the following environment variables:
 | OIDC_SERVER_METADATA_URL   | Authorisation server configuration endpoint                                             |
 | RESOURCE_SERVER_IDENTIFIER | Resource server identifier (this must match the audience claim in the JWT access token) |
 
+Environment variables can also be provided in a `.env` file.
+
 ## Running formatters and linters
 
 1. Run the formatters:

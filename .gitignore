@@ -1,6 +1,9 @@
 # Python
 __pycache__/
 
+# Pydantic Settings
+/.env
+
 # Terraform
 .terraform/
 /cloud/tf-backend/terraform.tfstate*
