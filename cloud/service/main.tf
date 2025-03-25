@@ -14,6 +14,18 @@ locals {
   project                  = "${var.project_prefix}-${local.env}"
   database_project         = "${var.database_project_prefix}-${local.env}"
   database_connection_name = "${local.database_project}:europe-west1:dft-ate-capital-schemes"
+
+  config = {
+    dev = {
+      github_action_deploy = true
+    }
+    test = {
+      github_action_deploy = false
+    }
+    prod = {
+      github_action_deploy = false
+    }
+  }
 }
 
 data "terraform_remote_state" "docker_repository" {
@@ -64,6 +76,8 @@ module "application" {
 }
 
 module "github_action_deploy" {
+  count = local.config[local.env].github_action_deploy ? 1 : 0
+
   source                       = "./github-action-deploy"
   project                      = local.project
   docker_repository_project    = data.terraform_remote_state.docker_repository.outputs.project

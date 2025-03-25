@@ -5,6 +5,6 @@ output "url" {
 
 output "github_action_deploy_private_key" {
   description = "Service account key for deploy GitHub Action service account"
-  value       = module.github_action_deploy.private_key
+  value       = length(module.github_action_deploy) > 0 ? module.github_action_deploy[0].private_key : null
   sensitive   = true
 }
