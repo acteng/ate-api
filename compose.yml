@@ -1,0 +1,26 @@
+services:
+
+  app:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: "postgresql+pg8000://ate:password@database/ate"
+      CREATE_DATABASE_SCHEMA: true
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ate
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER
+      interval: 5s

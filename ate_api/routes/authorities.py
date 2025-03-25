@@ -6,10 +6,12 @@ from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
+from sqlalchemy.orm import Session
 from starlette.status import HTTP_404_NOT_FOUND
 
+from ate_api.database import get_session
 from ate_api.domain import Authority, AuthorityRepository
-from ate_api.infrastructure.memory import MemoryAuthorityRepository
+from ate_api.infrastructure.database import DatabaseAuthorityRepository
 
 
 class AuthorityModel(BaseModel):
@@ -27,16 +29,14 @@ class AuthorityModel(BaseModel):
 
 
 router = APIRouter(tags=["authorities"])
-_authorities = MemoryAuthorityRepository()
-_authorities.add(Authority(abbreviation="GMA", full_name="Greater Manchester Combined Authority"))
 
 
-async def get_authority_repository() -> AuthorityRepository:
-    return _authorities
+def get_authority_repository(session: Annotated[Session, Depends(get_session)]) -> AuthorityRepository:
+    return DatabaseAuthorityRepository(session)
 
 
 @router.get("/authorities/{abbreviation}", summary="Get authority", responses={HTTP_404_NOT_FOUND: {}})
-async def get_authority(
+def get_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], abbreviation: str
 ) -> AuthorityModel:
     """

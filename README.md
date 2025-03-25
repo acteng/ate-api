@@ -9,6 +9,48 @@ Operational data API for Active Travel England.
 1. Install Python 3.13
 1. Install [Terraform](https://developer.hashicorp.com/terraform/install) 1.11
 
+## Running locally using Compose
+
+To run the server as a container using a database:
+
+1. Run the services:
+
+   ```bash
+   docker compose up
+   ```
+
+1. Invoke the server at http://localhost:8000
+
+## Running locally using Docker
+
+To run the server as a container:
+
+1. Build the Docker image:
+
+   ```bash
+   docker build -t ate-api .
+   ```
+   
+1. Run the database image:
+
+   ```bash
+   docker run --rm -it -e POSTGRES_USER=ate -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16       
+   ```
+
+1. Run the Docker image:
+
+   ```bash
+   docker run --rm -it --network=host -e CREATE_DATABASE_SCHEMA=true ate-api
+   ```
+   
+1. Invoke the server at http://localhost:8000
+
+The server can also be run on a different port by specifying the `PORT` environment variable:
+
+```bash
+docker run --rm -it --network=host -e CREATE_DATABASE_SCHEMA=true -e PORT=8001 ate-api
+```
+
 ## Running locally
 
 1. Create a virtual environment:
@@ -29,37 +71,25 @@ Operational data API for Active Travel England.
    pip install -e .[dev]
    ```
 
+1. Run the database image:
+
+   ```bash
+   docker run --rm -it -e POSTGRES_USER=ate -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16       
+   ```
+   
+   Or using Compose:
+
+   ```bash
+   docker compose up database
+   ```
+   
 1. Run the server:
 
    ```bash
-   make run
+   CREATE_DATABASE_SCHEMA=true make run
    ```
 
 1. Invoke the server at http://localhost:8000
-
-## Running locally using Docker
-
-To run the server as a container:
-
-1. Build the Docker image:
-
-   ```bash
-   docker build -t ate-api .
-   ```
-   
-1. Run the Docker image:
-
-   ```bash
-   docker run --rm -it -p 8000:8000 ate-api
-   ```
-   
-1. Invoke the server at http://localhost:8000
-
-The server can also be run on a different port by specifying the `PORT` environment variable:
-
-```bash
-docker run --rm -it -e PORT=8001 -p 8001:8001 ate-api
-```
 
 ## Invoking
 
@@ -107,6 +137,8 @@ The server can be configured with the following environment variables:
 
 | Name                       | Value                                                                                   |
 |----------------------------|-----------------------------------------------------------------------------------------|
+| DATABASE_URL               | [Database URL](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)       |
+| CREATE_DATABASE_SCHEMA     | `true` to create the database schema                                                    |
 | OIDC_SERVER_METADATA_URL   | Authorisation server configuration endpoint                                             |
 | RESOURCE_SERVER_IDENTIFIER | Resource server identifier (this must match the audience claim in the JWT access token) |
 
