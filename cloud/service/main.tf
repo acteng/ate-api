@@ -76,7 +76,11 @@ module "application" {
   oidc_server_metadata_url   = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
   resource_server_identifier = data.terraform_remote_state.identity.outputs.resource_server_identifier
 
-  depends_on = [google_project_service.run]
+  depends_on = [
+    google_project_service.run,
+    google_project_service.secret_manager,
+    google_project_service.sql_admin
+  ]
 }
 
 module "github_action_deploy" {
