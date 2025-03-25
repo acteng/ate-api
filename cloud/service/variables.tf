@@ -4,6 +4,12 @@ variable "project_prefix" {
   default     = "dft-ate-api"
 }
 
+variable "database_project_prefix" {
+  description = "Database GCP project prefix"
+  type        = string
+  default     = "dft-ate-capitalschemes"
+}
+
 variable "location" {
   description = "GCP location"
   type        = string
