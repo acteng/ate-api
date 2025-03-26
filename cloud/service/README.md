@@ -65,7 +65,8 @@ Repeat the steps below for each environment as required. The target environment 
 
 ## Configuring GitHub Actions
 
-To configure the [CI workflow](../../.github/workflows/ci.yml) with credentials to deploy images to the service:
+For the Dev environment only, configure the [CI workflow](../../.github/workflows/ci.yml) with credentials to deploy
+images to the service:
 
 1. Obtain the Cloud Run service account private key:
 
