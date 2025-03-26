@@ -7,6 +7,7 @@ This service is hosted on [Google Cloud Platform](https://console.cloud.google.c
 1. Install [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
 1. Install [Auth0 CLI](https://auth0.github.io/auth0-cli/)
 1. Install [jq](https://jqlang.org/download/)
+1. Install [Bitwarden CLI](https://bitwarden.com/help/cli/#download-and-install)
 
 ## Provisioning
 
