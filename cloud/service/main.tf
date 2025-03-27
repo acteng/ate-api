@@ -21,7 +21,7 @@ locals {
       github_action_deploy = true
     }
     test = {
-      image_tag            = "0.1.0-rc3"
+      image_tag            = "0.1.0"
       github_action_deploy = false
     }
     prod = {
