@@ -36,3 +36,10 @@ module "example_client" {
   description = "Client used for API development."
   audience    = module.resource_server.identifier
 }
+
+module "update_your_capital_schemes_client" {
+  source      = "./client"
+  name        = "Update your capital schemes"
+  description = "Client used for the Update your capital schemes service."
+  audience    = module.resource_server.identifier
+}
