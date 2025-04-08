@@ -37,7 +37,7 @@ def test_cannot_access_with_invalid_issuer(authorization_server: StubAuthorizati
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
-    assert response.json() == {"detail": 'invalid_claim: Invalid claim "iss"'}
+    assert response.json() == {"detail": "invalid_claim: Invalid claim 'iss'"}
 
 
 @respx.mock
@@ -47,7 +47,7 @@ def test_cannot_access_with_invalid_audience(authorization_server: StubAuthoriza
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 403
-    assert response.json() == {"detail": 'invalid_claim: Invalid claim "aud"'}
+    assert response.json() == {"detail": "invalid_claim: Invalid claim 'aud'"}
 
 
 @respx.mock
