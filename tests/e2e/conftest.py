@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Generator
 
 import pytest
@@ -14,6 +15,12 @@ from tests.e2e.oauth import StubClient, clients
 from tests.e2e.server import Server
 
 
+@dataclass
+class _Client:
+    client_id: str
+    client_secret: str
+
+
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
     with PostgresContainer("postgres:16") as postgres:
@@ -26,8 +33,8 @@ def resource_server_identifier_fixture() -> str:
 
 
 @pytest.fixture(name="stub_client", scope="package")
-def stub_client_fixture() -> StubClient:
-    return StubClient(client_id="stub_client_id", client_secret="stub_client_secret")
+def stub_client_fixture() -> _Client:
+    return _Client(client_id="stub_client_id", client_secret="stub_client_secret")
 
 
 @pytest.fixture(name="authorization_server_settings", scope="package")
@@ -37,10 +44,10 @@ def authorization_server_settings_fixture(resource_server_identifier: str) -> oa
 
 @pytest.fixture(name="authorization_server_app", scope="package")
 def authorization_server_app_fixture(
-    authorization_server_settings: oauth.Settings, stub_client: StubClient
+    authorization_server_settings: oauth.Settings, stub_client: _Client
 ) -> Generator[FastAPI]:
     oauth.app.dependency_overrides[oauth.get_settings] = lambda: authorization_server_settings
-    clients.add(stub_client)
+    clients.add(StubClient(client_id=stub_client.client_id, client_secret=stub_client.client_secret))
     yield oauth.app
     clients.clear()
     oauth.app.dependency_overrides = {}
@@ -55,7 +62,7 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
 
 
 @pytest.fixture(name="oauth_client")
-def oauth_client_fixture(stub_client: StubClient) -> OAuth2Client:
+def oauth_client_fixture(stub_client: _Client) -> OAuth2Client:
     return OAuth2Client(
         client_id=stub_client.client_id,
         client_secret=stub_client.client_secret,
