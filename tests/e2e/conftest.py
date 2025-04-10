@@ -61,8 +61,8 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
     server.stop()
 
 
-@pytest.fixture(name="oauth_client")
-def oauth_client_fixture(test_oauth_client: _Client) -> OAuth2Client:
+@pytest.fixture(name="authorization_client")
+def authorization_client_fixture(test_oauth_client: _Client) -> OAuth2Client:
     return OAuth2Client(
         client_id=test_oauth_client.client_id,
         client_secret=test_oauth_client.client_secret,
@@ -72,10 +72,10 @@ def oauth_client_fixture(test_oauth_client: _Client) -> OAuth2Client:
 
 @pytest.fixture(name="access_token")
 def access_token_fixture(
-    authorization_server: Server, resource_server_identifier: str, oauth_client: OAuth2Client
+    authorization_server: Server, resource_server_identifier: str, authorization_client: OAuth2Client
 ) -> str:
     token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
-    token: OAuth2Token = oauth_client.fetch_token(
+    token: OAuth2Token = authorization_client.fetch_token(
         token_endpoint, grant_type="client_credentials", audience=resource_server_identifier
     )
     return str(token["access_token"])
