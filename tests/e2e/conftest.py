@@ -21,15 +21,20 @@ class _Client:
     client_secret: str
 
 
+@dataclass
+class _ResourceServer:
+    identifier: str
+
+
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
     with PostgresContainer("postgres:16") as postgres:
         yield postgres.get_connection_url(driver="pg8000")
 
 
-@pytest.fixture(name="resource_server_identifier", scope="package")
-def resource_server_identifier_fixture() -> str:
-    return "https://api.example"
+@pytest.fixture(name="resource_server", scope="package")
+def resource_server_fixture() -> _ResourceServer:
+    return _ResourceServer(identifier="https://api.example")
 
 
 @pytest.fixture(name="test_oauth_client", scope="package")
@@ -38,8 +43,8 @@ def test_oauth_client_fixture() -> _Client:
 
 
 @pytest.fixture(name="authorization_server_settings", scope="package")
-def authorization_server_settings_fixture(resource_server_identifier: str) -> oauth.Settings:
-    return oauth.Settings(resource_server_identifier=resource_server_identifier)
+def authorization_server_settings_fixture(resource_server: _ResourceServer) -> oauth.Settings:
+    return oauth.Settings(resource_server_identifier=resource_server.identifier)
 
 
 @pytest.fixture(name="authorization_server_app", scope="package")
@@ -72,25 +77,25 @@ def authorization_client_fixture(test_oauth_client: _Client) -> OAuth2Client:
 
 @pytest.fixture(name="access_token")
 def access_token_fixture(
-    authorization_server: Server, resource_server_identifier: str, authorization_client: OAuth2Client
+    authorization_server: Server, resource_server: _ResourceServer, authorization_client: OAuth2Client
 ) -> str:
     token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
     token: OAuth2Token = authorization_client.fetch_token(
-        token_endpoint, grant_type="client_credentials", audience=resource_server_identifier
+        token_endpoint, grant_type="client_credentials", audience=resource_server.identifier
     )
     return str(token["access_token"])
 
 
 @pytest.fixture(name="settings", scope="package")
 def settings_fixture(
-    database_url: str, authorization_server: Server, resource_server_identifier: str
+    database_url: str, authorization_server: Server, resource_server: _ResourceServer
 ) -> ate_api.Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
     return ate_api.Settings(
         database_url=database_url,
         create_database_schema=True,
         oidc_server_metadata_url=oidc_server_metadata_url,
-        resource_server_identifier=resource_server_identifier,
+        resource_server_identifier=resource_server.identifier,
     )
 
 
