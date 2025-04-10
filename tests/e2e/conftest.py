@@ -15,13 +15,13 @@ from tests.e2e.oauth import StubClient, clients
 from tests.e2e.server import Server
 
 
-@dataclass
+@dataclass(frozen=True)
 class _Client:
     client_id: str
     client_secret: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class _ResourceServer:
     identifier: str
 
