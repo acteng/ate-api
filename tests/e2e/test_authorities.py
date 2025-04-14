@@ -9,4 +9,8 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
-    assert response.json() == {"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"}
+    assert response.json() == {
+        "abbreviation": "LIV",
+        "fullName": "Liverpool City Region Combined Authority",
+        "bidSubmittingCapitalSchemes": "/authorities/LIV/capital-schemes/bid-submitting",
+    }

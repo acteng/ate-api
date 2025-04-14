@@ -7,7 +7,10 @@ from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
-from ate_api.routes.authorities import AuthorityModel, get_authority_repository
+from ate_api.routes.authorities.authorities import (
+    AuthorityModel,
+    get_authority_repository,
+)
 
 router = APIRouter()
 

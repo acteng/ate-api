@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.main import app
-from ate_api.routes.authorities import get_authority_repository
+from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.settings import Settings, get_settings
 from tests.integration.memory import MemoryAuthorityRepository
 from tests.integration.oauth import StubAuthorizationServer
