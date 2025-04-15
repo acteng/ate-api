@@ -1,0 +1,46 @@
+from datetime import datetime
+
+from ate_api.domain.dates import DateTimeRange
+from ate_api.main import app
+from ate_api.routes.capital_schemes import (
+    CapitalSchemeModel,
+    CapitalSchemeOverviewModel,
+)
+from ate_api.routes.dates import DateTimeRangeModel
+
+
+class TestCapitalSchemeModel:
+    def test_link_from_identifier(self) -> None:
+        assert CapitalSchemeModel.link_from_identifier("ATE00001", app) == "/capital-schemes/ATE00001"
+
+    def test_to_domain(self) -> None:
+        capital_scheme_model = CapitalSchemeModel(
+            reference="ATE00001",
+            overview=CapitalSchemeOverviewModel(
+                effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+                bid_submitting_authority="/authorities/LIV",
+            ),
+        )
+
+        capital_scheme = capital_scheme_model.to_domain()
+
+        assert capital_scheme.reference == "ATE00001"
+        (overview,) = capital_scheme.overviews
+        assert (
+            overview.effective_date == DateTimeRange(datetime(2020, 1, 1))
+            and overview.bid_submitting_authority == "LIV"
+        )
+
+
+class TestCapitalSchemeOverviewModel:
+    def test_to_domain(self) -> None:
+        overview_model = CapitalSchemeOverviewModel(
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_submitting_authority="/authorities/LIV"
+        )
+
+        overview = overview_model.to_domain()
+
+        assert (
+            overview.effective_date == DateTimeRange(datetime(2020, 1, 1))
+            and overview.bid_submitting_authority == "LIV"
+        )

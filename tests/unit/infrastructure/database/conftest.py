@@ -30,10 +30,11 @@ def data_fixture(engine: Engine) -> Generator[None]:
 def _create_schema(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(CreateSchema("authority"))
+        connection.execute(CreateSchema("capital_scheme"))
 
     BaseEntity.metadata.create_all(engine)
 
 
 def _delete_all(engine: Engine) -> None:
     with engine.begin() as connection:
-        connection.execute(text("TRUNCATE authority.authority CASCADE;"))
+        connection.execute(text("TRUNCATE authority.authority, capital_scheme.capital_scheme CASCADE;"))

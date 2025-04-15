@@ -14,3 +14,37 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
         "fullName": "Liverpool City Region Combined Authority",
         "bidSubmittingCapitalSchemes": "/authorities/LIV/capital-schemes/bid-submitting",
     }
+
+
+def test_get_authority_bid_submitting_capital_schemes(client: Client, access_token: str, app_client: AppClient) -> None:
+    app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    app_client.create_capital_scheme(
+        {
+            "reference": "ATE00001",
+            "overview": {
+                "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
+                "bidSubmittingAuthority": "/authorities/LIV",
+            },
+        }
+    )
+    app_client.create_capital_scheme(
+        {
+            "reference": "ATE00002",
+            "overview": {
+                "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
+                "bidSubmittingAuthority": "/authorities/LIV",
+            },
+        }
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting", headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            "/capital-schemes/ATE00001",
+            "/capital-schemes/ATE00002",
+        ],
+    }

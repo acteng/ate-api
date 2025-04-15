@@ -39,5 +39,6 @@ def _schema_exists(engine: Engine) -> bool:
 def _create_schema(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(CreateSchema("authority"))
+        connection.execute(CreateSchema("capital_scheme"))
 
     BaseEntity.metadata.create_all(engine)

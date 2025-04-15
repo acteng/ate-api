@@ -14,3 +14,11 @@ class AppClient:
     def delete_authorities(self) -> None:
         response = self._client.delete("/test/authorities")
         response.raise_for_status()
+
+    def create_capital_scheme(self, capital_scheme: Any) -> None:
+        response = self._client.post("/test/capital-schemes", json=capital_scheme)
+        response.raise_for_status()
+
+    def delete_capital_schemes(self) -> None:
+        response = self._client.delete("/test/capital-schemes")
+        response.raise_for_status()
