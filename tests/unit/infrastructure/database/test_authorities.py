@@ -54,7 +54,7 @@ class TestDatabaseAuthorityRepository:
         with Session(engine) as session:
             assert session.execute(select(func.count()).select_from(AuthorityEntity)).scalar_one() == 0
 
-    def test_get_by_abbreviation(self, engine: Engine) -> None:
+    def test_get(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add(
                 AuthorityEntity(
@@ -64,7 +64,7 @@ class TestDatabaseAuthorityRepository:
 
         with Session(engine) as session:
             authorities = DatabaseAuthorityRepository(session)
-            authority = authorities.get_by_abbreviation("LIV")
+            authority = authorities.get("LIV")
 
         assert (
             authority

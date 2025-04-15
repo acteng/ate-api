@@ -11,5 +11,5 @@ class MemoryAuthorityRepository(AuthorityRepository):
     def clear(self) -> None:
         self._authorities.clear()
 
-    def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
+    def get(self, abbreviation: str) -> Authority | None:
         return self._authorities.get(abbreviation)

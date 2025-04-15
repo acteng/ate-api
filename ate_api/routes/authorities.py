@@ -42,7 +42,7 @@ def get_authority(
     """
     Gets an authority.
     """
-    authority = authorities.get_by_abbreviation(abbreviation)
+    authority = authorities.get(abbreviation)
 
     if not authority:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)

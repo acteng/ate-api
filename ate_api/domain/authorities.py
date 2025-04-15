@@ -19,5 +19,5 @@ class AuthorityRepository:
     def clear(self) -> None:
         raise NotImplementedError()
 
-    def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
+    def get(self, abbreviation: str) -> Authority | None:
         raise NotImplementedError()

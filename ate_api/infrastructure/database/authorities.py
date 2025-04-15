@@ -33,7 +33,7 @@ class DatabaseAuthorityRepository(AuthorityRepository):
     def clear(self) -> None:
         self._session.execute(delete(AuthorityEntity))
 
-    def get_by_abbreviation(self, abbreviation: str) -> Authority | None:
+    def get(self, abbreviation: str) -> Authority | None:
         result = self._session.scalars(
             select(AuthorityEntity).where(AuthorityEntity.authority_abbreviation == abbreviation)
         )
