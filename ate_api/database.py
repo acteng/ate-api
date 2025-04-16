@@ -6,7 +6,7 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.ddl import CreateSchema
 
-from ate_api.infrastructure.database import BaseEntity
+from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.settings import Settings, get_settings
 
 

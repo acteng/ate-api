@@ -5,7 +5,7 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.sql.ddl import CreateSchema
 from testcontainers.postgres import PostgresContainer
 
-from ate_api.infrastructure.database import BaseEntity
+from ate_api.infrastructure.database.base import BaseEntity
 
 
 @pytest.fixture(name="database_url", scope="package")

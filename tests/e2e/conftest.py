@@ -8,14 +8,15 @@ from fastapi import FastAPI
 from httpx import Client
 from testcontainers.postgres import PostgresContainer
 
-from ate_api import Settings, app, get_settings
+from ate_api.main import app
+from ate_api.settings import Settings, get_settings
 from tests.e2e import routes
 from tests.e2e.app_client import AppClient
-from tests.e2e.oauth import Settings as oauth_Settings
-from tests.e2e.oauth import StubClient
-from tests.e2e.oauth import app as oauth_app
-from tests.e2e.oauth import clients
-from tests.e2e.oauth import get_settings as oauth_get_settings
+from tests.e2e.oauth.app import app as oauth_app
+from tests.e2e.oauth.app import clients
+from tests.e2e.oauth.clients import StubClient
+from tests.e2e.oauth.settings import Settings as oauth_Settings
+from tests.e2e.oauth.settings import get_settings as oauth_get_settings
 from tests.e2e.server import Server
 
 

@@ -1,8 +1,11 @@
 from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
 
-from ate_api.domain import Authority
-from ate_api.infrastructure.database import AuthorityEntity, DatabaseAuthorityRepository
+from ate_api.domain.authorities import Authority
+from ate_api.infrastructure.database.authorities import (
+    AuthorityEntity,
+    DatabaseAuthorityRepository,
+)
 
 
 class TestAuthorityEntity:

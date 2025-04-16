@@ -1,4 +1,4 @@
-from ate_api.domain import Authority
+from ate_api.domain.authorities import Authority
 
 
 class TestAuthority:

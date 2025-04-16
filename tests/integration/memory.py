@@ -1,4 +1,4 @@
-from ate_api.domain import Authority, AuthorityRepository
+from ate_api.domain.authorities import Authority, AuthorityRepository
 
 
 class MemoryAuthorityRepository(AuthorityRepository):

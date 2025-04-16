@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-from ate_api.domain import Authority, AuthorityRepository
+from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.infrastructure.database.base import BaseEntity
 
 
