@@ -8,10 +8,14 @@ from fastapi import FastAPI
 from httpx import Client
 from testcontainers.postgres import PostgresContainer
 
-import ate_api
-from tests.e2e import oauth, routes
+from ate_api import Settings, app, get_settings
+from tests.e2e import routes
 from tests.e2e.app_client import AppClient
-from tests.e2e.oauth import StubClient, clients
+from tests.e2e.oauth import Settings as oauth_Settings
+from tests.e2e.oauth import StubClient
+from tests.e2e.oauth import app as oauth_app
+from tests.e2e.oauth import clients
+from tests.e2e.oauth import get_settings as oauth_get_settings
 from tests.e2e.server import Server
 
 
@@ -43,19 +47,19 @@ def test_oauth_client_fixture() -> _Client:
 
 
 @pytest.fixture(name="authorization_server_settings", scope="package")
-def authorization_server_settings_fixture(resource_server: _ResourceServer) -> oauth.Settings:
-    return oauth.Settings(resource_server_identifier=resource_server.identifier)
+def authorization_server_settings_fixture(resource_server: _ResourceServer) -> oauth_Settings:
+    return oauth_Settings(resource_server_identifier=resource_server.identifier)
 
 
 @pytest.fixture(name="authorization_server_app", scope="package")
 def authorization_server_app_fixture(
-    authorization_server_settings: oauth.Settings, test_oauth_client: _Client
+    authorization_server_settings: oauth_Settings, test_oauth_client: _Client
 ) -> Generator[FastAPI]:
-    oauth.app.dependency_overrides[oauth.get_settings] = lambda: authorization_server_settings
+    oauth_app.dependency_overrides[oauth_get_settings] = lambda: authorization_server_settings
     clients.add(StubClient(client_id=test_oauth_client.client_id, client_secret=test_oauth_client.client_secret))
-    yield oauth.app
+    yield oauth_app
     clients.clear()
-    oauth.app.dependency_overrides = {}
+    oauth_app.dependency_overrides = {}
 
 
 @pytest.fixture(name="authorization_server", scope="package")
@@ -87,11 +91,9 @@ def access_token_fixture(
 
 
 @pytest.fixture(name="settings", scope="package")
-def settings_fixture(
-    database_url: str, authorization_server: Server, resource_server: _ResourceServer
-) -> ate_api.Settings:
+def settings_fixture(database_url: str, authorization_server: Server, resource_server: _ResourceServer) -> Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
-    return ate_api.Settings(
+    return Settings(
         database_url=database_url,
         create_database_schema=True,
         oidc_server_metadata_url=oidc_server_metadata_url,
@@ -100,11 +102,11 @@ def settings_fixture(
 
 
 @pytest.fixture(name="app", scope="package")
-def app_fixture(settings: ate_api.Settings) -> Generator[FastAPI]:
-    ate_api.app.dependency_overrides[ate_api.get_settings] = lambda: settings
-    ate_api.app.include_router(routes.router)
-    yield ate_api.app
-    ate_api.app.dependency_overrides = {}
+def app_fixture(settings: Settings) -> Generator[FastAPI]:
+    app.dependency_overrides[get_settings] = lambda: settings
+    app.include_router(routes.router)
+    yield app
+    app.dependency_overrides = {}
 
 
 @pytest.fixture(name="server", scope="package")
