@@ -13,6 +13,7 @@ class HTTPError(BaseModel):
 app = FastAPI(
     title="ATE API",
     description="The Active Travel England Web API.",
+    version="0.2.0",
     dependencies=[Depends(authorize)],
     responses={HTTP_403_FORBIDDEN: {"model": HTTPError}},
 )
