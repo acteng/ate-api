@@ -32,6 +32,9 @@ class CapitalSchemeEntity(BaseEntity):
             ],
         )
 
+    def to_domain(self) -> CapitalScheme:
+        return CapitalScheme(reference=self.scheme_reference)
+
 
 class CapitalSchemeOverviewEntity(BaseEntity):
     __tablename__ = "capital_scheme_overview"
@@ -63,6 +66,13 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     def clear(self) -> None:
         self._session.execute(delete(CapitalSchemeOverviewEntity))
         self._session.execute(delete(CapitalSchemeEntity))
+
+    def get(self, reference: str) -> CapitalScheme | None:
+        result = self._session.scalars(
+            select(CapitalSchemeEntity).where(CapitalSchemeEntity.scheme_reference == reference)
+        )
+        row = result.one_or_none()
+        return row.to_domain() if row else None
 
     def get_references_by_bid_submitting_authority(self, authority_abbreviation: str) -> list[str]:
         result = self._session.scalars(

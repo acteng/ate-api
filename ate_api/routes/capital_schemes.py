@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 from sqlalchemy.orm import Session
 from starlette.applications import Starlette
+from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
 from ate_api.domain.capital_schemes import (
@@ -57,9 +58,16 @@ def get_capital_scheme_repository(session: Annotated[Session, Depends(get_sessio
     return DatabaseCapitalSchemeRepository(session)
 
 
-@router.get("/capital-schemes/{reference}", summary="Get capital scheme")
-def get_capital_scheme(reference: str) -> None:
+@router.get("/capital-schemes/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})
+def get_capital_scheme(
+    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)], reference: str
+) -> dict[str, str]:
     """
     Gets a capital scheme.
     """
-    pass
+    capital_scheme = capital_schemes.get(reference)
+
+    if not capital_scheme:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
+    return {"reference": capital_scheme.reference}

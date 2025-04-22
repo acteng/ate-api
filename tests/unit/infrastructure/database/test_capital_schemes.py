@@ -36,6 +36,13 @@ class TestCapitalSchemeEntity:
             and overview_entity.effective_date_to is None
         )
 
+    def test_to_domain(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(scheme_reference="ATE00001")
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.reference == "ATE00001"
+
 
 class TestCapitalSchemeOverviewEntity:
     def test_from_domain(self) -> None:
@@ -112,6 +119,23 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             assert session.execute(select(func.count()).select_from(CapitalSchemeEntity)).scalar_one() == 0
+
+    def test_get(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add(CapitalSchemeEntity(scheme_reference="ATE00001"))
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert capital_scheme and capital_scheme.reference == "ATE00001"
+
+    def test_get_when_not_found(self, engine: Engine) -> None:
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert not capital_scheme
 
     def test_get_references_by_bid_submitting_authority(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
