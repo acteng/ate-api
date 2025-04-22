@@ -74,3 +74,10 @@ class TestDatabaseAuthorityRepository:
             and authority.abbreviation == "LIV"
             and authority.full_name == "Liverpool City Region Combined Authority"
         )
+
+    def test_get_when_not_found(self, engine: Engine) -> None:
+        with Session(engine) as session:
+            authorities = DatabaseAuthorityRepository(session)
+            authority = authorities.get("LIV")
+
+        assert not authority
