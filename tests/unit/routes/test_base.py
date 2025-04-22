@@ -1,0 +1,2 @@
+class TestBaseModel:
+    pass

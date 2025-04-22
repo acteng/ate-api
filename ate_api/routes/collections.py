@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from ate_api.routes.base import BaseModel
 
 
 class CollectionModel[T](BaseModel):
