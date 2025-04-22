@@ -13,13 +13,11 @@ from ate_api.routes.capital_schemes import (
 )
 from ate_api.routes.collections import CollectionModel
 
-router = APIRouter()
+router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 
 
 @router.get(
-    "/authorities/{abbreviation}/capital-schemes/bid-submitting",
-    summary="Get authority bid submitting capital schemes",
-    responses={HTTP_404_NOT_FOUND: {}},
+    "/bid-submitting", summary="Get authority bid submitting capital schemes", responses={HTTP_404_NOT_FOUND: {}}
 )
 def get_authority_bid_submitting_capital_schemes(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],

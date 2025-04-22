@@ -17,10 +17,10 @@ from ate_api.routes.capital_schemes import (
     get_capital_scheme_repository,
 )
 
-router = APIRouter()
+router = APIRouter(prefix="/test")
 
 
-@router.post("/test/authorities", status_code=HTTP_201_CREATED, response_class=Response)
+@router.post("/authorities", status_code=HTTP_201_CREATED, response_class=Response)
 def create_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
     session: Annotated[Session, Depends(get_session)],
@@ -30,7 +30,7 @@ def create_authority(
     session.commit()
 
 
-@router.delete("/test/authorities", status_code=HTTP_204_NO_CONTENT)
+@router.delete("/authorities", status_code=HTTP_204_NO_CONTENT)
 def delete_authorities(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
     session: Annotated[Session, Depends(get_session)],
@@ -40,7 +40,7 @@ def delete_authorities(
     return Response(status_code=HTTP_204_NO_CONTENT)
 
 
-@router.post("/test/capital-schemes", status_code=HTTP_201_CREATED, response_class=Response)
+@router.post("/capital-schemes", status_code=HTTP_201_CREATED, response_class=Response)
 def create_capital_scheme(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     session: Annotated[Session, Depends(get_session)],
@@ -50,7 +50,7 @@ def create_capital_scheme(
     session.commit()
 
 
-@router.delete("/test/capital-schemes", status_code=HTTP_204_NO_CONTENT)
+@router.delete("/capital-schemes", status_code=HTTP_204_NO_CONTENT)
 def delete_capital_schemes(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     session: Annotated[Session, Depends(get_session)],

@@ -46,14 +46,14 @@ class CapitalSchemeOverviewModel(BaseModel):
         )
 
 
-router = APIRouter(tags=["capital-schemes"])
+router = APIRouter(prefix="/capital-schemes", tags=["capital-schemes"])
 
 
 def get_capital_scheme_repository(session: Annotated[Session, Depends(get_session)]) -> CapitalSchemeRepository:
     return DatabaseCapitalSchemeRepository(session)
 
 
-@router.get("/capital-schemes/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})
+@router.get("/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})
 def get_capital_scheme(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)], reference: str
 ) -> dict[str, str]:

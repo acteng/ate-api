@@ -51,7 +51,7 @@ def get_authority_repository(session: Annotated[Session, Depends(get_session)]) 
     return DatabaseAuthorityRepository(session)
 
 
-@router.get("/authorities/{abbreviation}", summary="Get authority", responses={HTTP_404_NOT_FOUND: {}})
+@router.get("/{abbreviation}", summary="Get authority", responses={HTTP_404_NOT_FOUND: {}})
 def get_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], request: Request, abbreviation: str
 ) -> AuthorityModel:
