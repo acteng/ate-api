@@ -35,7 +35,7 @@ class AuthorityModel(BaseModel):
 
     @classmethod
     def from_domain(cls, authority: Authority, app: Starlette) -> AuthorityModel:
-        return AuthorityModel(
+        return cls(
             abbreviation=authority.abbreviation,
             full_name=authority.full_name,
             bid_submitting_capital_schemes=app.url_path_for(
