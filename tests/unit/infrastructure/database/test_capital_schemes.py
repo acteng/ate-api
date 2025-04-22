@@ -101,18 +101,18 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_clear(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(
-                AuthorityEntity(
-                    authority_id=1,
-                    authority_full_name="Liverpool City Region Combined Authority",
-                    authority_abbreviation="LIV",
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
-                )
+            session.add_all(
+                [
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                ]
             )
 
         with Session(engine) as session, session.begin():
@@ -141,37 +141,31 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_references_by_bid_submitting_authority(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(
-                AuthorityEntity(
-                    authority_id=1,
-                    authority_full_name="Liverpool City Region Combined Authority",
-                    authority_abbreviation="LIV",
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=2, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
-                )
-            )
-            session.add(
-                AuthorityEntity(
-                    authority_id=2,
-                    authority_full_name="West Yorkshire Combined Authority",
-                    authority_abbreviation="WYO",
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=3, scheme_reference="ATE00003"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=3, bid_submitting_authority_id=2, effective_date_from=datetime(2020, 1, 1)
-                )
+            session.add_all(
+                [
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=2, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                    AuthorityEntity(
+                        authority_id=2,
+                        authority_full_name="West Yorkshire Combined Authority",
+                        authority_abbreviation="WYO",
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=3, scheme_reference="ATE00003"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=3, bid_submitting_authority_id=2, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                ]
             )
 
         with Session(engine) as session:
@@ -182,33 +176,29 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_references_by_bid_submitting_authority_uses_current_overview(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(
-                AuthorityEntity(
-                    authority_id=1,
-                    authority_full_name="Liverpool City Region Combined Authority",
-                    authority_abbreviation="LIV",
-                )
-            )
-            session.add(
-                AuthorityEntity(
-                    authority_id=2,
-                    authority_full_name="West Yorkshire Combined Authority",
-                    authority_abbreviation="WYO",
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=1,
-                    bid_submitting_authority_id=1,
-                    effective_date_from=datetime(2020, 1, 1),
-                    effective_date_to=datetime(2020, 2, 1),
-                )
-            )
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=1, bid_submitting_authority_id=2, effective_date_from=datetime(2020, 2, 1)
-                )
+            session.add_all(
+                [
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    AuthorityEntity(
+                        authority_id=2,
+                        authority_full_name="West Yorkshire Combined Authority",
+                        authority_abbreviation="WYO",
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        bid_submitting_authority_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_to=datetime(2020, 2, 1),
+                    ),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1, bid_submitting_authority_id=2, effective_date_from=datetime(2020, 2, 1)
+                    ),
+                ]
             )
 
         with Session(engine) as session:
@@ -219,24 +209,22 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_references_by_bid_submitting_authority_orders_by_reference(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(
-                AuthorityEntity(
-                    authority_id=1,
-                    authority_full_name="Liverpool City Region Combined Authority",
-                    authority_abbreviation="LIV",
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=2, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
-                )
-            )
-            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
-            session.add(
-                CapitalSchemeOverviewEntity(
-                    capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
-                )
+            session.add_all(
+                [
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=2, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                ]
             )
 
         with Session(engine) as session:
