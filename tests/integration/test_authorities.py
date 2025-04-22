@@ -27,7 +27,7 @@ def test_get_authority(authorities: AuthorityRepository, client: TestClient, acc
 
 
 @respx.mock
-def test_get_authority_when_not_found(authorities: AuthorityRepository, client: TestClient, access_token: str) -> None:
+def test_get_authority_when_not_found(client: TestClient, access_token: str) -> None:
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 404
