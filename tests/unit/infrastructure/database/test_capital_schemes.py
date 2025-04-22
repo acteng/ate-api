@@ -17,7 +17,7 @@ class TestCapitalSchemeEntity:
     def test_from_domain(self) -> None:
         capital_scheme = CapitalScheme(reference="ATE00001")
 
-        capital_scheme_entity = CapitalSchemeEntity.from_domain(capital_scheme, {"LIV": 1})
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(capital_scheme, {})
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
 
