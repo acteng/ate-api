@@ -5,10 +5,12 @@ from sqlalchemy.orm import Session
 
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeOverview
 from ate_api.domain.dates import DateTimeRange
-from ate_api.infrastructure.database.authorities import AuthorityEntity
-from ate_api.infrastructure.database.capital_schemes import (
+from ate_api.infrastructure.database import (
+    AuthorityEntity,
     CapitalSchemeEntity,
     CapitalSchemeOverviewEntity,
+)
+from ate_api.infrastructure.database.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
 
