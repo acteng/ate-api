@@ -9,7 +9,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
         {
             "reference": "ATE00001",
             "overview": {
-                "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
+                "effectiveDate": {"from": "2020-01-01T00:00:00Z"},
                 "bidSubmittingAuthority": "/authorities/LIV",
             },
         }
@@ -18,4 +18,10 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
-    assert response.json() == {"reference": "ATE00001"}
+    assert response.json() == {
+        "reference": "ATE00001",
+        "overview": {
+            "effectiveDate": {"from": "2020-01-01T00:00:00Z", "to": None},
+            "bidSubmittingAuthority": "/authorities/LIV",
+        },
+    }

@@ -3,16 +3,24 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, delete, select
-from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+from sqlalchemy.orm import (
+    Mapped,
+    Session,
+    joinedload,
+    mapped_column,
+    relationship,
+    selectinload,
+)
 
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
     CapitalSchemeOverview,
     CapitalSchemeRepository,
 )
+from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
-from ate_api.infrastructure.database.dates import zoned_to_local
+from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 
 
 class CapitalSchemeEntity(BaseEntity):
@@ -34,7 +42,12 @@ class CapitalSchemeEntity(BaseEntity):
         )
 
     def to_domain(self) -> CapitalScheme:
-        return CapitalScheme(reference=self.scheme_reference)
+        capital_scheme = CapitalScheme(reference=self.scheme_reference)
+
+        for overview in self.capital_scheme_overviews:
+            capital_scheme.update_overview(overview.to_domain())
+
+        return capital_scheme
 
 
 class CapitalSchemeOverviewEntity(BaseEntity):
@@ -44,6 +57,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     capital_scheme_overview_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
     bid_submitting_authority_id = mapped_column(ForeignKey(AuthorityEntity.authority_id), nullable=False)
+    bid_submitting_authority: Mapped[AuthorityEntity] = relationship()
     effective_date_from: Mapped[datetime]
     effective_date_to: Mapped[datetime | None]
 
@@ -53,6 +67,15 @@ class CapitalSchemeOverviewEntity(BaseEntity):
             bid_submitting_authority_id=authority_ids[overview.bid_submitting_authority],
             effective_date_from=zoned_to_local(overview.effective_date.from_),
             effective_date_to=zoned_to_local(overview.effective_date.to) if overview.effective_date.to else None,
+        )
+
+    def to_domain(self) -> CapitalSchemeOverview:
+        return CapitalSchemeOverview(
+            effective_date=DateTimeRange(
+                local_to_zoned(self.effective_date_from),
+                local_to_zoned(self.effective_date_to) if self.effective_date_to else None,
+            ),
+            bid_submitting_authority=self.bid_submitting_authority.authority_abbreviation,
         )
 
 
@@ -70,7 +93,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
     def get(self, reference: str) -> CapitalScheme | None:
         result = self._session.scalars(
-            select(CapitalSchemeEntity).where(CapitalSchemeEntity.scheme_reference == reference)
+            select(CapitalSchemeEntity)
+            .options(
+                selectinload(CapitalSchemeEntity.capital_scheme_overviews),
+                joinedload(
+                    CapitalSchemeEntity.capital_scheme_overviews,
+                    CapitalSchemeOverviewEntity.bid_submitting_authority,
+                ),
+            )
+            .where(CapitalSchemeEntity.scheme_reference == reference)
         )
         row = result.one_or_none()
         return row.to_domain() if row else None

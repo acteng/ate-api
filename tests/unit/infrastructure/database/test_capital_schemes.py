@@ -45,6 +45,24 @@ class TestCapitalSchemeEntity:
 
         assert capital_scheme.reference == "ATE00001"
 
+    def test_to_domain_sets_overview(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[
+                CapitalSchemeOverviewEntity(
+                    bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
+                    effective_date_from=datetime(2020, 1, 1),
+                )
+            ],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        (overview,) = capital_scheme.overviews
+        assert overview.bid_submitting_authority == "LIV" and overview.effective_date == DateTimeRange(
+            datetime(2020, 1, 1, tzinfo=timezone.utc)
+        )
+
 
 class TestCapitalSchemeOverviewEntity:
     def test_from_domain(self) -> None:
@@ -69,7 +87,7 @@ class TestCapitalSchemeOverviewEntity:
 
         assert overview_entity.effective_date_to is None
 
-    def test_from_domain_localises_dates(self) -> None:
+    def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(
                 datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
@@ -82,6 +100,44 @@ class TestCapitalSchemeOverviewEntity:
         assert overview_entity.effective_date_from == datetime(
             2020, 6, 1, 13
         ) and overview_entity.effective_date_to == datetime(2020, 7, 1, 13)
+
+    def test_to_domain(self) -> None:
+        overview_entity = CapitalSchemeOverviewEntity(
+            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
+            effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
+        )
+
+        overview = overview_entity.to_domain()
+
+        assert (
+            overview.effective_date
+            == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc))
+            and overview.bid_submitting_authority == "LIV"
+        )
+
+    def test_to_domain_when_current(self) -> None:
+        overview_entity = CapitalSchemeOverviewEntity(
+            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
+            effective_date_from=datetime(2020, 1, 1),
+        )
+
+        overview = overview_entity.to_domain()
+
+        assert overview.effective_date.to is None
+
+    def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
+        overview_entity = CapitalSchemeOverviewEntity(
+            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
+            effective_date_from=datetime(2020, 6, 1, 13),
+            effective_date_to=datetime(2020, 7, 1, 13),
+        )
+
+        overview = overview_entity.to_domain()
+
+        assert overview.effective_date == DateTimeRange(
+            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+        )
 
 
 class TestDatabaseCapitalSchemeRepository:
@@ -154,6 +210,33 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = capital_schemes.get("ATE00001")
 
         assert capital_scheme and capital_scheme.reference == "ATE00001"
+
+    def test_get_overview(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1, bid_submitting_authority_id=1, effective_date_from=datetime(2020, 1, 1)
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert capital_scheme
+        (overview,) = capital_scheme.overviews
+        assert (
+            overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc))
+            and overview.bid_submitting_authority == "LIV"
+        )
 
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:

@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.applications import Starlette
+from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
@@ -29,6 +30,13 @@ class CapitalSchemeModel(BaseModel):
     def link_from_identifier(reference: str, app: Starlette) -> str:
         return app.url_path_for("get_capital_scheme", reference=reference)
 
+    @classmethod
+    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeModel:
+        return cls(
+            reference=capital_scheme.reference,
+            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, app),
+        )
+
     def to_domain(self) -> CapitalScheme:
         capital_scheme = CapitalScheme(reference=self.reference)
         capital_scheme.update_overview(self.overview.to_domain())
@@ -38,6 +46,13 @@ class CapitalSchemeModel(BaseModel):
 class CapitalSchemeOverviewModel(BaseModel):
     effective_date: DateTimeRangeModel
     bid_submitting_authority: str
+
+    @classmethod
+    def from_domain(cls, overview: CapitalSchemeOverview, app: Starlette) -> CapitalSchemeOverviewModel:
+        return cls(
+            effective_date=DateTimeRangeModel.from_domain(overview.effective_date),
+            bid_submitting_authority=app.url_path_for("get_authority", abbreviation=overview.bid_submitting_authority),
+        )
 
     def to_domain(self) -> CapitalSchemeOverview:
         return CapitalSchemeOverview(
@@ -55,8 +70,10 @@ def get_capital_scheme_repository(session: Annotated[Session, Depends(get_sessio
 
 @router.get("/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})
 def get_capital_scheme(
-    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)], reference: str
-) -> dict[str, str]:
+    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
+    request: Request,
+    reference: str,
+) -> CapitalSchemeModel:
     """
     Gets a capital scheme.
     """
@@ -65,4 +82,4 @@ def get_capital_scheme(
     if not capital_scheme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    return {"reference": capital_scheme.reference}
+    return CapitalSchemeModel.from_domain(capital_scheme, request.app)

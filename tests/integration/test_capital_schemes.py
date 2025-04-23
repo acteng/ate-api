@@ -1,17 +1,40 @@
+from datetime import datetime, timezone
+
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.authorities import Authority, AuthorityRepository
+from ate_api.domain.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeOverview,
+    CapitalSchemeRepository,
+)
+from ate_api.domain.dates import DateTimeRange
 
 
 @respx.mock
-def test_get_capital_scheme(capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str) -> None:
-    capital_schemes.add(CapitalScheme(reference="ATE00001"))
+def test_get_capital_scheme(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+    capital_scheme = CapitalScheme(reference="ATE00001")
+    capital_scheme.update_overview(
+        CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)), bid_submitting_authority="LIV"
+        )
+    )
+    capital_schemes.add(capital_scheme)
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
-    assert response.json() == {"reference": "ATE00001"}
+    assert response.json() == {
+        "reference": "ATE00001",
+        "overview": {
+            "effectiveDate": {"from": "2020-01-01T00:00:00Z", "to": None},
+            "bidSubmittingAuthority": "/authorities/LIV",
+        },
+    }
 
 
 @respx.mock

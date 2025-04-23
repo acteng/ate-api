@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeOverview
 from ate_api.domain.dates import DateTimeRange
 from ate_api.main import app
 from ate_api.routes.capital_schemes import (
@@ -12,6 +13,27 @@ from ate_api.routes.dates import DateTimeRangeModel
 class TestCapitalSchemeModel:
     def test_link_from_identifier(self) -> None:
         assert CapitalSchemeModel.link_from_identifier("ATE00001", app) == "/capital-schemes/ATE00001"
+
+    def test_from_domain(self) -> None:
+        capital_scheme = CapitalScheme(reference="ATE00001")
+        capital_scheme.update_overview(
+            CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)), bid_submitting_authority="WYO"
+            )
+        )
+        capital_scheme.update_overview(
+            CapitalSchemeOverview(effective_date=DateTimeRange(datetime(2020, 2, 1)), bid_submitting_authority="LIV")
+        )
+
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, app)
+
+        assert capital_scheme_model == CapitalSchemeModel(
+            reference="ATE00001",
+            overview=CapitalSchemeOverviewModel(
+                effective_date=DateTimeRangeModel(from_=datetime(2020, 2, 1)),
+                bid_submitting_authority="/authorities/LIV",
+            ),
+        )
 
     def test_to_domain(self) -> None:
         capital_scheme_model = CapitalSchemeModel(
@@ -33,6 +55,17 @@ class TestCapitalSchemeModel:
 
 
 class TestCapitalSchemeOverviewModel:
+    def test_from_domain(self) -> None:
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+        )
+
+        overview_model = CapitalSchemeOverviewModel.from_domain(overview, app)
+
+        assert overview_model == CapitalSchemeOverviewModel(
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_submitting_authority="/authorities/LIV"
+        )
+
     def test_to_domain(self) -> None:
         overview_model = CapitalSchemeOverviewModel(
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_submitting_authority="/authorities/LIV"
