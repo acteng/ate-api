@@ -21,11 +21,11 @@ locals {
       github_action_deploy = true
     }
     test = {
-      image_tag            = "0.2.0-rc3"
+      image_tag            = "0.2.0"
       github_action_deploy = false
     }
     prod = {
-      image_tag            = "0.1.1"
+      image_tag            = "0.2.0"
       github_action_deploy = false
     }
   }
