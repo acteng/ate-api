@@ -4,7 +4,7 @@ from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepositor
 
 class MemoryAuthorityRepository(AuthorityRepository):
     def __init__(self) -> None:
-        self._authorities = dict[str, Authority]()
+        self._authorities: dict[str, Authority] = {}
 
     def add(self, authority: Authority) -> None:
         self._authorities[authority.abbreviation] = authority
@@ -18,7 +18,7 @@ class MemoryAuthorityRepository(AuthorityRepository):
 
 class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     def __init__(self) -> None:
-        self._capital_schemes = dict[str, CapitalScheme]()
+        self._capital_schemes: dict[str, CapitalScheme] = {}
 
     def add(self, capital_scheme: CapitalScheme) -> None:
         self._capital_schemes[capital_scheme.reference] = capital_scheme
