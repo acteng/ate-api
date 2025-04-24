@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Engine, func, select
 from sqlalchemy.orm import Session
@@ -59,6 +59,29 @@ class TestCapitalSchemeOverviewEntity:
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
             and overview_entity.effective_date_to == datetime(2020, 2, 1)
         )
+
+    def test_from_domain_when_current(self) -> None:
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+        )
+
+        overview_entity = CapitalSchemeOverviewEntity.from_domain(overview, {"LIV": 1})
+
+        assert overview_entity.effective_date_to is None
+
+    def test_from_domain_localises_dates(self) -> None:
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(
+                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            ),
+            bid_submitting_authority="LIV",
+        )
+
+        overview_entity = CapitalSchemeOverviewEntity.from_domain(overview, {"LIV": 1})
+
+        assert overview_entity.effective_date_from == datetime(
+            2020, 6, 1, 13
+        ) and overview_entity.effective_date_to == datetime(2020, 7, 1, 13)
 
 
 class TestDatabaseCapitalSchemeRepository:

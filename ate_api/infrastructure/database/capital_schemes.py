@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes import (
 )
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.dates import datetime_to_local
 
 
 class CapitalSchemeEntity(BaseEntity):
@@ -50,8 +51,8 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     def from_domain(cls, overview: CapitalSchemeOverview, authority_ids: dict[str, int]) -> CapitalSchemeOverviewEntity:
         return cls(
             bid_submitting_authority_id=authority_ids[overview.bid_submitting_authority],
-            effective_date_from=overview.effective_date.from_,
-            effective_date_to=overview.effective_date.to,
+            effective_date_from=datetime_to_local(overview.effective_date.from_),
+            effective_date_to=datetime_to_local(overview.effective_date.to),
         )
 
 
