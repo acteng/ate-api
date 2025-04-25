@@ -9,9 +9,3 @@ def test_datetime_to_local() -> None:
     local = datetime_to_local(zoned)
 
     assert local == datetime(2020, 6, 1, 13)
-
-
-def test_datetime_to_local_when_none() -> None:
-    local = datetime_to_local(None)
-
-    assert local is None

@@ -52,7 +52,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
         return cls(
             bid_submitting_authority_id=authority_ids[overview.bid_submitting_authority],
             effective_date_from=datetime_to_local(overview.effective_date.from_),
-            effective_date_to=datetime_to_local(overview.effective_date.to),
+            effective_date_to=datetime_to_local(overview.effective_date.to) if overview.effective_date.to else None,
         )
 
 
