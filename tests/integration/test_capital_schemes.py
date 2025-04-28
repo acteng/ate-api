@@ -17,6 +17,7 @@ def test_get_capital_scheme(
         CapitalScheme(
             reference="ATE00001",
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            name="Wirral Package",
             bid_submitting_authority="LIV",
         )
     )
@@ -28,6 +29,7 @@ def test_get_capital_scheme(
         "reference": "ATE00001",
         "overview": {
             "effectiveDate": {"from": "2020-01-01T00:00:00Z", "to": None},
+            "name": "Wirral Package",
             "bidSubmittingAuthority": "/authorities/LIV",
         },
     }

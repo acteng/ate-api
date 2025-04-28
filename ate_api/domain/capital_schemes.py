@@ -4,9 +4,10 @@ from ate_api.domain.dates import DateTimeRange
 
 
 class CapitalScheme:
-    def __init__(self, reference: str, effective_date: DateTimeRange, bid_submitting_authority: str):
+    def __init__(self, reference: str, effective_date: DateTimeRange, name: str, bid_submitting_authority: str):
         self._reference = reference
         self._effective_date = effective_date
+        self._name = name
         self._bid_submitting_authority = bid_submitting_authority
 
     @property
@@ -16,6 +17,10 @@ class CapitalScheme:
     @property
     def effective_date(self) -> DateTimeRange:
         return self._effective_date
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def bid_submitting_authority(self) -> str:

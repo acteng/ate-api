@@ -10,6 +10,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "reference": "ATE00001",
             "overview": {
                 "effectiveDate": {"from": "2020-01-01T00:00:00Z"},
+                "name": "Wirral Package",
                 "bidSubmittingAuthority": "/authorities/LIV",
             },
         }
@@ -22,6 +23,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
         "reference": "ATE00001",
         "overview": {
             "effectiveDate": {"from": "2020-01-01T00:00:00Z", "to": None},
+            "name": "Wirral Package",
             "bidSubmittingAuthority": "/authorities/LIV",
         },
     }

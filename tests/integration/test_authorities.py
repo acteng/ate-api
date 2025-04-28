@@ -36,18 +36,27 @@ def test_get_authority_bid_submitting_capital_schemes(
     authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+            reference="ATE00001",
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
         )
     )
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00002", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+            reference="ATE00002",
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="School Streets",
+            bid_submitting_authority="LIV",
         )
     )
     authorities.add(Authority(abbreviation="WYO", full_name="West Yorkshire Combined Authority"))
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00003", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="WYO"
+            reference="ATE00003",
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Hospital Fields Road",
+            bid_submitting_authority="WYO",
         )
     )
 

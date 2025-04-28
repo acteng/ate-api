@@ -58,7 +58,10 @@ class TestMemoryCapitalSchemeRepository:
     def test_add(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00001",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
             )
         )
 
@@ -67,13 +70,17 @@ class TestMemoryCapitalSchemeRepository:
             capital_scheme
             and capital_scheme.reference == "ATE00001"
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
+            and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
         )
 
     def test_clear(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00001",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
             )
         )
 
@@ -84,7 +91,10 @@ class TestMemoryCapitalSchemeRepository:
     def test_get(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00001",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
             )
         )
 
@@ -94,6 +104,7 @@ class TestMemoryCapitalSchemeRepository:
             capital_scheme
             and capital_scheme.reference == "ATE00001"
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
+            and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
         )
 
@@ -105,17 +116,26 @@ class TestMemoryCapitalSchemeRepository:
     def test_get_references_by_bid_submitting_authority(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00001",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
             )
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00002", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00002",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="School Streets",
+                bid_submitting_authority="LIV",
             )
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00003", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="WYO"
+                reference="ATE00003",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Hospital Fields Road",
+                bid_submitting_authority="WYO",
             )
         )
 
@@ -128,12 +148,18 @@ class TestMemoryCapitalSchemeRepository:
     ) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00002", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00002",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
             )
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+                reference="ATE00001",
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
             )
         )
 

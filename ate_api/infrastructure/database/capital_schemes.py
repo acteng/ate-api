@@ -33,6 +33,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     capital_scheme_overview_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
     capital_scheme: Mapped[CapitalSchemeEntity] = relationship(lazy="raise")
+    scheme_name: Mapped[str]
     bid_submitting_authority_id = mapped_column(ForeignKey(AuthorityEntity.authority_id), nullable=False)
     bid_submitting_authority: Mapped[AuthorityEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
@@ -42,6 +43,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     def from_domain(cls, capital_scheme: CapitalScheme, authority_ids: dict[str, int]) -> CapitalSchemeOverviewEntity:
         return cls(
             capital_scheme=CapitalSchemeEntity(scheme_reference=capital_scheme.reference),
+            scheme_name=capital_scheme.name,
             bid_submitting_authority_id=authority_ids[capital_scheme.bid_submitting_authority],
             effective_date_from=zoned_to_local(capital_scheme.effective_date.from_),
             effective_date_to=(
@@ -56,6 +58,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
                 local_to_zoned(self.effective_date_from),
                 local_to_zoned(self.effective_date_to) if self.effective_date_to else None,
             ),
+            name=self.scheme_name,
             bid_submitting_authority=self.bid_submitting_authority.authority_abbreviation,
         )
 

@@ -23,6 +23,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             "reference": "ATE00001",
             "overview": {
                 "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
+                "name": "Wirral Package",
                 "bidSubmittingAuthority": "/authorities/LIV",
             },
         }
@@ -32,6 +33,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             "reference": "ATE00002",
             "overview": {
                 "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
+                "name": "School Streets",
                 "bidSubmittingAuthority": "/authorities/LIV",
             },
         }

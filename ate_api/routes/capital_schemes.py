@@ -39,12 +39,14 @@ class CapitalSchemeModel(BaseModel):
 
 class CapitalSchemeOverviewModel(BaseModel):
     effective_date: DateTimeRangeModel
+    name: str
     bid_submitting_authority: str
 
     @classmethod
     def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeOverviewModel:
         return cls(
             effective_date=DateTimeRangeModel.from_domain(capital_scheme.effective_date),
+            name=capital_scheme.name,
             bid_submitting_authority=app.url_path_for(
                 "get_authority", abbreviation=capital_scheme.bid_submitting_authority
             ),
@@ -54,6 +56,7 @@ class CapitalSchemeOverviewModel(BaseModel):
         return CapitalScheme(
             reference=reference,
             effective_date=self.effective_date.to_domain(),
+            name=self.name,
             bid_submitting_authority=AuthorityModel.link_to_identifier(self.bid_submitting_authority),
         )
 

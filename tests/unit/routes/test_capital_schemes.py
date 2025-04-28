@@ -16,7 +16,10 @@ class TestCapitalSchemeModel:
 
     def test_from_domain(self) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+            reference="ATE00001",
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
         )
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, app)
@@ -25,6 +28,7 @@ class TestCapitalSchemeModel:
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+                name="Wirral Package",
                 bid_submitting_authority="/authorities/LIV",
             ),
         )
@@ -34,6 +38,7 @@ class TestCapitalSchemeModel:
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+                name="Wirral Package",
                 bid_submitting_authority="/authorities/LIV",
             ),
         )
@@ -43,6 +48,7 @@ class TestCapitalSchemeModel:
         assert (
             capital_scheme.reference == "ATE00001"
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
+            and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
         )
 
@@ -50,18 +56,25 @@ class TestCapitalSchemeModel:
 class TestCapitalSchemeOverviewModel:
     def test_from_domain(self) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001", effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_submitting_authority="LIV"
+            reference="ATE00001",
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
         )
 
         overview_model = CapitalSchemeOverviewModel.from_domain(capital_scheme, app)
 
         assert overview_model == CapitalSchemeOverviewModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_submitting_authority="/authorities/LIV"
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="/authorities/LIV",
         )
 
     def test_to_domain(self) -> None:
         overview_model = CapitalSchemeOverviewModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_submitting_authority="/authorities/LIV"
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="/authorities/LIV",
         )
 
         capital_scheme = overview_model.to_domain("ATE00001")
@@ -69,5 +82,6 @@ class TestCapitalSchemeOverviewModel:
         assert (
             capital_scheme.reference == "ATE00001"
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
+            and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
         )
