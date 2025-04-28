@@ -33,5 +33,5 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         return sorted(
             reference
             for reference, capital_scheme in self._capital_schemes.items()
-            if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
+            if capital_scheme.bid_submitting_authority == authority_abbreviation
         )

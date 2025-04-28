@@ -4,30 +4,14 @@ from ate_api.domain.dates import DateTimeRange
 
 
 class CapitalScheme:
-    def __init__(self, reference: str):
+    def __init__(self, reference: str, effective_date: DateTimeRange, bid_submitting_authority: str):
         self._reference = reference
-        self._overviews: list[CapitalSchemeOverview] = []
+        self._effective_date = effective_date
+        self._bid_submitting_authority = bid_submitting_authority
 
     @property
     def reference(self) -> str:
         return self._reference
-
-    @property
-    def overview(self) -> CapitalSchemeOverview:
-        return next(overview for overview in self._overviews if not overview.effective_date.to)
-
-    @property
-    def overviews(self) -> list[CapitalSchemeOverview]:
-        return list(self._overviews)
-
-    def update_overview(self, overview: CapitalSchemeOverview) -> None:
-        self._overviews.append(overview)
-
-
-class CapitalSchemeOverview:
-    def __init__(self, effective_date: DateTimeRange, bid_submitting_authority: str):
-        self._effective_date = effective_date
-        self._bid_submitting_authority = bid_submitting_authority
 
     @property
     def effective_date(self) -> DateTimeRange:
