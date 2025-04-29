@@ -6,7 +6,7 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.ddl import CreateSchema
 
-from ate_api.infrastructure.database import BaseEntity
+from ate_api.infrastructure.database import BaseEntity, SchemeTypeEntity, SchemeTypeName
 from ate_api.settings import Settings, get_settings
 
 
@@ -16,6 +16,7 @@ def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> Engine:
 
     if settings.create_database_schema and not _schema_exists(engine):
         _create_schema(engine)
+        _create_reference_data(engine)
 
     return engine
 
@@ -42,3 +43,14 @@ def _create_schema(engine: Engine) -> None:
         connection.execute(CreateSchema("capital_scheme"))
 
     BaseEntity.metadata.create_all(engine)
+
+
+def _create_reference_data(engine: Engine) -> None:
+    with Session(engine) as session:
+        session.add_all(
+            [
+                SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
+                SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+            ]
+        )
+        session.commit()

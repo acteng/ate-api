@@ -1,11 +1,12 @@
 from datetime import datetime
 
-from ate_api.domain.capital_schemes import CapitalScheme
+from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.main import app
 from ate_api.routes.capital_schemes import (
     CapitalSchemeModel,
     CapitalSchemeOverviewModel,
+    CapitalSchemeTypeModel,
 )
 from ate_api.routes.dates import DateTimeRangeModel
 
@@ -20,6 +21,7 @@ class TestCapitalSchemeModel:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            type_=CapitalSchemeType.CONSTRUCTION,
         )
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, app)
@@ -30,6 +32,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="/authorities/LIV",
+                type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
 
@@ -40,6 +43,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="/authorities/LIV",
+                type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
 
@@ -50,7 +54,16 @@ class TestCapitalSchemeModel:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
+
+
+class TestCapitalSchemeTypeModel:
+    def test_from_domain(self) -> None:
+        assert CapitalSchemeTypeModel.from_domain(CapitalSchemeType.CONSTRUCTION) == CapitalSchemeTypeModel.CONSTRUCTION
+
+    def test_to_domain(self) -> None:
+        assert CapitalSchemeTypeModel.CONSTRUCTION.to_domain() == CapitalSchemeType.CONSTRUCTION
 
 
 class TestCapitalSchemeOverviewModel:
@@ -60,6 +73,7 @@ class TestCapitalSchemeOverviewModel:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            type_=CapitalSchemeType.CONSTRUCTION,
         )
 
         overview_model = CapitalSchemeOverviewModel.from_domain(capital_scheme, app)
@@ -68,6 +82,7 @@ class TestCapitalSchemeOverviewModel:
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="/authorities/LIV",
+            type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
     def test_to_domain(self) -> None:
@@ -75,6 +90,7 @@ class TestCapitalSchemeOverviewModel:
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="/authorities/LIV",
+            type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
         capital_scheme = overview_model.to_domain("ATE00001")
@@ -84,4 +100,5 @@ class TestCapitalSchemeOverviewModel:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )

@@ -4,7 +4,11 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityRepository
-from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeRepository,
+    CapitalSchemeType,
+)
 from ate_api.domain.dates import DateTimeRange
 
 
@@ -40,6 +44,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            type_=CapitalSchemeType.CONSTRUCTION,
         )
     )
     capital_schemes.add(
@@ -48,6 +53,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="School Streets",
             bid_submitting_authority="LIV",
+            type_=CapitalSchemeType.CONSTRUCTION,
         )
     )
     authorities.add(Authority(abbreviation="WYO", full_name="West Yorkshire Combined Authority"))
@@ -57,6 +63,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Hospital Fields Road",
             bid_submitting_authority="WYO",
+            type_=CapitalSchemeType.CONSTRUCTION,
         )
     )
 

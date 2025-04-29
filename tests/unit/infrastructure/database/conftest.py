@@ -37,4 +37,6 @@ def _create_schema(engine: Engine) -> None:
 
 def _delete_all(engine: Engine) -> None:
     with engine.begin() as connection:
-        connection.execute(text("TRUNCATE authority.authority, capital_scheme.capital_scheme CASCADE;"))
+        connection.execute(
+            text("TRUNCATE authority.authority, capital_scheme.capital_scheme, capital_scheme.scheme_type CASCADE;")
+        )

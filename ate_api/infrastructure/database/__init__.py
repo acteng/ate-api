@@ -8,3 +8,9 @@ from ate_api.infrastructure.database.capital_schemes import (
 from ate_api.infrastructure.database.capital_schemes import (
     CapitalSchemeOverviewEntity as CapitalSchemeOverviewEntity,
 )
+from ate_api.infrastructure.database.capital_schemes import (
+    SchemeTypeEntity as SchemeTypeEntity,
+)
+from ate_api.infrastructure.database.capital_schemes import (
+    SchemeTypeName as SchemeTypeName,
+)

@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from ate_api.domain.authorities import Authority
-from ate_api.domain.capital_schemes import CapitalScheme
+from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from tests.integration.memory import (
     MemoryAuthorityRepository,
@@ -62,6 +62,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
 
@@ -72,6 +73,7 @@ class TestMemoryCapitalSchemeRepository:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
 
     def test_clear(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
@@ -81,6 +83,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
 
@@ -95,6 +98,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
 
@@ -106,6 +110,7 @@ class TestMemoryCapitalSchemeRepository:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
 
     def test_get_when_not_found(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
@@ -120,6 +125,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
         capital_schemes.add(
@@ -128,6 +134,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="School Streets",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
         capital_schemes.add(
@@ -136,6 +143,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Hospital Fields Road",
                 bid_submitting_authority="WYO",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
 
@@ -152,6 +160,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
         capital_schemes.add(
@@ -160,6 +169,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
 

@@ -4,7 +4,11 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityRepository
-from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeRepository,
+    CapitalSchemeType,
+)
 from ate_api.domain.dates import DateTimeRange
 
 
@@ -19,6 +23,7 @@ def test_get_capital_scheme(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            type_=CapitalSchemeType.CONSTRUCTION,
         )
     )
 
@@ -31,6 +36,7 @@ def test_get_capital_scheme(
             "effectiveDate": {"from": "2020-01-01T00:00:00Z", "to": None},
             "name": "Wirral Package",
             "bidSubmittingAuthority": "/authorities/LIV",
+            "type": "construction",
         },
     }
 

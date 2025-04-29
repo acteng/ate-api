@@ -25,6 +25,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
                 "name": "Wirral Package",
                 "bidSubmittingAuthority": "/authorities/LIV",
+                "type": "construction",
             },
         }
     )
@@ -35,6 +36,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
                 "name": "School Streets",
                 "bidSubmittingAuthority": "/authorities/LIV",
+                "type": "construction",
             },
         }
     )

@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from enum import Enum
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import Field
 from sqlalchemy.orm import Session
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
-from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeRepository,
+    CapitalSchemeType,
+)
 from ate_api.infrastructure.database.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
@@ -37,10 +43,23 @@ class CapitalSchemeModel(BaseModel):
         return self.overview.to_domain(self.reference)
 
 
+class CapitalSchemeTypeModel(str, Enum):
+    DEVELOPMENT = "development"
+    CONSTRUCTION = "construction"
+
+    @classmethod
+    def from_domain(cls, type_: CapitalSchemeType) -> CapitalSchemeTypeModel:
+        return cls[type_.name]
+
+    def to_domain(self) -> CapitalSchemeType:
+        return CapitalSchemeType[self.name]
+
+
 class CapitalSchemeOverviewModel(BaseModel):
     effective_date: DateTimeRangeModel
     name: str
     bid_submitting_authority: str
+    type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
 
     @classmethod
     def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeOverviewModel:
@@ -50,6 +69,7 @@ class CapitalSchemeOverviewModel(BaseModel):
             bid_submitting_authority=app.url_path_for(
                 "get_authority", abbreviation=capital_scheme.bid_submitting_authority
             ),
+            type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
         )
 
     def to_domain(self, reference: str) -> CapitalScheme:
@@ -58,6 +78,7 @@ class CapitalSchemeOverviewModel(BaseModel):
             effective_date=self.effective_date.to_domain(),
             name=self.name,
             bid_submitting_authority=AuthorityModel.link_to_identifier(self.bid_submitting_authority),
+            type_=self.type_.to_domain(),
         )
 
 
