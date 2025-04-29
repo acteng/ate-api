@@ -5,14 +5,43 @@ import pytest
 from ate_api.domain.authorities import Authority
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgramme
 from tests.integration.memory import (
     MemoryAuthorityRepository,
     MemoryCapitalSchemeRepository,
+    MemoryFundingProgrammeRepository,
 )
 
 
 class TestMemoryFundingProgrammeRepository:
-    pass
+    @pytest.fixture(name="funding_programmes")
+    def funding_programmes_fixture(self) -> MemoryFundingProgrammeRepository:
+        return MemoryFundingProgrammeRepository()
+
+    def test_add(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        funding_programmes.add(FundingProgramme(code="ATF3"))
+
+        funding_programme = funding_programmes.get("ATF3")
+        assert funding_programme and funding_programme.code == "ATF3"
+
+    def test_clear(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        funding_programmes.add(FundingProgramme(code="ATF3"))
+
+        funding_programmes.clear()
+
+        assert not funding_programmes.get("ATF3")
+
+    def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        funding_programmes.add(FundingProgramme(code="ATF3"))
+
+        funding_programme = funding_programmes.get("ATF3")
+
+        assert funding_programme and funding_programme.code == "ATF3"
+
+    def test_get_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        funding_programme = funding_programmes.get("ATF3")
+
+        assert not funding_programme
 
 
 class TestMemoryAuthorityRepository:

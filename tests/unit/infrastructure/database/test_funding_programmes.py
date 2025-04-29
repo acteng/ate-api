@@ -16,6 +16,13 @@ class TestFundingProgrammeEntity:
 
         assert funding_programme_entity.funding_programme_code == "ATF3"
 
+    def test_to_domain(self) -> None:
+        funding_programme_entity = FundingProgrammeEntity(funding_programme_code="ATF3")
+
+        funding_programme = funding_programme_entity.to_domain()
+
+        assert funding_programme.code == "ATF3"
+
 
 class TestDatabaseFundingProgrammeRepository:
     def test_add(self, engine: Engine) -> None:
@@ -37,3 +44,20 @@ class TestDatabaseFundingProgrammeRepository:
 
         with Session(engine) as session:
             assert session.execute(select(func.count()).select_from(FundingProgrammeEntity)).scalar_one() == 0
+
+    def test_get(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add(FundingProgrammeEntity(funding_programme_code="ATF3"))
+
+        with Session(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            funding_programme = funding_programmes.get("ATF3")
+
+        assert funding_programme and funding_programme.code == "ATF3"
+
+    def test_get_when_not_found(self, engine: Engine) -> None:
+        with Session(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            funding_programme = funding_programmes.get("ATF3")
+
+        assert not funding_programme

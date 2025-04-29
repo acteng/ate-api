@@ -1,10 +1,23 @@
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepository
-from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.domain.funding_programmes import (
+    FundingProgramme,
+    FundingProgrammeRepository,
+)
 
 
 class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
-    pass
+    def __init__(self) -> None:
+        self._funding_programmes: dict[str, FundingProgramme] = {}
+
+    def add(self, funding_programme: FundingProgramme) -> None:
+        self._funding_programmes[funding_programme.code] = funding_programme
+
+    def clear(self) -> None:
+        self._funding_programmes.clear()
+
+    def get(self, code: str) -> FundingProgramme | None:
+        return self._funding_programmes.get(code)
 
 
 class MemoryAuthorityRepository(AuthorityRepository):

@@ -13,3 +13,6 @@ class FundingProgrammeRepository:
 
     def clear(self) -> None:
         raise NotImplementedError()
+
+    def get(self, code: str) -> FundingProgramme | None:
+        raise NotImplementedError()

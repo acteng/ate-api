@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -28,6 +30,10 @@ class FundingProgrammeModel(BaseModel):
 
         return code
 
+    @classmethod
+    def from_domain(cls, funding_programme: FundingProgramme) -> FundingProgrammeModel:
+        return cls(code=funding_programme.code)
+
     def to_domain(self) -> FundingProgramme:
         return FundingProgramme(code=self.code)
 
@@ -40,8 +46,15 @@ def get_funding_programme_repository(session: Annotated[Session, Depends(get_ses
 
 
 @router.get("/{code}", summary="Get funding programme", responses={HTTP_404_NOT_FOUND: {}})
-def get_funding_programme(code: str) -> FundingProgrammeModel:
+def get_funding_programme(
+    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)], code: str
+) -> FundingProgrammeModel:
     """
     Gets a funding programme.
     """
-    raise NotImplementedError()
+    funding_programme = funding_programmes.get(code)
+
+    if not funding_programme:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
+    return FundingProgrammeModel.from_domain(funding_programme)

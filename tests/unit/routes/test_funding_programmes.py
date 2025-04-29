@@ -1,5 +1,6 @@
 import pytest
 
+from ate_api.domain.funding_programmes import FundingProgramme
 from ate_api.routes.funding_programmes import FundingProgrammeModel
 
 
@@ -10,6 +11,13 @@ class TestFundingProgrammeModel:
     def test_link_to_identifier_when_invalid(self) -> None:
         with pytest.raises(ValueError, match="Invalid funding programme link: not a link"):
             FundingProgrammeModel.link_to_identifier("not a link")
+
+    def test_from_domain(self) -> None:
+        funding_programme = FundingProgramme(code="ATF3")
+
+        funding_programme_model = FundingProgrammeModel.from_domain(funding_programme)
+
+        assert funding_programme_model.code == "ATF3"
 
     def test_to_domain(self) -> None:
         funding_programme_model = FundingProgrammeModel(code="ATF3")

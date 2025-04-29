@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from ate_api.domain.funding_programmes import (
@@ -21,6 +21,9 @@ class FundingProgrammeEntity(BaseEntity):
     def from_domain(cls, funding_programme: FundingProgramme) -> FundingProgrammeEntity:
         return cls(funding_programme_code=funding_programme.code)
 
+    def to_domain(self) -> FundingProgramme:
+        return FundingProgramme(code=self.funding_programme_code)
+
 
 class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
     def __init__(self, session: Session):
@@ -31,3 +34,10 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
 
     def clear(self) -> None:
         self._session.execute(delete(FundingProgrammeEntity))
+
+    def get(self, code: str) -> FundingProgramme | None:
+        result = self._session.scalars(
+            select(FundingProgrammeEntity).where(FundingProgrammeEntity.funding_programme_code == code)
+        )
+        row = result.one_or_none()
+        return row.to_domain() if row else None
