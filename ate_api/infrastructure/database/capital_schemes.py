@@ -21,6 +21,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
+from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 
 
 class CapitalSchemeEntity(BaseEntity):
@@ -61,6 +62,8 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     scheme_name: Mapped[str]
     bid_submitting_authority_id = mapped_column(ForeignKey(AuthorityEntity.authority_id), nullable=False)
     bid_submitting_authority: Mapped[AuthorityEntity] = relationship(lazy="raise")
+    funding_programme_id = mapped_column(ForeignKey(FundingProgrammeEntity.funding_programme_id), nullable=False)
+    funding_programme: Mapped[FundingProgrammeEntity] = relationship(lazy="raise")
     scheme_type_id = mapped_column(ForeignKey(SchemeTypeEntity.scheme_type_id), nullable=False)
     scheme_type: Mapped[SchemeTypeEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
@@ -68,12 +71,17 @@ class CapitalSchemeOverviewEntity(BaseEntity):
 
     @classmethod
     def from_domain(
-        cls, capital_scheme: CapitalScheme, authority_ids: dict[str, int], scheme_type_ids: dict[SchemeTypeName, int]
+        cls,
+        capital_scheme: CapitalScheme,
+        authority_ids: dict[str, int],
+        funding_programme_ids: dict[str, int],
+        scheme_type_ids: dict[SchemeTypeName, int],
     ) -> CapitalSchemeOverviewEntity:
         return cls(
             capital_scheme=CapitalSchemeEntity(scheme_reference=capital_scheme.reference),
             scheme_name=capital_scheme.name,
             bid_submitting_authority_id=authority_ids[capital_scheme.bid_submitting_authority],
+            funding_programme_id=funding_programme_ids[capital_scheme.funding_programme],
             scheme_type_id=scheme_type_ids[SchemeTypeName.from_domain(capital_scheme.type)],
             effective_date_from=zoned_to_local(capital_scheme.effective_date.from_),
             effective_date_to=(
@@ -90,6 +98,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
             ),
             name=self.scheme_name,
             bid_submitting_authority=self.bid_submitting_authority.authority_abbreviation,
+            funding_programme=self.funding_programme.funding_programme_code,
             type_=self.scheme_type.scheme_type_name.to_domain(),
         )
 
@@ -100,8 +109,13 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
     def add(self, capital_scheme: CapitalScheme) -> None:
         authority_ids = self._get_authority_ids(capital_scheme)
+        funding_programme_ids = self._get_funding_programme_ids(capital_scheme)
         scheme_type_ids = self._get_scheme_type_ids(capital_scheme)
-        self._session.add(CapitalSchemeOverviewEntity.from_domain(capital_scheme, authority_ids, scheme_type_ids))
+        self._session.add(
+            CapitalSchemeOverviewEntity.from_domain(
+                capital_scheme, authority_ids, funding_programme_ids, scheme_type_ids
+            )
+        )
 
     def clear(self) -> None:
         self._session.execute(delete(CapitalSchemeOverviewEntity))
@@ -113,6 +127,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .options(
                 joinedload(CapitalSchemeOverviewEntity.capital_scheme),
                 joinedload(CapitalSchemeOverviewEntity.bid_submitting_authority),
+                joinedload(CapitalSchemeOverviewEntity.funding_programme),
                 joinedload(CapitalSchemeOverviewEntity.scheme_type),
             )
             .join(CapitalSchemeEntity)
@@ -143,6 +158,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {row.authority_abbreviation: row.authority_id for row in rows}
+
+    def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:
+        funding_programme_codes = [capital_scheme.funding_programme]
+        rows = self._session.execute(
+            select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
+                FundingProgrammeEntity.funding_programme_code.in_(funding_programme_codes)
+            )
+        )
+        return {row.funding_programme_code: row.funding_programme_id for row in rows}
 
     def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[SchemeTypeName, int]:
         scheme_type_names = [SchemeTypeName.from_domain(capital_scheme.type)]

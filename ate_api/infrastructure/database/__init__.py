@@ -14,3 +14,6 @@ from ate_api.infrastructure.database.capital_schemes import (
 from ate_api.infrastructure.database.capital_schemes import (
     SchemeTypeName as SchemeTypeName,
 )
+from ate_api.infrastructure.database.funding_programmes import (
+    FundingProgrammeEntity as FundingProgrammeEntity,
+)

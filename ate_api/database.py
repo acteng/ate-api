@@ -41,6 +41,7 @@ def _create_schema(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(CreateSchema("authority"))
         connection.execute(CreateSchema("capital_scheme"))
+        connection.execute(CreateSchema("common"))
 
     BaseEntity.metadata.create_all(engine)
 

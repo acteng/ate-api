@@ -8,6 +8,7 @@ from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.routes.authorities.authorities import (
     AuthorityModel,
     get_authority_repository,
@@ -16,8 +17,32 @@ from ate_api.routes.capital_schemes import (
     CapitalSchemeModel,
     get_capital_scheme_repository,
 )
+from ate_api.routes.funding_programmes import (
+    FundingProgrammeModel,
+    get_funding_programme_repository,
+)
 
 router = APIRouter(prefix="/test")
+
+
+@router.post("/funding-programmes", status_code=HTTP_201_CREATED, response_class=Response)
+def create_funding_programme(
+    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
+    session: Annotated[Session, Depends(get_session)],
+    funding_programme: FundingProgrammeModel,
+) -> None:
+    funding_programmes.add(funding_programme.to_domain())
+    session.commit()
+
+
+@router.delete("/funding-programmes", status_code=HTTP_204_NO_CONTENT)
+def delete_funding_programmes(
+    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
+    session: Annotated[Session, Depends(get_session)],
+) -> Response:
+    funding_programmes.clear()
+    session.commit()
+    return Response(status_code=HTTP_204_NO_CONTENT)
 
 
 @router.post("/authorities", status_code=HTTP_201_CREATED, response_class=Response)

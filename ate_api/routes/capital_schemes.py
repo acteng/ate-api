@@ -22,6 +22,7 @@ from ate_api.infrastructure.database.capital_schemes import (
 from ate_api.routes.authorities.authorities import AuthorityModel
 from ate_api.routes.base import BaseModel
 from ate_api.routes.dates import DateTimeRangeModel
+from ate_api.routes.funding_programmes import FundingProgrammeModel
 
 
 class CapitalSchemeModel(BaseModel):
@@ -59,6 +60,7 @@ class CapitalSchemeOverviewModel(BaseModel):
     effective_date: DateTimeRangeModel
     name: str
     bid_submitting_authority: str
+    funding_programme: str
     type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
 
     @classmethod
@@ -69,6 +71,7 @@ class CapitalSchemeOverviewModel(BaseModel):
             bid_submitting_authority=app.url_path_for(
                 "get_authority", abbreviation=capital_scheme.bid_submitting_authority
             ),
+            funding_programme=app.url_path_for("get_funding_programme", code=capital_scheme.funding_programme),
             type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
         )
 
@@ -78,6 +81,7 @@ class CapitalSchemeOverviewModel(BaseModel):
             effective_date=self.effective_date.to_domain(),
             name=self.name,
             bid_submitting_authority=AuthorityModel.link_to_identifier(self.bid_submitting_authority),
+            funding_programme=FundingProgrammeModel.link_to_identifier(self.funding_programme),
             type_=self.type_.to_domain(),
         )
 

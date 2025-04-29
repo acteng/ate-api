@@ -21,6 +21,7 @@ class TestCapitalSchemeModel:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            funding_programme="ATF3",
             type_=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -32,6 +33,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="/authorities/LIV",
+                funding_programme="/funding-programmes/ATF3",
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
@@ -43,6 +45,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="/authorities/LIV",
+                funding_programme="/funding-programmes/ATF3",
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
@@ -54,6 +57,7 @@ class TestCapitalSchemeModel:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.funding_programme == "ATF3"
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
 
@@ -73,6 +77,7 @@ class TestCapitalSchemeOverviewModel:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            funding_programme="ATF3",
             type_=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -82,6 +87,7 @@ class TestCapitalSchemeOverviewModel:
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="/authorities/LIV",
+            funding_programme="/funding-programmes/ATF3",
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
@@ -90,6 +96,7 @@ class TestCapitalSchemeOverviewModel:
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="/authorities/LIV",
+            funding_programme="/funding-programmes/ATF3",
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
@@ -100,5 +107,6 @@ class TestCapitalSchemeOverviewModel:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.funding_programme == "ATF3"
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )

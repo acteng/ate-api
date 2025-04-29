@@ -44,6 +44,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            funding_programme="ATF3",
             type_=CapitalSchemeType.CONSTRUCTION,
         )
     )
@@ -53,6 +54,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="School Streets",
             bid_submitting_authority="LIV",
+            funding_programme="ATF3",
             type_=CapitalSchemeType.CONSTRUCTION,
         )
     )
@@ -63,6 +65,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Hospital Fields Road",
             bid_submitting_authority="WYO",
+            funding_programme="ATF3",
             type_=CapitalSchemeType.CONSTRUCTION,
         )
     )

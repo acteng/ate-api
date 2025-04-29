@@ -11,6 +11,7 @@ class TestCapitalScheme:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
+            funding_programme="ATF3",
             type_=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -19,5 +20,6 @@ class TestCapitalScheme:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.funding_programme == "ATF3"
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )

@@ -6,13 +6,16 @@ from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.main import app
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes import get_capital_scheme_repository
+from ate_api.routes.funding_programmes import get_funding_programme_repository
 from ate_api.settings import Settings, get_settings
 from tests.integration.memory import (
     MemoryAuthorityRepository,
     MemoryCapitalSchemeRepository,
+    MemoryFundingProgrammeRepository,
 )
 from tests.integration.oauth import StubAuthorizationServer
 
@@ -44,6 +47,11 @@ def settings_fixture(authorization_server: StubAuthorizationServer, resource_ser
     )
 
 
+@pytest.fixture(name="funding_programmes")
+def funding_programmes_fixture() -> FundingProgrammeRepository:
+    return MemoryFundingProgrammeRepository()
+
+
 @pytest.fixture(name="authorities")
 def authorities_fixture() -> AuthorityRepository:
     return MemoryAuthorityRepository()
@@ -56,9 +64,13 @@ def capital_schemes_fixture() -> CapitalSchemeRepository:
 
 @pytest.fixture(name="app")
 def app_fixture(
-    settings: Settings, authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository
+    settings: Settings,
+    funding_programmes: FundingProgrammeRepository,
+    authorities: AuthorityRepository,
+    capital_schemes: CapitalSchemeRepository,
 ) -> Generator[FastAPI]:
     app.dependency_overrides[get_settings] = lambda: settings
+    app.dependency_overrides[get_funding_programme_repository] = lambda: funding_programmes
     app.dependency_overrides[get_authority_repository] = lambda: authorities
     app.dependency_overrides[get_capital_scheme_repository] = lambda: capital_schemes
     yield app

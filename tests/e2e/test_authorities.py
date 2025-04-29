@@ -17,6 +17,7 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
 
 
 def test_get_authority_bid_submitting_capital_schemes(client: Client, access_token: str, app_client: AppClient) -> None:
+    app_client.create_funding_programme({"code": "ATF3"})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
         {
@@ -25,6 +26,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
                 "name": "Wirral Package",
                 "bidSubmittingAuthority": "/authorities/LIV",
+                "fundingProgramme": "/funding-programmes/ATF3",
                 "type": "construction",
             },
         }
@@ -36,6 +38,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "effectiveDate": {"from": "2020-01-01T00:00:00+00:00"},
                 "name": "School Streets",
                 "bidSubmittingAuthority": "/authorities/LIV",
+                "fundingProgramme": "/funding-programmes/ATF3",
                 "type": "construction",
             },
         }

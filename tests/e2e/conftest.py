@@ -129,3 +129,4 @@ def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient
     yield app_client
     app_client.delete_capital_schemes()
     app_client.delete_authorities()
+    app_client.delete_funding_programmes()

@@ -11,6 +11,10 @@ from tests.integration.memory import (
 )
 
 
+class TestMemoryFundingProgrammeRepository:
+    pass
+
+
 class TestMemoryAuthorityRepository:
     @pytest.fixture(name="authorities")
     def authorities_fixture(self) -> MemoryAuthorityRepository:
@@ -62,6 +66,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -73,6 +78,7 @@ class TestMemoryCapitalSchemeRepository:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.funding_programme == "ATF3"
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
 
@@ -83,6 +89,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -98,6 +105,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -110,6 +118,7 @@ class TestMemoryCapitalSchemeRepository:
             and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
             and capital_scheme.name == "Wirral Package"
             and capital_scheme.bid_submitting_authority == "LIV"
+            and capital_scheme.funding_programme == "ATF3"
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
 
@@ -125,6 +134,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -134,6 +144,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="School Streets",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -143,6 +154,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Hospital Fields Road",
                 bid_submitting_authority="WYO",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -160,6 +172,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )
@@ -169,6 +182,7 @@ class TestMemoryCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority="LIV",
+                funding_programme="ATF3",
                 type_=CapitalSchemeType.CONSTRUCTION,
             )
         )

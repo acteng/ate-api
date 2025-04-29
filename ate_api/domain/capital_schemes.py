@@ -17,12 +17,14 @@ class CapitalScheme:
         effective_date: DateTimeRange,
         name: str,
         bid_submitting_authority: str,
+        funding_programme: str,
         type_: CapitalSchemeType,
     ):
         self._reference = reference
         self._effective_date = effective_date
         self._name = name
         self._bid_submitting_authority = bid_submitting_authority
+        self._funding_programme = funding_programme
         self._type = type_
 
     @property
@@ -40,6 +42,10 @@ class CapitalScheme:
     @property
     def bid_submitting_authority(self) -> str:
         return self._bid_submitting_authority
+
+    @property
+    def funding_programme(self) -> str:
+        return self._funding_programme
 
     @property
     def type(self) -> CapitalSchemeType:

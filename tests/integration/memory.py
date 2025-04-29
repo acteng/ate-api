@@ -1,5 +1,10 @@
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.funding_programmes import FundingProgrammeRepository
+
+
+class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
+    pass
 
 
 class MemoryAuthorityRepository(AuthorityRepository):

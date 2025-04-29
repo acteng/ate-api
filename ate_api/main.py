@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from starlette.status import HTTP_403_FORBIDDEN
 
 from ate_api.auth import authorize
-from ate_api.routes import authorities, capital_schemes
+from ate_api.routes import authorities, capital_schemes, funding_programmes
 
 
 class HTTPError(BaseModel):
@@ -19,3 +19,4 @@ app = FastAPI(
 )
 app.include_router(authorities.router)
 app.include_router(capital_schemes.router)
+app.include_router(funding_programmes.router)
