@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from enum import Enum, auto
 
 from ate_api.domain.dates import DateTimeRange
