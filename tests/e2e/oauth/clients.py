@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from authlib.oauth2.rfc6749 import ClientMixin
 
 
-@dataclass
+@dataclass(frozen=True)
 class StubClient(ClientMixin):  # type: ignore
     client_id: str
     client_secret: str
