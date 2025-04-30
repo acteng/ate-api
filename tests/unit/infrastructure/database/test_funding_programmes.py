@@ -47,7 +47,12 @@ class TestDatabaseFundingProgrammeRepository:
 
     def test_get(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(FundingProgrammeEntity(funding_programme_code="ATF3"))
+            session.add_all(
+                [
+                    FundingProgrammeEntity(funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(funding_programme_code="ATF4"),
+                ]
+            )
 
         with Session(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)

@@ -59,10 +59,15 @@ class TestDatabaseAuthorityRepository:
 
     def test_get(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(
-                AuthorityEntity(
-                    authority_full_name="Liverpool City Region Combined Authority", authority_abbreviation="LIV"
-                )
+            session.add_all(
+                [
+                    AuthorityEntity(
+                        authority_full_name="Liverpool City Region Combined Authority", authority_abbreviation="LIV"
+                    ),
+                    AuthorityEntity(
+                        authority_full_name="West Yorkshire Combined Authority", authority_abbreviation="WYO"
+                    ),
+                ]
             )
 
         with Session(engine) as session:
