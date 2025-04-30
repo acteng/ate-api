@@ -50,8 +50,8 @@ class TestCapitalSchemeOverviewEntity:
         )
 
         assert (
-            overview_entity.bid_submitting_authority_id == 1
-            and overview_entity.scheme_name == "Wirral Package"
+            overview_entity.scheme_name == "Wirral Package"
+            and overview_entity.bid_submitting_authority_id == 1
             and overview_entity.funding_programme_id == 1
             and overview_entity.scheme_type_id == 1
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
