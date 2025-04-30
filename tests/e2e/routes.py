@@ -3,13 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Response
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
+from starlette.requests import Request
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
-from ate_api.main import app
 from ate_api.routes.authorities.authorities import (
     AuthorityModel,
     get_authority_repository,
@@ -70,9 +70,10 @@ def delete_authorities(
 def create_capital_scheme(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     session: Annotated[Session, Depends(get_session)],
+    request: Request,
     capital_scheme: CapitalSchemeModel,
 ) -> None:
-    capital_schemes.add(capital_scheme.to_domain(app))
+    capital_schemes.add(capital_scheme.to_domain(request.app))
     session.commit()
 
 
