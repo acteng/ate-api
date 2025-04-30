@@ -24,25 +24,6 @@ from ate_api.routes.dates import DateTimeRangeModel
 from ate_api.routes.links import path_parameter_for
 
 
-class CapitalSchemeModel(BaseModel):
-    reference: str
-    overview: CapitalSchemeOverviewModel
-
-    @staticmethod
-    def link_from_identifier(reference: str, app: Starlette) -> str:
-        return app.url_path_for("get_capital_scheme", reference=reference)
-
-    @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeModel:
-        return cls(
-            reference=capital_scheme.reference,
-            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, app),
-        )
-
-    def to_domain(self, app: Starlette) -> CapitalScheme:
-        return self.overview.to_domain(self.reference, app)
-
-
 class CapitalSchemeTypeModel(str, Enum):
     DEVELOPMENT = "development"
     CONSTRUCTION = "construction"
@@ -85,6 +66,25 @@ class CapitalSchemeOverviewModel(BaseModel):
             funding_programme=path_parameter_for(app, "get_funding_programme", "code", self.funding_programme),
             type_=self.type_.to_domain(),
         )
+
+
+class CapitalSchemeModel(BaseModel):
+    reference: str
+    overview: CapitalSchemeOverviewModel
+
+    @staticmethod
+    def link_from_identifier(reference: str, app: Starlette) -> str:
+        return app.url_path_for("get_capital_scheme", reference=reference)
+
+    @classmethod
+    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeModel:
+        return cls(
+            reference=capital_scheme.reference,
+            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, app),
+        )
+
+    def to_domain(self, app: Starlette) -> CapitalScheme:
+        return self.overview.to_domain(self.reference, app)
 
 
 router = APIRouter(prefix="/capital-schemes", tags=["capital-schemes"])
