@@ -15,7 +15,7 @@ class DateTimeRangeModel(BaseModel):
 
     @classmethod
     def from_domain(cls, date_time_range: DateTimeRange) -> DateTimeRangeModel:
-        return DateTimeRangeModel(from_=date_time_range.from_, to=date_time_range.to)
+        return cls(from_=date_time_range.from_, to=date_time_range.to)
 
     def to_domain(self) -> DateTimeRange:
         return DateTimeRange(self.from_, self.to)
