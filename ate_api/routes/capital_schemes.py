@@ -70,10 +70,6 @@ class CapitalSchemeModel(BaseModel):
     reference: str
     overview: CapitalSchemeOverviewModel
 
-    @staticmethod
-    def link_from_identifier(reference: str, app: Starlette) -> str:
-        return app.url_path_for("get_capital_scheme", reference=reference)
-
     @classmethod
     def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> Self:
         return cls(

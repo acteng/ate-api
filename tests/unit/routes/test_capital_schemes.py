@@ -12,9 +12,6 @@ from ate_api.routes.dates import DateTimeRangeModel
 
 
 class TestCapitalSchemeModel:
-    def test_link_from_identifier(self) -> None:
-        assert CapitalSchemeModel.link_from_identifier("ATE00001", app) == "/capital-schemes/ATE00001"
-
     def test_from_domain(self) -> None:
         capital_scheme = CapitalScheme(
             reference="ATE00001",
