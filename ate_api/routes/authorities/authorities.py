@@ -13,22 +13,12 @@ from ate_api.database import get_session
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
 from ate_api.routes.base import BaseModel
-from ate_api.routes.links import get_path_parameter
 
 
 class AuthorityModel(BaseModel):
     abbreviation: str
     full_name: str
     bid_submitting_capital_schemes: str | None = None
-
-    @staticmethod
-    def link_to_identifier(link: str) -> str:
-        abbreviation = get_path_parameter(link, "/authorities/{abbreviation}", "abbreviation")
-
-        if abbreviation is None:
-            raise ValueError(f"Invalid authority link: {link}")
-
-        return abbreviation
 
     @classmethod
     def from_domain(cls, authority: Authority, app: Starlette) -> AuthorityModel:

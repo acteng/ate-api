@@ -1,16 +1,34 @@
 import pytest
+from fastapi import FastAPI
 
-from ate_api.routes.links import get_path_parameter
-
-
-def test_get_path_parameter() -> None:
-    assert get_path_parameter("/foo/xyz", "/foo/{bar}", "bar") == "xyz"
+from ate_api.routes.links import path_parameter_for
 
 
-def test_get_path_parameter_when_not_matched() -> None:
-    assert get_path_parameter("not a link", "/foo/{bar}", "bar") is None
+@pytest.fixture(name="app")
+def app_fixture() -> FastAPI:
+    app = FastAPI()
+
+    @app.get("/foo/{bar}")
+    def foo(bar: str) -> None:
+        pass
+
+    return app
 
 
-def test_get_path_parameter_when_unknown() -> None:
+def test_path_parameter_for(app: FastAPI) -> None:
+    assert path_parameter_for(app, "foo", "bar", "/foo/xyz") == "xyz"
+
+
+def test_path_parameter_for_when_unknown_route(app: FastAPI) -> None:
+    with pytest.raises(ValueError, match="Unknown route: baz"):
+        path_parameter_for(app, "baz", "bar", "/foo/xyz")
+
+
+def test_path_parameter_for_when_unmatched_path(app: FastAPI) -> None:
+    with pytest.raises(ValueError, match="Unmatched path: not a link"):
+        path_parameter_for(app, "foo", "bar", "not a link")
+
+
+def test_path_parameter_for_when_unknown_parameter(app: FastAPI) -> None:
     with pytest.raises(ValueError, match="Unknown path parameter: baz"):
-        get_path_parameter("/foo/xyz", "/foo/{bar}", "baz")
+        path_parameter_for(app, "foo", "baz", "/foo/xyz")

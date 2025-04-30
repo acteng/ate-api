@@ -15,20 +15,10 @@ from ate_api.infrastructure.database.funding_programmes import (
     DatabaseFundingProgrammeRepository,
 )
 from ate_api.routes.base import BaseModel
-from ate_api.routes.links import get_path_parameter
 
 
 class FundingProgrammeModel(BaseModel):
     code: str
-
-    @staticmethod
-    def link_to_identifier(link: str) -> str:
-        code = get_path_parameter(link, "/funding-programmes/{code}", "code")
-
-        if code is None:
-            raise ValueError(f"Invalid funding programme link: {link}")
-
-        return code
 
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme) -> FundingProgrammeModel:

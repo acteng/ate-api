@@ -50,7 +50,7 @@ class TestCapitalSchemeModel:
             ),
         )
 
-        capital_scheme = capital_scheme_model.to_domain()
+        capital_scheme = capital_scheme_model.to_domain(app)
 
         assert (
             capital_scheme.reference == "ATE00001"
@@ -100,7 +100,7 @@ class TestCapitalSchemeOverviewModel:
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
-        capital_scheme = overview_model.to_domain("ATE00001")
+        capital_scheme = overview_model.to_domain("ATE00001", app)
 
         assert (
             capital_scheme.reference == "ATE00001"

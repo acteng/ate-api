@@ -19,10 +19,9 @@ from ate_api.domain.capital_schemes import (
 from ate_api.infrastructure.database.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
-from ate_api.routes.authorities.authorities import AuthorityModel
 from ate_api.routes.base import BaseModel
 from ate_api.routes.dates import DateTimeRangeModel
-from ate_api.routes.funding_programmes import FundingProgrammeModel
+from ate_api.routes.links import path_parameter_for
 
 
 class CapitalSchemeModel(BaseModel):
@@ -40,8 +39,8 @@ class CapitalSchemeModel(BaseModel):
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, app),
         )
 
-    def to_domain(self) -> CapitalScheme:
-        return self.overview.to_domain(self.reference)
+    def to_domain(self, app: Starlette) -> CapitalScheme:
+        return self.overview.to_domain(self.reference, app)
 
 
 class CapitalSchemeTypeModel(str, Enum):
@@ -75,13 +74,15 @@ class CapitalSchemeOverviewModel(BaseModel):
             type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
         )
 
-    def to_domain(self, reference: str) -> CapitalScheme:
+    def to_domain(self, reference: str, app: Starlette) -> CapitalScheme:
         return CapitalScheme(
             reference=reference,
             effective_date=self.effective_date.to_domain(),
             name=self.name,
-            bid_submitting_authority=AuthorityModel.link_to_identifier(self.bid_submitting_authority),
-            funding_programme=FundingProgrammeModel.link_to_identifier(self.funding_programme),
+            bid_submitting_authority=path_parameter_for(
+                app, "get_authority", "abbreviation", self.bid_submitting_authority
+            ),
+            funding_programme=path_parameter_for(app, "get_funding_programme", "code", self.funding_programme),
             type_=self.type_.to_domain(),
         )
 

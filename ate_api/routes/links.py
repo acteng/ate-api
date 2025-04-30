@@ -1,12 +1,18 @@
-from starlette.routing import compile_path
+from starlette.applications import Starlette
+from starlette.routing import Route, compile_path
 
 
-def get_path_parameter(path: str, path_template: str, parameter: str) -> str | None:
-    path_regex, _, _ = compile_path(path_template)
+def path_parameter_for(app: Starlette, name: str, parameter: str, path: str) -> str:
+    route = next((route for route in app.routes if isinstance(route, Route) and route.name == name), None)
+
+    if not route:
+        raise ValueError(f"Unknown route: {name}")
+
+    path_regex, _, _ = compile_path(route.path)
     match = path_regex.match(path)
 
     if not match:
-        return None
+        raise ValueError(f"Unmatched path: {path}")
 
     if parameter not in match.groupdict():
         raise ValueError(f"Unknown path parameter: {parameter}")

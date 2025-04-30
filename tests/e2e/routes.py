@@ -9,6 +9,7 @@ from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.main import app
 from ate_api.routes.authorities.authorities import (
     AuthorityModel,
     get_authority_repository,
@@ -71,7 +72,7 @@ def create_capital_scheme(
     session: Annotated[Session, Depends(get_session)],
     capital_scheme: CapitalSchemeModel,
 ) -> None:
-    capital_schemes.add(capital_scheme.to_domain())
+    capital_schemes.add(capital_scheme.to_domain(app))
     session.commit()
 
 
