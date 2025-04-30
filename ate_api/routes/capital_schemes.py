@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from enum import Enum
-from typing import Annotated
+from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import Field
@@ -29,7 +27,7 @@ class CapitalSchemeTypeModel(str, Enum):
     CONSTRUCTION = "construction"
 
     @classmethod
-    def from_domain(cls, type_: CapitalSchemeType) -> CapitalSchemeTypeModel:
+    def from_domain(cls, type_: CapitalSchemeType) -> Self:
         return cls[type_.name]
 
     def to_domain(self) -> CapitalSchemeType:
@@ -44,7 +42,7 @@ class CapitalSchemeOverviewModel(BaseModel):
     type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
 
     @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeOverviewModel:
+    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> Self:
         return cls(
             effective_date=DateTimeRangeModel.from_domain(capital_scheme.effective_date),
             name=capital_scheme.name,
@@ -77,7 +75,7 @@ class CapitalSchemeModel(BaseModel):
         return app.url_path_for("get_capital_scheme", reference=reference)
 
     @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> CapitalSchemeModel:
+    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> Self:
         return cls(
             reference=capital_scheme.reference,
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, app),

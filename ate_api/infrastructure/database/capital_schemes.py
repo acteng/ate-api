@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 from datetime import datetime
 from enum import Enum
+from typing import Self
 
 from sqlalchemy import ForeignKey, delete, select
 from sqlalchemy.orm import (
@@ -37,7 +36,7 @@ class SchemeTypeName(Enum):
     CONSTRUCTION = "construction"
 
     @classmethod
-    def from_domain(cls, type_: CapitalSchemeType) -> SchemeTypeName:
+    def from_domain(cls, type_: CapitalSchemeType) -> Self:
         return cls[type_.name]
 
     def to_domain(self) -> CapitalSchemeType:
@@ -76,7 +75,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
         authority_ids: dict[str, int],
         funding_programme_ids: dict[str, int],
         scheme_type_ids: dict[SchemeTypeName, int],
-    ) -> CapitalSchemeOverviewEntity:
+    ) -> Self:
         return cls(
             capital_scheme=CapitalSchemeEntity(scheme_reference=capital_scheme.reference),
             scheme_name=capital_scheme.name,

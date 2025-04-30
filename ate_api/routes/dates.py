@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Self
 
 from pydantic import Field
 
@@ -14,7 +12,7 @@ class DateTimeRangeModel(BaseModel):
     to: datetime | None = None
 
     @classmethod
-    def from_domain(cls, date_time_range: DateTimeRange) -> DateTimeRangeModel:
+    def from_domain(cls, date_time_range: DateTimeRange) -> Self:
         return cls(from_=date_time_range.from_, to=date_time_range.to)
 
     def to_domain(self) -> DateTimeRange:

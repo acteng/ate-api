@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Self
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
@@ -16,7 +16,7 @@ class AuthorityEntity(BaseEntity):
     authority_abbreviation: Mapped[str] = mapped_column(unique=True)
 
     @classmethod
-    def from_domain(cls, authority: Authority) -> AuthorityEntity:
+    def from_domain(cls, authority: Authority) -> Self:
         return cls(authority_full_name=authority.full_name, authority_abbreviation=authority.abbreviation)
 
     def to_domain(self) -> Authority:

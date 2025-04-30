@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Annotated
+from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -21,7 +19,7 @@ class FundingProgrammeModel(BaseModel):
     code: str
 
     @classmethod
-    def from_domain(cls, funding_programme: FundingProgramme) -> FundingProgrammeModel:
+    def from_domain(cls, funding_programme: FundingProgramme) -> Self:
         return cls(code=funding_programme.code)
 
     def to_domain(self) -> FundingProgramme:

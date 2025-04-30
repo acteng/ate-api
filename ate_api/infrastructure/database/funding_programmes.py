@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Self
 
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
@@ -18,7 +18,7 @@ class FundingProgrammeEntity(BaseEntity):
     funding_programme_code: Mapped[str] = mapped_column(unique=True)
 
     @classmethod
-    def from_domain(cls, funding_programme: FundingProgramme) -> FundingProgrammeEntity:
+    def from_domain(cls, funding_programme: FundingProgramme) -> Self:
         return cls(funding_programme_code=funding_programme.code)
 
     def to_domain(self) -> FundingProgramme:

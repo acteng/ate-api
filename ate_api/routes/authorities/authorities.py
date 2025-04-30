@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Annotated
+from typing import Annotated, Self
 
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
@@ -21,7 +19,7 @@ class AuthorityModel(BaseModel):
     bid_submitting_capital_schemes: str | None = None
 
     @classmethod
-    def from_domain(cls, authority: Authority, app: Starlette) -> AuthorityModel:
+    def from_domain(cls, authority: Authority, app: Starlette) -> Self:
         return cls(
             abbreviation=authority.abbreviation,
             full_name=authority.full_name,
