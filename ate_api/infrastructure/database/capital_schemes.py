@@ -29,7 +29,7 @@ class CapitalSchemeEntity(BaseEntity):
 
     capital_scheme_id: Mapped[int] = mapped_column(primary_key=True)
     scheme_reference: Mapped[str] = mapped_column(unique=True)
-    capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship()
+    capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
 
     @classmethod
     def from_domain(cls, capital_scheme: CapitalScheme, authority_ids: dict[str, int]) -> CapitalSchemeEntity:
@@ -57,7 +57,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     capital_scheme_overview_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
     bid_submitting_authority_id = mapped_column(ForeignKey(AuthorityEntity.authority_id), nullable=False)
-    bid_submitting_authority: Mapped[AuthorityEntity] = relationship()
+    bid_submitting_authority: Mapped[AuthorityEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
     effective_date_to: Mapped[datetime | None]
 
