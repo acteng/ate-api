@@ -2,6 +2,7 @@ from typing import Annotated, Self
 
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
+from pydantic import AnyUrl
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
@@ -15,15 +16,17 @@ from ate_api.routes.base import BaseModel
 class AuthorityModel(BaseModel):
     abbreviation: str
     full_name: str
-    bid_submitting_capital_schemes: str | None = None
+    bid_submitting_capital_schemes: AnyUrl | None = None
 
     @classmethod
     def from_domain(cls, authority: Authority, request: Request) -> Self:
         return cls(
             abbreviation=authority.abbreviation,
             full_name=authority.full_name,
-            bid_submitting_capital_schemes=str(
-                request.url_for("get_authority_bid_submitting_capital_schemes", abbreviation=authority.abbreviation)
+            bid_submitting_capital_schemes=AnyUrl(
+                str(
+                    request.url_for("get_authority_bid_submitting_capital_schemes", abbreviation=authority.abbreviation)
+                )
             ),
         )
 

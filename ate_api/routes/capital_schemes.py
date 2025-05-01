@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import Field
+from pydantic import AnyUrl, Field
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
@@ -36,8 +36,8 @@ class CapitalSchemeTypeModel(str, Enum):
 class CapitalSchemeOverviewModel(BaseModel):
     effective_date: DateTimeRangeModel
     name: str
-    bid_submitting_authority: str
-    funding_programme: str
+    bid_submitting_authority: AnyUrl
+    funding_programme: AnyUrl
     type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
 
     @classmethod
@@ -45,10 +45,12 @@ class CapitalSchemeOverviewModel(BaseModel):
         return cls(
             effective_date=DateTimeRangeModel.from_domain(capital_scheme.effective_date),
             name=capital_scheme.name,
-            bid_submitting_authority=str(
-                request.url_for("get_authority", abbreviation=capital_scheme.bid_submitting_authority)
+            bid_submitting_authority=AnyUrl(
+                str(request.url_for("get_authority", abbreviation=capital_scheme.bid_submitting_authority))
             ),
-            funding_programme=str(request.url_for("get_funding_programme", code=capital_scheme.funding_programme)),
+            funding_programme=AnyUrl(
+                str(request.url_for("get_funding_programme", code=capital_scheme.funding_programme))
+            ),
             type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
         )
 
@@ -58,9 +60,9 @@ class CapitalSchemeOverviewModel(BaseModel):
             effective_date=self.effective_date.to_domain(),
             name=self.name,
             bid_submitting_authority=path_parameter_for(
-                request, "get_authority", "abbreviation", self.bid_submitting_authority
+                request, "get_authority", "abbreviation", str(self.bid_submitting_authority)
             ),
-            funding_programme=path_parameter_for(request, "get_funding_programme", "code", self.funding_programme),
+            funding_programme=path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme)),
             type_=self.type_.to_domain(),
         )
 

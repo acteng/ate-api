@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import AnyUrl
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -21,7 +22,7 @@ def get_authority_bid_submitting_capital_schemes(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     request: Request,
     abbreviation: str,
-) -> CollectionModel[str]:
+) -> CollectionModel[AnyUrl]:
     """
     Gets the capital schemes submitted by an authority.
     """
@@ -31,5 +32,7 @@ def get_authority_bid_submitting_capital_schemes(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
     references = capital_schemes.get_references_by_bid_submitting_authority(abbreviation)
-    capital_scheme_links = [str(request.url_for("get_capital_scheme", reference=reference)) for reference in references]
-    return CollectionModel[str](items=capital_scheme_links)
+    capital_scheme_links = [
+        AnyUrl(str(request.url_for("get_capital_scheme", reference=reference))) for reference in references
+    ]
+    return CollectionModel[AnyUrl](items=capital_scheme_links)
