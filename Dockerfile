@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir . \
 
 USER ate-api
 
-CMD [ "sh", "-c", "fastapi run ate_api/main.py --port ${PORT}" ]
+CMD [ "sh", "-c", "uvicorn ate_api.main:app --host 0.0.0.0 --port ${PORT}" ]
