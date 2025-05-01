@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from starlette.requests import Request
+
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.main import app
@@ -12,7 +14,7 @@ from ate_api.routes.dates import DateTimeRangeModel
 
 
 class TestCapitalSchemeModel:
-    def test_from_domain(self) -> None:
+    def test_from_domain(self, http_request: Request, base_url: str) -> None:
         capital_scheme = CapitalScheme(
             reference="ATE00001",
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
@@ -22,15 +24,15 @@ class TestCapitalSchemeModel:
             type_=CapitalSchemeType.CONSTRUCTION,
         )
 
-        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, app)
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
 
         assert capital_scheme_model == CapitalSchemeModel(
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority="/authorities/LIV",
-                funding_programme="/funding-programmes/ATF3",
+                bid_submitting_authority=f"{base_url}/authorities/LIV",
+                funding_programme=f"{base_url}/funding-programmes/ATF3",
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
@@ -68,7 +70,7 @@ class TestCapitalSchemeTypeModel:
 
 
 class TestCapitalSchemeOverviewModel:
-    def test_from_domain(self) -> None:
+    def test_from_domain(self, http_request: Request, base_url: str) -> None:
         capital_scheme = CapitalScheme(
             reference="ATE00001",
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
@@ -78,13 +80,13 @@ class TestCapitalSchemeOverviewModel:
             type_=CapitalSchemeType.CONSTRUCTION,
         )
 
-        overview_model = CapitalSchemeOverviewModel.from_domain(capital_scheme, app)
+        overview_model = CapitalSchemeOverviewModel.from_domain(capital_scheme, http_request)
 
         assert overview_model == CapitalSchemeOverviewModel(
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority="/authorities/LIV",
-            funding_programme="/funding-programmes/ATF3",
+            bid_submitting_authority=f"{base_url}/authorities/LIV",
+            funding_programme=f"{base_url}/funding-programmes/ATF3",
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 

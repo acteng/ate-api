@@ -3,7 +3,6 @@ from typing import Annotated, Self
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
-from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -19,12 +18,12 @@ class AuthorityModel(BaseModel):
     bid_submitting_capital_schemes: str | None = None
 
     @classmethod
-    def from_domain(cls, authority: Authority, app: Starlette) -> Self:
+    def from_domain(cls, authority: Authority, request: Request) -> Self:
         return cls(
             abbreviation=authority.abbreviation,
             full_name=authority.full_name,
-            bid_submitting_capital_schemes=app.url_path_for(
-                "get_authority_bid_submitting_capital_schemes", abbreviation=authority.abbreviation
+            bid_submitting_capital_schemes=str(
+                request.url_for("get_authority_bid_submitting_capital_schemes", abbreviation=authority.abbreviation)
             ),
         )
 
@@ -51,4 +50,4 @@ def get_authority(
     if not authority:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    return AuthorityModel.from_domain(authority, request.app)
+    return AuthorityModel.from_domain(authority, request)

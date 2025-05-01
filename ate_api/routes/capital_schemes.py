@@ -42,14 +42,14 @@ class CapitalSchemeOverviewModel(BaseModel):
     type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
 
     @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> Self:
+    def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
         return cls(
             effective_date=DateTimeRangeModel.from_domain(capital_scheme.effective_date),
             name=capital_scheme.name,
-            bid_submitting_authority=app.url_path_for(
-                "get_authority", abbreviation=capital_scheme.bid_submitting_authority
+            bid_submitting_authority=str(
+                request.url_for("get_authority", abbreviation=capital_scheme.bid_submitting_authority)
             ),
-            funding_programme=app.url_path_for("get_funding_programme", code=capital_scheme.funding_programme),
+            funding_programme=str(request.url_for("get_funding_programme", code=capital_scheme.funding_programme)),
             type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
         )
 
@@ -71,10 +71,10 @@ class CapitalSchemeModel(BaseModel):
     overview: CapitalSchemeOverviewModel
 
     @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, app: Starlette) -> Self:
+    def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
         return cls(
             reference=capital_scheme.reference,
-            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, app),
+            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, request),
         )
 
     def to_domain(self, app: Starlette) -> CapitalScheme:
@@ -102,4 +102,4 @@ def get_capital_scheme(
     if not capital_scheme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    return CapitalSchemeModel.from_domain(capital_scheme, request.app)
+    return CapitalSchemeModel.from_domain(capital_scheme, request)

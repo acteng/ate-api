@@ -31,7 +31,5 @@ def get_authority_bid_submitting_capital_schemes(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
     references = capital_schemes.get_references_by_bid_submitting_authority(abbreviation)
-    capital_scheme_links = [
-        request.app.url_path_for("get_capital_scheme", reference=reference) for reference in references
-    ]
+    capital_scheme_links = [str(request.url_for("get_capital_scheme", reference=reference)) for reference in references]
     return CollectionModel[str](items=capital_scheme_links)

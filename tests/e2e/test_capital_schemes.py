@@ -27,8 +27,8 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
         "overview": {
             "effectiveDate": {"from": "2020-01-01T00:00:00Z", "to": None},
             "name": "Wirral Package",
-            "bidSubmittingAuthority": "/authorities/LIV",
-            "fundingProgramme": "/funding-programmes/ATF3",
+            "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
+            "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "type": "construction",
         },
     }

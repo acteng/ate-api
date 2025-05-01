@@ -12,7 +12,7 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
     assert response.json() == {
         "abbreviation": "LIV",
         "fullName": "Liverpool City Region Combined Authority",
-        "bidSubmittingCapitalSchemes": "/authorities/LIV/capital-schemes/bid-submitting",
+        "bidSubmittingCapitalSchemes": f"{client.base_url}/authorities/LIV/capital-schemes/bid-submitting",
     }
 
 
@@ -51,7 +51,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
     assert response.status_code == 200
     assert response.json() == {
         "items": [
-            "/capital-schemes/ATE00001",
-            "/capital-schemes/ATE00002",
+            f"{client.base_url}/capital-schemes/ATE00001",
+            f"{client.base_url}/capital-schemes/ATE00002",
         ],
     }
