@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir . \
 
 USER ate-api
 
-CMD [ "sh", "-c", "fastapi run ate_api/main.py --port ${PORT} --forwarded-allow-ips='*'" ]
+CMD [ "sh", "-c", "fastapi run ate_api/main.py --port ${PORT}" ]
