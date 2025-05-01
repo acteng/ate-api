@@ -4,7 +4,6 @@ from starlette.requests import Request
 
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
-from ate_api.main import app
 from ate_api.routes.capital_schemes import (
     CapitalSchemeModel,
     CapitalSchemeOverviewModel,
@@ -37,19 +36,19 @@ class TestCapitalSchemeModel:
             ),
         )
 
-    def test_to_domain(self) -> None:
+    def test_to_domain(self, http_request: Request, base_url: str) -> None:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority="/authorities/LIV",
-                funding_programme="/funding-programmes/ATF3",
+                bid_submitting_authority=f"{base_url}/authorities/LIV",
+                funding_programme=f"{base_url}/funding-programmes/ATF3",
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
 
-        capital_scheme = capital_scheme_model.to_domain(app)
+        capital_scheme = capital_scheme_model.to_domain(http_request)
 
         assert (
             capital_scheme.reference == "ATE00001"
@@ -90,16 +89,16 @@ class TestCapitalSchemeOverviewModel:
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
-    def test_to_domain(self) -> None:
+    def test_to_domain(self, http_request: Request, base_url: str) -> None:
         overview_model = CapitalSchemeOverviewModel(
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority="/authorities/LIV",
-            funding_programme="/funding-programmes/ATF3",
+            bid_submitting_authority=f"{base_url}/authorities/LIV",
+            funding_programme=f"{base_url}/funding-programmes/ATF3",
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
-        capital_scheme = overview_model.to_domain("ATE00001", app)
+        capital_scheme = overview_model.to_domain("ATE00001", http_request)
 
         assert (
             capital_scheme.reference == "ATE00001"

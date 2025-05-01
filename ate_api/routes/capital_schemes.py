@@ -4,7 +4,6 @@ from typing import Annotated, Self
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import Field
 from sqlalchemy.orm import Session
-from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -53,15 +52,15 @@ class CapitalSchemeOverviewModel(BaseModel):
             type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
         )
 
-    def to_domain(self, reference: str, app: Starlette) -> CapitalScheme:
+    def to_domain(self, reference: str, request: Request) -> CapitalScheme:
         return CapitalScheme(
             reference=reference,
             effective_date=self.effective_date.to_domain(),
             name=self.name,
             bid_submitting_authority=path_parameter_for(
-                app, "get_authority", "abbreviation", self.bid_submitting_authority
+                request, "get_authority", "abbreviation", self.bid_submitting_authority
             ),
-            funding_programme=path_parameter_for(app, "get_funding_programme", "code", self.funding_programme),
+            funding_programme=path_parameter_for(request, "get_funding_programme", "code", self.funding_programme),
             type_=self.type_.to_domain(),
         )
 
@@ -77,8 +76,8 @@ class CapitalSchemeModel(BaseModel):
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, request),
         )
 
-    def to_domain(self, app: Starlette) -> CapitalScheme:
-        return self.overview.to_domain(self.reference, app)
+    def to_domain(self, request: Request) -> CapitalScheme:
+        return self.overview.to_domain(self.reference, request)
 
 
 router = APIRouter(prefix="/capital-schemes", tags=["capital-schemes"])

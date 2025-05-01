@@ -73,7 +73,7 @@ def create_capital_scheme(
     request: Request,
     capital_scheme: CapitalSchemeModel,
 ) -> None:
-    capital_schemes.add(capital_scheme.to_domain(request.app))
+    capital_schemes.add(capital_scheme.to_domain(request))
     session.commit()
 
 
