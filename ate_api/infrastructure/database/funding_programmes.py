@@ -1,6 +1,6 @@
 from typing import Self
 
-from sqlalchemy import select
+from sqlalchemy import false, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from ate_api.domain.funding_programmes import (
@@ -35,7 +35,9 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
 
     def get(self, code: str) -> FundingProgramme | None:
         result = self._session.scalars(
-            select(FundingProgrammeEntity).where(FundingProgrammeEntity.funding_programme_code == code)
+            select(FundingProgrammeEntity)
+            .where(FundingProgrammeEntity.funding_programme_code == code)
+            .where(FundingProgrammeEntity.is_under_embargo == false())
         )
         row = result.one_or_none()
         return row.to_domain() if row else None

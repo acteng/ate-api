@@ -54,6 +54,16 @@ class TestDatabaseFundingProgrammeRepository:
 
         assert funding_programme and funding_programme.code == "ATF3"
 
+    def test_get_filters_under_embargo(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
+
+        with Session(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            funding_programme = funding_programmes.get("ATF3")
+
+        assert not funding_programme
+
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
