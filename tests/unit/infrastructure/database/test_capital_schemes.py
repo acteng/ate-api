@@ -156,7 +156,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
                     AuthorityEntity(
                         authority_id=1,
                         authority_full_name="Liverpool City Region Combined Authority",
@@ -197,7 +199,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
                     AuthorityEntity(
                         authority_id=1,
                         authority_full_name="Liverpool City Region Combined Authority",
@@ -243,7 +247,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
                     AuthorityEntity(
                         authority_id=1,
                         authority_full_name="Liverpool City Region Combined Authority",
@@ -285,6 +291,37 @@ class TestDatabaseCapitalSchemeRepository:
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
 
+    def test_get_filters_under_embargo(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=True
+                    ),
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert not capital_scheme
+
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
@@ -296,7 +333,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
                     AuthorityEntity(
                         authority_id=1,
                         authority_full_name="Liverpool City Region Combined Authority",
@@ -348,7 +387,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
                     AuthorityEntity(
                         authority_id=1,
                         authority_full_name="Liverpool City Region Combined Authority",
@@ -391,7 +432,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
                     AuthorityEntity(
                         authority_id=1,
                         authority_full_name="Liverpool City Region Combined Authority",

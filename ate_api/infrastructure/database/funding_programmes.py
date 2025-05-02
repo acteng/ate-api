@@ -16,10 +16,11 @@ class FundingProgrammeEntity(BaseEntity):
 
     funding_programme_id: Mapped[int] = mapped_column(primary_key=True)
     funding_programme_code: Mapped[str] = mapped_column(unique=True)
+    is_under_embargo: Mapped[bool]
 
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme) -> Self:
-        return cls(funding_programme_code=funding_programme.code)
+        return cls(funding_programme_code=funding_programme.code, is_under_embargo=False)
 
     def to_domain(self) -> FundingProgramme:
         return FundingProgramme(code=self.funding_programme_code)

@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey, false, select
 from sqlalchemy.orm import (
     Mapped,
     Session,
@@ -126,8 +126,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 joinedload(CapitalSchemeOverviewEntity.scheme_type),
             )
             .join(CapitalSchemeEntity)
+            .join(FundingProgrammeEntity)
             .where(CapitalSchemeEntity.scheme_reference == reference)
             .where(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
+            .where(FundingProgrammeEntity.is_under_embargo == false())
         )
         row = result.one_or_none()
         return row.to_domain() if row else None

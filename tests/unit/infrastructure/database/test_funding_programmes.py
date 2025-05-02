@@ -15,10 +15,13 @@ class TestFundingProgrammeEntity:
 
         funding_programme_entity = FundingProgrammeEntity.from_domain(funding_programme)
 
-        assert funding_programme_entity.funding_programme_code == "ATF3"
+        assert (
+            funding_programme_entity.funding_programme_code == "ATF3"
+            and funding_programme_entity.is_under_embargo is False
+        )
 
     def test_to_domain(self) -> None:
-        funding_programme_entity = FundingProgrammeEntity(funding_programme_code="ATF3")
+        funding_programme_entity = FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False)
 
         funding_programme = funding_programme_entity.to_domain()
 
@@ -40,8 +43,8 @@ class TestDatabaseFundingProgrammeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_code="ATF3"),
-                    FundingProgrammeEntity(funding_programme_code="ATF4"),
+                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
                 ]
             )
 
