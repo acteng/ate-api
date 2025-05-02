@@ -141,8 +141,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
+            .join(FundingProgrammeEntity)
             .where(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
             .where(AuthorityEntity.authority_abbreviation == authority_abbreviation)
+            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
         return list(result.all())

@@ -428,6 +428,37 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not references
 
+    def test_get_references_by_bid_submitting_authority_filters_under_embargo(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=True
+                    ),
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+
+        assert not references
+
     def test_get_references_by_bid_submitting_authority_orders_by_reference(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(
