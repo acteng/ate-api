@@ -1,6 +1,6 @@
 from typing import Self
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from ate_api.domain.funding_programmes import (
@@ -31,9 +31,6 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
 
     def add(self, funding_programme: FundingProgramme) -> None:
         self._session.add(FundingProgrammeEntity.from_domain(funding_programme))
-
-    def clear(self) -> None:
-        self._session.execute(delete(FundingProgrammeEntity))
 
     def get(self, code: str) -> FundingProgramme | None:
         result = self._session.scalars(

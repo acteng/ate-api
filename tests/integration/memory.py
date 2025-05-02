@@ -13,9 +13,6 @@ class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
     def add(self, funding_programme: FundingProgramme) -> None:
         self._funding_programmes[funding_programme.code] = funding_programme
 
-    def clear(self) -> None:
-        self._funding_programmes.clear()
-
     def get(self, code: str) -> FundingProgramme | None:
         return self._funding_programmes.get(code)
 
@@ -27,9 +24,6 @@ class MemoryAuthorityRepository(AuthorityRepository):
     def add(self, authority: Authority) -> None:
         self._authorities[authority.abbreviation] = authority
 
-    def clear(self) -> None:
-        self._authorities.clear()
-
     def get(self, abbreviation: str) -> Authority | None:
         return self._authorities.get(abbreviation)
 
@@ -40,9 +34,6 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
 
     def add(self, capital_scheme: CapitalScheme) -> None:
         self._capital_schemes[capital_scheme.reference] = capital_scheme
-
-    def clear(self) -> None:
-        self._capital_schemes.clear()
 
     def get(self, reference: str) -> CapitalScheme | None:
         return self._capital_schemes.get(reference)

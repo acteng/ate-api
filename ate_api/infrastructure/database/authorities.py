@@ -1,6 +1,6 @@
 from typing import Self
 
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from ate_api.domain.authorities import Authority, AuthorityRepository
@@ -29,9 +29,6 @@ class DatabaseAuthorityRepository(AuthorityRepository):
 
     def add(self, authority: Authority) -> None:
         self._session.add(AuthorityEntity.from_domain(authority))
-
-    def clear(self) -> None:
-        self._session.execute(delete(AuthorityEntity))
 
     def get(self, abbreviation: str) -> Authority | None:
         result = self._session.scalars(

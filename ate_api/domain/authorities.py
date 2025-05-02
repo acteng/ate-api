@@ -16,8 +16,5 @@ class AuthorityRepository:
     def add(self, authority: Authority) -> None:
         raise NotImplementedError()
 
-    def clear(self) -> None:
-        raise NotImplementedError()
-
     def get(self, abbreviation: str) -> Authority | None:
         raise NotImplementedError()

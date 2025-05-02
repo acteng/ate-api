@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey, delete, select
+from sqlalchemy import ForeignKey, select
 from sqlalchemy.orm import (
     Mapped,
     Session,
@@ -115,10 +115,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 capital_scheme, authority_ids, funding_programme_ids, scheme_type_ids
             )
         )
-
-    def clear(self) -> None:
-        self._session.execute(delete(CapitalSchemeOverviewEntity))
-        self._session.execute(delete(CapitalSchemeEntity))
 
     def get(self, reference: str) -> CapitalScheme | None:
         result = self._session.scalars(

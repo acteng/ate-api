@@ -24,13 +24,6 @@ class TestMemoryFundingProgrammeRepository:
         funding_programme = funding_programmes.get("ATF3")
         assert funding_programme and funding_programme.code == "ATF3"
 
-    def test_clear(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code="ATF3"))
-
-        funding_programmes.clear()
-
-        assert not funding_programmes.get("ATF3")
-
     def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
         funding_programmes.add(FundingProgramme(code="ATF3"))
 
@@ -58,13 +51,6 @@ class TestMemoryAuthorityRepository:
             and authority.abbreviation == "LIV"
             and authority.full_name == "Liverpool City Region Combined Authority"
         )
-
-    def test_clear(self, authorities: MemoryAuthorityRepository) -> None:
-        authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
-
-        authorities.clear()
-
-        assert not authorities.get("LIV")
 
     def test_get(self, authorities: MemoryAuthorityRepository) -> None:
         authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
@@ -110,22 +96,6 @@ class TestMemoryCapitalSchemeRepository:
             and capital_scheme.funding_programme == "ATF3"
             and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
         )
-
-    def test_clear(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
-        capital_schemes.add(
-            CapitalScheme(
-                reference="ATE00001",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
-            )
-        )
-
-        capital_schemes.clear()
-
-        assert not capital_schemes.get("ATE00001")
 
     def test_get(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_schemes.add(

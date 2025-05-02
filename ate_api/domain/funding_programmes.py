@@ -11,8 +11,5 @@ class FundingProgrammeRepository:
     def add(self, funding_programme: FundingProgramme) -> None:
         raise NotImplementedError()
 
-    def clear(self) -> None:
-        raise NotImplementedError()
-
     def get(self, code: str) -> FundingProgramme | None:
         raise NotImplementedError()

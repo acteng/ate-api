@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import Engine, func, select
+from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
@@ -190,36 +190,6 @@ class TestDatabaseCapitalSchemeRepository:
             and overview_row.effective_date_from == datetime(2020, 1, 1)
             and overview_row.effective_date_to is None
         )
-
-    def test_clear(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
-            session.add_all(
-                [
-                    FundingProgrammeEntity(funding_programme_id=1, funding_programme_code="ATF3"),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
-                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
-                    CapitalSchemeOverviewEntity(
-                        capital_scheme_id=1,
-                        scheme_name="Wirral Package",
-                        bid_submitting_authority_id=1,
-                        funding_programme_id=1,
-                        scheme_type_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                ]
-            )
-
-        with Session(engine) as session, session.begin():
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_schemes.clear()
-
-        with Session(engine) as session:
-            assert session.execute(select(func.count()).select_from(CapitalSchemeEntity)).scalar_one() == 0
 
     def test_get(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():

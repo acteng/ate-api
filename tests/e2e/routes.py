@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Response
 from fastapi.params import Depends
+from sqlalchemy import delete
 from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -10,6 +11,12 @@ from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.infrastructure.database import (
+    AuthorityEntity,
+    CapitalSchemeEntity,
+    CapitalSchemeOverviewEntity,
+    FundingProgrammeEntity,
+)
 from ate_api.routes.authorities.authorities import (
     AuthorityModel,
     get_authority_repository,
@@ -37,11 +44,8 @@ def create_funding_programme(
 
 
 @router.delete("/funding-programmes", status_code=HTTP_204_NO_CONTENT)
-def delete_funding_programmes(
-    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
-    session: Annotated[Session, Depends(get_session)],
-) -> Response:
-    funding_programmes.clear()
+def delete_funding_programmes(session: Annotated[Session, Depends(get_session)]) -> Response:
+    session.execute(delete(FundingProgrammeEntity))
     session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
 
@@ -57,11 +61,8 @@ def create_authority(
 
 
 @router.delete("/authorities", status_code=HTTP_204_NO_CONTENT)
-def delete_authorities(
-    authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
-    session: Annotated[Session, Depends(get_session)],
-) -> Response:
-    authorities.clear()
+def delete_authorities(session: Annotated[Session, Depends(get_session)]) -> Response:
+    session.execute(delete(AuthorityEntity))
     session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
 
@@ -78,10 +79,8 @@ def create_capital_scheme(
 
 
 @router.delete("/capital-schemes", status_code=HTTP_204_NO_CONTENT)
-def delete_capital_schemes(
-    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
-    session: Annotated[Session, Depends(get_session)],
-) -> Response:
-    capital_schemes.clear()
+def delete_capital_schemes(session: Annotated[Session, Depends(get_session)]) -> Response:
+    session.execute(delete(CapitalSchemeOverviewEntity))
+    session.execute(delete(CapitalSchemeEntity))
     session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)

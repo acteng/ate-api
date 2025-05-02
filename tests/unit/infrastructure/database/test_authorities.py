@@ -1,4 +1,4 @@
-from sqlalchemy import Engine, func, select
+from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from ate_api.domain.authorities import Authority
@@ -41,21 +41,6 @@ class TestDatabaseAuthorityRepository:
             row.authority_full_name == "Liverpool City Region Combined Authority"
             and row.authority_abbreviation == "LIV"
         )
-
-    def test_clear(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
-            session.add(
-                AuthorityEntity(
-                    authority_full_name="Liverpool City Region Combined Authority", authority_abbreviation="LIV"
-                )
-            )
-
-        with Session(engine) as session, session.begin():
-            authorities = DatabaseAuthorityRepository(session)
-            authorities.clear()
-
-        with Session(engine) as session:
-            assert session.execute(select(func.count()).select_from(AuthorityEntity)).scalar_one() == 0
 
     def test_get(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():

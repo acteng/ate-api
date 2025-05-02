@@ -54,9 +54,6 @@ class CapitalSchemeRepository:
     def add(self, capital_scheme: CapitalScheme) -> None:
         raise NotImplementedError()
 
-    def clear(self) -> None:
-        raise NotImplementedError()
-
     def get(self, reference: str) -> CapitalScheme | None:
         raise NotImplementedError()
 
