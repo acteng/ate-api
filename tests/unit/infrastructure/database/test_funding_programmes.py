@@ -1,3 +1,4 @@
+import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
@@ -24,6 +25,7 @@ class TestFundingProgrammeEntity:
         assert funding_programme.code == "ATF3"
 
 
+@pytest.mark.usefixtures("data")
 class TestDatabaseFundingProgrammeRepository:
     def test_add(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():

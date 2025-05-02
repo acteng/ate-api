@@ -1,3 +1,4 @@
+import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
@@ -29,6 +30,7 @@ class TestAuthorityEntity:
         assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool City Region Combined Authority"
 
 
+@pytest.mark.usefixtures("data")
 class TestDatabaseAuthorityRepository:
     def test_add(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():

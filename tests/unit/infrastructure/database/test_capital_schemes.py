@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
@@ -149,6 +150,7 @@ class TestCapitalSchemeOverviewEntity:
         )
 
 
+@pytest.mark.usefixtures("data")
 class TestDatabaseCapitalSchemeRepository:
     def test_add(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():

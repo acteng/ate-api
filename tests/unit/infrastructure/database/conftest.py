@@ -21,7 +21,7 @@ def engine_fixture(database_url: str) -> Engine:
     return engine
 
 
-@pytest.fixture(name="data", autouse=True)
+@pytest.fixture(name="data")
 def data_fixture(engine: Engine) -> Generator[None]:
     yield
     _delete_all(engine)
