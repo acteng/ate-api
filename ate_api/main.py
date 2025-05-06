@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
 from starlette.status import HTTP_403_FORBIDDEN
@@ -13,7 +15,7 @@ class HTTPError(BaseModel):
 app = FastAPI(
     title="ATE API",
     description="The Active Travel England Web API.",
-    version="0.2.0",
+    version=version("ate_api"),
     dependencies=[Depends(authorize)],
     responses={HTTP_403_FORBIDDEN: {"model": HTTPError}},
 )
