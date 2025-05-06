@@ -4,6 +4,12 @@
 
 1. Ensure all GitHub issues are closed for the milestone
 1. Close the GitHub milestone for the release
+1. Update the project version in [pyproject.toml](../pyproject.toml) for the release:
+   ```toml
+   [project]
+   name = "ate-api"
+   version = "<version>"
+   ```
 1. Tag the repository for the release:
    ```bash
    git tag <version>
