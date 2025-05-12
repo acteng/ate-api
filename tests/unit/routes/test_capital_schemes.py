@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from pydantic import AnyUrl
 from starlette.requests import Request
 
 from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
@@ -30,8 +31,8 @@ class TestCapitalSchemeModel:
             overview=CapitalSchemeOverviewModel(
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority=f"{base_url}/authorities/LIV",
-                funding_programme=f"{base_url}/funding-programmes/ATF3",
+                bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+                funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
@@ -42,8 +43,8 @@ class TestCapitalSchemeModel:
             overview=CapitalSchemeOverviewModel(
                 effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority=f"{base_url}/authorities/LIV",
-                funding_programme=f"{base_url}/funding-programmes/ATF3",
+                bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+                funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
         )
@@ -84,8 +85,8 @@ class TestCapitalSchemeOverviewModel:
         assert overview_model == CapitalSchemeOverviewModel(
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority=f"{base_url}/authorities/LIV",
-            funding_programme=f"{base_url}/funding-programmes/ATF3",
+            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
@@ -93,8 +94,8 @@ class TestCapitalSchemeOverviewModel:
         overview_model = CapitalSchemeOverviewModel(
             effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority=f"{base_url}/authorities/LIV",
-            funding_programme=f"{base_url}/funding-programmes/ATF3",
+            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
