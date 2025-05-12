@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum, auto
 
 from ate_api.domain.dates import DateTimeRange
@@ -8,46 +9,27 @@ class CapitalSchemeType(Enum):
     CONSTRUCTION = auto()
 
 
+@dataclass(frozen=True)
+class CapitalSchemeOverview:
+    effective_date: DateTimeRange
+    name: str
+    bid_submitting_authority: str
+    funding_programme: str
+    type: CapitalSchemeType
+
+
 class CapitalScheme:
-    def __init__(
-        self,
-        reference: str,
-        effective_date: DateTimeRange,
-        name: str,
-        bid_submitting_authority: str,
-        funding_programme: str,
-        type_: CapitalSchemeType,
-    ):
+    def __init__(self, reference: str, overview: CapitalSchemeOverview):
         self._reference = reference
-        self._effective_date = effective_date
-        self._name = name
-        self._bid_submitting_authority = bid_submitting_authority
-        self._funding_programme = funding_programme
-        self._type = type_
+        self._overview = overview
 
     @property
     def reference(self) -> str:
         return self._reference
 
     @property
-    def effective_date(self) -> DateTimeRange:
-        return self._effective_date
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def bid_submitting_authority(self) -> str:
-        return self._bid_submitting_authority
-
-    @property
-    def funding_programme(self) -> str:
-        return self._funding_programme
-
-    @property
-    def type(self) -> CapitalSchemeType:
-        return self._type
+    def overview(self) -> CapitalSchemeOverview:
+        return self._overview
 
 
 class CapitalSchemeRepository:

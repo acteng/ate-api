@@ -10,6 +10,7 @@ from starlette.status import HTTP_404_NOT_FOUND
 from ate_api.database import get_session
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
 )
@@ -41,29 +42,26 @@ class CapitalSchemeOverviewModel(BaseModel):
     type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
 
     @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
+    def from_domain(cls, overview: CapitalSchemeOverview, request: Request) -> Self:
         return cls(
-            effective_date=DateTimeRangeModel.from_domain(capital_scheme.effective_date),
-            name=capital_scheme.name,
+            effective_date=DateTimeRangeModel.from_domain(overview.effective_date),
+            name=overview.name,
             bid_submitting_authority=AnyUrl(
-                str(request.url_for("get_authority", abbreviation=capital_scheme.bid_submitting_authority))
+                str(request.url_for("get_authority", abbreviation=overview.bid_submitting_authority))
             ),
-            funding_programme=AnyUrl(
-                str(request.url_for("get_funding_programme", code=capital_scheme.funding_programme))
-            ),
-            type_=CapitalSchemeTypeModel.from_domain(capital_scheme.type),
+            funding_programme=AnyUrl(str(request.url_for("get_funding_programme", code=overview.funding_programme))),
+            type_=CapitalSchemeTypeModel.from_domain(overview.type),
         )
 
-    def to_domain(self, reference: str, request: Request) -> CapitalScheme:
-        return CapitalScheme(
-            reference=reference,
+    def to_domain(self, request: Request) -> CapitalSchemeOverview:
+        return CapitalSchemeOverview(
             effective_date=self.effective_date.to_domain(),
             name=self.name,
             bid_submitting_authority=path_parameter_for(
                 request, "get_authority", "abbreviation", str(self.bid_submitting_authority)
             ),
             funding_programme=path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme)),
-            type_=self.type_.to_domain(),
+            type=self.type_.to_domain(),
         )
 
 
@@ -75,11 +73,11 @@ class CapitalSchemeModel(BaseModel):
     def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
         return cls(
             reference=capital_scheme.reference,
-            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme, request),
+            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
         )
 
     def to_domain(self, request: Request) -> CapitalScheme:
-        return self.overview.to_domain(self.reference, request)
+        return CapitalScheme(reference=self.reference, overview=self.overview.to_domain(request))
 
 
 router = APIRouter(prefix="/capital-schemes", tags=["capital-schemes"])

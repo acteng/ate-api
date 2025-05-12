@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
 )
@@ -41,32 +42,38 @@ def test_get_authority_bid_submitting_capital_schemes(
     capital_schemes.add(
         CapitalScheme(
             reference="ATE00001",
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
-            name="Wirral Package",
-            bid_submitting_authority="LIV",
-            funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
         )
     )
     capital_schemes.add(
         CapitalScheme(
             reference="ATE00002",
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
-            name="School Streets",
-            bid_submitting_authority="LIV",
-            funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="School Streets",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
         )
     )
     authorities.add(Authority(abbreviation="WYO", full_name="West Yorkshire Combined Authority"))
     capital_schemes.add(
         CapitalScheme(
             reference="ATE00003",
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
-            name="Hospital Fields Road",
-            bid_submitting_authority="WYO",
-            funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Hospital Fields Road",
+                bid_submitting_authority="WYO",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
         )
     )
 

@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
 )
@@ -20,11 +21,13 @@ def test_get_capital_scheme(
     capital_schemes.add(
         CapitalScheme(
             reference="ATE00001",
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
-            name="Wirral Package",
-            bid_submitting_authority="LIV",
-            funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
         )
     )
 

@@ -4,7 +4,11 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
-from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
+from ate_api.domain.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeOverview,
+    CapitalSchemeType,
+)
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import (
     AuthorityEntity,
@@ -20,7 +24,56 @@ from ate_api.infrastructure.database.capital_schemes import (
 
 
 class TestCapitalSchemeEntity:
-    pass
+    def test_from_domain(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference="ATE00001",
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+        )
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+        )
+
+        assert capital_scheme_entity.scheme_reference == "ATE00001"
+        (overview_entity,) = capital_scheme_entity.capital_scheme_overviews
+        assert (
+            overview_entity.scheme_name == "Wirral Package"
+            and overview_entity.bid_submitting_authority_id == 1
+            and overview_entity.funding_programme_id == 1
+            and overview_entity.scheme_type_id == 1
+            and overview_entity.effective_date_from == datetime(2020, 1, 1)
+            and overview_entity.effective_date_to is None
+        )
+
+    def test_to_domain(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[
+                CapitalSchemeOverviewEntity(
+                    scheme_name="Wirral Package",
+                    bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
+                    funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
+                    scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    effective_date_from=datetime(2020, 1, 1),
+                )
+            ],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.reference == "ATE00001" and capital_scheme.overview == CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
+            funding_programme="ATF3",
+            type=CapitalSchemeType.CONSTRUCTION,
+        )
 
 
 class TestSchemeTypeName:
@@ -37,17 +90,16 @@ class TestSchemeTypeEntity:
 
 class TestCapitalSchemeOverviewEntity:
     def test_from_domain(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference="ATE00001",
+        overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
             funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            type=CapitalSchemeType.CONSTRUCTION,
         )
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
         )
 
         assert (
@@ -60,35 +112,33 @@ class TestCapitalSchemeOverviewEntity:
         )
 
     def test_from_domain_when_current(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference="ATE00001",
+        overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority="LIV",
             funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            type=CapitalSchemeType.CONSTRUCTION,
         )
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
         )
 
         assert overview_entity.effective_date_to is None
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference="ATE00001",
+        overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(
                 datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
             ),
             name="Wirral Package",
             bid_submitting_authority="LIV",
             funding_programme="ATF3",
-            type_=CapitalSchemeType.CONSTRUCTION,
+            type=CapitalSchemeType.CONSTRUCTION,
         )
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
         )
 
         assert overview_entity.effective_date_from == datetime(
@@ -97,7 +147,6 @@ class TestCapitalSchemeOverviewEntity:
 
     def test_to_domain(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
-            capital_scheme=CapitalSchemeEntity(scheme_reference="ATE00001"),
             scheme_name="Wirral Package",
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
@@ -106,21 +155,19 @@ class TestCapitalSchemeOverviewEntity:
             effective_date_to=datetime(2020, 2, 1),
         )
 
-        capital_scheme = overview_entity.to_domain()
+        overview = overview_entity.to_domain()
 
         assert (
-            capital_scheme.reference == "ATE00001"
-            and capital_scheme.effective_date
+            overview.effective_date
             == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc))
-            and capital_scheme.name == "Wirral Package"
-            and capital_scheme.bid_submitting_authority == "LIV"
-            and capital_scheme.funding_programme == "ATF3"
-            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
+            and overview.name == "Wirral Package"
+            and overview.bid_submitting_authority == "LIV"
+            and overview.funding_programme == "ATF3"
+            and overview.type == CapitalSchemeType.CONSTRUCTION
         )
 
     def test_to_domain_when_current(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
-            capital_scheme=CapitalSchemeEntity(scheme_reference="ATE00001"),
             scheme_name="Wirral Package",
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
@@ -128,13 +175,12 @@ class TestCapitalSchemeOverviewEntity:
             effective_date_from=datetime(2020, 1, 1),
         )
 
-        capital_scheme = overview_entity.to_domain()
+        overview = overview_entity.to_domain()
 
-        assert capital_scheme.effective_date.to is None
+        assert overview.effective_date.to is None
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
-            capital_scheme=CapitalSchemeEntity(scheme_reference="ATE00001"),
             scheme_name="Wirral Package",
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
@@ -143,9 +189,9 @@ class TestCapitalSchemeOverviewEntity:
             effective_date_to=datetime(2020, 7, 1, 13),
         )
 
-        capital_scheme = overview_entity.to_domain()
+        overview = overview_entity.to_domain()
 
-        assert capital_scheme.effective_date == DateTimeRange(
+        assert overview.effective_date == DateTimeRange(
             datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
         )
 
@@ -173,11 +219,13 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes.add(
                 CapitalScheme(
                     reference="ATE00001",
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                    name="Wirral Package",
-                    bid_submitting_authority="LIV",
-                    funding_programme="ATF3",
-                    type_=CapitalSchemeType.CONSTRUCTION,
+                    overview=CapitalSchemeOverview(
+                        effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                        name="Wirral Package",
+                        bid_submitting_authority="LIV",
+                        funding_programme="ATF3",
+                        type=CapitalSchemeType.CONSTRUCTION,
+                    ),
                 )
             )
 
@@ -236,11 +284,14 @@ class TestDatabaseCapitalSchemeRepository:
         assert (
             capital_scheme
             and capital_scheme.reference == "ATE00001"
-            and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc))
-            and capital_scheme.name == "Wirral Package"
-            and capital_scheme.bid_submitting_authority == "LIV"
-            and capital_scheme.funding_programme == "ATF3"
-            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
+            and capital_scheme.overview
+            == CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            )
         )
 
     def test_get_uses_current_overview(self, engine: Engine) -> None:
@@ -284,11 +335,14 @@ class TestDatabaseCapitalSchemeRepository:
         assert (
             capital_scheme
             and capital_scheme.reference == "ATE00001"
-            and capital_scheme.effective_date == DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc))
-            and capital_scheme.name == "School Streets"
-            and capital_scheme.bid_submitting_authority == "LIV"
-            and capital_scheme.funding_programme == "ATF3"
-            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
+            and capital_scheme.overview
+            == CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                name="School Streets",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            )
         )
 
     def test_get_filters_under_embargo(self, engine: Engine) -> None:

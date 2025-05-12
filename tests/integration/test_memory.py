@@ -3,7 +3,11 @@ from datetime import datetime
 import pytest
 
 from ate_api.domain.authorities import Authority
-from ate_api.domain.capital_schemes import CapitalScheme, CapitalSchemeType
+from ate_api.domain.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeOverview,
+    CapitalSchemeType,
+)
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme
 from tests.integration.memory import (
@@ -75,51 +79,33 @@ class TestMemoryCapitalSchemeRepository:
         return MemoryCapitalSchemeRepository()
 
     def test_add(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
-        capital_schemes.add(
-            CapitalScheme(
-                reference="ATE00001",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
-            )
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
+            funding_programme="ATF3",
+            type=CapitalSchemeType.CONSTRUCTION,
         )
 
+        capital_schemes.add(CapitalScheme(reference="ATE00001", overview=overview))
+
         capital_scheme = capital_schemes.get("ATE00001")
-        assert (
-            capital_scheme
-            and capital_scheme.reference == "ATE00001"
-            and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
-            and capital_scheme.name == "Wirral Package"
-            and capital_scheme.bid_submitting_authority == "LIV"
-            and capital_scheme.funding_programme == "ATF3"
-            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
-        )
+        assert capital_scheme and capital_scheme.reference == "ATE00001" and capital_scheme.overview == overview
 
     def test_get(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
-        capital_schemes.add(
-            CapitalScheme(
-                reference="ATE00001",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
-            )
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
+            funding_programme="ATF3",
+            type=CapitalSchemeType.CONSTRUCTION,
         )
+
+        capital_schemes.add(CapitalScheme(reference="ATE00001", overview=overview))
 
         capital_scheme = capital_schemes.get("ATE00001")
 
-        assert (
-            capital_scheme
-            and capital_scheme.reference == "ATE00001"
-            and capital_scheme.effective_date == DateTimeRange(datetime(2020, 1, 1))
-            and capital_scheme.name == "Wirral Package"
-            and capital_scheme.bid_submitting_authority == "LIV"
-            and capital_scheme.funding_programme == "ATF3"
-            and capital_scheme.type == CapitalSchemeType.CONSTRUCTION
-        )
+        assert capital_scheme and capital_scheme.reference == "ATE00001" and capital_scheme.overview == overview
 
     def test_get_when_not_found(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_scheme = capital_schemes.get("ATE00001")
@@ -130,31 +116,37 @@ class TestMemoryCapitalSchemeRepository:
         capital_schemes.add(
             CapitalScheme(
                 reference="ATE00001",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Wirral Package",
+                    bid_submitting_authority="LIV",
+                    funding_programme="ATF3",
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
             )
         )
         capital_schemes.add(
             CapitalScheme(
                 reference="ATE00002",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="School Streets",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="School Streets",
+                    bid_submitting_authority="LIV",
+                    funding_programme="ATF3",
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
             )
         )
         capital_schemes.add(
             CapitalScheme(
                 reference="ATE00003",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Hospital Fields Road",
-                bid_submitting_authority="WYO",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Hospital Fields Road",
+                    bid_submitting_authority="WYO",
+                    funding_programme="ATF3",
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
             )
         )
 
@@ -168,21 +160,25 @@ class TestMemoryCapitalSchemeRepository:
         capital_schemes.add(
             CapitalScheme(
                 reference="ATE00002",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Wirral Package",
+                    bid_submitting_authority="LIV",
+                    funding_programme="ATF3",
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
             )
         )
         capital_schemes.add(
             CapitalScheme(
                 reference="ATE00001",
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type_=CapitalSchemeType.CONSTRUCTION,
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Wirral Package",
+                    bid_submitting_authority="LIV",
+                    funding_programme="ATF3",
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
             )
         )
 
