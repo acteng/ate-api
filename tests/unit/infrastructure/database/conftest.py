@@ -8,6 +8,11 @@ from testcontainers.postgres import PostgresContainer
 from ate_api.infrastructure.database import BaseEntity
 
 
+@pytest.fixture(name="debug", scope="package")
+def debug_fixture() -> bool:
+    return False
+
+
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
     with PostgresContainer("postgres:16") as postgres:
@@ -15,8 +20,8 @@ def database_url_fixture() -> Generator[str]:
 
 
 @pytest.fixture(name="engine", scope="package")
-def engine_fixture(database_url: str) -> Engine:
-    engine = create_engine(database_url)
+def engine_fixture(database_url: str, debug: bool) -> Engine:
+    engine = create_engine(database_url, echo=debug)
     _create_schema(engine)
     return engine
 
