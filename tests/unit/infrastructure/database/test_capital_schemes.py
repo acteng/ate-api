@@ -416,7 +416,7 @@ class TestDatabaseCapitalSchemeRepository:
             and not capital_scheme.authority_review
         )
 
-    def test_get_uses_current_overview(self, engine: Engine) -> None:
+    def test_get_fetches_current_overview(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
@@ -638,7 +638,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert references == ["ATE00001", "ATE00002"]
 
-    def test_get_references_by_bid_submitting_authority_uses_current_overview(self, engine: Engine) -> None:
+    def test_get_references_by_bid_submitting_authority_fetches_current_overview(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
