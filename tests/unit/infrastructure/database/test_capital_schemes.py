@@ -25,107 +25,6 @@ from ate_api.infrastructure.database.capital_schemes import (
 )
 
 
-class TestCapitalSchemeEntity:
-    def test_from_domain(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference="ATE00001",
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-        )
-
-        capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
-        )
-
-        assert capital_scheme_entity.scheme_reference == "ATE00001"
-        (overview_entity,) = capital_scheme_entity.capital_scheme_overviews
-        assert (
-            overview_entity.scheme_name == "Wirral Package"
-            and overview_entity.bid_submitting_authority_id == 1
-            and overview_entity.funding_programme_id == 1
-            and overview_entity.scheme_type_id == 1
-            and overview_entity.effective_date_from == datetime(2020, 1, 1)
-            and overview_entity.effective_date_to is None
-        )
-        assert not capital_scheme_entity.capital_scheme_authority_reviews
-
-    def test_from_domain_sets_authority_review(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference="ATE00001",
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-        )
-        capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
-
-        capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
-        )
-
-        (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
-        assert authority_review_entity.review_date == datetime(2020, 2, 1)
-
-    def test_to_domain(self) -> None:
-        capital_scheme_entity = CapitalSchemeEntity(
-            scheme_reference="ATE00001",
-            capital_scheme_overviews=[
-                CapitalSchemeOverviewEntity(
-                    scheme_name="Wirral Package",
-                    bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
-                    funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
-                    scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    effective_date_from=datetime(2020, 1, 1),
-                )
-            ],
-        )
-
-        capital_scheme = capital_scheme_entity.to_domain()
-
-        assert (
-            capital_scheme.reference == "ATE00001"
-            and capital_scheme.overview
-            == CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type=CapitalSchemeType.CONSTRUCTION,
-            )
-            and not capital_scheme.authority_review
-        )
-
-    def test_to_domain_sets_authority_review(self) -> None:
-        capital_scheme_entity = CapitalSchemeEntity(
-            scheme_reference="ATE00001",
-            capital_scheme_overviews=[self._dummy_overview_entity()],
-            capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
-        )
-
-        capital_scheme = capital_scheme_entity.to_domain()
-
-        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 1, 1, tzinfo=timezone.utc)
-        )
-
-    @staticmethod
-    def _dummy_overview_entity() -> CapitalSchemeOverviewEntity:
-        return CapitalSchemeOverviewEntity(
-            bid_submitting_authority=AuthorityEntity(),
-            funding_programme=FundingProgrammeEntity(),
-            scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
-            effective_date_from=datetime.min,
-        )
-
-
 class TestSchemeTypeName:
     def test_from_domain(self) -> None:
         assert SchemeTypeName.from_domain(CapitalSchemeType.CONSTRUCTION) == SchemeTypeName.CONSTRUCTION
@@ -275,6 +174,107 @@ class TestCapitalSchemeAuthorityReviewEntity:
 
         assert authority_review == CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 6, 1, 12, tzinfo=timezone.utc)
+        )
+
+
+class TestCapitalSchemeEntity:
+    def test_from_domain(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference="ATE00001",
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+        )
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+        )
+
+        assert capital_scheme_entity.scheme_reference == "ATE00001"
+        (overview_entity,) = capital_scheme_entity.capital_scheme_overviews
+        assert (
+            overview_entity.scheme_name == "Wirral Package"
+            and overview_entity.bid_submitting_authority_id == 1
+            and overview_entity.funding_programme_id == 1
+            and overview_entity.scheme_type_id == 1
+            and overview_entity.effective_date_from == datetime(2020, 1, 1)
+            and overview_entity.effective_date_to is None
+        )
+        assert not capital_scheme_entity.capital_scheme_authority_reviews
+
+    def test_from_domain_sets_authority_review(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference="ATE00001",
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+        )
+        capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+        )
+
+        (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
+        assert authority_review_entity.review_date == datetime(2020, 2, 1)
+
+    def test_to_domain(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[
+                CapitalSchemeOverviewEntity(
+                    scheme_name="Wirral Package",
+                    bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
+                    funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
+                    scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    effective_date_from=datetime(2020, 1, 1),
+                )
+            ],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert (
+            capital_scheme.reference == "ATE00001"
+            and capital_scheme.overview
+            == CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            )
+            and not capital_scheme.authority_review
+        )
+
+    def test_to_domain_sets_authority_review(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[self._dummy_overview_entity()],
+            capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 1, 1, tzinfo=timezone.utc)
+        )
+
+    @staticmethod
+    def _dummy_overview_entity() -> CapitalSchemeOverviewEntity:
+        return CapitalSchemeOverviewEntity(
+            bid_submitting_authority=AuthorityEntity(),
+            funding_programme=FundingProgrammeEntity(),
+            scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
+            effective_date_from=datetime.min,
         )
 
 
