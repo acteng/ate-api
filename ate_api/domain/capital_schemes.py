@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum, auto
 
 from ate_api.domain.dates import DateTimeRange
@@ -18,10 +19,16 @@ class CapitalSchemeOverview:
     type: CapitalSchemeType
 
 
+@dataclass(frozen=True)
+class CapitalSchemeAuthorityReview:
+    review_date: datetime
+
+
 class CapitalScheme:
     def __init__(self, reference: str, overview: CapitalSchemeOverview):
         self._reference = reference
         self._overview = overview
+        self._authority_review: CapitalSchemeAuthorityReview | None = None
 
     @property
     def reference(self) -> str:
@@ -30,6 +37,13 @@ class CapitalScheme:
     @property
     def overview(self) -> CapitalSchemeOverview:
         return self._overview
+
+    @property
+    def authority_review(self) -> CapitalSchemeAuthorityReview | None:
+        return self._authority_review
+
+    def perform_authority_review(self, authority_review: CapitalSchemeAuthorityReview) -> None:
+        self._authority_review = authority_review
 
 
 class CapitalSchemeRepository:

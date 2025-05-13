@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeAuthorityReview,
     CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
@@ -43,7 +44,25 @@ def test_get_capital_scheme(
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "type": "construction",
         },
+        "authorityReview": None,
     }
+
+
+@respx.mock
+def test_get_capital_scheme_with_authority_review(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+    capital_scheme = CapitalScheme(reference="ATE00001", overview=_dummy_overview())
+    capital_scheme.perform_authority_review(
+        CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=timezone.utc))
+    )
+    capital_schemes.add(capital_scheme)
+
+    response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200
+    assert response.json()["authorityReview"] == {"reviewDate": "2020-02-01T00:00:00Z"}
 
 
 @respx.mock
@@ -51,3 +70,13 @@ def test_get_capital_scheme_when_not_found(client: TestClient, access_token: str
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 404
+
+
+def _dummy_overview() -> CapitalSchemeOverview:
+    return CapitalSchemeOverview(
+        effective_date=DateTimeRange(datetime.min),
+        name="",
+        bid_submitting_authority="dummy",
+        funding_programme="dummy",
+        type=CapitalSchemeType.DEVELOPMENT,
+    )

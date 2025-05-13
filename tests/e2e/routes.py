@@ -13,6 +13,7 @@ from ate_api.domain.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.database import (
     AuthorityEntity,
+    CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
@@ -81,6 +82,7 @@ def create_capital_scheme(
 @router.delete("/capital-schemes", status_code=HTTP_204_NO_CONTENT)
 def delete_capital_schemes(session: Annotated[Session, Depends(get_session)]) -> Response:
     session.execute(delete(CapitalSchemeOverviewEntity))
+    session.execute(delete(CapitalSchemeAuthorityReviewEntity))
     session.execute(delete(CapitalSchemeEntity))
     session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)

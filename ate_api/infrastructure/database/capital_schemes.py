@@ -2,10 +2,11 @@ from datetime import datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey, false, select
+from sqlalchemy import ForeignKey, Select, and_, false, func, select
 from sqlalchemy.orm import (
     Mapped,
     Session,
+    aliased,
     contains_eager,
     joinedload,
     mapped_column,
@@ -14,6 +15,7 @@ from sqlalchemy.orm import (
 
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeAuthorityReview,
     CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
@@ -91,6 +93,22 @@ class CapitalSchemeOverviewEntity(BaseEntity):
         )
 
 
+class CapitalSchemeAuthorityReviewEntity(BaseEntity):
+    __tablename__ = "capital_scheme_authority_review"
+    __table_args__ = {"schema": "capital_scheme"}
+
+    capital_scheme_authority_review_id: Mapped[int] = mapped_column(primary_key=True)
+    capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
+    review_date: Mapped[datetime]
+
+    @classmethod
+    def from_domain(cls, authority_review: CapitalSchemeAuthorityReview) -> Self:
+        return cls(review_date=zoned_to_local(authority_review.review_date))
+
+    def to_domain(self) -> CapitalSchemeAuthorityReview:
+        return CapitalSchemeAuthorityReview(review_date=local_to_zoned(self.review_date))
+
+
 class CapitalSchemeEntity(BaseEntity):
     __tablename__ = "capital_scheme"
     __table_args__ = {"schema": "capital_scheme"}
@@ -98,6 +116,7 @@ class CapitalSchemeEntity(BaseEntity):
     capital_scheme_id: Mapped[int] = mapped_column(primary_key=True)
     scheme_reference: Mapped[str] = mapped_column(unique=True)
     capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
+    capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
 
     @classmethod
     def from_domain(
@@ -114,11 +133,22 @@ class CapitalSchemeEntity(BaseEntity):
                     capital_scheme.overview, authority_ids, funding_programme_ids, scheme_type_ids
                 )
             ],
+            capital_scheme_authority_reviews=(
+                [CapitalSchemeAuthorityReviewEntity.from_domain(capital_scheme.authority_review)]
+                if capital_scheme.authority_review
+                else []
+            ),
         )
 
     def to_domain(self) -> CapitalScheme:
         (capital_scheme_overview,) = self.capital_scheme_overviews
-        return CapitalScheme(reference=self.scheme_reference, overview=capital_scheme_overview.to_domain())
+        capital_scheme = CapitalScheme(reference=self.scheme_reference, overview=capital_scheme_overview.to_domain())
+
+        if self.capital_scheme_authority_reviews:
+            (capital_scheme_authority_review,) = self.capital_scheme_authority_reviews
+            capital_scheme.perform_authority_review(capital_scheme_authority_review.to_domain())
+
+        return capital_scheme
 
 
 class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
@@ -134,6 +164,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
     def get(self, reference: str) -> CapitalScheme | None:
+        ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
+        ranked_capital_scheme_authority_reviews_alias = aliased(
+            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
+        )
+
         result = self._session.scalars(
             select(CapitalSchemeEntity)
             .options(
@@ -145,6 +180,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                     CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
                 ),
                 joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
+                contains_eager(
+                    CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
+                        ranked_capital_scheme_authority_reviews_alias
+                    )
+                ),
             )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
@@ -154,8 +194,17 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(
                 CapitalSchemeOverviewEntity.funding_programme.and_(FundingProgrammeEntity.is_under_embargo == false())
             )
+            .outerjoin(
+                ranked_capital_scheme_authority_reviews_alias,
+                and_(
+                    CapitalSchemeEntity.capital_scheme_id
+                    == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
+                    ranked_capital_scheme_authority_reviews.c.rank == 1,
+                ),
+            )
             .where(CapitalSchemeEntity.scheme_reference == reference)
         )
+
         row = result.unique().one_or_none()
         return row.to_domain() if row else None
 
@@ -200,3 +249,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {row.scheme_type_name: row.scheme_type_id for row in rows}
+
+    @staticmethod
+    def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:
+        return select(
+            CapitalSchemeAuthorityReviewEntity,
+            func.rank()
+            .over(
+                partition_by=CapitalSchemeAuthorityReviewEntity.capital_scheme_id,
+                order_by=CapitalSchemeAuthorityReviewEntity.review_date.desc(),
+            )
+            .label("rank"),
+        )

@@ -6,12 +6,14 @@ from sqlalchemy.orm import Session
 
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeAuthorityReview,
     CapitalSchemeOverview,
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import (
     AuthorityEntity,
+    CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
@@ -50,6 +52,27 @@ class TestCapitalSchemeEntity:
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
             and overview_entity.effective_date_to is None
         )
+        assert not capital_scheme_entity.capital_scheme_authority_reviews
+
+    def test_from_domain_sets_authority_review(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference="ATE00001",
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+        )
+        capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+        )
+
+        (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
+        assert authority_review_entity.review_date == datetime(2020, 2, 1)
 
     def test_to_domain(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
@@ -67,12 +90,39 @@ class TestCapitalSchemeEntity:
 
         capital_scheme = capital_scheme_entity.to_domain()
 
-        assert capital_scheme.reference == "ATE00001" and capital_scheme.overview == CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
-            name="Wirral Package",
-            bid_submitting_authority="LIV",
-            funding_programme="ATF3",
-            type=CapitalSchemeType.CONSTRUCTION,
+        assert (
+            capital_scheme.reference == "ATE00001"
+            and capital_scheme.overview
+            == CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                name="Wirral Package",
+                bid_submitting_authority="LIV",
+                funding_programme="ATF3",
+                type=CapitalSchemeType.CONSTRUCTION,
+            )
+            and not capital_scheme.authority_review
+        )
+
+    def test_to_domain_sets_authority_review(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[self._dummy_overview_entity()],
+            capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 1, 1, tzinfo=timezone.utc)
+        )
+
+    @staticmethod
+    def _dummy_overview_entity() -> CapitalSchemeOverviewEntity:
+        return CapitalSchemeOverviewEntity(
+            bid_submitting_authority=AuthorityEntity(),
+            funding_programme=FundingProgrammeEntity(),
+            scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
+            effective_date_from=datetime.min,
         )
 
 
@@ -196,6 +246,38 @@ class TestCapitalSchemeOverviewEntity:
         )
 
 
+class TestCapitalSchemeAuthorityReviewEntity:
+    def test_from_domain(self) -> None:
+        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
+
+        authority_review_entity = CapitalSchemeAuthorityReviewEntity.from_domain(authority_review)
+
+        assert authority_review_entity.review_date == datetime(2020, 1, 1)
+
+    def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
+        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 6, 1, 12, tzinfo=timezone.utc))
+
+        authority_review_entity = CapitalSchemeAuthorityReviewEntity.from_domain(authority_review)
+
+        assert authority_review_entity.review_date == datetime(2020, 6, 1, 13)
+
+    def test_to_domain(self) -> None:
+        authority_review_entity = CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))
+
+        authority_review = authority_review_entity.to_domain()
+
+        assert authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1, tzinfo=timezone.utc))
+
+    def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
+        authority_review_entity = CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 6, 1, 13))
+
+        authority_review = authority_review_entity.to_domain()
+
+        assert authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 6, 1, 12, tzinfo=timezone.utc)
+        )
+
+
 @pytest.mark.usefixtures("data")
 class TestDatabaseCapitalSchemeRepository:
     def test_add(self, engine: Engine) -> None:
@@ -241,6 +323,45 @@ class TestDatabaseCapitalSchemeRepository:
             and overview_row.scheme_type_id == 1
             and overview_row.effective_date_from == datetime(2020, 1, 1)
             and overview_row.effective_date_to is None
+        )
+
+    def test_add_stores_authority_review(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                ]
+            )
+
+        with Session(engine) as session, session.begin():
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = CapitalScheme(
+                reference="ATE00001",
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Wirral Package",
+                    bid_submitting_authority="LIV",
+                    funding_programme="ATF3",
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+            )
+            capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
+            capital_schemes.add(capital_scheme)
+
+        with Session(engine) as session:
+            (capital_scheme_row,) = session.scalars(select(CapitalSchemeEntity))
+            (authority_review_row,) = session.scalars(select(CapitalSchemeAuthorityReviewEntity))
+        assert (
+            authority_review_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and authority_review_row.review_date == datetime(2020, 2, 1)
         )
 
     def test_get(self, engine: Engine) -> None:
@@ -292,6 +413,7 @@ class TestDatabaseCapitalSchemeRepository:
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             )
+            and not capital_scheme.authority_review
         )
 
     def test_get_uses_current_overview(self, engine: Engine) -> None:
@@ -375,6 +497,85 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = capital_schemes.get("ATE00001")
 
         assert not capital_scheme
+
+    def test_get_fetches_authority_review(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeAuthorityReviewEntity(capital_scheme_id=1, review_date=datetime(2020, 2, 1)),
+                    CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=2,
+                        scheme_name="School Streets",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeAuthorityReviewEntity(capital_scheme_id=2, review_date=datetime(2020, 3, 1)),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=timezone.utc)
+        )
+
+    def test_get_fetches_latest_authority_review(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    AuthorityEntity(
+                        authority_id=1,
+                        authority_full_name="Liverpool City Region Combined Authority",
+                        authority_abbreviation="LIV",
+                    ),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeAuthorityReviewEntity(capital_scheme_id=1, review_date=datetime(2020, 2, 1)),
+                    CapitalSchemeAuthorityReviewEntity(capital_scheme_id=1, review_date=datetime(2020, 3, 1)),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 3, 1, tzinfo=timezone.utc)
+        )
 
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
