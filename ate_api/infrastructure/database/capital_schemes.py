@@ -211,14 +211,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     def get_references_by_bid_submitting_authority(self, authority_abbreviation: str) -> list[str]:
         result = self._session.scalars(
             select(CapitalSchemeEntity.scheme_reference)
-            .join(CapitalSchemeOverviewEntity)
+            .join(
+                CapitalSchemeEntity.capital_scheme_overviews.and_(
+                    CapitalSchemeOverviewEntity.effective_date_to.is_(None)
+                )
+            )
             .join(
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
-            .join(FundingProgrammeEntity)
-            .where(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
+            .join(
+                CapitalSchemeOverviewEntity.funding_programme.and_(FundingProgrammeEntity.is_under_embargo == false())
+            )
             .where(AuthorityEntity.authority_abbreviation == authority_abbreviation)
-            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
         return list(result.all())
