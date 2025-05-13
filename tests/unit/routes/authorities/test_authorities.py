@@ -1,3 +1,4 @@
+from pydantic import AnyUrl
 from starlette.requests import Request
 
 from ate_api.domain.authorities import Authority
@@ -13,7 +14,7 @@ class TestAuthorityModel:
         assert authority_model == AuthorityModel(
             abbreviation="LIV",
             full_name="Liverpool City Region Combined Authority",
-            bid_submitting_capital_schemes=f"{base_url}/authorities/LIV/capital-schemes/bid-submitting",
+            bid_submitting_capital_schemes=AnyUrl(f"{base_url}/authorities/LIV/capital-schemes/bid-submitting"),
         )
 
     def test_to_domain(self) -> None:
