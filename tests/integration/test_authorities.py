@@ -6,13 +6,12 @@ from fastapi.testclient import TestClient
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
     CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
+from tests.unit.domain.dummies import dummy_bid_status_details
 
 
 @respx.mock
@@ -51,7 +50,7 @@ def test_get_authority_bid_submitting_capital_schemes(
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=_dummy_bid_status_details(),
+            bid_status_details=dummy_bid_status_details(),
         )
     )
     capital_schemes.add(
@@ -64,7 +63,7 @@ def test_get_authority_bid_submitting_capital_schemes(
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=_dummy_bid_status_details(),
+            bid_status_details=dummy_bid_status_details(),
         )
     )
     authorities.add(Authority(abbreviation="WYO", full_name="West Yorkshire Combined Authority"))
@@ -78,7 +77,7 @@ def test_get_authority_bid_submitting_capital_schemes(
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=_dummy_bid_status_details(),
+            bid_status_details=dummy_bid_status_details(),
         )
     )
 
@@ -116,9 +115,3 @@ def test_get_authority_bid_submitting_capital_schemes_when_not_found(client: Tes
     )
 
     assert response.status_code == 404
-
-
-def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
-    return CapitalSchemeBidStatusDetails(
-        effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
-    )

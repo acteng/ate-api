@@ -28,6 +28,7 @@ from ate_api.infrastructure.database import (
 from ate_api.infrastructure.database.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
+from tests.unit.domain.dummies import dummy_bid_status_details
 
 
 class TestSchemeTypeName:
@@ -482,7 +483,7 @@ class TestDatabaseCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=self._dummy_bid_status_details(),
+                bid_status_details=dummy_bid_status_details(),
             )
             capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
             capital_schemes.add(capital_scheme)
@@ -869,9 +870,3 @@ class TestDatabaseCapitalSchemeRepository:
             references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
         assert references == ["ATE00001", "ATE00002"]
-
-    @staticmethod
-    def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
-        return CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime.fromtimestamp(0)), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
-        )

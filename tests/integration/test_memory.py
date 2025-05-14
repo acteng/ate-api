@@ -17,6 +17,7 @@ from tests.integration.memory import (
     MemoryCapitalSchemeRepository,
     MemoryFundingProgrammeRepository,
 )
+from tests.unit.domain.dummies import dummy_bid_status_details
 
 
 class TestMemoryFundingProgrammeRepository:
@@ -147,7 +148,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=self._dummy_bid_status_details(),
+                bid_status_details=dummy_bid_status_details(),
             )
         )
         capital_schemes.add(
@@ -160,7 +161,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=self._dummy_bid_status_details(),
+                bid_status_details=dummy_bid_status_details(),
             )
         )
         capital_schemes.add(
@@ -173,7 +174,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=self._dummy_bid_status_details(),
+                bid_status_details=dummy_bid_status_details(),
             )
         )
 
@@ -194,7 +195,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=self._dummy_bid_status_details(),
+                bid_status_details=dummy_bid_status_details(),
             )
         )
         capital_schemes.add(
@@ -207,16 +208,10 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=self._dummy_bid_status_details(),
+                bid_status_details=dummy_bid_status_details(),
             )
         )
 
         references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
         assert references == ["ATE00001", "ATE00002"]
-
-    @staticmethod
-    def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
-        return CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
-        )

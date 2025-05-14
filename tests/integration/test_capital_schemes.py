@@ -14,6 +14,7 @@ from ate_api.domain.capital_schemes import (
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
+from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
 @respx.mock
@@ -64,7 +65,7 @@ def test_get_capital_scheme_with_authority_review(
 ) -> None:
     authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
     capital_scheme = CapitalScheme(
-        reference="ATE00001", overview=_dummy_overview(), bid_status_details=_dummy_bid_status_details()
+        reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
     )
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=timezone.utc))
@@ -82,19 +83,3 @@ def test_get_capital_scheme_when_not_found(client: TestClient, access_token: str
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 404
-
-
-def _dummy_overview() -> CapitalSchemeOverview:
-    return CapitalSchemeOverview(
-        effective_date=DateTimeRange(datetime.min),
-        name="",
-        bid_submitting_authority="dummy",
-        funding_programme="dummy",
-        type=CapitalSchemeType.DEVELOPMENT,
-    )
-
-
-def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
-    return CapitalSchemeBidStatusDetails(
-        effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
-    )

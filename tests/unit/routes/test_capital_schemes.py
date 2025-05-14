@@ -21,6 +21,7 @@ from ate_api.routes.capital_schemes import (
     CapitalSchemeTypeModel,
 )
 from ate_api.routes.dates import DateTimeRangeModel
+from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
 class TestCapitalSchemeTypeModel:
@@ -158,7 +159,7 @@ class TestCapitalSchemeModel:
 
     def test_from_domain_sets_authority_review(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001", overview=self._dummy_overview(), bid_status_details=self._dummy_bid_status_details()
+            reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
         )
         capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1)))
 
@@ -217,16 +218,6 @@ class TestCapitalSchemeModel:
         assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1))
 
     @staticmethod
-    def _dummy_overview() -> CapitalSchemeOverview:
-        return CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime.min),
-            name="",
-            bid_submitting_authority="dummy",
-            funding_programme="dummy",
-            type=CapitalSchemeType.DEVELOPMENT,
-        )
-
-    @staticmethod
     def _dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
         return CapitalSchemeOverviewModel(
             name="",
@@ -234,12 +225,6 @@ class TestCapitalSchemeModel:
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/dummy"),
             type_=CapitalSchemeTypeModel.DEVELOPMENT,
             effective_date=DateTimeRangeModel(from_=datetime.min),
-        )
-
-    @staticmethod
-    def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
-        return CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
         )
 
     @staticmethod

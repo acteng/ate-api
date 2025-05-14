@@ -9,6 +9,7 @@ from ate_api.domain.capital_schemes import (
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
+from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
 class TestCapitalSchemeOverview:
@@ -39,26 +40,10 @@ class TestCapitalScheme:
 
     def test_perform_authority_review(self) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001", overview=self._dummy_overview(), bid_status_details=self._dummy_bid_status_details()
+            reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
         )
         authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1))
 
         capital_scheme.perform_authority_review(authority_review)
 
         assert capital_scheme.authority_review == authority_review
-
-    @staticmethod
-    def _dummy_overview() -> CapitalSchemeOverview:
-        return CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime.min),
-            name="",
-            bid_submitting_authority="",
-            funding_programme="",
-            type=CapitalSchemeType.DEVELOPMENT,
-        )
-
-    @staticmethod
-    def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
-        return CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
-        )
