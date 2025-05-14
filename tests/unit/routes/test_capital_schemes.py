@@ -207,13 +207,7 @@ class TestCapitalSchemeModel:
     def test_to_domain_sets_authority_review(self, http_request: Request, base_url: str) -> None:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
-            overview=CapitalSchemeOverviewModel(
-                effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
-                funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-                type_=CapitalSchemeTypeModel.CONSTRUCTION,
-            ),
+            overview=self._dummy_overview_model(base_url),
             bid_status_details=self._dummy_bid_status_details_model(),
             authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1)),
         )
@@ -230,6 +224,16 @@ class TestCapitalSchemeModel:
             bid_submitting_authority="dummy",
             funding_programme="dummy",
             type=CapitalSchemeType.DEVELOPMENT,
+        )
+
+    @staticmethod
+    def _dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
+        return CapitalSchemeOverviewModel(
+            name="",
+            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/dummy"),
+            funding_programme=AnyUrl(f"{base_url}/funding-programmes/dummy"),
+            type_=CapitalSchemeTypeModel.DEVELOPMENT,
+            effective_date=DateTimeRangeModel(from_=datetime.min),
         )
 
     @staticmethod
