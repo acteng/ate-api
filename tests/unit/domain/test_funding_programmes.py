@@ -6,7 +6,3 @@ class TestFundingProgramme:
         funding_programme = FundingProgramme(code="ATF3")
 
         assert funding_programme.code == "ATF3"
-
-
-class TestFundingProgrammeRepository:
-    pass

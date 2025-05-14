@@ -43,10 +43,6 @@ class TestSchemeTypeName:
         assert SchemeTypeName.CONSTRUCTION.to_domain() == CapitalSchemeType.CONSTRUCTION
 
 
-class TestSchemeTypeEntity:
-    pass
-
-
 class TestCapitalSchemeOverviewEntity:
     def test_from_domain(self) -> None:
         overview = CapitalSchemeOverview(

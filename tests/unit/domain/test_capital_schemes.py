@@ -12,10 +12,6 @@ from ate_api.domain.dates import DateTimeRange
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
-class TestCapitalSchemeOverview:
-    pass
-
-
 class TestCapitalScheme:
     def test_create(self) -> None:
         overview = CapitalSchemeOverview(
