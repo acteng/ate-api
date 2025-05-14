@@ -14,8 +14,10 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeAuthorityReview,
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,
-    CapitalSchemeOverview,
     CapitalSchemeRepository,
+)
+from ate_api.domain.capital_schemes.overviews import (
+    CapitalSchemeOverview,
     CapitalSchemeType,
 )
 from ate_api.infrastructure.database.capital_schemes import (

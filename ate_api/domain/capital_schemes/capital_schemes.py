@@ -2,21 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.dates import DateTimeRange
-
-
-class CapitalSchemeType(Enum):
-    DEVELOPMENT = auto()
-    CONSTRUCTION = auto()
-
-
-@dataclass(frozen=True)
-class CapitalSchemeOverview:
-    effective_date: DateTimeRange
-    name: str
-    bid_submitting_authority: str
-    funding_programme: str
-    type: CapitalSchemeType
 
 
 class CapitalSchemeBidStatus(Enum):

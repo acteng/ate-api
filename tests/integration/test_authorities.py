@@ -6,8 +6,10 @@ from fastapi.testclient import TestClient
 from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
-    CapitalSchemeOverview,
     CapitalSchemeRepository,
+)
+from ate_api.domain.capital_schemes.overviews import (
+    CapitalSchemeOverview,
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange

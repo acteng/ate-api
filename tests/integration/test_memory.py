@@ -7,6 +7,8 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,
+)
+from ate_api.domain.capital_schemes.overviews import (
     CapitalSchemeOverview,
     CapitalSchemeType,
 )

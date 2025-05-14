@@ -9,6 +9,8 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeAuthorityReview,
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,
+)
+from ate_api.domain.capital_schemes.overviews import (
     CapitalSchemeOverview,
     CapitalSchemeType,
 )
