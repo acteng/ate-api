@@ -5,6 +5,8 @@ import pytest
 from ate_api.domain.authorities import Authority
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
+    CapitalSchemeBidStatus,
+    CapitalSchemeBidStatusDetails,
     CapitalSchemeOverview,
     CapitalSchemeType,
 )
@@ -86,11 +88,22 @@ class TestMemoryCapitalSchemeRepository:
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
+        bid_status_details = CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 2, 1)),
+            bid_status=CapitalSchemeBidStatus.FUNDED,
+        )
 
-        capital_schemes.add(CapitalScheme(reference="ATE00001", overview=overview))
+        capital_schemes.add(
+            CapitalScheme(reference="ATE00001", overview=overview, bid_status_details=bid_status_details)
+        )
 
         capital_scheme = capital_schemes.get("ATE00001")
-        assert capital_scheme and capital_scheme.reference == "ATE00001" and capital_scheme.overview == overview
+        assert (
+            capital_scheme
+            and capital_scheme.reference == "ATE00001"
+            and capital_scheme.overview == overview
+            and capital_scheme.bid_status_details == bid_status_details
+        )
 
     def test_get(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         overview = CapitalSchemeOverview(
@@ -100,12 +113,23 @@ class TestMemoryCapitalSchemeRepository:
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
+        bid_status_details = CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 2, 1)),
+            bid_status=CapitalSchemeBidStatus.FUNDED,
+        )
 
-        capital_schemes.add(CapitalScheme(reference="ATE00001", overview=overview))
+        capital_schemes.add(
+            CapitalScheme(reference="ATE00001", overview=overview, bid_status_details=bid_status_details)
+        )
 
         capital_scheme = capital_schemes.get("ATE00001")
 
-        assert capital_scheme and capital_scheme.reference == "ATE00001" and capital_scheme.overview == overview
+        assert (
+            capital_scheme
+            and capital_scheme.reference == "ATE00001"
+            and capital_scheme.overview == overview
+            and capital_scheme.bid_status_details == bid_status_details
+        )
 
     def test_get_when_not_found(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_scheme = capital_schemes.get("ATE00001")
@@ -123,6 +147,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                bid_status_details=self._dummy_bid_status_details(),
             )
         )
         capital_schemes.add(
@@ -135,6 +160,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                bid_status_details=self._dummy_bid_status_details(),
             )
         )
         capital_schemes.add(
@@ -147,6 +173,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                bid_status_details=self._dummy_bid_status_details(),
             )
         )
 
@@ -167,6 +194,7 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                bid_status_details=self._dummy_bid_status_details(),
             )
         )
         capital_schemes.add(
@@ -179,9 +207,16 @@ class TestMemoryCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                bid_status_details=self._dummy_bid_status_details(),
             )
         )
 
         references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
         assert references == ["ATE00001", "ATE00002"]
+
+    @staticmethod
+    def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
+        return CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
+        )

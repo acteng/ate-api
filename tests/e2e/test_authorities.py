@@ -29,6 +29,10 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
             },
+            "bidStatusDetails": {
+                "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
+                "bidStatus": "funded",
+            },
         }
     )
     app_client.create_capital_scheme(
@@ -40,6 +44,10 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
+            },
+            "bidStatusDetails": {
+                "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
+                "bidStatus": "funded",
             },
         }
     )

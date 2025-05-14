@@ -7,6 +7,8 @@ from ate_api.domain.authorities import Authority, AuthorityRepository
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
+    CapitalSchemeBidStatus,
+    CapitalSchemeBidStatusDetails,
     CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
@@ -29,6 +31,10 @@ def test_get_capital_scheme(
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
+            bid_status_details=CapitalSchemeBidStatusDetails(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                bid_status=CapitalSchemeBidStatus.FUNDED,
+            ),
         )
     )
 
@@ -44,6 +50,10 @@ def test_get_capital_scheme(
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "type": "construction",
         },
+        "bidStatusDetails": {
+            "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
+            "bidStatus": "funded",
+        },
         "authorityReview": None,
     }
 
@@ -53,7 +63,9 @@ def test_get_capital_scheme_with_authority_review(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
     authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
-    capital_scheme = CapitalScheme(reference="ATE00001", overview=_dummy_overview())
+    capital_scheme = CapitalScheme(
+        reference="ATE00001", overview=_dummy_overview(), bid_status_details=_dummy_bid_status_details()
+    )
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=timezone.utc))
     )
@@ -79,4 +91,10 @@ def _dummy_overview() -> CapitalSchemeOverview:
         bid_submitting_authority="dummy",
         funding_programme="dummy",
         type=CapitalSchemeType.DEVELOPMENT,
+    )
+
+
+def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
+    return CapitalSchemeBidStatusDetails(
+        effective_date=DateTimeRange(datetime.min), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
     )

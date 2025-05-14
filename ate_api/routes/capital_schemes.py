@@ -12,6 +12,8 @@ from ate_api.database import get_session
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
+    CapitalSchemeBidStatus,
+    CapitalSchemeBidStatusDetails,
     CapitalSchemeOverview,
     CapitalSchemeRepository,
     CapitalSchemeType,
@@ -67,6 +69,38 @@ class CapitalSchemeOverviewModel(BaseModel):
         )
 
 
+class CapitalSchemeBidStatusModel(str, Enum):
+    SUBMITTED = "submitted"
+    FUNDED = "funded"
+    NOT_FUNDED = "not funded"
+    SPLIT = "split"
+    DELETED = "deleted"
+
+    @classmethod
+    def from_domain(cls, bid_status: CapitalSchemeBidStatus) -> Self:
+        return cls[bid_status.name]
+
+    def to_domain(self) -> CapitalSchemeBidStatus:
+        return CapitalSchemeBidStatus[self.name]
+
+
+class CapitalSchemeBidStatusDetailsModel(BaseModel):
+    effective_date: DateTimeRangeModel
+    bid_status: CapitalSchemeBidStatusModel
+
+    @classmethod
+    def from_domain(cls, bid_status_details: CapitalSchemeBidStatusDetails) -> Self:
+        return cls(
+            effective_date=DateTimeRangeModel.from_domain(bid_status_details.effective_date),
+            bid_status=CapitalSchemeBidStatusModel.from_domain(bid_status_details.bid_status),
+        )
+
+    def to_domain(self) -> CapitalSchemeBidStatusDetails:
+        return CapitalSchemeBidStatusDetails(
+            effective_date=self.effective_date.to_domain(), bid_status=self.bid_status.to_domain()
+        )
+
+
 class CapitalSchemeAuthorityReviewModel(BaseModel):
     review_date: datetime
 
@@ -81,6 +115,7 @@ class CapitalSchemeAuthorityReviewModel(BaseModel):
 class CapitalSchemeModel(BaseModel):
     reference: str
     overview: CapitalSchemeOverviewModel
+    bid_status_details: CapitalSchemeBidStatusDetailsModel
     authority_review: CapitalSchemeAuthorityReviewModel | None = None
 
     @classmethod
@@ -88,6 +123,7 @@ class CapitalSchemeModel(BaseModel):
         return cls(
             reference=capital_scheme.reference,
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
+            bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
             authority_review=(
                 CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme.authority_review)
                 if capital_scheme.authority_review
@@ -96,7 +132,11 @@ class CapitalSchemeModel(BaseModel):
         )
 
     def to_domain(self, request: Request) -> CapitalScheme:
-        capital_scheme = CapitalScheme(reference=self.reference, overview=self.overview.to_domain(request))
+        capital_scheme = CapitalScheme(
+            reference=self.reference,
+            overview=self.overview.to_domain(request),
+            bid_status_details=self.bid_status_details.to_domain(),
+        )
 
         if self.authority_review:
             capital_scheme.perform_authority_review(self.authority_review.to_domain())

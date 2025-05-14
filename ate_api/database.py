@@ -6,7 +6,13 @@ from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.ddl import CreateSchema
 
-from ate_api.infrastructure.database import BaseEntity, SchemeTypeEntity, SchemeTypeName
+from ate_api.infrastructure.database import (
+    BaseEntity,
+    BidStatusEntity,
+    BidStatusName,
+    SchemeTypeEntity,
+    SchemeTypeName,
+)
 from ate_api.settings import Settings, get_settings
 
 
@@ -48,5 +54,6 @@ def _create_schema(engine: Engine) -> None:
 
 def _create_reference_data(engine: Engine) -> None:
     with Session(engine) as session:
+        session.add_all([BidStatusEntity(bid_status_name=bid_status_name) for bid_status_name in BidStatusName])
         session.add_all([SchemeTypeEntity(scheme_type_name=scheme_type_name) for scheme_type_name in SchemeTypeName])
         session.commit()

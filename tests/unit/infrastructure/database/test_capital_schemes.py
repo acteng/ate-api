@@ -7,13 +7,18 @@ from sqlalchemy.orm import Session
 from ate_api.domain.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
+    CapitalSchemeBidStatus,
+    CapitalSchemeBidStatusDetails,
     CapitalSchemeOverview,
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import (
     AuthorityEntity,
+    BidStatusEntity,
+    BidStatusName,
     CapitalSchemeAuthorityReviewEntity,
+    CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
@@ -145,6 +150,92 @@ class TestCapitalSchemeOverviewEntity:
         )
 
 
+class TestBidStatusName:
+    def test_to_domain(self) -> None:
+        assert BidStatusName.FUNDED.to_domain() == CapitalSchemeBidStatus.FUNDED
+
+    def test_from_domain(self) -> None:
+        assert BidStatusName.from_domain(CapitalSchemeBidStatus.FUNDED) == BidStatusName.FUNDED
+
+
+class TestCapitalSchemeBidStatusEntity:
+    def test_from_domain(self) -> None:
+        bid_status_details = CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
+            bid_status=CapitalSchemeBidStatus.FUNDED,
+        )
+
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
+
+        assert (
+            bid_status_entity.bid_status_id == 1
+            and bid_status_entity.effective_date_from == datetime(2020, 1, 1)
+            and bid_status_entity.effective_date_to == datetime(2020, 2, 1)
+        )
+
+    def test_from_domain_when_current(self) -> None:
+        bid_status_details = CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+        )
+
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
+
+        assert bid_status_entity.effective_date_to is None
+
+    def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
+        bid_status_details = CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(
+                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            ),
+            bid_status=CapitalSchemeBidStatus.FUNDED,
+        )
+
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
+
+        assert bid_status_entity.effective_date_from == datetime(
+            2020, 6, 1, 13
+        ) and bid_status_entity.effective_date_to == datetime(2020, 7, 1, 13)
+
+    def test_to_domain(self) -> None:
+        bid_status_entity = CapitalSchemeBidStatusEntity(
+            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+            effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
+        )
+
+        bid_status_details = bid_status_entity.to_domain()
+
+        assert bid_status_details == CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(
+                datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
+            ),
+            bid_status=CapitalSchemeBidStatus.FUNDED,
+        )
+
+    def test_to_domain_when_current(self) -> None:
+        bid_status_entity = CapitalSchemeBidStatusEntity(
+            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+            effective_date_from=datetime(2020, 1, 1),
+        )
+
+        bid_status_details = bid_status_entity.to_domain()
+
+        assert bid_status_details.effective_date.to is None
+
+    def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
+        bid_status_entity = CapitalSchemeBidStatusEntity(
+            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+            effective_date_from=datetime(2020, 6, 1, 13),
+            effective_date_to=datetime(2020, 7, 1, 13),
+        )
+
+        bid_status_details = bid_status_entity.to_domain()
+
+        assert bid_status_details.effective_date == DateTimeRange(
+            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+        )
+
+
 class TestCapitalSchemeAuthorityReviewEntity:
     def test_from_domain(self) -> None:
         authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
@@ -188,10 +279,14 @@ class TestCapitalSchemeEntity:
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
+            bid_status_details=CapitalSchemeBidStatusDetails(
+                effective_date=DateTimeRange(datetime(2020, 2, 1)),
+                bid_status=CapitalSchemeBidStatus.FUNDED,
+            ),
         )
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}, {BidStatusName.FUNDED: 1}
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -203,6 +298,12 @@ class TestCapitalSchemeEntity:
             and overview_entity.scheme_type_id == 1
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
             and overview_entity.effective_date_to is None
+        )
+        (bid_status_entity,) = capital_scheme_entity.capital_scheme_bid_statuses
+        assert (
+            bid_status_entity.bid_status_id == 1
+            and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
+            and bid_status_entity.effective_date_to is None
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
 
@@ -216,11 +317,14 @@ class TestCapitalSchemeEntity:
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
+            bid_status_details=CapitalSchemeBidStatusDetails(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+            ),
         )
         capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}, {BidStatusName.FUNDED: 1}
         )
 
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
@@ -238,6 +342,12 @@ class TestCapitalSchemeEntity:
                     effective_date_from=datetime(2020, 1, 1),
                 )
             ],
+            capital_scheme_bid_statuses=[
+                CapitalSchemeBidStatusEntity(
+                    bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    effective_date_from=datetime(2020, 2, 1),
+                )
+            ],
         )
 
         capital_scheme = capital_scheme_entity.to_domain()
@@ -252,6 +362,11 @@ class TestCapitalSchemeEntity:
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             )
+            and capital_scheme.bid_status_details
+            == CapitalSchemeBidStatusDetails(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                bid_status=CapitalSchemeBidStatus.FUNDED,
+            )
             and not capital_scheme.authority_review
         )
 
@@ -259,6 +374,7 @@ class TestCapitalSchemeEntity:
         capital_scheme_entity = CapitalSchemeEntity(
             scheme_reference="ATE00001",
             capital_scheme_overviews=[self._dummy_overview_entity()],
+            capital_scheme_bid_statuses=[self._dummy_bid_status_entity()],
             capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
         )
 
@@ -275,6 +391,12 @@ class TestCapitalSchemeEntity:
             funding_programme=FundingProgrammeEntity(),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
             effective_date_from=datetime.min,
+        )
+
+    @staticmethod
+    def _dummy_bid_status_entity() -> CapitalSchemeBidStatusEntity:
+        return CapitalSchemeBidStatusEntity(
+            bid_status=BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED), effective_date_from=datetime.min
         )
 
 
@@ -301,6 +423,8 @@ class TestDatabaseCapitalSchemeRepository:
                         authority_full_name="West Yorkshire Combined Authority",
                         authority_abbreviation="WYO",
                     ),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
+                    BidStatusEntity(bid_status_id=2, bid_status_name=BidStatusName.NOT_FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                 ]
             )
@@ -318,12 +442,17 @@ class TestDatabaseCapitalSchemeRepository:
                         funding_programme="ATF3",
                         type=CapitalSchemeType.CONSTRUCTION,
                     ),
+                    bid_status_details=CapitalSchemeBidStatusDetails(
+                        effective_date=DateTimeRange(datetime(2020, 2, 1)),
+                        bid_status=CapitalSchemeBidStatus.FUNDED,
+                    ),
                 )
             )
 
         with Session(engine) as session:
             (capital_scheme_row,) = session.scalars(select(CapitalSchemeEntity))
             (overview_row,) = session.scalars(select(CapitalSchemeOverviewEntity))
+            (bid_status_row,) = session.scalars(select(CapitalSchemeBidStatusEntity))
         assert capital_scheme_row.scheme_reference == "ATE00001"
         assert (
             overview_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
@@ -333,6 +462,12 @@ class TestDatabaseCapitalSchemeRepository:
             and overview_row.scheme_type_id == 1
             and overview_row.effective_date_from == datetime(2020, 1, 1)
             and overview_row.effective_date_to is None
+        )
+        assert (
+            bid_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and bid_status_row.bid_status_id == 1
+            and bid_status_row.effective_date_from == datetime(2020, 2, 1)
+            and bid_status_row.effective_date_to is None
         )
 
     def test_add_stores_authority_review(self, engine: Engine) -> None:
@@ -347,6 +482,7 @@ class TestDatabaseCapitalSchemeRepository:
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                bid_status_details=self._dummy_bid_status_details(),
             )
             capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
             capital_schemes.add(capital_scheme)
@@ -372,6 +508,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                     CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
                     CapitalSchemeOverviewEntity(
                         capital_scheme_id=2,
@@ -379,6 +520,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_submitting_authority_id=1,
                         funding_programme_id=1,
                         scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
@@ -424,6 +570,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 2, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                 ]
             )
 
@@ -457,6 +608,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                 ]
             )
 
@@ -465,6 +621,47 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = capital_schemes.get("ATE00001")
 
         assert not capital_scheme
+
+    def test_get_fetches_current_bid_status(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_to=datetime(2020, 2, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=2,
+                        effective_date_from=datetime(2020, 2, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert (
+            capital_scheme
+            and capital_scheme.reference == "ATE00001"
+            and capital_scheme.bid_status_details
+            == CapitalSchemeBidStatusDetails(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                bid_status=CapitalSchemeBidStatus.NOT_FUNDED,
+            )
+        )
 
     def test_get_fetches_authority_review(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
@@ -479,6 +676,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                     CapitalSchemeAuthorityReviewEntity(capital_scheme_id=1, review_date=datetime(2020, 2, 1)),
                     CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
                     CapitalSchemeOverviewEntity(
@@ -487,6 +689,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_submitting_authority_id=1,
                         funding_programme_id=1,
                         scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
                     CapitalSchemeAuthorityReviewEntity(capital_scheme_id=2, review_date=datetime(2020, 3, 1)),
@@ -512,6 +719,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_submitting_authority_id=1,
                         funding_programme_id=1,
                         scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
                     CapitalSchemeAuthorityReviewEntity(capital_scheme_id=1, review_date=datetime(2020, 2, 1)),
@@ -657,3 +869,9 @@ class TestDatabaseCapitalSchemeRepository:
             references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
         assert references == ["ATE00001", "ATE00002"]
+
+    @staticmethod
+    def _dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
+        return CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime.fromtimestamp(0)), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
+        )

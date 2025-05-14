@@ -19,15 +19,32 @@ class CapitalSchemeOverview:
     type: CapitalSchemeType
 
 
+class CapitalSchemeBidStatus(Enum):
+    SUBMITTED = auto()
+    FUNDED = auto()
+    NOT_FUNDED = auto()
+    SPLIT = auto()
+    DELETED = auto()
+
+
+@dataclass(frozen=True)
+class CapitalSchemeBidStatusDetails:
+    effective_date: DateTimeRange
+    bid_status: CapitalSchemeBidStatus
+
+
 @dataclass(frozen=True)
 class CapitalSchemeAuthorityReview:
     review_date: datetime
 
 
 class CapitalScheme:
-    def __init__(self, reference: str, overview: CapitalSchemeOverview):
+    def __init__(
+        self, reference: str, overview: CapitalSchemeOverview, bid_status_details: CapitalSchemeBidStatusDetails
+    ):
         self._reference = reference
         self._overview = overview
+        self._bid_status_details = bid_status_details
         self._authority_review: CapitalSchemeAuthorityReview | None = None
 
     @property
@@ -37,6 +54,10 @@ class CapitalScheme:
     @property
     def overview(self) -> CapitalSchemeOverview:
         return self._overview
+
+    @property
+    def bid_status_details(self) -> CapitalSchemeBidStatusDetails:
+        return self._bid_status_details
 
     @property
     def authority_review(self) -> CapitalSchemeAuthorityReview | None:

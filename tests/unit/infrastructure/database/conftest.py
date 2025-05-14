@@ -48,6 +48,7 @@ def _delete_all(engine: Engine) -> None:
                 """
                 TRUNCATE
                     authority.authority,
+                    capital_scheme.bid_status,
                     capital_scheme.capital_scheme,
                     capital_scheme.scheme_type,
                     common.funding_programme
