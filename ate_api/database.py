@@ -48,10 +48,5 @@ def _create_schema(engine: Engine) -> None:
 
 def _create_reference_data(engine: Engine) -> None:
     with Session(engine) as session:
-        session.add_all(
-            [
-                SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
-                SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-            ]
-        )
+        session.add_all([SchemeTypeEntity(scheme_type_name=scheme_type_name) for scheme_type_name in SchemeTypeName])
         session.commit()
