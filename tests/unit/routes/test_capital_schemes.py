@@ -195,7 +195,7 @@ class TestCapitalSchemeOverviewModel:
         )
 
 
-class TestCapitalSchemeStatusModel:
+class TestCapitalSchemeBidStatusModel:
     def test_from_domain(self) -> None:
         assert (
             CapitalSchemeBidStatusModel.from_domain(CapitalSchemeBidStatus.FUNDED) == CapitalSchemeBidStatusModel.FUNDED
@@ -205,7 +205,7 @@ class TestCapitalSchemeStatusModel:
         assert CapitalSchemeBidStatusModel.FUNDED.to_domain() == CapitalSchemeBidStatus.FUNDED
 
 
-class TestCapitalSchemeBidStatusModel:
+class TestCapitalSchemeBidStatusDetailsModel:
     def test_from_domain(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
