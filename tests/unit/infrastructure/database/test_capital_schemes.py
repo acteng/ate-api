@@ -653,51 +653,6 @@ class TestDatabaseCapitalSchemeRepository:
             )
         )
 
-    def test_get_fetches_authority_review(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
-            session.add_all(
-                [
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
-                    CapitalSchemeOverviewEntity(
-                        capital_scheme_id=1,
-                        scheme_name="Wirral Package",
-                        bid_submitting_authority_id=1,
-                        funding_programme_id=1,
-                        scheme_type_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                    CapitalSchemeBidStatusEntity(
-                        capital_scheme_id=1,
-                        bid_status_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                    CapitalSchemeAuthorityReviewEntity(capital_scheme_id=1, review_date=datetime(2020, 2, 1)),
-                    CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
-                    CapitalSchemeOverviewEntity(
-                        capital_scheme_id=2,
-                        scheme_name="School Streets",
-                        bid_submitting_authority_id=1,
-                        funding_programme_id=1,
-                        scheme_type_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                    CapitalSchemeBidStatusEntity(
-                        capital_scheme_id=2,
-                        bid_status_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                    CapitalSchemeAuthorityReviewEntity(capital_scheme_id=2, review_date=datetime(2020, 3, 1)),
-                ]
-            )
-
-        with Session(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
-
-        assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 2, 1, tzinfo=timezone.utc)
-        )
-
     def test_get_fetches_latest_authority_review(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(
