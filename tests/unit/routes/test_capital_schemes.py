@@ -22,6 +22,10 @@ from ate_api.routes.capital_schemes import (
 )
 from ate_api.routes.dates import DateTimeRangeModel
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.routes.dummies import (
+    dummy_bid_status_details_model,
+    dummy_overview_model,
+)
 
 
 class TestCapitalSchemeTypeModel:
@@ -208,27 +212,11 @@ class TestCapitalSchemeModel:
     def test_to_domain_sets_authority_review(self, http_request: Request, base_url: str) -> None:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
-            overview=self._dummy_overview_model(base_url),
-            bid_status_details=self._dummy_bid_status_details_model(),
+            overview=dummy_overview_model(base_url),
+            bid_status_details=dummy_bid_status_details_model(),
             authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1)),
         )
 
         capital_scheme = capital_scheme_model.to_domain(http_request)
 
         assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1))
-
-    @staticmethod
-    def _dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
-        return CapitalSchemeOverviewModel(
-            name="",
-            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/dummy"),
-            funding_programme=AnyUrl(f"{base_url}/funding-programmes/dummy"),
-            type_=CapitalSchemeTypeModel.DEVELOPMENT,
-            effective_date=DateTimeRangeModel(from_=datetime.min),
-        )
-
-    @staticmethod
-    def _dummy_bid_status_details_model() -> CapitalSchemeBidStatusDetailsModel:
-        return CapitalSchemeBidStatusDetailsModel(
-            effective_date=DateTimeRangeModel(from_=datetime.min), bid_status=CapitalSchemeBidStatusModel.NOT_FUNDED
-        )
