@@ -29,6 +29,10 @@ from ate_api.infrastructure.database.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
 from tests.unit.domain.dummies import dummy_bid_status_details
+from tests.unit.infrastructure.database.dummies import (
+    dummy_bid_status_entity,
+    dummy_overview_entity,
+)
 
 
 class TestSchemeTypeName:
@@ -374,8 +378,8 @@ class TestCapitalSchemeEntity:
     def test_to_domain_sets_authority_review(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
             scheme_reference="ATE00001",
-            capital_scheme_overviews=[self._dummy_overview_entity()],
-            capital_scheme_bid_statuses=[self._dummy_bid_status_entity()],
+            capital_scheme_overviews=[dummy_overview_entity()],
+            capital_scheme_bid_statuses=[dummy_bid_status_entity()],
             capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
         )
 
@@ -383,21 +387,6 @@ class TestCapitalSchemeEntity:
 
         assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 1, 1, tzinfo=timezone.utc)
-        )
-
-    @staticmethod
-    def _dummy_overview_entity() -> CapitalSchemeOverviewEntity:
-        return CapitalSchemeOverviewEntity(
-            bid_submitting_authority=AuthorityEntity(),
-            funding_programme=FundingProgrammeEntity(),
-            scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
-            effective_date_from=datetime.min,
-        )
-
-    @staticmethod
-    def _dummy_bid_status_entity() -> CapitalSchemeBidStatusEntity:
-        return CapitalSchemeBidStatusEntity(
-            bid_status=BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED), effective_date_from=datetime.min
         )
 
 
