@@ -23,6 +23,104 @@ from ate_api.routes.capital_schemes import (
 from ate_api.routes.dates import DateTimeRangeModel
 
 
+class TestCapitalSchemeTypeModel:
+    def test_from_domain(self) -> None:
+        assert CapitalSchemeTypeModel.from_domain(CapitalSchemeType.CONSTRUCTION) == CapitalSchemeTypeModel.CONSTRUCTION
+
+    def test_to_domain(self) -> None:
+        assert CapitalSchemeTypeModel.CONSTRUCTION.to_domain() == CapitalSchemeType.CONSTRUCTION
+
+
+class TestCapitalSchemeOverviewModel:
+    def test_from_domain(self, http_request: Request, base_url: str) -> None:
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
+            funding_programme="ATF3",
+            type=CapitalSchemeType.CONSTRUCTION,
+        )
+
+        overview_model = CapitalSchemeOverviewModel.from_domain(overview, http_request)
+
+        assert overview_model == CapitalSchemeOverviewModel(
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+            type_=CapitalSchemeTypeModel.CONSTRUCTION,
+        )
+
+    def test_to_domain(self, http_request: Request, base_url: str) -> None:
+        overview_model = CapitalSchemeOverviewModel(
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+            type_=CapitalSchemeTypeModel.CONSTRUCTION,
+        )
+
+        overview = overview_model.to_domain(http_request)
+
+        assert overview == CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority="LIV",
+            funding_programme="ATF3",
+            type=CapitalSchemeType.CONSTRUCTION,
+        )
+
+
+class TestCapitalSchemeBidStatusModel:
+    def test_from_domain(self) -> None:
+        assert (
+            CapitalSchemeBidStatusModel.from_domain(CapitalSchemeBidStatus.FUNDED) == CapitalSchemeBidStatusModel.FUNDED
+        )
+
+    def test_to_domain(self) -> None:
+        assert CapitalSchemeBidStatusModel.FUNDED.to_domain() == CapitalSchemeBidStatus.FUNDED
+
+
+class TestCapitalSchemeBidStatusDetailsModel:
+    def test_from_domain(self) -> None:
+        bid_status_details = CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+        )
+
+        bid_status_details_model = CapitalSchemeBidStatusDetailsModel.from_domain(bid_status_details)
+
+        assert bid_status_details_model == CapitalSchemeBidStatusDetailsModel(
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatusModel.FUNDED
+        )
+
+    def test_to_domain(self) -> None:
+        bid_status_details_model = CapitalSchemeBidStatusDetailsModel(
+            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatusModel.FUNDED
+        )
+
+        bid_status_details = bid_status_details_model.to_domain()
+
+        assert bid_status_details == CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+        )
+
+
+class TestCapitalSchemeAuthorityReviewModel:
+    def test_from_domain(self) -> None:
+        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
+
+        authority_review_model = CapitalSchemeAuthorityReviewModel.from_domain(authority_review)
+
+        assert authority_review_model == CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 1, 1))
+
+    def test_to_domain(self) -> None:
+        authority_review_model = CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 1, 1))
+
+        authority_review = authority_review_model.to_domain()
+
+        assert authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
+
+
 class TestCapitalSchemeModel:
     def test_from_domain(self, http_request: Request, base_url: str) -> None:
         capital_scheme = CapitalScheme(
@@ -145,101 +243,3 @@ class TestCapitalSchemeModel:
         return CapitalSchemeBidStatusDetailsModel(
             effective_date=DateTimeRangeModel(from_=datetime.min), bid_status=CapitalSchemeBidStatusModel.NOT_FUNDED
         )
-
-
-class TestCapitalSchemeTypeModel:
-    def test_from_domain(self) -> None:
-        assert CapitalSchemeTypeModel.from_domain(CapitalSchemeType.CONSTRUCTION) == CapitalSchemeTypeModel.CONSTRUCTION
-
-    def test_to_domain(self) -> None:
-        assert CapitalSchemeTypeModel.CONSTRUCTION.to_domain() == CapitalSchemeType.CONSTRUCTION
-
-
-class TestCapitalSchemeOverviewModel:
-    def test_from_domain(self, http_request: Request, base_url: str) -> None:
-        overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
-            name="Wirral Package",
-            bid_submitting_authority="LIV",
-            funding_programme="ATF3",
-            type=CapitalSchemeType.CONSTRUCTION,
-        )
-
-        overview_model = CapitalSchemeOverviewModel.from_domain(overview, http_request)
-
-        assert overview_model == CapitalSchemeOverviewModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
-            name="Wirral Package",
-            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
-            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-            type_=CapitalSchemeTypeModel.CONSTRUCTION,
-        )
-
-    def test_to_domain(self, http_request: Request, base_url: str) -> None:
-        overview_model = CapitalSchemeOverviewModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
-            name="Wirral Package",
-            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
-            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-            type_=CapitalSchemeTypeModel.CONSTRUCTION,
-        )
-
-        overview = overview_model.to_domain(http_request)
-
-        assert overview == CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
-            name="Wirral Package",
-            bid_submitting_authority="LIV",
-            funding_programme="ATF3",
-            type=CapitalSchemeType.CONSTRUCTION,
-        )
-
-
-class TestCapitalSchemeBidStatusModel:
-    def test_from_domain(self) -> None:
-        assert (
-            CapitalSchemeBidStatusModel.from_domain(CapitalSchemeBidStatus.FUNDED) == CapitalSchemeBidStatusModel.FUNDED
-        )
-
-    def test_to_domain(self) -> None:
-        assert CapitalSchemeBidStatusModel.FUNDED.to_domain() == CapitalSchemeBidStatus.FUNDED
-
-
-class TestCapitalSchemeBidStatusDetailsModel:
-    def test_from_domain(self) -> None:
-        bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
-        )
-
-        bid_status_details_model = CapitalSchemeBidStatusDetailsModel.from_domain(bid_status_details)
-
-        assert bid_status_details_model == CapitalSchemeBidStatusDetailsModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatusModel.FUNDED
-        )
-
-    def test_to_domain(self) -> None:
-        bid_status_details_model = CapitalSchemeBidStatusDetailsModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatusModel.FUNDED
-        )
-
-        bid_status_details = bid_status_details_model.to_domain()
-
-        assert bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
-        )
-
-
-class TestCapitalSchemeAuthorityReviewModel:
-    def test_from_domain(self) -> None:
-        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
-
-        authority_review_model = CapitalSchemeAuthorityReviewModel.from_domain(authority_review)
-
-        assert authority_review_model == CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 1, 1))
-
-    def test_to_domain(self) -> None:
-        authority_review_model = CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 1, 1))
-
-        authority_review = authority_review_model.to_domain()
-
-        assert authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
