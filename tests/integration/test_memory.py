@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from ate_api.domain.authorities import Authority
-from ate_api.domain.capital_schemes import (
+from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,

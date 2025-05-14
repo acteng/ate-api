@@ -9,7 +9,7 @@ from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
-from ate_api.domain.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.database import (
     AuthorityEntity,

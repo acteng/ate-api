@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
-from ate_api.domain.capital_schemes import (
+from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
     CapitalSchemeBidStatus,

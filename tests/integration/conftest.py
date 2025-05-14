@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import AuthorityRepository
-from ate_api.domain.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.main import app
 from ate_api.routes.authorities.authorities import get_authority_repository

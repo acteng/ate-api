@@ -13,7 +13,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from ate_api.domain.capital_schemes import (
+from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
     CapitalSchemeBidStatus,
