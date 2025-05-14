@@ -585,33 +585,6 @@ class TestDatabaseCapitalSchemeRepository:
             )
         )
 
-    def test_get_filters_under_embargo(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
-            session.add_all(
-                [
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
-                    CapitalSchemeOverviewEntity(
-                        capital_scheme_id=1,
-                        scheme_name="Wirral Package",
-                        bid_submitting_authority_id=1,
-                        funding_programme_id=2,
-                        scheme_type_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                    CapitalSchemeBidStatusEntity(
-                        capital_scheme_id=1,
-                        bid_status_id=1,
-                        effective_date_from=datetime(2020, 1, 1),
-                    ),
-                ]
-            )
-
-        with Session(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
-
-        assert not capital_scheme
-
     def test_get_fetches_current_bid_status(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(
@@ -683,6 +656,33 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 3, 1, tzinfo=timezone.utc)
         )
+
+    def test_get_filters_under_embargo(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=2,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert not capital_scheme
 
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
