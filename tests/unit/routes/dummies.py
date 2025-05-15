@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import AnyUrl
 
-from ate_api.routes.capital_schemes.capital_schemes import (
+from ate_api.routes.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatusDetailsModel,
     CapitalSchemeBidStatusModel,
 )
