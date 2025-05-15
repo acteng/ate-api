@@ -16,14 +16,14 @@ from ate_api.domain.capital_schemes.overviews import (
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
+from ate_api.routes.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReviewModel,
+)
 from ate_api.routes.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatusDetailsModel,
     CapitalSchemeBidStatusModel,
 )
-from ate_api.routes.capital_schemes.capital_schemes import (
-    CapitalSchemeAuthorityReviewModel,
-    CapitalSchemeModel,
-)
+from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
 from ate_api.routes.capital_schemes.overviews import (
     CapitalSchemeOverviewModel,
     CapitalSchemeTypeModel,
@@ -34,22 +34,6 @@ from tests.unit.routes.dummies import (
     dummy_bid_status_details_model,
     dummy_overview_model,
 )
-
-
-class TestCapitalSchemeAuthorityReviewModel:
-    def test_from_domain(self) -> None:
-        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
-
-        authority_review_model = CapitalSchemeAuthorityReviewModel.from_domain(authority_review)
-
-        assert authority_review_model == CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 1, 1))
-
-    def test_to_domain(self) -> None:
-        authority_review_model = CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 1, 1))
-
-        authority_review = authority_review_model.to_domain()
-
-        assert authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
 
 
 class TestCapitalSchemeModel:

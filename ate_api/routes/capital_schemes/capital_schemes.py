@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -7,9 +6,6 @@ from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeRepository,
@@ -18,21 +14,13 @@ from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
 from ate_api.routes.base import BaseModel
+from ate_api.routes.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReviewModel,
+)
 from ate_api.routes.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatusDetailsModel,
 )
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
-
-
-class CapitalSchemeAuthorityReviewModel(BaseModel):
-    review_date: datetime
-
-    @classmethod
-    def from_domain(cls, authority_review: CapitalSchemeAuthorityReview) -> Self:
-        return cls(review_date=authority_review.review_date)
-
-    def to_domain(self) -> CapitalSchemeAuthorityReview:
-        return CapitalSchemeAuthorityReview(review_date=self.review_date)
 
 
 class CapitalSchemeModel(BaseModel):
