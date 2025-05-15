@@ -17,13 +17,13 @@ from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
     CapitalSchemeEntity as CapitalSchemeEntity,
 )
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.overviews import (
     CapitalSchemeOverviewEntity as CapitalSchemeOverviewEntity,
 )
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity as SchemeTypeEntity,
 )
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeName as SchemeTypeName,
 )
 from ate_api.infrastructure.database.funding_programmes import (
