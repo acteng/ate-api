@@ -35,7 +35,7 @@ class TestCapitalSchemeBidStatusEntity:
 
         bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
 
-        assert bid_status_entity.effective_date_to is None
+        assert not bid_status_entity.effective_date_to
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
@@ -74,7 +74,7 @@ class TestCapitalSchemeBidStatusEntity:
 
         bid_status_details = bid_status_entity.to_domain()
 
-        assert bid_status_details.effective_date.to is None
+        assert not bid_status_details.effective_date.to
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         bid_status_entity = CapitalSchemeBidStatusEntity(

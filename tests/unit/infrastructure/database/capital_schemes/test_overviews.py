@@ -55,7 +55,7 @@ class TestCapitalSchemeOverviewEntity:
             overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
         )
 
-        assert overview_entity.effective_date_to is None
+        assert not overview_entity.effective_date_to
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         overview = CapitalSchemeOverview(
@@ -107,7 +107,7 @@ class TestCapitalSchemeOverviewEntity:
 
         overview = overview_entity.to_domain()
 
-        assert overview.effective_date.to is None
+        assert not overview.effective_date.to
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(

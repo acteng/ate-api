@@ -55,13 +55,13 @@ class TestCapitalSchemeEntity:
             and overview_entity.funding_programme_id == 1
             and overview_entity.scheme_type_id == 1
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
-            and overview_entity.effective_date_to is None
+            and not overview_entity.effective_date_to
         )
         (bid_status_entity,) = capital_scheme_entity.capital_scheme_bid_statuses
         assert (
             bid_status_entity.bid_status_id == 1
             and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
-            and bid_status_entity.effective_date_to is None
+            and not bid_status_entity.effective_date_to
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
 
@@ -175,13 +175,13 @@ class TestDatabaseCapitalSchemeRepository:
             and overview_row.funding_programme_id == 1
             and overview_row.scheme_type_id == 1
             and overview_row.effective_date_from == datetime(2020, 1, 1)
-            and overview_row.effective_date_to is None
+            and not overview_row.effective_date_to
         )
         assert (
             bid_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and bid_status_row.bid_status_id == 1
             and bid_status_row.effective_date_from == datetime(2020, 2, 1)
-            and bid_status_row.effective_date_to is None
+            and not bid_status_row.effective_date_to
         )
 
     def test_add_stores_authority_review(self, engine: Engine) -> None:
