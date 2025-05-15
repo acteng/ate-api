@@ -5,6 +5,8 @@ from pydantic import AnyUrl
 from ate_api.routes.capital_schemes.capital_schemes import (
     CapitalSchemeBidStatusDetailsModel,
     CapitalSchemeBidStatusModel,
+)
+from ate_api.routes.capital_schemes.overviews import (
     CapitalSchemeOverviewModel,
     CapitalSchemeTypeModel,
 )
