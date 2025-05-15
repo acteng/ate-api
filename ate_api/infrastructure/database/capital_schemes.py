@@ -13,11 +13,13 @@ from sqlalchemy.orm import (
     relationship,
 )
 
+from ate_api.domain.capital_schemes.bid_statuses import (
+    CapitalSchemeBidStatus,
+    CapitalSchemeBidStatusDetails,
+)
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
     CapitalSchemeRepository,
 )
 from ate_api.domain.capital_schemes.overviews import (

@@ -1,23 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum, auto
 
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
-from ate_api.domain.dates import DateTimeRange
-
-
-class CapitalSchemeBidStatus(Enum):
-    SUBMITTED = auto()
-    FUNDED = auto()
-    NOT_FUNDED = auto()
-    SPLIT = auto()
-    DELETED = auto()
-
-
-@dataclass(frozen=True)
-class CapitalSchemeBidStatusDetails:
-    effective_date: DateTimeRange
-    bid_status: CapitalSchemeBidStatus
 
 
 @dataclass(frozen=True)

@@ -3,11 +3,13 @@ from datetime import datetime
 from pydantic import AnyUrl
 from starlette.requests import Request
 
+from ate_api.domain.capital_schemes.bid_statuses import (
+    CapitalSchemeBidStatus,
+    CapitalSchemeBidStatusDetails,
+)
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeAuthorityReview,
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
 )
 from ate_api.domain.capital_schemes.overviews import (
     CapitalSchemeOverview,

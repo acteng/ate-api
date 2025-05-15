@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ate_api.domain.capital_schemes.capital_schemes import (
+from ate_api.domain.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,
 )
