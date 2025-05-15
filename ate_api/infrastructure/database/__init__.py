@@ -2,17 +2,17 @@ from ate_api.infrastructure.database.authorities import (
     AuthorityEntity as AuthorityEntity,
 )
 from ate_api.infrastructure.database.base import BaseEntity as BaseEntity
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusEntity as BidStatusEntity,
 )
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusName as BidStatusName,
+)
+from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
+    CapitalSchemeBidStatusEntity as CapitalSchemeBidStatusEntity,
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
     CapitalSchemeAuthorityReviewEntity as CapitalSchemeAuthorityReviewEntity,
-)
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
-    CapitalSchemeBidStatusEntity as CapitalSchemeBidStatusEntity,
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
     CapitalSchemeEntity as CapitalSchemeEntity,
