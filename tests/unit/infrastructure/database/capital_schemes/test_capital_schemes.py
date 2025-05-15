@@ -152,11 +152,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                 ]
@@ -209,11 +205,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.NOT_FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                 ]
@@ -250,11 +242,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
@@ -313,11 +301,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
@@ -370,11 +354,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     BidStatusEntity(bid_status_id=2, bid_status_name=BidStatusName.NOT_FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
@@ -422,11 +402,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
@@ -463,11 +439,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=True
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
@@ -507,16 +479,8 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
-                    AuthorityEntity(
-                        authority_id=2,
-                        authority_full_name="West Yorkshire Combined Authority",
-                        authority_abbreviation="WYO",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    AuthorityEntity(authority_id=2, authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
@@ -561,16 +525,8 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
-                    AuthorityEntity(
-                        authority_id=2,
-                        authority_full_name="West Yorkshire Combined Authority",
-                        authority_abbreviation="WYO",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    AuthorityEntity(authority_id=2, authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
@@ -606,11 +562,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=True
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
@@ -637,11 +589,7 @@ class TestDatabaseCapitalSchemeRepository:
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(
-                        authority_id=1,
-                        authority_full_name="Liverpool City Region Combined Authority",
-                        authority_abbreviation="LIV",
-                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
                     CapitalSchemeOverviewEntity(
