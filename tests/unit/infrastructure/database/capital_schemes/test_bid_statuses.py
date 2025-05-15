@@ -47,9 +47,8 @@ class TestCapitalSchemeBidStatusEntity:
 
         bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
 
-        assert bid_status_entity.effective_date_from == datetime(
-            2020, 6, 1, 13
-        ) and bid_status_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert bid_status_entity.effective_date_from == datetime(2020, 6, 1, 13)
+        assert bid_status_entity.effective_date_to == datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         bid_status_entity = CapitalSchemeBidStatusEntity(

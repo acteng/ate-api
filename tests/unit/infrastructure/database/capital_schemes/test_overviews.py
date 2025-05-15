@@ -72,9 +72,8 @@ class TestCapitalSchemeOverviewEntity:
             overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
         )
 
-        assert overview_entity.effective_date_from == datetime(
-            2020, 6, 1, 13
-        ) and overview_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert overview_entity.effective_date_from == datetime(2020, 6, 1, 13)
+        assert overview_entity.effective_date_to == datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
