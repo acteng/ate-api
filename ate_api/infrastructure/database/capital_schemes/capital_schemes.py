@@ -1,7 +1,6 @@
-from datetime import datetime
 from typing import Self
 
-from sqlalchemy import ForeignKey, Select, and_, false, func, select
+from sqlalchemy import Select, and_, false, func, select
 from sqlalchemy.orm import (
     Mapped,
     Session,
@@ -12,15 +11,15 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeRepository,
 )
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReviewEntity,
+)
 from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusEntity,
     BidStatusName,
@@ -31,24 +30,7 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
-
-
-class CapitalSchemeAuthorityReviewEntity(BaseEntity):
-    __tablename__ = "capital_scheme_authority_review"
-    __table_args__ = {"schema": "capital_scheme"}
-
-    capital_scheme_authority_review_id: Mapped[int] = mapped_column(primary_key=True)
-    capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
-    review_date: Mapped[datetime]
-
-    @classmethod
-    def from_domain(cls, authority_review: CapitalSchemeAuthorityReview) -> Self:
-        return cls(review_date=zoned_to_local(authority_review.review_date))
-
-    def to_domain(self) -> CapitalSchemeAuthorityReview:
-        return CapitalSchemeAuthorityReview(review_date=local_to_zoned(self.review_date))
 
 
 class CapitalSchemeEntity(BaseEntity):
