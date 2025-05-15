@@ -1,8 +1,6 @@
 from datetime import datetime, timezone
 
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.infrastructure.database import CapitalSchemeAuthorityReviewEntity
 
 

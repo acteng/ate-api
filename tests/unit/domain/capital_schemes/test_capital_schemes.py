@@ -1,17 +1,9 @@
 from datetime import datetime
 
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 

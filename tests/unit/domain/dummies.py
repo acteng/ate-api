@@ -1,13 +1,7 @@
 from datetime import datetime
 
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 
 

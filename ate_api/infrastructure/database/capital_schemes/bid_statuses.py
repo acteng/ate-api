@@ -5,10 +5,7 @@ from typing import Self
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local

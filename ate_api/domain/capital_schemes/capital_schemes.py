@@ -1,6 +1,4 @@
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 

@@ -3,10 +3,7 @@ from typing import Self
 from sqlalchemy import false, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-from ate_api.domain.funding_programmes import (
-    FundingProgramme,
-    FundingProgrammeRepository,
-)
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
 from ate_api.infrastructure.database import BaseEntity
 
 

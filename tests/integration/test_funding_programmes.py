@@ -1,10 +1,7 @@
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.funding_programmes import (
-    FundingProgramme,
-    FundingProgrammeRepository,
-)
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
 
 
 @respx.mock

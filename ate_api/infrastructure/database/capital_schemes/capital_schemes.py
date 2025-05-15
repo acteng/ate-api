@@ -1,25 +1,12 @@
 from typing import Self
 
 from sqlalchemy import Select, and_, false, func, select
-from sqlalchemy.orm import (
-    Mapped,
-    Session,
-    aliased,
-    contains_eager,
-    joinedload,
-    mapped_column,
-    relationship,
-)
+from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload, mapped_column, relationship
 
-from ate_api.domain.capital_schemes.capital_schemes import (
-    CapitalScheme,
-    CapitalSchemeRepository,
-)
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
-from ate_api.infrastructure.database.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReviewEntity,
-)
+from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusEntity,
     BidStatusName,

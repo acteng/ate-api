@@ -4,9 +4,7 @@ from typing import Self
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 

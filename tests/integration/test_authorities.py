@@ -4,14 +4,8 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityRepository
-from ate_api.domain.capital_schemes.capital_schemes import (
-    CapitalScheme,
-    CapitalSchemeRepository,
-)
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from tests.unit.domain.dummies import dummy_bid_status_details
 

@@ -6,20 +6,11 @@ from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
-from ate_api.domain.capital_schemes.capital_schemes import (
-    CapitalScheme,
-    CapitalSchemeRepository,
-)
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
-    DatabaseCapitalSchemeRepository,
-)
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from ate_api.routes.base import BaseModel
-from ate_api.routes.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReviewModel,
-)
-from ate_api.routes.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatusDetailsModel,
-)
+from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
+from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 
 

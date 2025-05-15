@@ -3,15 +3,9 @@ from datetime import datetime
 import pytest
 
 from ate_api.domain.authorities import Authority
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme
 from tests.integration.memory import (

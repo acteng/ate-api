@@ -1,9 +1,6 @@
 from datetime import datetime, timezone
 
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import (

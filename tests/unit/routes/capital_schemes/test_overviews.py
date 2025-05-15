@@ -3,15 +3,9 @@ from datetime import datetime
 from pydantic import AnyUrl
 from starlette.requests import Request
 
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
-from ate_api.routes.capital_schemes.overviews import (
-    CapitalSchemeOverviewModel,
-    CapitalSchemeTypeModel,
-)
+from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 from ate_api.routes.dates import DateTimeRangeModel
 
 

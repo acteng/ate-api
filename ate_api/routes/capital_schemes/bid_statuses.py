@@ -1,10 +1,7 @@
 from enum import Enum
 from typing import Self
 
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.routes.base import BaseModel
 from ate_api.routes.dates import DateTimeRangeModel
 

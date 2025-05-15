@@ -3,10 +3,7 @@ from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from ate_api.domain.authorities import Authority
-from ate_api.infrastructure.database.authorities import (
-    AuthorityEntity,
-    DatabaseAuthorityRepository,
-)
+from ate_api.infrastructure.database.authorities import AuthorityEntity, DatabaseAuthorityRepository
 
 
 class TestAuthorityEntity:

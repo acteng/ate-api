@@ -5,13 +5,8 @@ from sqlalchemy.orm import Session
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
-from ate_api.domain.funding_programmes import (
-    FundingProgramme,
-    FundingProgrammeRepository,
-)
-from ate_api.infrastructure.database.funding_programmes import (
-    DatabaseFundingProgrammeRepository,
-)
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
+from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
 from ate_api.routes.base import BaseModel
 
 

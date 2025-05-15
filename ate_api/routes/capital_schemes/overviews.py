@@ -4,10 +4,7 @@ from typing import Annotated, Self
 from pydantic import AnyUrl, Field
 from starlette.requests import Request
 
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.routes.base import BaseModel
 from ate_api.routes.dates import DateTimeRangeModel
 from ate_api.routes.links import path_parameter_for

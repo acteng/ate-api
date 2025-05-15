@@ -1,15 +1,8 @@
 from datetime import datetime, timezone
 
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.dates import DateTimeRange
-from ate_api.infrastructure.database import (
-    BidStatusEntity,
-    BidStatusName,
-    CapitalSchemeBidStatusEntity,
-)
+from ate_api.infrastructure.database import BidStatusEntity, BidStatusName, CapitalSchemeBidStatusEntity
 
 
 class TestBidStatusName:

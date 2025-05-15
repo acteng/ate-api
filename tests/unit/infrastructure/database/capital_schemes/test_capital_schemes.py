@@ -4,18 +4,10 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
-from ate_api.domain.capital_schemes.authority_reviews import (
-    CapitalSchemeAuthorityReview,
-)
-from ate_api.domain.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatus,
-    CapitalSchemeBidStatusDetails,
-)
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
-from ate_api.domain.capital_schemes.overviews import (
-    CapitalSchemeOverview,
-    CapitalSchemeType,
-)
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import (
     AuthorityEntity,
@@ -29,14 +21,9 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
-    DatabaseCapitalSchemeRepository,
-)
+from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from tests.unit.domain.dummies import dummy_bid_status_details
-from tests.unit.infrastructure.database.dummies import (
-    dummy_bid_status_entity,
-    dummy_overview_entity,
-)
+from tests.unit.infrastructure.database.dummies import dummy_bid_status_entity, dummy_overview_entity
 
 
 class TestCapitalSchemeEntity:

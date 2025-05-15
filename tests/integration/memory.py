@@ -1,12 +1,6 @@
 from ate_api.domain.authorities import Authority, AuthorityRepository
-from ate_api.domain.capital_schemes.capital_schemes import (
-    CapitalScheme,
-    CapitalSchemeRepository,
-)
-from ate_api.domain.funding_programmes import (
-    FundingProgramme,
-    FundingProgrammeRepository,
-)
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
 
 
 class MemoryFundingProgrammeRepository(FundingProgrammeRepository):

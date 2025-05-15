@@ -2,14 +2,8 @@ from datetime import datetime
 
 from pydantic import AnyUrl
 
-from ate_api.routes.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatusDetailsModel,
-    CapitalSchemeBidStatusModel,
-)
-from ate_api.routes.capital_schemes.overviews import (
-    CapitalSchemeOverviewModel,
-    CapitalSchemeTypeModel,
-)
+from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
+from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 from ate_api.routes.dates import DateTimeRangeModel
 
 

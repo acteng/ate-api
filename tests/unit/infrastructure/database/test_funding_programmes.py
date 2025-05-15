@@ -4,9 +4,7 @@ from sqlalchemy.orm import Session
 
 from ate_api.domain.funding_programmes import FundingProgramme
 from ate_api.infrastructure.database import FundingProgrammeEntity
-from ate_api.infrastructure.database.funding_programmes import (
-    DatabaseFundingProgrammeRepository,
-)
+from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
 
 
 class TestFundingProgrammeEntity:
