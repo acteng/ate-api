@@ -8,7 +8,7 @@ from starlette.status import HTTP_404_NOT_FOUND
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.routes.authorities.authorities import get_authority_repository
-from ate_api.routes.capital_schemes import get_capital_scheme_repository
+from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
 from ate_api.routes.collections import CollectionModel
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")

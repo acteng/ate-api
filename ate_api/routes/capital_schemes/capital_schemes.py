@@ -150,7 +150,7 @@ class CapitalSchemeModel(BaseModel):
         return capital_scheme
 
 
-router = APIRouter(prefix="/capital-schemes", tags=["capital-schemes"])
+router = APIRouter()
 
 
 def get_capital_scheme_repository(session: Annotated[Session, Depends(get_session)]) -> CapitalSchemeRepository:

@@ -23,7 +23,7 @@ from ate_api.routes.authorities.authorities import (
     AuthorityModel,
     get_authority_repository,
 )
-from ate_api.routes.capital_schemes import (
+from ate_api.routes.capital_schemes.capital_schemes import (
     CapitalSchemeModel,
     get_capital_scheme_repository,
 )

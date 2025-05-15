@@ -9,7 +9,7 @@ from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReposito
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.main import app
 from ate_api.routes.authorities.authorities import get_authority_repository
-from ate_api.routes.capital_schemes import get_capital_scheme_repository
+from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
 from ate_api.routes.funding_programmes import get_funding_programme_repository
 from ate_api.settings import Settings, get_settings
 from tests.integration.memory import (

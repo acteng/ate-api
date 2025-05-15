@@ -16,7 +16,7 @@ from ate_api.domain.capital_schemes.overviews import (
     CapitalSchemeType,
 )
 from ate_api.domain.dates import DateTimeRange
-from ate_api.routes.capital_schemes import (
+from ate_api.routes.capital_schemes.capital_schemes import (
     CapitalSchemeAuthorityReviewModel,
     CapitalSchemeBidStatusDetailsModel,
     CapitalSchemeBidStatusModel,
