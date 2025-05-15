@@ -22,7 +22,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeName,
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
-from tests.unit.domain.dummies import dummy_bid_status_details
+from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.infrastructure.database.dummies import dummy_bid_status_entity, dummy_overview_entity
 
 
@@ -67,22 +67,12 @@ class TestCapitalSchemeEntity:
 
     def test_from_domain_sets_authority_review(self) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001",
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                name="Wirral Package",
-                bid_submitting_authority="LIV",
-                funding_programme="ATF3",
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
-            ),
+            reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
         )
         capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}, {BidStatusName.FUNDED: 1}
+            capital_scheme, {"dummy": 1}, {"dummy": 1}, {SchemeTypeName.DEVELOPMENT: 1}, {BidStatusName.NOT_FUNDED: 1}
         )
 
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
@@ -203,26 +193,18 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     FundingProgrammeEntity(
-                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                        funding_programme_id=1, funding_programme_code="dummy", is_under_embargo=False
                     ),
-                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    AuthorityEntity(authority_id=1, authority_full_name="dummy", authority_abbreviation="dummy"),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.NOT_FUNDED),
-                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.DEVELOPMENT),
                 ]
             )
 
         with Session(engine) as session, session.begin():
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             capital_scheme = CapitalScheme(
-                reference="ATE00001",
-                overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                    name="Wirral Package",
-                    bid_submitting_authority="LIV",
-                    funding_programme="ATF3",
-                    type=CapitalSchemeType.CONSTRUCTION,
-                ),
-                bid_status_details=dummy_bid_status_details(),
+                reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
             )
             capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
             capital_schemes.add(capital_scheme)
