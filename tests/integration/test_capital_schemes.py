@@ -4,13 +4,15 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityRepository
+from ate_api.domain.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReview,
+)
 from ate_api.domain.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,
 )
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
-    CapitalSchemeAuthorityReview,
     CapitalSchemeRepository,
 )
 from ate_api.domain.capital_schemes.overviews import (

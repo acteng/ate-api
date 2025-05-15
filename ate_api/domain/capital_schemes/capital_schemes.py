@@ -1,13 +1,8 @@
-from dataclasses import dataclass
-from datetime import datetime
-
+from ate_api.domain.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReview,
+)
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
-
-
-@dataclass(frozen=True)
-class CapitalSchemeAuthorityReview:
-    review_date: datetime
 
 
 class CapitalScheme:

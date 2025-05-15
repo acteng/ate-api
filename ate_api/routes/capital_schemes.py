@@ -9,13 +9,15 @@ from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
+from ate_api.domain.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReview,
+)
 from ate_api.domain.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatus,
     CapitalSchemeBidStatusDetails,
 )
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
-    CapitalSchemeAuthorityReview,
     CapitalSchemeRepository,
 )
 from ate_api.domain.capital_schemes.overviews import (
