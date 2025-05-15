@@ -17,7 +17,7 @@ def dummy_overview() -> CapitalSchemeOverview:
 
 def dummy_bid_status_details() -> CapitalSchemeBidStatusDetails:
     return CapitalSchemeBidStatusDetails(
-        effective_date=dummy_date_time_range(), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
+        effective_date=dummy_date_time_range(), bid_status=CapitalSchemeBidStatus.SUBMITTED
     )
 
 

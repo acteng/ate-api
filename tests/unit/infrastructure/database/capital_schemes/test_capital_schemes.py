@@ -72,7 +72,7 @@ class TestCapitalSchemeEntity:
         capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme, {"dummy": 1}, {"dummy": 1}, {SchemeTypeName.DEVELOPMENT: 1}, {BidStatusName.NOT_FUNDED: 1}
+            capital_scheme, {"dummy": 1}, {"dummy": 1}, {SchemeTypeName.DEVELOPMENT: 1}, {BidStatusName.SUBMITTED: 1}
         )
 
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
@@ -196,7 +196,7 @@ class TestDatabaseCapitalSchemeRepository:
                         funding_programme_id=1, funding_programme_code="dummy", is_under_embargo=False
                     ),
                     AuthorityEntity(authority_id=1, authority_full_name="dummy", authority_abbreviation="dummy"),
-                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.NOT_FUNDED),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.SUBMITTED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.DEVELOPMENT),
                 ]
             )
