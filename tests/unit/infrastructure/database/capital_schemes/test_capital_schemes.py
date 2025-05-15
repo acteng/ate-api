@@ -29,7 +29,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from ate_api.infrastructure.database.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
 from tests.unit.domain.dummies import dummy_bid_status_details

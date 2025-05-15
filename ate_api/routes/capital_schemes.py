@@ -24,7 +24,7 @@ from ate_api.domain.capital_schemes.overviews import (
     CapitalSchemeOverview,
     CapitalSchemeType,
 )
-from ate_api.infrastructure.database.capital_schemes import (
+from ate_api.infrastructure.database.capital_schemes.capital_schemes import (
     DatabaseCapitalSchemeRepository,
 )
 from ate_api.routes.base import BaseModel
