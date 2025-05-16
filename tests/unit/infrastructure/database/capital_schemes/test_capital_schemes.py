@@ -23,7 +23,10 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
-from tests.unit.infrastructure.database.dummies import dummy_bid_status_entity, dummy_overview_entity
+from tests.unit.infrastructure.database.dummies import (
+    dummy_capital_scheme_bid_status_entity,
+    dummy_capital_scheme_overview_entity,
+)
 
 
 class TestCapitalSchemeEntity:
@@ -117,8 +120,8 @@ class TestCapitalSchemeEntity:
     def test_to_domain_sets_authority_review(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
             scheme_reference="ATE00001",
-            capital_scheme_overviews=[dummy_overview_entity()],
-            capital_scheme_bid_statuses=[dummy_bid_status_entity()],
+            capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
             capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
         )
 
