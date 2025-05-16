@@ -528,7 +528,10 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     FundingProgrammeEntity(
-                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=True
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    FundingProgrammeEntity(
+                        funding_programme_id=2, funding_programme_code="ATF4", is_under_embargo=True
                     ),
                     AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
@@ -541,6 +544,15 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=2,
+                        scheme_name="School Streets",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=2,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                 ]
             )
 
@@ -548,7 +560,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
-        assert not references
+        assert references == ["ATE00001"]
 
     def test_get_references_by_bid_submitting_authority_filters_by_current_bid_status(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
