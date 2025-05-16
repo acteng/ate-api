@@ -815,7 +815,7 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_references_by_bid_submitting_authority_when_none(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add(AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"))
+            session.add(AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"))
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
