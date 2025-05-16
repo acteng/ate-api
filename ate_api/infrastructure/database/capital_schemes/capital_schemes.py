@@ -3,6 +3,7 @@ from typing import Self
 from sqlalchemy import Select, and_, false, func, select
 from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload, mapped_column, relationship
 
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
@@ -139,8 +140,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         row = result.unique().one_or_none()
         return row.to_domain() if row else None
 
-    def get_references_by_bid_submitting_authority(self, authority_abbreviation: str) -> list[str]:
-        result = self._session.scalars(
+    def get_references_by_bid_submitting_authority(
+        self, authority_abbreviation: str, bid_status: CapitalSchemeBidStatus | None = None
+    ) -> list[str]:
+        statement = (
             select(CapitalSchemeEntity.scheme_reference)
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
@@ -156,6 +159,19 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(AuthorityEntity.authority_abbreviation == authority_abbreviation)
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
+
+        if bid_status:
+            statement = (
+                statement.join(
+                    CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
+                        CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
+                    )
+                )
+                .join(BidStatusEntity)
+                .where(BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status))
+            )
+
+        result = self._session.scalars(statement)
         return list(result.all())
 
     def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:

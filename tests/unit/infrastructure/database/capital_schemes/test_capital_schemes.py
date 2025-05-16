@@ -546,6 +546,62 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not references
 
+    def test_get_references_by_bid_submitting_authority_filters_by_current_bid_status(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
+                    BidStatusEntity(bid_status_id=2, bid_status_name=BidStatusName.NOT_FUNDED),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=2,
+                        scheme_name="School Streets",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_to=datetime(2020, 2, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=2,
+                        effective_date_from=datetime(2020, 2, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority(
+                "LIV", bid_status=CapitalSchemeBidStatus.FUNDED
+            )
+
+        assert references == ["ATE00001"]
+
     def test_get_references_by_bid_submitting_authority_orders_by_reference(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(
