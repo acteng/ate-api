@@ -150,6 +150,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 )
             )
             .join(
+                CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
+                    CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
+                )
+            )
+            .join(
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
             .join(FundingProgrammeEntity)
@@ -159,14 +164,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
         if bid_status:
-            statement = (
-                statement.join(
-                    CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
-                        CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
-                    )
-                )
-                .join(BidStatusEntity)
-                .where(BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status))
+            statement = statement.join(BidStatusEntity).where(
+                BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status)
             )
 
         result = self._session.scalars(statement)

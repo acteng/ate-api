@@ -433,6 +433,53 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme
 
+    def test_get_when_no_overview(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert not capital_scheme
+
+    def test_get_when_no_bid_status(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get("ATE00001")
+
+        assert not capital_scheme
+
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
@@ -449,6 +496,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     AuthorityEntity(authority_id=2, authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
@@ -457,6 +505,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_submitting_authority_id=1,
                         funding_programme_id=1,
                         scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
                     CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
@@ -468,6 +521,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                     CapitalSchemeEntity(capital_scheme_id=3, scheme_reference="ATE00003"),
                     CapitalSchemeOverviewEntity(
                         capital_scheme_id=3,
@@ -475,6 +533,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_submitting_authority_id=2,
                         funding_programme_id=1,
                         scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=3,
+                        bid_status_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
@@ -495,6 +558,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     AuthorityEntity(authority_id=2, authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
@@ -513,6 +577,11 @@ class TestDatabaseCapitalSchemeRepository:
                         funding_programme_id=1,
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 2, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -534,6 +603,7 @@ class TestDatabaseCapitalSchemeRepository:
                         funding_programme_id=2, funding_programme_code="ATF4", is_under_embargo=True
                     ),
                     AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
@@ -544,6 +614,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
                     CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
                     CapitalSchemeOverviewEntity(
                         capital_scheme_id=2,
@@ -551,6 +626,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_submitting_authority_id=1,
                         funding_programme_id=2,
                         scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
@@ -626,6 +706,7 @@ class TestDatabaseCapitalSchemeRepository:
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
                     AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=2, scheme_reference="ATE00002"),
                     CapitalSchemeOverviewEntity(
@@ -636,6 +717,64 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_type_id=1,
                         effective_date_from=datetime(2020, 1, 1),
                     ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=2,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeOverviewEntity(
+                        capital_scheme_id=1,
+                        scheme_name="Wirral Package",
+                        bid_submitting_authority_id=1,
+                        funding_programme_id=1,
+                        scheme_type_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+
+        assert references == ["ATE00001", "ATE00002"]
+
+    def test_get_references_by_bid_submitting_authority_when_no_overview(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeBidStatusEntity(
+                        capital_scheme_id=1,
+                        bid_status_id=1,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+
+        assert not references
+
+    def test_get_references_by_bid_submitting_authority_when_no_bid_status(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(
+                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                    ),
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeOverviewEntity(
                         capital_scheme_id=1,
@@ -652,7 +791,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
-        assert references == ["ATE00001", "ATE00002"]
+        assert not references
 
     def test_get_references_by_bid_submitting_authority_when_none(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
