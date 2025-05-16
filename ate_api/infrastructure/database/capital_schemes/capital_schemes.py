@@ -118,9 +118,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
                 )
             )
-            .join(
-                CapitalSchemeOverviewEntity.funding_programme.and_(FundingProgrammeEntity.is_under_embargo == false())
-            )
+            .join(FundingProgrammeEntity)
             .join(
                 CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
                     CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
@@ -135,6 +133,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 ),
             )
             .where(CapitalSchemeEntity.scheme_reference == reference)
+            .where(FundingProgrammeEntity.is_under_embargo == false())
         )
 
         row = result.unique().one_or_none()
@@ -153,10 +152,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
-            .join(
-                CapitalSchemeOverviewEntity.funding_programme.and_(FundingProgrammeEntity.is_under_embargo == false())
-            )
+            .join(FundingProgrammeEntity)
             .where(AuthorityEntity.authority_abbreviation == authority_abbreviation)
+            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
 
