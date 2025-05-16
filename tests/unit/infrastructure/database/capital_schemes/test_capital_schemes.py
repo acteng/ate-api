@@ -266,6 +266,10 @@ class TestDatabaseCapitalSchemeRepository:
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
+        assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            bid_status=CapitalSchemeBidStatus.FUNDED,
+        )
         assert not capital_scheme.authority_review
 
     def test_get_fetches_current_overview(self, engine: Engine) -> None:
