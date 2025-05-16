@@ -135,12 +135,12 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
+                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     FundingProgrammeEntity(
                         funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
                     ),
-                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
                 ]
             )
 
@@ -188,10 +188,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_code="dummy", is_under_embargo=False),
                     AuthorityEntity(authority_full_name="dummy", authority_abbreviation="dummy"),
-                    BidStatusEntity(bid_status_name=BidStatusName.SUBMITTED),
+                    FundingProgrammeEntity(funding_programme_code="dummy", is_under_embargo=False),
                     SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
+                    BidStatusEntity(bid_status_name=BidStatusName.SUBMITTED),
                 ]
             )
 
@@ -215,10 +215,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -274,10 +274,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -320,11 +320,11 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     not_funded := BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED),
-                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -363,10 +363,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -401,10 +401,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -453,8 +453,8 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -488,11 +488,11 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     wyo := AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -551,11 +551,11 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     wyo := AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -592,11 +592,11 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
+                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     atf4 := FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=True),
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -640,8 +640,8 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     not_funded := BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED),
@@ -697,10 +697,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00002",
                         capital_scheme_overviews=[
@@ -765,8 +765,8 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
