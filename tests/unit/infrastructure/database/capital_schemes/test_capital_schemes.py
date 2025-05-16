@@ -24,8 +24,12 @@ from ate_api.infrastructure.database import (
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.infrastructure.database.dummies import (
+    dummy_authority_entity,
+    dummy_bid_status_entity,
     dummy_capital_scheme_bid_status_entity,
     dummy_capital_scheme_overview_entity,
+    dummy_funding_programme_entity,
+    dummy_scheme_type_entity,
 )
 
 
@@ -191,10 +195,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    AuthorityEntity(authority_full_name="dummy", authority_abbreviation="dummy"),
-                    FundingProgrammeEntity(funding_programme_code="dummy", is_under_embargo=False),
-                    SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
-                    BidStatusEntity(bid_status_name=BidStatusName.SUBMITTED),
+                    dummy_authority_entity(),
+                    dummy_funding_programme_entity(),
+                    dummy_scheme_type_entity(),
+                    dummy_bid_status_entity(),
                 ]
             )
 
@@ -280,7 +284,6 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -300,9 +303,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -323,22 +324,11 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     not_funded := BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Wirral Package",
-                                bid_submitting_authority=liv,
-                                funding_programme=atf3,
-                                scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                        capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
                         capital_scheme_bid_statuses=[
                             CapitalSchemeBidStatusEntity(
                                 bid_status=funded,
@@ -364,32 +354,16 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_fetches_latest_authority_review(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Wirral Package",
-                                bid_submitting_authority=liv,
-                                funding_programme=atf3,
-                                scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
-                        capital_scheme_authority_reviews=[
-                            CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 2, 1)),
-                            CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 3, 1)),
-                        ],
-                    ),
-                ]
+            session.add(
+                CapitalSchemeEntity(
+                    scheme_reference="ATE00001",
+                    capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
+                    capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                    capital_scheme_authority_reviews=[
+                        CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 2, 1)),
+                        CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 3, 1)),
+                    ],
+                )
             )
 
         with Session(engine) as session:
@@ -404,24 +378,19 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True),
-                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                bid_submitting_authority=liv,
+                                bid_submitting_authority=dummy_authority_entity(),
                                 funding_programme=atf3,
-                                scheme_type=construction,
+                                scheme_type=dummy_scheme_type_entity(),
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -434,16 +403,10 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_when_no_overview(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add_all(
-                [
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
-                    ),
-                ]
+            session.add(
+                CapitalSchemeEntity(
+                    scheme_reference="ATE00001", capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()]
+                )
             )
 
         with Session(engine) as session:
@@ -454,24 +417,10 @@ class TestDatabaseCapitalSchemeRepository:
 
     def test_get_when_no_bid_status(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Wirral Package",
-                                bid_submitting_authority=liv,
-                                funding_programme=atf3,
-                                scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
-                    ),
-                ]
+            session.add(
+                CapitalSchemeEntity(
+                    scheme_reference="ATE00001", capital_scheme_overviews=[dummy_capital_scheme_overview_entity()]
+                )
             )
 
         with Session(engine) as session:
@@ -558,7 +507,6 @@ class TestDatabaseCapitalSchemeRepository:
                     wyo := AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
                     atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -578,9 +526,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -748,12 +694,9 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
