@@ -23,5 +23,5 @@ def dummy_capital_scheme_overview_entity() -> CapitalSchemeOverviewEntity:
 
 def dummy_capital_scheme_bid_status_entity() -> CapitalSchemeBidStatusEntity:
     return CapitalSchemeBidStatusEntity(
-        bid_status=BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED), effective_date_from=datetime.min
+        bid_status=BidStatusEntity(bid_status_name=BidStatusName.SUBMITTED), effective_date_from=datetime.min
     )
