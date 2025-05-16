@@ -653,3 +653,13 @@ class TestDatabaseCapitalSchemeRepository:
             references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
         assert references == ["ATE00001", "ATE00002"]
+
+    def test_get_references_by_bid_submitting_authority_when_none(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add(AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"))
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+
+        assert not references

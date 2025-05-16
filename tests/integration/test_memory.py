@@ -253,3 +253,10 @@ class TestMemoryCapitalSchemeRepository:
         references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
 
         assert references == ["ATE00001", "ATE00002"]
+
+    def test_get_references_by_bid_submitting_authority_when_none(
+        self, capital_schemes: MemoryCapitalSchemeRepository
+    ) -> None:
+        references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+
+        assert not references
