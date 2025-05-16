@@ -188,12 +188,10 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(
-                        funding_programme_id=1, funding_programme_code="dummy", is_under_embargo=False
-                    ),
-                    AuthorityEntity(authority_id=1, authority_full_name="dummy", authority_abbreviation="dummy"),
-                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.SUBMITTED),
-                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.DEVELOPMENT),
+                    FundingProgrammeEntity(funding_programme_code="dummy", is_under_embargo=False),
+                    AuthorityEntity(authority_full_name="dummy", authority_abbreviation="dummy"),
+                    BidStatusEntity(bid_status_name=BidStatusName.SUBMITTED),
+                    SchemeTypeEntity(scheme_type_name=SchemeTypeName.DEVELOPMENT),
                 ]
             )
 
