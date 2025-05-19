@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.authorities import AuthorityEntity
@@ -24,7 +25,7 @@ class TestCapitalSchemeOverviewEntity:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -46,7 +47,7 @@ class TestCapitalSchemeOverviewEntity:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -63,7 +64,7 @@ class TestCapitalSchemeOverviewEntity:
                 datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
             ),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -91,7 +92,7 @@ class TestCapitalSchemeOverviewEntity:
             overview.effective_date
             == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc))
             and overview.name == "Wirral Package"
-            and overview.bid_submitting_authority == "LIV"
+            and overview.bid_submitting_authority == AuthorityAbbreviation("LIV")
             and overview.funding_programme == "ATF3"
             and overview.type == CapitalSchemeType.CONSTRUCTION
         )

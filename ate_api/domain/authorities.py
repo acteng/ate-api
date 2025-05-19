@@ -1,10 +1,27 @@
+from typing import Any
+
+
+class AuthorityAbbreviation:
+    def __init__(self, abbreviation: str):
+        self._abbreviation = abbreviation
+
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, AuthorityAbbreviation) and self._abbreviation == other._abbreviation
+
+    def __hash__(self) -> int:
+        return hash(self._abbreviation)
+
+    def __str__(self) -> str:
+        return self._abbreviation
+
+
 class Authority:
-    def __init__(self, abbreviation: str, full_name: str):
+    def __init__(self, abbreviation: AuthorityAbbreviation, full_name: str):
         self._abbreviation = abbreviation
         self._full_name = full_name
 
     @property
-    def abbreviation(self) -> str:
+    def abbreviation(self) -> AuthorityAbbreviation:
         return self._abbreviation
 
     @property
@@ -16,5 +33,5 @@ class AuthorityRepository:
     def add(self, authority: Authority) -> None:
         raise NotImplementedError()
 
-    def get(self, abbreviation: str) -> Authority | None:
+    def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
         raise NotImplementedError()

@@ -3,7 +3,7 @@ from datetime import datetime
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.authorities import Authority, AuthorityRepository
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from tests.integration.oauth import StubAuthorizationServer
 
 
@@ -11,7 +11,9 @@ from tests.integration.oauth import StubAuthorizationServer
 def test_can_access_with_valid_access_token(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+    authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 

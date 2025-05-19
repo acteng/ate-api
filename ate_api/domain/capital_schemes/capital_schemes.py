@@ -1,3 +1,4 @@
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
@@ -40,6 +41,6 @@ class CapitalSchemeRepository:
         raise NotImplementedError()
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: str, bid_status: CapitalSchemeBidStatus | None = None
+        self, authority_abbreviation: AuthorityAbbreviation, bid_status: CapitalSchemeBidStatus | None = None
     ) -> list[str]:
         raise NotImplementedError()

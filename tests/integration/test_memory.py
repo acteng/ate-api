@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from ate_api.domain.authorities import Authority
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -46,28 +46,32 @@ class TestMemoryAuthorityRepository:
         return MemoryAuthorityRepository()
 
     def test_add(self, authorities: MemoryAuthorityRepository) -> None:
-        authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+        authorities.add(
+            Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+        )
 
-        authority = authorities.get("LIV")
+        authority = authorities.get(AuthorityAbbreviation("LIV"))
         assert (
             authority
-            and authority.abbreviation == "LIV"
+            and authority.abbreviation == AuthorityAbbreviation("LIV")
             and authority.full_name == "Liverpool City Region Combined Authority"
         )
 
     def test_get(self, authorities: MemoryAuthorityRepository) -> None:
-        authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+        authorities.add(
+            Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+        )
 
-        authority = authorities.get("LIV")
+        authority = authorities.get(AuthorityAbbreviation("LIV"))
 
         assert (
             authority
-            and authority.abbreviation == "LIV"
+            and authority.abbreviation == AuthorityAbbreviation("LIV")
             and authority.full_name == "Liverpool City Region Combined Authority"
         )
 
     def test_get_when_not_found(self, authorities: MemoryAuthorityRepository) -> None:
-        authority = authorities.get("LIV")
+        authority = authorities.get(AuthorityAbbreviation("LIV"))
 
         assert not authority
 
@@ -81,7 +85,7 @@ class TestMemoryCapitalSchemeRepository:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -106,7 +110,7 @@ class TestMemoryCapitalSchemeRepository:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -140,7 +144,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
-                    bid_submitting_authority="LIV",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -153,7 +157,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="School Streets",
-                    bid_submitting_authority="LIV",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -166,7 +170,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Hospital Fields Road",
-                    bid_submitting_authority="WYO",
+                    bid_submitting_authority=AuthorityAbbreviation("WYO"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -174,7 +178,7 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
 
-        references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+        references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert references == ["ATE00001", "ATE00002"]
 
@@ -187,7 +191,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
-                    bid_submitting_authority="LIV",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -203,7 +207,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="School Streets",
-                    bid_submitting_authority="LIV",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -215,7 +219,7 @@ class TestMemoryCapitalSchemeRepository:
         )
 
         references = capital_schemes.get_references_by_bid_submitting_authority(
-            "LIV", bid_status=CapitalSchemeBidStatus.FUNDED
+            AuthorityAbbreviation("LIV"), bid_status=CapitalSchemeBidStatus.FUNDED
         )
 
         assert references == ["ATE00001"]
@@ -229,7 +233,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
-                    bid_submitting_authority="LIV",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -242,7 +246,7 @@ class TestMemoryCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
-                    bid_submitting_authority="LIV",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme="ATF3",
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
@@ -250,13 +254,13 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
 
-        references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+        references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert references == ["ATE00001", "ATE00002"]
 
     def test_get_references_by_bid_submitting_authority_when_none(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
-        references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+        references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references

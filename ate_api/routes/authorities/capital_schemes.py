@@ -5,7 +5,7 @@ from pydantic import AnyUrl
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
-from ate_api.domain.authorities import AuthorityRepository
+from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusModel
@@ -28,13 +28,13 @@ def get_authority_bid_submitting_capital_schemes(
     """
     Gets the capital schemes submitted by an authority.
     """
-    authority = authorities.get(abbreviation)
+    authority = authorities.get(AuthorityAbbreviation(abbreviation))
 
     if not authority:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
     references = capital_schemes.get_references_by_bid_submitting_authority(
-        abbreviation, bid_status=bid_status.to_domain() if bid_status else None
+        AuthorityAbbreviation(abbreviation), bid_status=bid_status.to_domain() if bid_status else None
     )
     capital_scheme_links = [
         AnyUrl(str(request.url_for("get_capital_scheme", reference=reference))) for reference in references

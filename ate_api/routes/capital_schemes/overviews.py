@@ -4,6 +4,7 @@ from typing import Annotated, Self
 from pydantic import AnyUrl, Field
 from starlette.requests import Request
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.routes.base import BaseModel
 from ate_api.routes.dates import DateTimeRangeModel
@@ -35,7 +36,7 @@ class CapitalSchemeOverviewModel(BaseModel):
             effective_date=DateTimeRangeModel.from_domain(overview.effective_date),
             name=overview.name,
             bid_submitting_authority=AnyUrl(
-                str(request.url_for("get_authority", abbreviation=overview.bid_submitting_authority))
+                str(request.url_for("get_authority", abbreviation=str(overview.bid_submitting_authority)))
             ),
             funding_programme=AnyUrl(str(request.url_for("get_funding_programme", code=overview.funding_programme))),
             type_=CapitalSchemeTypeModel.from_domain(overview.type),
@@ -45,8 +46,8 @@ class CapitalSchemeOverviewModel(BaseModel):
         return CapitalSchemeOverview(
             effective_date=self.effective_date.to_domain(),
             name=self.name,
-            bid_submitting_authority=path_parameter_for(
-                request, "get_authority", "abbreviation", str(self.bid_submitting_authority)
+            bid_submitting_authority=AuthorityAbbreviation(
+                path_parameter_for(request, "get_authority", "abbreviation", str(self.bid_submitting_authority))
             ),
             funding_programme=path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme)),
             type=self.type_.to_domain(),

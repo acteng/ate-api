@@ -1,13 +1,15 @@
 from pydantic import AnyUrl
 from starlette.requests import Request
 
-from ate_api.domain.authorities import Authority
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.routes.authorities.authorities import AuthorityModel
 
 
 class TestAuthorityModel:
     def test_from_domain(self, http_request: Request, base_url: str) -> None:
-        authority = Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority")
+        authority = Authority(
+            abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority"
+        )
 
         authority_model = AuthorityModel.from_domain(authority, http_request)
 
@@ -22,4 +24,7 @@ class TestAuthorityModel:
 
         authority = authority_model.to_domain()
 
-        assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool City Region Combined Authority"
+        assert (
+            authority.abbreviation == AuthorityAbbreviation("LIV")
+            and authority.full_name == "Liverpool City Region Combined Authority"
+        )

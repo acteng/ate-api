@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import AnyUrl
 from starlette.requests import Request
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
@@ -24,7 +25,7 @@ class TestCapitalSchemeModel:
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority="LIV",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
@@ -89,7 +90,7 @@ class TestCapitalSchemeModel:
             == CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority="LIV",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             )

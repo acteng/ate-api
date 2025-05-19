@@ -2,13 +2,13 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
-from ate_api.domain.authorities import Authority
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.infrastructure.database.authorities import AuthorityEntity, DatabaseAuthorityRepository
 
 
 class TestAuthorityEntity:
     def test_from_domain(self) -> None:
-        authority = Authority(abbreviation="LIV", full_name="Liverpool")
+        authority = Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool")
 
         authority_entity = AuthorityEntity.from_domain(authority)
 
@@ -19,7 +19,7 @@ class TestAuthorityEntity:
 
         authority = authority_entity.to_domain()
 
-        assert authority.abbreviation == "LIV" and authority.full_name == "Liverpool"
+        assert authority.abbreviation == AuthorityAbbreviation("LIV") and authority.full_name == "Liverpool"
 
 
 @pytest.mark.usefixtures("data")
@@ -27,7 +27,7 @@ class TestDatabaseAuthorityRepository:
     def test_add(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             authorities = DatabaseAuthorityRepository(session)
-            authorities.add(Authority(abbreviation="LIV", full_name="Liverpool"))
+            authorities.add(Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool"))
 
         with Session(engine) as session:
             (row,) = session.scalars(select(AuthorityEntity))
@@ -44,13 +44,15 @@ class TestDatabaseAuthorityRepository:
 
         with Session(engine) as session:
             authorities = DatabaseAuthorityRepository(session)
-            authority = authorities.get("LIV")
+            authority = authorities.get(AuthorityAbbreviation("LIV"))
 
-        assert authority and authority.abbreviation == "LIV" and authority.full_name == "Liverpool"
+        assert (
+            authority and authority.abbreviation == AuthorityAbbreviation("LIV") and authority.full_name == "Liverpool"
+        )
 
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
             authorities = DatabaseAuthorityRepository(session)
-            authority = authorities.get("LIV")
+            authority = authorities.get(AuthorityAbbreviation("LIV"))
 
         assert not authority

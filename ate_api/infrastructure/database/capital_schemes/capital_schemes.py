@@ -3,6 +3,7 @@ from typing import Self
 from sqlalchemy import Select, and_, false, func, select
 from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload, mapped_column, relationship
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
 from ate_api.infrastructure.database.authorities import AuthorityEntity
@@ -140,7 +141,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return row.to_domain() if row else None
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: str, bid_status: CapitalSchemeBidStatus | None = None
+        self, authority_abbreviation: AuthorityAbbreviation, bid_status: CapitalSchemeBidStatus | None = None
     ) -> list[str]:
         statement = (
             select(CapitalSchemeEntity.scheme_reference)
@@ -158,7 +159,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
             .join(FundingProgrammeEntity)
-            .where(AuthorityEntity.authority_abbreviation == authority_abbreviation)
+            .where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
             .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
@@ -172,7 +173,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return list(result.all())
 
     def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:
-        authority_abbreviations = [capital_scheme.overview.bid_submitting_authority]
+        authority_abbreviations = [str(capital_scheme.overview.bid_submitting_authority)]
         rows = self._session.execute(
             select(AuthorityEntity.authority_abbreviation, AuthorityEntity.authority_id).where(
                 AuthorityEntity.authority_abbreviation.in_(authority_abbreviations)

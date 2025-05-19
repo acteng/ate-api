@@ -5,6 +5,7 @@ from typing import Self
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.authorities import AuthorityEntity
@@ -59,7 +60,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     ) -> Self:
         return cls(
             scheme_name=overview.name,
-            bid_submitting_authority_id=authority_ids[overview.bid_submitting_authority],
+            bid_submitting_authority_id=authority_ids[str(overview.bid_submitting_authority)],
             funding_programme_id=funding_programme_ids[overview.funding_programme],
             scheme_type_id=scheme_type_ids[SchemeTypeName.from_domain(overview.type)],
             effective_date_from=zoned_to_local(overview.effective_date.from_),
@@ -73,7 +74,7 @@ class CapitalSchemeOverviewEntity(BaseEntity):
                 local_to_zoned(self.effective_date_to) if self.effective_date_to else None,
             ),
             name=self.scheme_name,
-            bid_submitting_authority=self.bid_submitting_authority.authority_abbreviation,
+            bid_submitting_authority=AuthorityAbbreviation(self.bid_submitting_authority.authority_abbreviation),
             funding_programme=self.funding_programme.funding_programme_code,
             type=self.scheme_type.scheme_type_name.to_domain(),
         )

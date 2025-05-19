@@ -4,6 +4,7 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
@@ -40,7 +41,7 @@ class TestCapitalSchemeEntity:
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
-                bid_submitting_authority="LIV",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
@@ -111,7 +112,7 @@ class TestCapitalSchemeEntity:
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -159,7 +160,7 @@ class TestDatabaseCapitalSchemeRepository:
                     overview=CapitalSchemeOverview(
                         effective_date=DateTimeRange(datetime(2020, 1, 1)),
                         name="Wirral Package",
-                        bid_submitting_authority="LIV",
+                        bid_submitting_authority=AuthorityAbbreviation("LIV"),
                         funding_programme="ATF3",
                         type=CapitalSchemeType.CONSTRUCTION,
                     ),
@@ -267,7 +268,7 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -315,7 +316,7 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme and capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
             name="School Streets",
-            bid_submitting_authority="LIV",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme="ATF3",
             type=CapitalSchemeType.CONSTRUCTION,
         )
@@ -495,7 +496,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert references == ["ATE00001", "ATE00002"]
 
@@ -533,7 +534,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references
 
@@ -581,7 +582,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert references == ["ATE00001"]
 
@@ -637,7 +638,7 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority(
-                "LIV", bid_status=CapitalSchemeBidStatus.FUNDED
+                AuthorityAbbreviation("LIV"), bid_status=CapitalSchemeBidStatus.FUNDED
             )
 
         assert references == ["ATE00001"]
@@ -685,7 +686,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert references == ["ATE00001", "ATE00002"]
 
@@ -703,7 +704,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references
 
@@ -731,7 +732,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references
 
@@ -741,6 +742,6 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = capital_schemes.get_references_by_bid_submitting_authority("LIV")
+            references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references

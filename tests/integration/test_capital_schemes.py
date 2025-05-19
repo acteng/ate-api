@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.authorities import Authority, AuthorityRepository
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
@@ -16,14 +16,16 @@ from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 def test_get_capital_scheme(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+    authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
     capital_schemes.add(
         CapitalScheme(
             reference="ATE00001",
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
                 name="Wirral Package",
-                bid_submitting_authority="LIV",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme="ATF3",
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
@@ -58,7 +60,9 @@ def test_get_capital_scheme(
 def test_get_capital_scheme_with_authority_review(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(Authority(abbreviation="LIV", full_name="Liverpool City Region Combined Authority"))
+    authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
     capital_scheme = CapitalScheme(
         reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
     )

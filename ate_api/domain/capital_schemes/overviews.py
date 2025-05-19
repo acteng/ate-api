@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum, auto
 
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.dates import DateTimeRange
 
 
@@ -13,6 +14,6 @@ class CapitalSchemeType(Enum):
 class CapitalSchemeOverview:
     effective_date: DateTimeRange
     name: str
-    bid_submitting_authority: str
+    bid_submitting_authority: AuthorityAbbreviation
     funding_programme: str
     type: CapitalSchemeType

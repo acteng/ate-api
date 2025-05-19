@@ -1,4 +1,4 @@
-from ate_api.domain.authorities import Authority, AuthorityRepository
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
@@ -17,12 +17,12 @@ class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
 
 class MemoryAuthorityRepository(AuthorityRepository):
     def __init__(self) -> None:
-        self._authorities: dict[str, Authority] = {}
+        self._authorities: dict[AuthorityAbbreviation, Authority] = {}
 
     def add(self, authority: Authority) -> None:
         self._authorities[authority.abbreviation] = authority
 
-    def get(self, abbreviation: str) -> Authority | None:
+    def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
         return self._authorities.get(abbreviation)
 
 
@@ -37,7 +37,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         return self._capital_schemes.get(reference)
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: str, bid_status: CapitalSchemeBidStatus | None = None
+        self, authority_abbreviation: AuthorityAbbreviation, bid_status: CapitalSchemeBidStatus | None = None
     ) -> list[str]:
         return sorted(
             reference
