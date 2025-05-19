@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import (
     CapitalSchemeOverviewEntity,
@@ -26,7 +27,7 @@ class TestCapitalSchemeOverviewEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -48,7 +49,7 @@ class TestCapitalSchemeOverviewEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -65,7 +66,7 @@ class TestCapitalSchemeOverviewEntity:
             ),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -93,7 +94,7 @@ class TestCapitalSchemeOverviewEntity:
             == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc))
             and overview.name == "Wirral Package"
             and overview.bid_submitting_authority == AuthorityAbbreviation("LIV")
-            and overview.funding_programme == "ATF3"
+            and overview.funding_programme == FundingProgrammeCode("ATF3")
             and overview.type == CapitalSchemeType.CONSTRUCTION
         )
 

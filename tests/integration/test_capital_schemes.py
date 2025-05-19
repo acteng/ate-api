@@ -13,6 +13,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 )
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
@@ -30,7 +31,7 @@ def test_get_capital_scheme(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(

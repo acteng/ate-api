@@ -6,6 +6,7 @@ from starlette.requests import Request
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.base import BaseModel
 from ate_api.routes.dates import DateTimeRangeModel
 from ate_api.routes.links import path_parameter_for
@@ -38,7 +39,9 @@ class CapitalSchemeOverviewModel(BaseModel):
             bid_submitting_authority=AnyUrl(
                 str(request.url_for("get_authority", abbreviation=str(overview.bid_submitting_authority)))
             ),
-            funding_programme=AnyUrl(str(request.url_for("get_funding_programme", code=overview.funding_programme))),
+            funding_programme=AnyUrl(
+                str(request.url_for("get_funding_programme", code=str(overview.funding_programme)))
+            ),
             type_=CapitalSchemeTypeModel.from_domain(overview.type),
         )
 
@@ -49,6 +52,8 @@ class CapitalSchemeOverviewModel(BaseModel):
             bid_submitting_authority=AuthorityAbbreviation(
                 path_parameter_for(request, "get_authority", "abbreviation", str(self.bid_submitting_authority))
             ),
-            funding_programme=path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme)),
+            funding_programme=FundingProgrammeCode(
+                path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme))
+            ),
             type=self.type_.to_domain(),
         )

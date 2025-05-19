@@ -9,6 +9,7 @@ from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
@@ -26,7 +27,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -93,7 +94,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             )
             and capital_scheme.bid_status_details

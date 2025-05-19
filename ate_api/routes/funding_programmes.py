@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
-from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
 from ate_api.routes.base import BaseModel
 
@@ -15,10 +15,10 @@ class FundingProgrammeModel(BaseModel):
 
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme) -> Self:
-        return cls(code=funding_programme.code)
+        return cls(code=str(funding_programme.code))
 
     def to_domain(self) -> FundingProgramme:
-        return FundingProgramme(code=self.code)
+        return FundingProgramme(code=FundingProgrammeCode(self.code))
 
 
 router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])
@@ -35,7 +35,7 @@ def get_funding_programme(
     """
     Gets a funding programme.
     """
-    funding_programme = funding_programmes.get(code)
+    funding_programme = funding_programmes.get(FundingProgrammeCode(code))
 
     if not funding_programme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)

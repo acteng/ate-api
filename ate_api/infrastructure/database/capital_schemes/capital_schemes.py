@@ -186,7 +186,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return {row.authority_abbreviation: row.authority_id for row in rows}
 
     def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:
-        funding_programme_codes = [capital_scheme.overview.funding_programme]
+        funding_programme_codes = [str(capital_scheme.overview.funding_programme)]
         rows = self._session.execute(
             select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
                 FundingProgrammeEntity.funding_programme_code.in_(funding_programme_codes)

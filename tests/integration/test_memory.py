@@ -7,7 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.funding_programmes import FundingProgramme
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
 from tests.integration.memory import (
     MemoryAuthorityRepository,
     MemoryCapitalSchemeRepository,
@@ -22,20 +22,20 @@ class TestMemoryFundingProgrammeRepository:
         return MemoryFundingProgrammeRepository()
 
     def test_add(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code="ATF3"))
+        funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
-        funding_programme = funding_programmes.get("ATF3")
-        assert funding_programme and funding_programme.code == "ATF3"
+        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
 
     def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code="ATF3"))
+        funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
-        funding_programme = funding_programmes.get("ATF3")
+        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
 
-        assert funding_programme and funding_programme.code == "ATF3"
+        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
 
     def test_get_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programme = funding_programmes.get("ATF3")
+        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme
 
@@ -86,7 +86,7 @@ class TestMemoryCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
@@ -113,7 +113,7 @@ class TestMemoryCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
@@ -149,7 +149,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -162,7 +162,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -175,7 +175,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("WYO"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -196,7 +196,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
@@ -212,7 +212,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
@@ -238,7 +238,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -251,7 +251,7 @@ class TestMemoryCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme="ATF3",
+                    funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),

@@ -10,6 +10,7 @@ from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.infrastructure.database import (
     AuthorityEntity,
     BidStatusEntity,
@@ -42,7 +43,7 @@ class TestCapitalSchemeEntity:
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -115,7 +116,7 @@ class TestCapitalSchemeEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
@@ -163,7 +164,7 @@ class TestDatabaseCapitalSchemeRepository:
                         effective_date=DateTimeRange(datetime(2020, 1, 1)),
                         name="Wirral Package",
                         bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                        funding_programme="ATF3",
+                        funding_programme=FundingProgrammeCode("ATF3"),
                         type=CapitalSchemeType.CONSTRUCTION,
                     ),
                     bid_status_details=CapitalSchemeBidStatusDetails(
@@ -273,7 +274,7 @@ class TestDatabaseCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
@@ -321,7 +322,7 @@ class TestDatabaseCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
             name="School Streets",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme="ATF3",
+            funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
 

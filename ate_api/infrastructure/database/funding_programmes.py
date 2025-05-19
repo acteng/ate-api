@@ -3,7 +3,7 @@ from typing import Self
 from sqlalchemy import false, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.infrastructure.database import BaseEntity
 
 
@@ -17,10 +17,10 @@ class FundingProgrammeEntity(BaseEntity):
 
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme) -> Self:
-        return cls(funding_programme_code=funding_programme.code, is_under_embargo=False)
+        return cls(funding_programme_code=str(funding_programme.code), is_under_embargo=False)
 
     def to_domain(self) -> FundingProgramme:
-        return FundingProgramme(code=self.funding_programme_code)
+        return FundingProgramme(code=FundingProgrammeCode(self.funding_programme_code))
 
 
 class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
@@ -30,10 +30,10 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
     def add(self, funding_programme: FundingProgramme) -> None:
         self._session.add(FundingProgrammeEntity.from_domain(funding_programme))
 
-    def get(self, code: str) -> FundingProgramme | None:
+    def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
         result = self._session.scalars(
             select(FundingProgrammeEntity)
-            .where(FundingProgrammeEntity.funding_programme_code == code)
+            .where(FundingProgrammeEntity.funding_programme_code == str(code))
             .where(FundingProgrammeEntity.is_under_embargo == false())
         )
         row = result.one_or_none()

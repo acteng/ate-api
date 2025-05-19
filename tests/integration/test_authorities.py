@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 )
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from tests.unit.domain.dummies import dummy_bid_status_details
 
 
@@ -52,7 +53,7 @@ def test_get_authority_bid_submitting_capital_schemes(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -65,7 +66,7 @@ def test_get_authority_bid_submitting_capital_schemes(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -79,7 +80,7 @@ def test_get_authority_bid_submitting_capital_schemes(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("WYO"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -113,7 +114,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -128,7 +129,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme="ATF3",
+                funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(

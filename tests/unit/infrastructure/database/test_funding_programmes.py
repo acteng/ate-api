@@ -2,14 +2,14 @@ import pytest
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
-from ate_api.domain.funding_programmes import FundingProgramme
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
 from ate_api.infrastructure.database import FundingProgrammeEntity
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
 
 
 class TestFundingProgrammeEntity:
     def test_from_domain(self) -> None:
-        funding_programme = FundingProgramme(code="ATF3")
+        funding_programme = FundingProgramme(code=FundingProgrammeCode("ATF3"))
 
         funding_programme_entity = FundingProgrammeEntity.from_domain(funding_programme)
 
@@ -23,7 +23,7 @@ class TestFundingProgrammeEntity:
 
         funding_programme = funding_programme_entity.to_domain()
 
-        assert funding_programme.code == "ATF3"
+        assert funding_programme.code == FundingProgrammeCode("ATF3")
 
 
 @pytest.mark.usefixtures("data")
@@ -31,7 +31,7 @@ class TestDatabaseFundingProgrammeRepository:
     def test_add(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programmes.add(FundingProgramme(code="ATF3"))
+            funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
         with Session(engine) as session:
             (row,) = session.scalars(select(FundingProgrammeEntity))
@@ -48,9 +48,9 @@ class TestDatabaseFundingProgrammeRepository:
 
         with Session(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = funding_programmes.get("ATF3")
+            funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
 
-        assert funding_programme and funding_programme.code == "ATF3"
+        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
 
     def test_get_filters_under_embargo(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
@@ -58,13 +58,13 @@ class TestDatabaseFundingProgrammeRepository:
 
         with Session(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = funding_programmes.get("ATF3")
+            funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme
 
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = funding_programmes.get("ATF3")
+            funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme

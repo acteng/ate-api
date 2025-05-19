@@ -1,14 +1,14 @@
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeRepository
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 
 
 @respx.mock
 def test_get_funding_programme(
     funding_programmes: FundingProgrammeRepository, client: TestClient, access_token: str
 ) -> None:
-    funding_programmes.add(FundingProgramme(code="ATF3"))
+    funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
     response = client.get("/funding-programmes/ATF3", headers={"Authorization": f"Bearer {access_token}"})
 
