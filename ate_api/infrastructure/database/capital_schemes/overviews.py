@@ -55,15 +55,15 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     def from_domain(
         cls,
         overview: CapitalSchemeOverview,
-        authority_ids: dict[str, int],
-        funding_programme_ids: dict[str, int],
-        scheme_type_ids: dict[SchemeTypeName, int],
+        authority_ids: dict[AuthorityAbbreviation, int],
+        funding_programme_ids: dict[FundingProgrammeCode, int],
+        scheme_type_ids: dict[CapitalSchemeType, int],
     ) -> Self:
         return cls(
             scheme_name=overview.name,
-            bid_submitting_authority_id=authority_ids[str(overview.bid_submitting_authority)],
-            funding_programme_id=funding_programme_ids[str(overview.funding_programme)],
-            scheme_type_id=scheme_type_ids[SchemeTypeName.from_domain(overview.type)],
+            bid_submitting_authority_id=authority_ids[overview.bid_submitting_authority],
+            funding_programme_id=funding_programme_ids[overview.funding_programme],
+            scheme_type_id=scheme_type_ids[overview.type],
             effective_date_from=zoned_to_local(overview.effective_date.from_),
             effective_date_to=zoned_to_local(overview.effective_date.to) if overview.effective_date.to else None,
         )

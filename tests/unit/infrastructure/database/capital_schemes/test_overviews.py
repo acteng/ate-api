@@ -32,7 +32,10 @@ class TestCapitalSchemeOverviewEntity:
         )
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
-            overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            overview,
+            {AuthorityAbbreviation("LIV"): 1},
+            {FundingProgrammeCode("ATF3"): 1},
+            {CapitalSchemeType.CONSTRUCTION: 1},
         )
 
         assert (
@@ -54,7 +57,10 @@ class TestCapitalSchemeOverviewEntity:
         )
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
-            overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            overview,
+            {AuthorityAbbreviation("LIV"): 1},
+            {FundingProgrammeCode("ATF3"): 1},
+            {CapitalSchemeType.CONSTRUCTION: 1},
         )
 
         assert not overview_entity.effective_date_to
@@ -71,7 +77,10 @@ class TestCapitalSchemeOverviewEntity:
         )
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
-            overview, {"LIV": 1}, {"ATF3": 1}, {SchemeTypeName.CONSTRUCTION: 1}
+            overview,
+            {AuthorityAbbreviation("LIV"): 1},
+            {FundingProgrammeCode("ATF3"): 1},
+            {CapitalSchemeType.CONSTRUCTION: 1},
         )
 
         assert overview_entity.effective_date_from == datetime(2020, 6, 1, 13)

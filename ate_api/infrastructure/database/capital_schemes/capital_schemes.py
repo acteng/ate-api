@@ -10,6 +10,8 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeReference,
     CapitalSchemeRepository,
 )
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
@@ -40,10 +42,10 @@ class CapitalSchemeEntity(BaseEntity):
     def from_domain(
         cls,
         capital_scheme: CapitalScheme,
-        authority_ids: dict[str, int],
-        funding_programme_ids: dict[str, int],
-        scheme_type_ids: dict[SchemeTypeName, int],
-        bid_status_ids: dict[BidStatusName, int],
+        authority_ids: dict[AuthorityAbbreviation, int],
+        funding_programme_ids: dict[FundingProgrammeCode, int],
+        scheme_type_ids: dict[CapitalSchemeType, int],
+        bid_status_ids: dict[CapitalSchemeBidStatus, int],
     ) -> Self:
         return cls(
             scheme_reference=str(capital_scheme.reference),
@@ -176,41 +178,41 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         result = self._session.scalars(statement)
         return [CapitalSchemeReference(reference) for reference in result.all()]
 
-    def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:
+    def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[AuthorityAbbreviation, int]:
         authority_abbreviations = [str(capital_scheme.overview.bid_submitting_authority)]
         rows = self._session.execute(
             select(AuthorityEntity.authority_abbreviation, AuthorityEntity.authority_id).where(
                 AuthorityEntity.authority_abbreviation.in_(authority_abbreviations)
             )
         )
-        return {row.authority_abbreviation: row.authority_id for row in rows}
+        return {AuthorityAbbreviation(row.authority_abbreviation): row.authority_id for row in rows}
 
-    def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:
+    def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[FundingProgrammeCode, int]:
         funding_programme_codes = [str(capital_scheme.overview.funding_programme)]
         rows = self._session.execute(
             select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
                 FundingProgrammeEntity.funding_programme_code.in_(funding_programme_codes)
             )
         )
-        return {row.funding_programme_code: row.funding_programme_id for row in rows}
+        return {FundingProgrammeCode(row.funding_programme_code): row.funding_programme_id for row in rows}
 
-    def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[SchemeTypeName, int]:
+    def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeType, int]:
         scheme_type_names = [SchemeTypeName.from_domain(capital_scheme.overview.type)]
         rows = self._session.execute(
             select(SchemeTypeEntity.scheme_type_name, SchemeTypeEntity.scheme_type_id).where(
                 SchemeTypeEntity.scheme_type_name.in_(scheme_type_names)
             )
         )
-        return {row.scheme_type_name: row.scheme_type_id for row in rows}
+        return {row.scheme_type_name.to_domain(): row.scheme_type_id for row in rows}
 
-    def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[BidStatusName, int]:
+    def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeBidStatus, int]:
         bid_status_names = [BidStatusName.from_domain(capital_scheme.bid_status_details.bid_status)]
         rows = self._session.execute(
             select(BidStatusEntity.bid_status_name, BidStatusEntity.bid_status_id).where(
                 BidStatusEntity.bid_status_name.in_(bid_status_names)
             )
         )
-        return {row.bid_status_name: row.bid_status_id for row in rows}
+        return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
 
     @staticmethod
     def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:

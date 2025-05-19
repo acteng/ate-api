@@ -47,10 +47,10 @@ class CapitalSchemeBidStatusEntity(BaseEntity):
 
     @classmethod
     def from_domain(
-        cls, bid_status_details: CapitalSchemeBidStatusDetails, bid_status_ids: dict[BidStatusName, int]
+        cls, bid_status_details: CapitalSchemeBidStatusDetails, bid_status_ids: dict[CapitalSchemeBidStatus, int]
     ) -> Self:
         return cls(
-            bid_status_id=bid_status_ids[BidStatusName.from_domain(bid_status_details.bid_status)],
+            bid_status_id=bid_status_ids[bid_status_details.bid_status],
             effective_date_from=zoned_to_local(bid_status_details.effective_date.from_),
             effective_date_to=(
                 zoned_to_local(bid_status_details.effective_date.to) if bid_status_details.effective_date.to else None

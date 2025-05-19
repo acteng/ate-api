@@ -20,7 +20,9 @@ class TestCapitalSchemeBidStatusEntity:
             bid_status=CapitalSchemeBidStatus.FUNDED,
         )
 
-        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(
+            bid_status_details, {CapitalSchemeBidStatus.FUNDED: 1}
+        )
 
         assert (
             bid_status_entity.bid_status_id == 1
@@ -33,7 +35,9 @@ class TestCapitalSchemeBidStatusEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
         )
 
-        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(
+            bid_status_details, {CapitalSchemeBidStatus.FUNDED: 1}
+        )
 
         assert not bid_status_entity.effective_date_to
 
@@ -45,7 +49,9 @@ class TestCapitalSchemeBidStatusEntity:
             bid_status=CapitalSchemeBidStatus.FUNDED,
         )
 
-        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatusName.FUNDED: 1})
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(
+            bid_status_details, {CapitalSchemeBidStatus.FUNDED: 1}
+        )
 
         assert bid_status_entity.effective_date_from == datetime(2020, 6, 1, 13)
         assert bid_status_entity.effective_date_to == datetime(2020, 7, 1, 13)
