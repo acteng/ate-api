@@ -6,7 +6,7 @@ from starlette.requests import Request
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
@@ -21,7 +21,7 @@ from tests.unit.routes.dummies import dummy_bid_status_details_model, dummy_over
 class TestCapitalSchemeModel:
     def test_from_domain(self, http_request: Request, base_url: str) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001",
+            reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
@@ -55,7 +55,9 @@ class TestCapitalSchemeModel:
 
     def test_from_domain_sets_authority_review(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
         )
         capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1)))
 
@@ -85,7 +87,7 @@ class TestCapitalSchemeModel:
         capital_scheme = capital_scheme_model.to_domain(http_request)
 
         assert (
-            capital_scheme.reference == "ATE00001"
+            capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview
             == CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),

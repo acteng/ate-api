@@ -5,7 +5,11 @@ from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload,
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
@@ -42,7 +46,7 @@ class CapitalSchemeEntity(BaseEntity):
         bid_status_ids: dict[BidStatusName, int],
     ) -> Self:
         return cls(
-            scheme_reference=capital_scheme.reference,
+            scheme_reference=str(capital_scheme.reference),
             capital_scheme_overviews=[
                 CapitalSchemeOverviewEntity.from_domain(
                     capital_scheme.overview, authority_ids, funding_programme_ids, scheme_type_ids
@@ -62,7 +66,7 @@ class CapitalSchemeEntity(BaseEntity):
         (capital_scheme_overview,) = self.capital_scheme_overviews
         (capital_scheme_bid_status,) = self.capital_scheme_bid_statuses
         capital_scheme = CapitalScheme(
-            reference=self.scheme_reference,
+            reference=CapitalSchemeReference(self.scheme_reference),
             overview=capital_scheme_overview.to_domain(),
             bid_status_details=capital_scheme_bid_status.to_domain(),
         )
@@ -89,7 +93,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
 
-    def get(self, reference: str) -> CapitalScheme | None:
+    def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
         ranked_capital_scheme_authority_reviews_alias = aliased(
             CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
@@ -133,7 +137,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                     ranked_capital_scheme_authority_reviews.c.rank == 1,
                 ),
             )
-            .where(CapitalSchemeEntity.scheme_reference == reference)
+            .where(CapitalSchemeEntity.scheme_reference == str(reference))
             .where(FundingProgrammeEntity.is_under_embargo == false())
         )
 
@@ -142,7 +146,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
     def get_references_by_bid_submitting_authority(
         self, authority_abbreviation: AuthorityAbbreviation, bid_status: CapitalSchemeBidStatus | None = None
-    ) -> list[str]:
+    ) -> list[CapitalSchemeReference]:
         statement = (
             select(CapitalSchemeEntity.scheme_reference)
             .join(
@@ -170,7 +174,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
 
         result = self._session.scalars(statement)
-        return list(result.all())
+        return [CapitalSchemeReference(reference) for reference in result.all()]
 
     def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[str, int]:
         authority_abbreviations = [str(capital_scheme.overview.bid_submitting_authority)]

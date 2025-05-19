@@ -37,6 +37,6 @@ def get_authority_bid_submitting_capital_schemes(
         AuthorityAbbreviation(abbreviation), bid_status=bid_status.to_domain() if bid_status else None
     )
     capital_scheme_links = [
-        AnyUrl(str(request.url_for("get_capital_scheme", reference=reference))) for reference in references
+        AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))) for reference in references
     ]
     return CollectionModel[AnyUrl](items=capital_scheme_links)

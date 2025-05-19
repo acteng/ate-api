@@ -6,7 +6,11 @@ from fastapi.testclient import TestClient
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
@@ -21,7 +25,7 @@ def test_get_capital_scheme(
     )
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00001",
+            reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
                 name="Wirral Package",
@@ -64,7 +68,9 @@ def test_get_capital_scheme_with_authority_review(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     capital_scheme = CapitalScheme(
-        reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
+        reference=CapitalSchemeReference("ATE00001"),
+        overview=dummy_overview(),
+        bid_status_details=dummy_bid_status_details(),
     )
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=timezone.utc))

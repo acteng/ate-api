@@ -6,7 +6,11 @@ from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
@@ -23,7 +27,7 @@ class CapitalSchemeModel(BaseModel):
     @classmethod
     def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
         return cls(
-            reference=capital_scheme.reference,
+            reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
             authority_review=(
@@ -35,7 +39,7 @@ class CapitalSchemeModel(BaseModel):
 
     def to_domain(self, request: Request) -> CapitalScheme:
         capital_scheme = CapitalScheme(
-            reference=self.reference,
+            reference=CapitalSchemeReference(self.reference),
             overview=self.overview.to_domain(request),
             bid_status_details=self.bid_status_details.to_domain(),
         )
@@ -62,7 +66,7 @@ def get_capital_scheme(
     """
     Gets a capital scheme.
     """
-    capital_scheme = capital_schemes.get(reference)
+    capital_scheme = capital_schemes.get(CapitalSchemeReference(reference))
 
     if not capital_scheme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)

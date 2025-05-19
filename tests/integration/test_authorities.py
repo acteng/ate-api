@@ -5,7 +5,11 @@ from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from tests.unit.domain.dummies import dummy_bid_status_details
@@ -43,7 +47,7 @@ def test_get_authority_bid_submitting_capital_schemes(
     )
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00001",
+            reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
@@ -56,7 +60,7 @@ def test_get_authority_bid_submitting_capital_schemes(
     )
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00002",
+            reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="School Streets",
@@ -70,7 +74,7 @@ def test_get_authority_bid_submitting_capital_schemes(
     authorities.add(Authority(abbreviation=AuthorityAbbreviation("WYO"), full_name="West Yorkshire Combined Authority"))
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00003",
+            reference=CapitalSchemeReference("ATE00003"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Hospital Fields Road",
@@ -104,7 +108,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
     )
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00001",
+            reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
@@ -119,7 +123,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
     )
     capital_schemes.add(
         CapitalScheme(
-            reference="ATE00002",
+            reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="School Streets",

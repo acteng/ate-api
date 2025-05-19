@@ -4,7 +4,7 @@ import pytest
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme
@@ -95,13 +95,15 @@ class TestMemoryCapitalSchemeRepository:
         )
 
         capital_schemes.add(
-            CapitalScheme(reference="ATE00001", overview=overview, bid_status_details=bid_status_details)
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"), overview=overview, bid_status_details=bid_status_details
+            )
         )
 
-        capital_scheme = capital_schemes.get("ATE00001")
+        capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
         assert (
             capital_scheme
-            and capital_scheme.reference == "ATE00001"
+            and capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
             and capital_scheme.bid_status_details == bid_status_details
         )
@@ -120,27 +122,29 @@ class TestMemoryCapitalSchemeRepository:
         )
 
         capital_schemes.add(
-            CapitalScheme(reference="ATE00001", overview=overview, bid_status_details=bid_status_details)
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"), overview=overview, bid_status_details=bid_status_details
+            )
         )
 
-        capital_scheme = capital_schemes.get("ATE00001")
+        capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert (
             capital_scheme
-            and capital_scheme.reference == "ATE00001"
+            and capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
             and capital_scheme.bid_status_details == bid_status_details
         )
 
     def test_get_when_not_found(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
-        capital_scheme = capital_schemes.get("ATE00001")
+        capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert not capital_scheme
 
     def test_get_references_by_bid_submitting_authority(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001",
+                reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
@@ -153,7 +157,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00002",
+                reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="School Streets",
@@ -166,7 +170,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00003",
+                reference=CapitalSchemeReference("ATE00003"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Hospital Fields Road",
@@ -180,14 +184,14 @@ class TestMemoryCapitalSchemeRepository:
 
         references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == ["ATE00001", "ATE00002"]
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     def test_get_references_by_bid_submitting_authority_filters_by_bid_status(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001",
+                reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
@@ -203,7 +207,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00002",
+                reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="School Streets",
@@ -222,14 +226,14 @@ class TestMemoryCapitalSchemeRepository:
             AuthorityAbbreviation("LIV"), bid_status=CapitalSchemeBidStatus.FUNDED
         )
 
-        assert references == ["ATE00001"]
+        assert references == [CapitalSchemeReference("ATE00001")]
 
     def test_get_references_by_bid_submitting_authority_orders_by_reference(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00002",
+                reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
@@ -242,7 +246,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_schemes.add(
             CapitalScheme(
-                reference="ATE00001",
+                reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
                     name="Wirral Package",
@@ -256,7 +260,7 @@ class TestMemoryCapitalSchemeRepository:
 
         references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == ["ATE00001", "ATE00002"]
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     def test_get_references_by_bid_submitting_authority_when_none(
         self, capital_schemes: MemoryCapitalSchemeRepository

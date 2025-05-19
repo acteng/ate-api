@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import (
@@ -37,7 +37,7 @@ from tests.unit.infrastructure.database.dummies import (
 class TestCapitalSchemeEntity:
     def test_from_domain(self) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001",
+            reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 name="Wirral Package",
@@ -75,7 +75,9 @@ class TestCapitalSchemeEntity:
 
     def test_from_domain_sets_authority_review(self) -> None:
         capital_scheme = CapitalScheme(
-            reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
         )
         capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
 
@@ -108,7 +110,7 @@ class TestCapitalSchemeEntity:
 
         capital_scheme = capital_scheme_entity.to_domain()
 
-        assert capital_scheme.reference == "ATE00001"
+        assert capital_scheme.reference == CapitalSchemeReference("ATE00001")
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
@@ -156,7 +158,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             capital_schemes.add(
                 CapitalScheme(
-                    reference="ATE00001",
+                    reference=CapitalSchemeReference("ATE00001"),
                     overview=CapitalSchemeOverview(
                         effective_date=DateTimeRange(datetime(2020, 1, 1)),
                         name="Wirral Package",
@@ -206,7 +208,9 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session, session.begin():
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             capital_scheme = CapitalScheme(
-                reference="ATE00001", overview=dummy_overview(), bid_status_details=dummy_bid_status_details()
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=dummy_overview(),
+                bid_status_details=dummy_bid_status_details(),
             )
             capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
             capital_schemes.add(capital_scheme)
@@ -262,9 +266,9 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
-        assert capital_scheme and capital_scheme.reference == "ATE00001"
+        assert capital_scheme and capital_scheme.reference == CapitalSchemeReference("ATE00001")
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             name="Wirral Package",
@@ -311,7 +315,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
@@ -346,7 +350,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
@@ -369,7 +373,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 3, 1, tzinfo=timezone.utc)
@@ -398,7 +402,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert not capital_scheme
 
@@ -412,7 +416,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert not capital_scheme
 
@@ -426,14 +430,14 @@ class TestDatabaseCapitalSchemeRepository:
 
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert not capital_scheme
 
     def test_get_when_not_found(self, engine: Engine) -> None:
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = capital_schemes.get("ATE00001")
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert not capital_scheme
 
@@ -498,7 +502,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == ["ATE00001", "ATE00002"]
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     def test_get_references_by_bid_submitting_authority_fetches_current_overview(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
@@ -584,7 +588,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == ["ATE00001"]
+        assert references == [CapitalSchemeReference("ATE00001")]
 
     def test_get_references_by_bid_submitting_authority_filters_by_current_bid_status(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
@@ -641,7 +645,7 @@ class TestDatabaseCapitalSchemeRepository:
                 AuthorityAbbreviation("LIV"), bid_status=CapitalSchemeBidStatus.FUNDED
             )
 
-        assert references == ["ATE00001"]
+        assert references == [CapitalSchemeReference("ATE00001")]
 
     def test_get_references_by_bid_submitting_authority_orders_by_reference(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
@@ -688,7 +692,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == ["ATE00001", "ATE00002"]
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     def test_get_references_by_bid_submitting_authority_when_no_overview(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
