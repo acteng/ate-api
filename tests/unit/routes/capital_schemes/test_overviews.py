@@ -8,7 +8,6 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
-from ate_api.routes.dates import DateTimeRangeModel
 
 
 class TestCapitalSchemeTypeModel:
@@ -32,7 +31,6 @@ class TestCapitalSchemeOverviewModel:
         overview_model = CapitalSchemeOverviewModel.from_domain(overview, http_request)
 
         assert overview_model == CapitalSchemeOverviewModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
@@ -41,14 +39,13 @@ class TestCapitalSchemeOverviewModel:
 
     def test_to_domain(self, http_request: Request, base_url: str) -> None:
         overview_model = CapitalSchemeOverviewModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
             name="Wirral Package",
             bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
             type_=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
-        overview = overview_model.to_domain(http_request)
+        overview = overview_model.to_domain(datetime(2020, 1, 1), http_request)
 
         assert overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),

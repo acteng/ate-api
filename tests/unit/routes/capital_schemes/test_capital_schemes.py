@@ -14,7 +14,6 @@ from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthor
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
-from ate_api.routes.dates import DateTimeRangeModel
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.routes.dummies import dummy_bid_status_details_model, dummy_overview_model
 
@@ -41,7 +40,6 @@ class TestCapitalSchemeModel:
         assert capital_scheme_model == CapitalSchemeModel(
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
-                effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
@@ -69,7 +67,6 @@ class TestCapitalSchemeModel:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
-                effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)),
                 name="Wirral Package",
                 bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
@@ -79,7 +76,7 @@ class TestCapitalSchemeModel:
             authority_review=None,
         )
 
-        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 2, 1), http_request)
+        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1), http_request)
 
         assert (
             capital_scheme.reference == CapitalSchemeReference("ATE00001")
@@ -93,7 +90,7 @@ class TestCapitalSchemeModel:
             )
             and capital_scheme.bid_status_details
             == CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
             )
             and not capital_scheme.authority_review
         )

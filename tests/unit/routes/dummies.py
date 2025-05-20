@@ -1,10 +1,7 @@
-from datetime import datetime
-
 from pydantic import AnyUrl
 
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
-from ate_api.routes.dates import DateTimeRangeModel
 
 
 def dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
@@ -13,7 +10,6 @@ def dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
         bid_submitting_authority=AnyUrl(f"{base_url}/authorities/dummy"),
         funding_programme=AnyUrl(f"{base_url}/funding-programmes/dummy"),
         type_=CapitalSchemeTypeModel.DEVELOPMENT,
-        effective_date=DateTimeRangeModel(from_=datetime.min),
     )
 
 

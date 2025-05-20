@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Annotated, Self
 
@@ -6,9 +7,9 @@ from starlette.requests import Request
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.base import BaseModel
-from ate_api.routes.dates import DateTimeRangeModel
 from ate_api.routes.links import path_parameter_for
 
 
@@ -25,7 +26,6 @@ class CapitalSchemeTypeModel(str, Enum):
 
 
 class CapitalSchemeOverviewModel(BaseModel):
-    effective_date: DateTimeRangeModel
     name: str
     bid_submitting_authority: AnyUrl
     funding_programme: AnyUrl
@@ -34,7 +34,6 @@ class CapitalSchemeOverviewModel(BaseModel):
     @classmethod
     def from_domain(cls, overview: CapitalSchemeOverview, request: Request) -> Self:
         return cls(
-            effective_date=DateTimeRangeModel.from_domain(overview.effective_date),
             name=overview.name,
             bid_submitting_authority=AnyUrl(
                 str(request.url_for("get_authority", abbreviation=str(overview.bid_submitting_authority)))
@@ -45,9 +44,9 @@ class CapitalSchemeOverviewModel(BaseModel):
             type_=CapitalSchemeTypeModel.from_domain(overview.type),
         )
 
-    def to_domain(self, request: Request) -> CapitalSchemeOverview:
+    def to_domain(self, now: datetime, request: Request) -> CapitalSchemeOverview:
         return CapitalSchemeOverview(
-            effective_date=self.effective_date.to_domain(),
+            effective_date=DateTimeRange(now),
             name=self.name,
             bid_submitting_authority=AuthorityAbbreviation(
                 path_parameter_for(request, "get_authority", "abbreviation", str(self.bid_submitting_authority))
