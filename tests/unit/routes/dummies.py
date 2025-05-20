@@ -18,6 +18,4 @@ def dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
 
 
 def dummy_bid_status_details_model() -> CapitalSchemeBidStatusDetailsModel:
-    return CapitalSchemeBidStatusDetailsModel(
-        effective_date=DateTimeRangeModel(from_=datetime.min), bid_status=CapitalSchemeBidStatusModel.NOT_FUNDED
-    )
+    return CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.NOT_FUNDED)

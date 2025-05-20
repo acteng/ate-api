@@ -17,10 +17,9 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                 "type": "construction",
             },
             "bidStatusDetails": {
-                "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
                 "bidStatus": "funded",
             },
-            "authorityReview": {"reviewDate": "2020-03-01T00:00:00Z"},
+            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
         }
     )
 
@@ -37,8 +36,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "type": "construction",
         },
         "bidStatusDetails": {
-            "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
             "bidStatus": "funded",
         },
-        "authorityReview": {"reviewDate": "2020-03-01T00:00:00Z"},
+        "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
     }

@@ -54,7 +54,6 @@ def test_get_capital_scheme(
             "type": "construction",
         },
         "bidStatusDetails": {
-            "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
             "bidStatus": "funded",
         },
         "authorityReview": None,

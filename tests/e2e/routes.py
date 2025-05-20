@@ -7,10 +7,12 @@ from sqlalchemy.orm import Session
 from starlette.requests import Request
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
+from ate_api.clock import get_clock
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.infrastructure.clock import Clock
 from ate_api.infrastructure.database import (
     AuthorityEntity,
     CapitalSchemeAuthorityReviewEntity,
@@ -62,12 +64,13 @@ def delete_authorities(session: Annotated[Session, Depends(get_session)]) -> Res
 
 @router.post("/capital-schemes", status_code=HTTP_201_CREATED, response_class=Response)
 def create_capital_scheme(
+    clock: Annotated[Clock, Depends(get_clock)],
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     session: Annotated[Session, Depends(get_session)],
     request: Request,
     capital_scheme: CapitalSchemeModel,
 ) -> None:
-    capital_schemes.add(capital_scheme.to_domain(request))
+    capital_schemes.add(capital_scheme.to_domain(clock.now, request))
     session.commit()
 
 

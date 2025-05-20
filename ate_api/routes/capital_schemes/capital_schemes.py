@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -37,11 +38,11 @@ class CapitalSchemeModel(BaseModel):
             ),
         )
 
-    def to_domain(self, request: Request) -> CapitalScheme:
+    def to_domain(self, now: datetime, request: Request) -> CapitalScheme:
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference(self.reference),
             overview=self.overview.to_domain(request),
-            bid_status_details=self.bid_status_details.to_domain(),
+            bid_status_details=self.bid_status_details.to_domain(now),
         )
 
         if self.authority_review:

@@ -30,7 +30,6 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "type": "construction",
             },
             "bidStatusDetails": {
-                "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
                 "bidStatus": "funded",
             },
         }
@@ -46,7 +45,6 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "type": "construction",
             },
             "bidStatusDetails": {
-                "effectiveDate": {"from": "2020-02-01T00:00:00Z", "to": None},
                 "bidStatus": "funded",
             },
         }

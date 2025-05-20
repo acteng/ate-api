@@ -47,10 +47,7 @@ class TestCapitalSchemeModel:
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetailsModel(
-                effective_date=DateTimeRangeModel(from_=datetime(2020, 2, 1)),
-                bid_status=CapitalSchemeBidStatusModel.FUNDED,
-            ),
+            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.FUNDED),
             authority_review=None,
         )
 
@@ -78,14 +75,11 @@ class TestCapitalSchemeModel:
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetailsModel(
-                effective_date=DateTimeRangeModel(from_=datetime(2020, 2, 1)),
-                bid_status=CapitalSchemeBidStatusModel.FUNDED,
-            ),
+            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.FUNDED),
             authority_review=None,
         )
 
-        capital_scheme = capital_scheme_model.to_domain(http_request)
+        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 2, 1), http_request)
 
         assert (
             capital_scheme.reference == CapitalSchemeReference("ATE00001")
@@ -112,6 +106,6 @@ class TestCapitalSchemeModel:
             authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1)),
         )
 
-        capital_scheme = capital_scheme_model.to_domain(http_request)
+        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1), http_request)
 
         assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1))

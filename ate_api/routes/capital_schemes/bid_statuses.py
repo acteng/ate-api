@@ -1,9 +1,10 @@
+from datetime import datetime
 from enum import Enum
 from typing import Self
 
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.dates import DateTimeRange
 from ate_api.routes.base import BaseModel
-from ate_api.routes.dates import DateTimeRangeModel
 
 
 class CapitalSchemeBidStatusModel(str, Enum):
@@ -22,17 +23,11 @@ class CapitalSchemeBidStatusModel(str, Enum):
 
 
 class CapitalSchemeBidStatusDetailsModel(BaseModel):
-    effective_date: DateTimeRangeModel
     bid_status: CapitalSchemeBidStatusModel
 
     @classmethod
     def from_domain(cls, bid_status_details: CapitalSchemeBidStatusDetails) -> Self:
-        return cls(
-            effective_date=DateTimeRangeModel.from_domain(bid_status_details.effective_date),
-            bid_status=CapitalSchemeBidStatusModel.from_domain(bid_status_details.bid_status),
-        )
+        return cls(bid_status=CapitalSchemeBidStatusModel.from_domain(bid_status_details.bid_status))
 
-    def to_domain(self) -> CapitalSchemeBidStatusDetails:
-        return CapitalSchemeBidStatusDetails(
-            effective_date=self.effective_date.to_domain(), bid_status=self.bid_status.to_domain()
-        )
+    def to_domain(self, now: datetime) -> CapitalSchemeBidStatusDetails:
+        return CapitalSchemeBidStatusDetails(effective_date=DateTimeRange(now), bid_status=self.bid_status.to_domain())

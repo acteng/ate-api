@@ -3,7 +3,6 @@ from datetime import datetime
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.dates import DateTimeRange
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
-from ate_api.routes.dates import DateTimeRangeModel
 
 
 class TestCapitalSchemeBidStatusModel:
@@ -25,15 +24,13 @@ class TestCapitalSchemeBidStatusDetailsModel:
         bid_status_details_model = CapitalSchemeBidStatusDetailsModel.from_domain(bid_status_details)
 
         assert bid_status_details_model == CapitalSchemeBidStatusDetailsModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatusModel.FUNDED
+            bid_status=CapitalSchemeBidStatusModel.FUNDED
         )
 
     def test_to_domain(self) -> None:
-        bid_status_details_model = CapitalSchemeBidStatusDetailsModel(
-            effective_date=DateTimeRangeModel(from_=datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatusModel.FUNDED
-        )
+        bid_status_details_model = CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.FUNDED)
 
-        bid_status_details = bid_status_details_model.to_domain()
+        bid_status_details = bid_status_details_model.to_domain(datetime(2020, 1, 1))
 
         assert bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
