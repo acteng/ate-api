@@ -1,28 +1,26 @@
 from datetime import datetime, timezone
 
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import BidStatusEntity, BidStatusName, CapitalSchemeBidStatusEntity
 
 
 class TestBidStatusName:
     def test_to_domain(self) -> None:
-        assert BidStatusName.FUNDED.to_domain() == CapitalSchemeBidStatus.FUNDED
+        assert BidStatusName.FUNDED.to_domain() == BidStatus.FUNDED
 
     def test_from_domain(self) -> None:
-        assert BidStatusName.from_domain(CapitalSchemeBidStatus.FUNDED) == BidStatusName.FUNDED
+        assert BidStatusName.from_domain(BidStatus.FUNDED) == BidStatusName.FUNDED
 
 
 class TestCapitalSchemeBidStatusEntity:
     def test_from_domain(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
 
-        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(
-            bid_status_details, {CapitalSchemeBidStatus.FUNDED: 1}
-        )
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatus.FUNDED: 1})
 
         assert (
             bid_status_entity.bid_status_id == 1
@@ -32,12 +30,10 @@ class TestCapitalSchemeBidStatusEntity:
 
     def test_from_domain_when_current(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.FUNDED
         )
 
-        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(
-            bid_status_details, {CapitalSchemeBidStatus.FUNDED: 1}
-        )
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatus.FUNDED: 1})
 
         assert not bid_status_entity.effective_date_to
 
@@ -46,12 +42,10 @@ class TestCapitalSchemeBidStatusEntity:
             effective_date=DateTimeRange(
                 datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
             ),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
 
-        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(
-            bid_status_details, {CapitalSchemeBidStatus.FUNDED: 1}
-        )
+        bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatus.FUNDED: 1})
 
         assert bid_status_entity.effective_date_from == datetime(2020, 6, 1, 13)
         assert bid_status_entity.effective_date_to == datetime(2020, 7, 1, 13)
@@ -69,7 +63,7 @@ class TestCapitalSchemeBidStatusEntity:
             effective_date=DateTimeRange(
                 datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
             ),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
 
     def test_to_domain_when_current(self) -> None:

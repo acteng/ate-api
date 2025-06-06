@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
@@ -91,7 +91,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1)),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
 
         capital_schemes.add(
@@ -118,7 +118,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1)),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
 
         capital_schemes.add(
@@ -201,7 +201,7 @@ class TestMemoryCapitalSchemeRepository:
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                    bid_status=CapitalSchemeBidStatus.FUNDED,
+                    bid_status=BidStatus.FUNDED,
                 ),
             )
         )
@@ -217,13 +217,13 @@ class TestMemoryCapitalSchemeRepository:
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
                     effective_date=DateTimeRange(datetime(2020, 1, 1)),
-                    bid_status=CapitalSchemeBidStatus.NOT_FUNDED,
+                    bid_status=BidStatus.NOT_FUNDED,
                 ),
             )
         )
 
         references = capital_schemes.get_references_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"), bid_status=CapitalSchemeBidStatus.FUNDED
+            AuthorityAbbreviation("LIV"), bid_status=BidStatus.FUNDED
         )
 
         assert references == [CapitalSchemeReference("ATE00001")]

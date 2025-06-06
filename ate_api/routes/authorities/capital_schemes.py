@@ -8,7 +8,7 @@ from starlette.status import HTTP_404_NOT_FOUND
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.routes.authorities.authorities import get_authority_repository
-from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusModel
+from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
 from ate_api.routes.collections import CollectionModel
 
@@ -23,7 +23,7 @@ def get_authority_bid_submitting_capital_schemes(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     request: Request,
     abbreviation: str,
-    bid_status: Annotated[CapitalSchemeBidStatusModel | None, Query(alias="bid-status")] = None,
+    bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status")] = None,
 ) -> CollectionModel[AnyUrl]:
     """
     Gets the capital schemes submitted by an authority.

@@ -5,13 +5,13 @@ from starlette.requests import Request
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
-from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
+from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel, CapitalSchemeBidStatusDetailsModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
@@ -31,7 +31,7 @@ class TestCapitalSchemeModel:
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 2, 1)),
-                bid_status=CapitalSchemeBidStatus.FUNDED,
+                bid_status=BidStatus.FUNDED,
             ),
         )
 
@@ -45,7 +45,7 @@ class TestCapitalSchemeModel:
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.FUNDED),
+            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
             authority_review=None,
         )
 
@@ -72,7 +72,7 @@ class TestCapitalSchemeModel:
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.FUNDED),
+            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
             authority_review=None,
         )
 
@@ -90,7 +90,7 @@ class TestCapitalSchemeModel:
             )
             and capital_scheme.bid_status_details
             == CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.FUNDED
             )
             and not capital_scheme.authority_review
         )

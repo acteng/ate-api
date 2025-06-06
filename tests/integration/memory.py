@@ -1,5 +1,5 @@
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
@@ -41,7 +41,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         return self._capital_schemes.get(reference)
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: AuthorityAbbreviation, bid_status: CapitalSchemeBidStatus | None = None
+        self, authority_abbreviation: AuthorityAbbreviation, bid_status: BidStatus | None = None
     ) -> list[CapitalSchemeReference]:
         return sorted(
             [

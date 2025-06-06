@@ -4,7 +4,7 @@ from sqlalchemy import Select, and_, false, func, select
 from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload, mapped_column, relationship
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
@@ -45,7 +45,7 @@ class CapitalSchemeEntity(BaseEntity):
         authority_ids: dict[AuthorityAbbreviation, int],
         funding_programme_ids: dict[FundingProgrammeCode, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
-        bid_status_ids: dict[CapitalSchemeBidStatus, int],
+        bid_status_ids: dict[BidStatus, int],
     ) -> Self:
         return cls(
             scheme_reference=str(capital_scheme.reference),
@@ -147,7 +147,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return row.to_domain() if row else None
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: AuthorityAbbreviation, bid_status: CapitalSchemeBidStatus | None = None
+        self, authority_abbreviation: AuthorityAbbreviation, bid_status: BidStatus | None = None
     ) -> list[CapitalSchemeReference]:
         statement = (
             select(CapitalSchemeEntity.scheme_reference)
@@ -205,7 +205,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
         return {row.scheme_type_name.to_domain(): row.scheme_type_id for row in rows}
 
-    def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeBidStatus, int]:
+    def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[BidStatus, int]:
         bid_status_names = [BidStatusName.from_domain(capital_scheme.bid_status_details.bid_status)]
         rows = self._session.execute(
             select(BidStatusEntity.bid_status_name, BidStatusEntity.bid_status_id).where(

@@ -5,7 +5,7 @@ from typing import Self
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
@@ -19,11 +19,11 @@ class BidStatusName(Enum):
     DELETED = "deleted"
 
     @classmethod
-    def from_domain(cls, status: CapitalSchemeBidStatus) -> Self:
+    def from_domain(cls, status: BidStatus) -> Self:
         return cls[status.name]
 
-    def to_domain(self) -> CapitalSchemeBidStatus:
-        return CapitalSchemeBidStatus[self.name]
+    def to_domain(self) -> BidStatus:
+        return BidStatus[self.name]
 
 
 class BidStatusEntity(BaseEntity):
@@ -47,7 +47,7 @@ class CapitalSchemeBidStatusEntity(BaseEntity):
 
     @classmethod
     def from_domain(
-        cls, bid_status_details: CapitalSchemeBidStatusDetails, bid_status_ids: dict[CapitalSchemeBidStatus, int]
+        cls, bid_status_details: CapitalSchemeBidStatusDetails, bid_status_ids: dict[BidStatus, int]
     ) -> Self:
         return cls(
             bid_status_id=bid_status_ids[bid_status_details.bid_status],

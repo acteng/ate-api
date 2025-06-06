@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
@@ -48,7 +48,7 @@ class TestCapitalSchemeEntity:
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 2, 1)),
-                bid_status=CapitalSchemeBidStatus.FUNDED,
+                bid_status=BidStatus.FUNDED,
             ),
         )
 
@@ -57,7 +57,7 @@ class TestCapitalSchemeEntity:
             {AuthorityAbbreviation("LIV"): 1},
             {FundingProgrammeCode("ATF3"): 1},
             {CapitalSchemeType.CONSTRUCTION: 1},
-            {CapitalSchemeBidStatus.FUNDED: 1},
+            {BidStatus.FUNDED: 1},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -91,7 +91,7 @@ class TestCapitalSchemeEntity:
             {AuthorityAbbreviation("dummy"): 1},
             {FundingProgrammeCode("dummy"): 1},
             {CapitalSchemeType.DEVELOPMENT: 1},
-            {CapitalSchemeBidStatus.SUBMITTED: 1},
+            {BidStatus.SUBMITTED: 1},
         )
 
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
@@ -129,7 +129,7 @@ class TestCapitalSchemeEntity:
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
         assert not capital_scheme.authority_review
 
@@ -177,7 +177,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     bid_status_details=CapitalSchemeBidStatusDetails(
                         effective_date=DateTimeRange(datetime(2020, 2, 1)),
-                        bid_status=CapitalSchemeBidStatus.FUNDED,
+                        bid_status=BidStatus.FUNDED,
                     ),
                 )
             )
@@ -287,7 +287,7 @@ class TestDatabaseCapitalSchemeRepository:
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
-            bid_status=CapitalSchemeBidStatus.FUNDED,
+            bid_status=BidStatus.FUNDED,
         )
         assert not capital_scheme.authority_review
 
@@ -363,7 +363,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
-            bid_status=CapitalSchemeBidStatus.NOT_FUNDED,
+            bid_status=BidStatus.NOT_FUNDED,
         )
 
     def test_get_fetches_latest_authority_review(self, engine: Engine) -> None:
@@ -651,7 +651,7 @@ class TestDatabaseCapitalSchemeRepository:
         with Session(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = capital_schemes.get_references_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), bid_status=CapitalSchemeBidStatus.FUNDED
+                AuthorityAbbreviation("LIV"), bid_status=BidStatus.FUNDED
             )
 
         assert references == [CapitalSchemeReference("ATE00001")]

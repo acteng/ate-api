@@ -4,7 +4,7 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
@@ -118,7 +118,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.FUNDED
             ),
         )
     )
@@ -133,7 +133,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=CapitalSchemeBidStatus.NOT_FUNDED
+                effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.NOT_FUNDED
             ),
         )
     )

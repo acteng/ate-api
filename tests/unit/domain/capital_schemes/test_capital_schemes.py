@@ -2,7 +2,7 @@ from datetime import datetime
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
@@ -50,7 +50,7 @@ class TestCapitalScheme:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1)), bid_status=CapitalSchemeBidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 2, 1)), bid_status=BidStatus.FUNDED
         )
 
         capital_scheme = CapitalScheme(

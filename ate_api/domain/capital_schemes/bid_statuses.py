@@ -4,7 +4,7 @@ from enum import Enum, auto
 from ate_api.domain.dates import DateTimeRange
 
 
-class CapitalSchemeBidStatus(Enum):
+class BidStatus(Enum):
     SUBMITTED = auto()
     FUNDED = auto()
     NOT_FUNDED = auto()
@@ -15,4 +15,4 @@ class CapitalSchemeBidStatus(Enum):
 @dataclass(frozen=True)
 class CapitalSchemeBidStatusDetails:
     effective_date: DateTimeRange
-    bid_status: CapitalSchemeBidStatus
+    bid_status: BidStatus

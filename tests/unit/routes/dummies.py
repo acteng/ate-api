@@ -1,6 +1,6 @@
 from pydantic import AnyUrl
 
-from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel, CapitalSchemeBidStatusModel
+from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel, CapitalSchemeBidStatusDetailsModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 
 
@@ -14,4 +14,4 @@ def dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
 
 
 def dummy_bid_status_details_model() -> CapitalSchemeBidStatusDetailsModel:
-    return CapitalSchemeBidStatusDetailsModel(bid_status=CapitalSchemeBidStatusModel.NOT_FUNDED)
+    return CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.NOT_FUNDED)

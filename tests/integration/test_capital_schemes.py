@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
@@ -36,7 +36,7 @@ def test_get_capital_scheme(
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
-                bid_status=CapitalSchemeBidStatus.FUNDED,
+                bid_status=BidStatus.FUNDED,
             ),
         )
     )
