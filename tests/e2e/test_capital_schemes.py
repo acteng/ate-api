@@ -18,6 +18,15 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "bidStatusDetails": {
                 "bidStatus": "funded",
             },
+            "milestones": {
+                "items": [
+                    {
+                        "milestone": "detailed design completed",
+                        "observationType": "actual",
+                        "statusDate": "2020-03-01",
+                    }
+                ],
+            },
             "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
         }
     )
@@ -35,6 +44,15 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
         },
         "bidStatusDetails": {
             "bidStatus": "funded",
+        },
+        "milestones": {
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                }
+            ],
         },
         "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
     }

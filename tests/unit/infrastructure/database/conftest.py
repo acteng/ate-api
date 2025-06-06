@@ -50,8 +50,10 @@ def _delete_all(engine: Engine) -> None:
                     authority.authority,
                     capital_scheme.bid_status,
                     capital_scheme.capital_scheme,
+                    capital_scheme.milestone,
                     capital_scheme.scheme_type,
-                    common.funding_programme
+                    common.funding_programme,
+                    common.observation_type
                 CASCADE;
                 """
             )

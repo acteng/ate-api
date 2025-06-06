@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 from sqlalchemy import Engine, select
@@ -8,9 +8,11 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     AuthorityEntity,
     BidStatusEntity,
@@ -18,8 +20,13 @@ from ate_api.infrastructure.database import (
     CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
+    CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
+    MilestoneEntity,
+    MilestoneName,
+    ObservationTypeEntity,
+    ObservationTypeName,
     SchemeTypeEntity,
     SchemeTypeName,
 )
@@ -58,6 +65,8 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("ATF3"): 1},
             {CapitalSchemeType.CONSTRUCTION: 1},
             {BidStatus.FUNDED: 1},
+            {},
+            {},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -78,6 +87,55 @@ class TestCapitalSchemeEntity:
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
 
+    def test_from_domain_sets_milestones(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+            )
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            )
+        )
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme,
+            {AuthorityAbbreviation("dummy"): 1},
+            {FundingProgrammeCode("dummy"): 1},
+            {CapitalSchemeType.DEVELOPMENT: 1},
+            {BidStatus.SUBMITTED: 1},
+            {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
+            {ObservationType.ACTUAL: 1},
+        )
+
+        milestone_entity1, milestone_entity2 = capital_scheme_entity.capital_scheme_milestones
+        assert (
+            milestone_entity1.milestone_id == 1
+            and milestone_entity1.status_date == date(2020, 2, 1)
+            and milestone_entity1.observation_type_id == 1
+            and milestone_entity1.effective_date_from == datetime(2020, 1, 1)
+            and not milestone_entity1.effective_date_to
+        )
+        assert (
+            milestone_entity2.milestone_id == 2
+            and milestone_entity2.status_date == date(2020, 3, 1)
+            and milestone_entity2.observation_type_id == 1
+            and milestone_entity2.effective_date_from == datetime(2020, 1, 1)
+            and not milestone_entity2.effective_date_to
+        )
+
     def test_from_domain_sets_authority_review(self) -> None:
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -92,6 +150,8 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 1},
             {CapitalSchemeType.DEVELOPMENT: 1},
             {BidStatus.SUBMITTED: 1},
+            {},
+            {},
         )
 
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
@@ -131,7 +191,46 @@ class TestCapitalSchemeEntity:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
             bid_status=BidStatus.FUNDED,
         )
+        assert not capital_scheme.milestones
         assert not capital_scheme.authority_review
+
+    def test_to_domain_sets_milestones(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+            capital_scheme_milestones=[
+                CapitalSchemeMilestoneEntity(
+                    milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    status_date=date(2020, 2, 1),
+                    effective_date_from=datetime(2020, 1, 1),
+                ),
+                CapitalSchemeMilestoneEntity(
+                    milestone=MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED),
+                    observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    status_date=date(2020, 3, 1),
+                    effective_date_from=datetime(2020, 1, 1),
+                ),
+            ],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.milestones == [
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+            ),
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            ),
+        ]
 
     def test_to_domain_sets_authority_review(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
@@ -201,6 +300,65 @@ class TestDatabaseCapitalSchemeRepository:
             and bid_status_row.bid_status_id == 1
             and bid_status_row.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_row.effective_date_to
+        )
+
+    def test_add_stores_milestones(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    dummy_authority_entity(),
+                    dummy_funding_programme_entity(),
+                    dummy_scheme_type_entity(),
+                    dummy_bid_status_entity(),
+                    MilestoneEntity(milestone_id=1, milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    MilestoneEntity(milestone_id=2, milestone_name=MilestoneName.CONSTRUCTION_STARTED),
+                    ObservationTypeEntity(observation_type_id=1, observation_type_name=ObservationTypeName.ACTUAL),
+                ]
+            )
+
+        with Session(engine) as session, session.begin():
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=dummy_overview(),
+                bid_status_details=dummy_bid_status_details(),
+            )
+            capital_scheme.change_milestone(
+                CapitalSchemeMilestone(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                    observation_type=ObservationType.ACTUAL,
+                    status_date=date(2020, 2, 1),
+                )
+            )
+            capital_scheme.change_milestone(
+                CapitalSchemeMilestone(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    milestone=Milestone.CONSTRUCTION_STARTED,
+                    observation_type=ObservationType.ACTUAL,
+                    status_date=date(2020, 3, 1),
+                )
+            )
+            capital_schemes.add(capital_scheme)
+
+        with Session(engine) as session:
+            (capital_scheme_row,) = session.scalars(select(CapitalSchemeEntity))
+            milestone_row1, milestone_row2 = session.scalars(select(CapitalSchemeMilestoneEntity))
+        assert (
+            milestone_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and milestone_row1.milestone_id == 1
+            and milestone_row1.status_date == date(2020, 2, 1)
+            and milestone_row1.observation_type_id == 1
+            and milestone_row1.effective_date_from == datetime(2020, 1, 1)
+            and not milestone_row1.effective_date_to
+        )
+        assert (
+            milestone_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and milestone_row2.milestone_id == 2
+            and milestone_row2.status_date == date(2020, 3, 1)
+            and milestone_row2.observation_type_id == 1
+            and milestone_row2.effective_date_from == datetime(2020, 1, 1)
+            and not milestone_row2.effective_date_to
         )
 
     def test_add_stores_authority_review(self, engine: Engine) -> None:
@@ -365,6 +523,63 @@ class TestDatabaseCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
             bid_status=BidStatus.NOT_FUNDED,
         )
+
+    def test_get_fetches_current_milestones(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    detailed_design_completed := MilestoneEntity(
+                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED
+                    ),
+                    construction_started := MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED),
+                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                observation_type=actual,
+                                status_date=date(2020, 3, 1),
+                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_to=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                observation_type=actual,
+                                status_date=date(2020, 4, 1),
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeMilestoneEntity(
+                                milestone=construction_started,
+                                observation_type=actual,
+                                status_date=date(2020, 5, 1),
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.milestones == [
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 4, 1),
+            ),
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 5, 1),
+            ),
+        ]
 
     def test_get_fetches_latest_authority_review(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():

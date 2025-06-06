@@ -1,12 +1,14 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
@@ -61,8 +63,45 @@ class TestCapitalScheme:
             capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
             and capital_scheme.bid_status_details == bid_status_details
+            and not capital_scheme.milestones
             and not capital_scheme.authority_review
         )
+
+    def test_milestones_is_copy(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+            )
+        )
+
+        capital_scheme.milestones.clear()
+
+        assert capital_scheme.milestones
+
+    def test_change_milestone(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        milestone = CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 2, 1),
+        )
+
+        capital_scheme.change_milestone(milestone)
+
+        assert capital_scheme.milestones == [milestone]
 
     def test_perform_authority_review(self) -> None:
         capital_scheme = CapitalScheme(

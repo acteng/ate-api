@@ -1,0 +1,84 @@
+from datetime import date, datetime
+from enum import Enum
+from typing import Self
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.observation_types import ObservationType
+from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
+from ate_api.infrastructure.database.observation_types import ObservationTypeEntity
+
+
+class MilestoneName(Enum):
+    PUBLIC_CONSULTATION_COMPLETED = "public consultation completed"
+    FEASIBILITY_DESIGN_STARTED = "feasibility design started"
+    FEASIBILITY_DESIGN_COMPLETED = "feasibility design completed"
+    PRELIMINARY_DESIGN_COMPLETED = "preliminary design completed"
+    OUTLINE_DESIGN_COMPLETED = "outline design completed"
+    DETAILED_DESIGN_COMPLETED = "detailed design completed"
+    CONSTRUCTION_STARTED = "construction started"
+    CONSTRUCTION_COMPLETED = "construction completed"
+    FUNDING_COMPLETED = "funding completed"
+    NOT_PROGRESSED = "not progressed"
+    SUPERSEDED = "superseded"
+    REMOVED = "removed"
+
+    @classmethod
+    def from_domain(cls, milestone: Milestone) -> Self:
+        return cls[milestone.name]
+
+    def to_domain(self) -> Milestone:
+        return Milestone[self.name]
+
+
+class MilestoneEntity(BaseEntity):
+    __tablename__ = "milestone"
+    __table_args__ = {"schema": "capital_scheme"}
+
+    milestone_id: Mapped[int] = mapped_column(primary_key=True)
+    milestone_name: Mapped[MilestoneName] = mapped_column(unique=True)
+
+
+class CapitalSchemeMilestoneEntity(BaseEntity):
+    __tablename__ = "capital_scheme_milestone"
+    __table_args__ = {"schema": "capital_scheme"}
+
+    capital_scheme_milestone_id: Mapped[int] = mapped_column(primary_key=True)
+    capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
+    milestone_id = mapped_column(ForeignKey(MilestoneEntity.milestone_id), nullable=False)
+    milestone: Mapped[MilestoneEntity] = relationship(lazy="raise")
+    status_date: Mapped[date]
+    observation_type_id = mapped_column(ForeignKey(ObservationTypeEntity.observation_type_id), nullable=False)
+    observation_type: Mapped[ObservationTypeEntity] = relationship(lazy="raise")
+    effective_date_from: Mapped[datetime]
+    effective_date_to: Mapped[datetime | None]
+
+    @classmethod
+    def from_domain(
+        cls,
+        milestone: CapitalSchemeMilestone,
+        milestone_ids: dict[Milestone, int],
+        observation_type_ids: dict[ObservationType, int],
+    ) -> Self:
+        return cls(
+            milestone_id=milestone_ids[milestone.milestone],
+            status_date=milestone.status_date,
+            observation_type_id=observation_type_ids[milestone.observation_type],
+            effective_date_from=zoned_to_local(milestone.effective_date.from_),
+            effective_date_to=zoned_to_local(milestone.effective_date.to) if milestone.effective_date.to else None,
+        )
+
+    def to_domain(self) -> CapitalSchemeMilestone:
+        return CapitalSchemeMilestone(
+            effective_date=DateTimeRange(
+                local_to_zoned(self.effective_date_from),
+                local_to_zoned(self.effective_date_to) if self.effective_date_to else None,
+            ),
+            milestone=self.milestone.milestone_name.to_domain(),
+            observation_type=self.observation_type.observation_type_name.to_domain(),
+            status_date=self.status_date,
+        )
