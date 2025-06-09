@@ -19,8 +19,8 @@ class BidStatusName(Enum):
     DELETED = "deleted"
 
     @classmethod
-    def from_domain(cls, status: BidStatus) -> Self:
-        return cls[status.name]
+    def from_domain(cls, bid_status: BidStatus) -> Self:
+        return cls[bid_status.name]
 
     def to_domain(self) -> BidStatus:
         return BidStatus[self.name]
