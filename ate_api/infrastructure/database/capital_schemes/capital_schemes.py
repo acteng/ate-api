@@ -96,14 +96,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
     def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
-        ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
-        ranked_capital_scheme_authority_reviews_alias = aliased(
-            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
-        )
+        statement = select(CapitalSchemeEntity).where(CapitalSchemeEntity.scheme_reference == str(reference))
 
-        result = self._session.scalars(
-            select(CapitalSchemeEntity)
-            .options(
+        # fetch current overview
+        statement = (
+            statement.options(
                 contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
                 joinedload(
                     CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
@@ -112,13 +109,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                     CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
                 ),
                 joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
-                contains_eager(CapitalSchemeEntity.capital_scheme_bid_statuses),
-                joinedload(CapitalSchemeEntity.capital_scheme_bid_statuses, CapitalSchemeBidStatusEntity.bid_status),
-                contains_eager(
-                    CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
-                        ranked_capital_scheme_authority_reviews_alias
-                    )
-                ),
             )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
@@ -126,23 +116,40 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 )
             )
             .join(FundingProgrammeEntity)
-            .join(
-                CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
-                    CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
-                )
-            )
-            .outerjoin(
-                ranked_capital_scheme_authority_reviews_alias,
-                and_(
-                    CapitalSchemeEntity.capital_scheme_id
-                    == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
-                    ranked_capital_scheme_authority_reviews.c.rank == 1,
-                ),
-            )
-            .where(CapitalSchemeEntity.scheme_reference == str(reference))
             .where(FundingProgrammeEntity.is_under_embargo == false())
         )
 
+        # fetch current bid status
+        statement = statement.options(
+            contains_eager(CapitalSchemeEntity.capital_scheme_bid_statuses),
+            joinedload(CapitalSchemeEntity.capital_scheme_bid_statuses, CapitalSchemeBidStatusEntity.bid_status),
+        ).join(
+            CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
+                CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
+            )
+        )
+
+        # fetch latest authority review
+        ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
+        ranked_capital_scheme_authority_reviews_alias = aliased(
+            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
+        )
+        statement = statement.options(
+            contains_eager(
+                CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
+                    ranked_capital_scheme_authority_reviews_alias
+                )
+            )
+        ).outerjoin(
+            ranked_capital_scheme_authority_reviews_alias,
+            and_(
+                CapitalSchemeEntity.capital_scheme_id
+                == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
+                ranked_capital_scheme_authority_reviews.c.rank == 1,
+            ),
+        )
+
+        result = self._session.scalars(statement)
         row = result.unique().one_or_none()
         return row.to_domain() if row else None
 
