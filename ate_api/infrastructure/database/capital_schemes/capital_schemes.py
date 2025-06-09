@@ -233,37 +233,37 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return [CapitalSchemeReference(reference) for reference in result.all()]
 
     def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[AuthorityAbbreviation, int]:
-        authority_abbreviations = [str(capital_scheme.overview.bid_submitting_authority)]
+        authority_abbreviation = str(capital_scheme.overview.bid_submitting_authority)
         rows = self._session.execute(
             select(AuthorityEntity.authority_abbreviation, AuthorityEntity.authority_id).where(
-                AuthorityEntity.authority_abbreviation.in_(authority_abbreviations)
+                AuthorityEntity.authority_abbreviation == authority_abbreviation
             )
         )
         return {AuthorityAbbreviation(row.authority_abbreviation): row.authority_id for row in rows}
 
     def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[FundingProgrammeCode, int]:
-        funding_programme_codes = [str(capital_scheme.overview.funding_programme)]
+        funding_programme_code = str(capital_scheme.overview.funding_programme)
         rows = self._session.execute(
             select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
-                FundingProgrammeEntity.funding_programme_code.in_(funding_programme_codes)
+                FundingProgrammeEntity.funding_programme_code == funding_programme_code
             )
         )
         return {FundingProgrammeCode(row.funding_programme_code): row.funding_programme_id for row in rows}
 
     def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeType, int]:
-        scheme_type_names = [SchemeTypeName.from_domain(capital_scheme.overview.type)]
+        scheme_type_name = SchemeTypeName.from_domain(capital_scheme.overview.type)
         rows = self._session.execute(
             select(SchemeTypeEntity.scheme_type_name, SchemeTypeEntity.scheme_type_id).where(
-                SchemeTypeEntity.scheme_type_name.in_(scheme_type_names)
+                SchemeTypeEntity.scheme_type_name == scheme_type_name
             )
         )
         return {row.scheme_type_name.to_domain(): row.scheme_type_id for row in rows}
 
     def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[BidStatus, int]:
-        bid_status_names = [BidStatusName.from_domain(capital_scheme.bid_status_details.bid_status)]
+        bid_status_name = BidStatusName.from_domain(capital_scheme.bid_status_details.bid_status)
         rows = self._session.execute(
             select(BidStatusEntity.bid_status_name, BidStatusEntity.bid_status_id).where(
-                BidStatusEntity.bid_status_name.in_(bid_status_names)
+                BidStatusEntity.bid_status_name == bid_status_name
             )
         )
         return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
