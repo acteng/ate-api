@@ -34,15 +34,15 @@ class TestCapitalSchemeOverviewEntity:
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
             {AuthorityAbbreviation("LIV"): 1},
-            {FundingProgrammeCode("ATF3"): 1},
-            {CapitalSchemeType.CONSTRUCTION: 1},
+            {FundingProgrammeCode("ATF3"): 2},
+            {CapitalSchemeType.CONSTRUCTION: 3},
         )
 
         assert (
             overview_entity.scheme_name == "Wirral Package"
             and overview_entity.bid_submitting_authority_id == 1
-            and overview_entity.funding_programme_id == 1
-            and overview_entity.scheme_type_id == 1
+            and overview_entity.funding_programme_id == 2
+            and overview_entity.scheme_type_id == 3
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
             and overview_entity.effective_date_to == datetime(2020, 2, 1)
         )
@@ -58,9 +58,9 @@ class TestCapitalSchemeOverviewEntity:
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
-            {AuthorityAbbreviation("LIV"): 1},
-            {FundingProgrammeCode("ATF3"): 1},
-            {CapitalSchemeType.CONSTRUCTION: 1},
+            {AuthorityAbbreviation("LIV"): 0},
+            {FundingProgrammeCode("ATF3"): 0},
+            {CapitalSchemeType.CONSTRUCTION: 0},
         )
 
         assert not overview_entity.effective_date_to
@@ -78,9 +78,9 @@ class TestCapitalSchemeOverviewEntity:
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
-            {AuthorityAbbreviation("LIV"): 1},
-            {FundingProgrammeCode("ATF3"): 1},
-            {CapitalSchemeType.CONSTRUCTION: 1},
+            {AuthorityAbbreviation("LIV"): 0},
+            {FundingProgrammeCode("ATF3"): 0},
+            {CapitalSchemeType.CONSTRUCTION: 0},
         )
 
         assert overview_entity.effective_date_from == datetime(2020, 6, 1, 13)

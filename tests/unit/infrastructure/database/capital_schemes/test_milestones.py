@@ -30,13 +30,13 @@ class TestCapitalSchemeMilestoneEntity:
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
-            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 1}, {ObservationType.ACTUAL: 1}
+            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 1}, {ObservationType.ACTUAL: 2}
         )
 
         assert (
             milestone_entity.milestone_id == 1
             and milestone_entity.status_date == date(2020, 3, 1)
-            and milestone_entity.observation_type_id == 1
+            and milestone_entity.observation_type_id == 2
             and milestone_entity.effective_date_from == datetime(2020, 1, 1)
             and milestone_entity.effective_date_to == datetime(2020, 2, 1)
         )
@@ -50,7 +50,7 @@ class TestCapitalSchemeMilestoneEntity:
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
-            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 1}, {ObservationType.ACTUAL: 1}
+            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 0}, {ObservationType.ACTUAL: 0}
         )
 
         assert not milestone_entity.effective_date_to
@@ -66,7 +66,7 @@ class TestCapitalSchemeMilestoneEntity:
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
-            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 1}, {ObservationType.ACTUAL: 1}
+            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 0}, {ObservationType.ACTUAL: 0}
         )
 
         assert milestone_entity.effective_date_from == datetime(2020, 6, 1, 13)

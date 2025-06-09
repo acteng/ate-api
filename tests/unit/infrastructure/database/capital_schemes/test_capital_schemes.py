@@ -62,9 +62,9 @@ class TestCapitalSchemeEntity:
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
             {AuthorityAbbreviation("LIV"): 1},
-            {FundingProgrammeCode("ATF3"): 1},
-            {CapitalSchemeType.CONSTRUCTION: 1},
-            {BidStatus.FUNDED: 1},
+            {FundingProgrammeCode("ATF3"): 2},
+            {CapitalSchemeType.CONSTRUCTION: 3},
+            {BidStatus.FUNDED: 4},
             {},
             {},
         )
@@ -74,14 +74,14 @@ class TestCapitalSchemeEntity:
         assert (
             overview_entity.scheme_name == "Wirral Package"
             and overview_entity.bid_submitting_authority_id == 1
-            and overview_entity.funding_programme_id == 1
-            and overview_entity.scheme_type_id == 1
+            and overview_entity.funding_programme_id == 2
+            and overview_entity.scheme_type_id == 3
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
         (bid_status_entity,) = capital_scheme_entity.capital_scheme_bid_statuses
         assert (
-            bid_status_entity.bid_status_id == 1
+            bid_status_entity.bid_status_id == 4
             and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_entity.effective_date_to
         )
@@ -112,26 +112,26 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {AuthorityAbbreviation("dummy"): 1},
-            {FundingProgrammeCode("dummy"): 1},
-            {CapitalSchemeType.DEVELOPMENT: 1},
-            {BidStatus.SUBMITTED: 1},
+            {AuthorityAbbreviation("dummy"): 0},
+            {FundingProgrammeCode("dummy"): 0},
+            {CapitalSchemeType.DEVELOPMENT: 0},
+            {BidStatus.SUBMITTED: 0},
             {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
-            {ObservationType.ACTUAL: 1},
+            {ObservationType.ACTUAL: 3},
         )
 
         milestone_entity1, milestone_entity2 = capital_scheme_entity.capital_scheme_milestones
         assert (
             milestone_entity1.milestone_id == 1
             and milestone_entity1.status_date == date(2020, 2, 1)
-            and milestone_entity1.observation_type_id == 1
+            and milestone_entity1.observation_type_id == 3
             and milestone_entity1.effective_date_from == datetime(2020, 1, 1)
             and not milestone_entity1.effective_date_to
         )
         assert (
             milestone_entity2.milestone_id == 2
             and milestone_entity2.status_date == date(2020, 3, 1)
-            and milestone_entity2.observation_type_id == 1
+            and milestone_entity2.observation_type_id == 3
             and milestone_entity2.effective_date_from == datetime(2020, 1, 1)
             and not milestone_entity2.effective_date_to
         )
@@ -146,10 +146,10 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {AuthorityAbbreviation("dummy"): 1},
-            {FundingProgrammeCode("dummy"): 1},
-            {CapitalSchemeType.DEVELOPMENT: 1},
-            {BidStatus.SUBMITTED: 1},
+            {AuthorityAbbreviation("dummy"): 0},
+            {FundingProgrammeCode("dummy"): 0},
+            {CapitalSchemeType.DEVELOPMENT: 0},
+            {BidStatus.SUBMITTED: 0},
             {},
             {},
         )
