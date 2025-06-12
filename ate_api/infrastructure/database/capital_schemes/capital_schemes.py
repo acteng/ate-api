@@ -9,8 +9,8 @@ from sqlalchemy.orm import (
     joinedload,
     mapped_column,
     relationship,
-    selectinload,
 )
+from sqlalchemy.orm.attributes import set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
@@ -165,17 +165,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
 
-        # fetch current milestones
-        statement = statement.options(
-            selectinload(
-                CapitalSchemeEntity.capital_scheme_milestones.and_(
-                    CapitalSchemeMilestoneEntity.effective_date_to.is_(None)
-                )
-            ),
-            joinedload(CapitalSchemeEntity.capital_scheme_milestones, CapitalSchemeMilestoneEntity.milestone),
-            joinedload(CapitalSchemeEntity.capital_scheme_milestones, CapitalSchemeMilestoneEntity.observation_type),
-        )
-
         # fetch latest authority review
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
         ranked_capital_scheme_authority_reviews_alias = aliased(
@@ -198,7 +187,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         result = self._session.scalars(statement)
         row = result.unique().one_or_none()
-        return row.to_domain() if row else None
+
+        if not row:
+            return None
+
+        # fetch current milestones
+        capital_scheme_milestones = self._session.scalars(
+            self._select_current_capital_scheme_milestones(row.capital_scheme_id)
+        ).all()
+        # untyped function, see: https://github.com/sqlalchemy/sqlalchemy/issues/12669
+        set_committed_value(row, "capital_scheme_milestones", capital_scheme_milestones)  # type: ignore
+
+        return row.to_domain()
 
     def get_references_by_bid_submitting_authority(
         self, authority_abbreviation: AuthorityAbbreviation, bid_status: BidStatus | None = None
@@ -287,6 +287,24 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
+
+    @staticmethod
+    def _select_current_capital_scheme_milestones(
+        capital_scheme_id: int,
+    ) -> Select[tuple[CapitalSchemeMilestoneEntity]]:
+        return (
+            select(CapitalSchemeMilestoneEntity)
+            .options(
+                contains_eager(CapitalSchemeMilestoneEntity.milestone),
+                contains_eager(CapitalSchemeMilestoneEntity.observation_type),
+            )
+            .join(MilestoneEntity)
+            .join(ObservationTypeEntity)
+            .where(CapitalSchemeMilestoneEntity.capital_scheme_id == capital_scheme_id)
+            .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
+            .order_by(MilestoneEntity.stage_order)
+            .order_by(ObservationTypeEntity.observation_type_id)
+        )
 
     @staticmethod
     def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:

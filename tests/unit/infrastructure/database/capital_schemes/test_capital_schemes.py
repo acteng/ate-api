@@ -310,8 +310,10 @@ class TestDatabaseCapitalSchemeRepository:
                     dummy_funding_programme_entity(),
                     dummy_scheme_type_entity(),
                     dummy_bid_status_entity(),
-                    MilestoneEntity(milestone_id=1, milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    MilestoneEntity(milestone_id=2, milestone_name=MilestoneName.CONSTRUCTION_STARTED),
+                    MilestoneEntity(
+                        milestone_id=1, milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    ),
+                    MilestoneEntity(milestone_id=2, milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
                     ObservationTypeEntity(observation_type_id=1, observation_type_name=ObservationTypeName.ACTUAL),
                 ]
             )
@@ -529,9 +531,11 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED
+                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
                     ),
-                    construction_started := MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED),
+                    construction_started := MilestoneEntity(
+                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                    ),
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -578,6 +582,73 @@ class TestDatabaseCapitalSchemeRepository:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 5, 1),
+            ),
+        ]
+
+    def test_get_fetches_current_milestones_ordered_by_milestone_stage_order_then_observation_type(
+        self, engine: Engine
+    ) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    detailed_design_completed := MilestoneEntity(
+                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    ),
+                    construction_started := MilestoneEntity(
+                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                    ),
+                    planned := ObservationTypeEntity(observation_type_name=ObservationTypeName.PLANNED),
+                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=construction_started,
+                                observation_type=actual,
+                                status_date=date(2020, 4, 1),
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                observation_type=actual,
+                                status_date=date(2020, 3, 1),
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                observation_type=planned,
+                                status_date=date(2020, 2, 1),
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.milestones == [
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.PLANNED,
+                status_date=date(2020, 2, 1),
+            ),
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            ),
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 4, 1),
             ),
         ]
 

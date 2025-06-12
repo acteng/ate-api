@@ -67,6 +67,11 @@ def _create_reference_data(engine: Engine) -> None:
         )
         # capital_scheme
         session.add_all([BidStatusEntity(bid_status_name=bid_status_name) for bid_status_name in BidStatusName])
-        session.add_all([MilestoneEntity(milestone_name=milestone_name) for milestone_name in MilestoneName])
+        session.add_all(
+            [
+                MilestoneEntity(milestone_name=milestone_name, stage_order=index)
+                for index, milestone_name in enumerate(MilestoneName)
+            ]
+        )
         session.add_all([SchemeTypeEntity(scheme_type_name=scheme_type_name) for scheme_type_name in SchemeTypeName])
         session.commit()
