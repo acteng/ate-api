@@ -16,16 +16,19 @@ from ate_api.infrastructure.database.capital_schemes.capital_schemes import Data
 from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel
-from ate_api.routes.capital_schemes.milestones import CapitalSchemeMilestoneModel
+from ate_api.routes.capital_schemes.milestones import (
+    CapitalSchemeMilestoneModel,
+    CapitalSchemeMilestonesModel,
+    MilestoneModel,
+)
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
-from ate_api.routes.collections import CollectionModel
 
 
 class CapitalSchemeModel(BaseModel):
     reference: str
     overview: CapitalSchemeOverviewModel
     bid_status_details: CapitalSchemeBidStatusDetailsModel
-    milestones: CollectionModel[CapitalSchemeMilestoneModel]
+    milestones: CapitalSchemeMilestonesModel
     authority_review: CapitalSchemeAuthorityReviewModel | None = None
 
     @classmethod
@@ -34,8 +37,13 @@ class CapitalSchemeModel(BaseModel):
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
-            milestones=CollectionModel[CapitalSchemeMilestoneModel](
-                items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in capital_scheme.milestones]
+            milestones=CapitalSchemeMilestonesModel(
+                current_milestone=(
+                    MilestoneModel.from_domain(capital_scheme.current_milestone)
+                    if capital_scheme.current_milestone
+                    else None
+                ),
+                items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in capital_scheme.milestones],
             ),
             authority_review=(
                 CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme.authority_review)

@@ -46,6 +46,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "bidStatus": "funded",
         },
         "milestones": {
+            "currentMilestone": "detailed design completed",
             "items": [
                 {
                     "milestone": "detailed design completed",

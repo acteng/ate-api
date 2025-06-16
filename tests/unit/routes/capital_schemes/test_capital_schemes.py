@@ -15,9 +15,12 @@ from ate_api.domain.observation_types import ObservationType
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel, CapitalSchemeBidStatusDetailsModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
-from ate_api.routes.capital_schemes.milestones import CapitalSchemeMilestoneModel, MilestoneModel
+from ate_api.routes.capital_schemes.milestones import (
+    CapitalSchemeMilestoneModel,
+    CapitalSchemeMilestonesModel,
+    MilestoneModel,
+)
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
-from ate_api.routes.collections import CollectionModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.routes.dummies import dummy_bid_status_details_model, dummy_overview_model
@@ -51,9 +54,36 @@ class TestCapitalSchemeModel:
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
-            milestones=CollectionModel[CapitalSchemeMilestoneModel](items=[]),
+            milestones=CapitalSchemeMilestonesModel(current_milestone=None, items=[]),
             authority_review=None,
         )
+
+    def test_from_domain_sets_current_milestone(self, http_request: Request) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+            )
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            )
+        )
+
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
+
+        assert capital_scheme_model.milestones.current_milestone == MilestoneModel.CONSTRUCTION_STARTED
 
     def test_from_domain_sets_milestones(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
@@ -80,20 +110,18 @@ class TestCapitalSchemeModel:
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
 
-        assert capital_scheme_model.milestones == CollectionModel[CapitalSchemeMilestoneModel](
-            items=[
-                CapitalSchemeMilestoneModel(
-                    milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
-                    observation_type=ObservationTypeModel.ACTUAL,
-                    status_date=date(2020, 2, 1),
-                ),
-                CapitalSchemeMilestoneModel(
-                    milestone=MilestoneModel.CONSTRUCTION_STARTED,
-                    observation_type=ObservationTypeModel.ACTUAL,
-                    status_date=date(2020, 3, 1),
-                ),
-            ],
-        )
+        assert capital_scheme_model.milestones.items == [
+            CapitalSchemeMilestoneModel(
+                milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationTypeModel.ACTUAL,
+                status_date=date(2020, 2, 1),
+            ),
+            CapitalSchemeMilestoneModel(
+                milestone=MilestoneModel.CONSTRUCTION_STARTED,
+                observation_type=ObservationTypeModel.ACTUAL,
+                status_date=date(2020, 3, 1),
+            ),
+        ]
 
     def test_from_domain_sets_authority_review(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
@@ -119,7 +147,7 @@ class TestCapitalSchemeModel:
                 type_=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
-            milestones=CollectionModel[CapitalSchemeMilestoneModel](items=[]),
+            milestones=CapitalSchemeMilestonesModel(items=[]),
             authority_review=None,
         )
 
@@ -148,7 +176,7 @@ class TestCapitalSchemeModel:
             reference="ATE00001",
             overview=dummy_overview_model(base_url),
             bid_status_details=dummy_bid_status_details_model(),
-            milestones=CollectionModel[CapitalSchemeMilestoneModel](
+            milestones=CapitalSchemeMilestonesModel(
                 items=[
                     CapitalSchemeMilestoneModel(
                         milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
@@ -186,7 +214,7 @@ class TestCapitalSchemeModel:
             reference="ATE00001",
             overview=dummy_overview_model(base_url),
             bid_status_details=dummy_bid_status_details_model(),
-            milestones=CollectionModel[CapitalSchemeMilestoneModel](items=[]),
+            milestones=CapitalSchemeMilestonesModel(items=[]),
             authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1)),
         )
 

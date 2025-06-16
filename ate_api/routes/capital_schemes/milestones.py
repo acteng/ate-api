@@ -5,6 +5,7 @@ from typing import Self
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.dates import DateTimeRange
 from ate_api.routes.base import BaseModel
+from ate_api.routes.collections import CollectionModel
 from ate_api.routes.observation_types import ObservationTypeModel
 
 
@@ -50,3 +51,7 @@ class CapitalSchemeMilestoneModel(BaseModel):
             observation_type=self.observation_type.to_domain(),
             status_date=self.status_date,
         )
+
+
+class CapitalSchemeMilestonesModel(CollectionModel[CapitalSchemeMilestoneModel]):
+    current_milestone: MilestoneModel | None = None

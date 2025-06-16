@@ -3,8 +3,9 @@ from typing import Any
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone
+from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
+from ate_api.domain.observation_types import ObservationType
 
 
 class CapitalSchemeReference:
@@ -49,6 +50,15 @@ class CapitalScheme:
     @property
     def milestones(self) -> list[CapitalSchemeMilestone]:
         return list(self._milestones)
+
+    @property
+    def current_milestone(self) -> Milestone | None:
+        actual_milestones = [
+            milestone.milestone
+            for milestone in self._milestones
+            if milestone.observation_type == ObservationType.ACTUAL
+        ]
+        return sorted(actual_milestones)[-1] if actual_milestones else None
 
     def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
         self._milestones.append(milestone)

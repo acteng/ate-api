@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from datetime import date
-from enum import Enum, auto
+from enum import IntEnum, auto
 
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 
 
-class Milestone(Enum):
+class Milestone(IntEnum):
     PUBLIC_CONSULTATION_COMPLETED = auto()
     FEASIBILITY_DESIGN_STARTED = auto()
     FEASIBILITY_DESIGN_COMPLETED = auto()

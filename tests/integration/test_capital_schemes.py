@@ -58,6 +58,7 @@ def test_get_capital_scheme(
             "bidStatus": "funded",
         },
         "milestones": {
+            "currentMilestone": None,
             "items": [],
         },
         "authorityReview": None,
@@ -90,13 +91,14 @@ def test_get_capital_scheme_with_milestones(
 
     assert response.status_code == 200
     assert response.json()["milestones"] == {
+        "currentMilestone": "detailed design completed",
         "items": [
             {
                 "milestone": "detailed design completed",
                 "observationType": "actual",
                 "statusDate": "2020-02-01",
             }
-        ]
+        ],
     }
 
 

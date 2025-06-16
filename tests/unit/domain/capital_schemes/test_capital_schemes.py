@@ -86,6 +86,65 @@ class TestCapitalScheme:
 
         assert capital_scheme.milestones
 
+    def test_current_milestone_selects_actual_observation_type(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.PLANNED,
+                status_date=date(2020, 2, 1),
+            )
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            )
+        )
+
+        assert capital_scheme.current_milestone == Milestone.DETAILED_DESIGN_COMPLETED
+
+    def test_current_milestone_selects_latest_milestone(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+            )
+        )
+        capital_scheme.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            )
+        )
+
+        assert capital_scheme.current_milestone == Milestone.CONSTRUCTION_STARTED
+
+    def test_current_milestone_when_none(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+
+        assert not capital_scheme.current_milestone
+
     def test_change_milestone(self) -> None:
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
