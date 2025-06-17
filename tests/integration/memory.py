@@ -45,7 +45,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         self,
         authority_abbreviation: AuthorityAbbreviation,
         bid_status: BidStatus | None = None,
-        current_milestone: Milestone | None = None,
+        current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
         return sorted(
             [
@@ -53,7 +53,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
                 and (not bid_status or capital_scheme.bid_status_details.bid_status == bid_status)
-                and (not current_milestone or capital_scheme.current_milestone == current_milestone)
+                and (not current_milestones or capital_scheme.current_milestone in current_milestones)
             ],
             key=lambda reference: str(reference),
         )

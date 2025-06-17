@@ -217,6 +217,89 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
 
 
 @respx.mock
+def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestones(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
+    capital_scheme1 = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00001"),
+        overview=CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Wirral Package",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        ),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme1.change_milestone(
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 2, 1),
+        )
+    )
+    capital_schemes.add(capital_scheme1)
+    capital_scheme2 = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00002"),
+        overview=CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="School Streets",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        ),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme2.change_milestone(
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            milestone=Milestone.CONSTRUCTION_STARTED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 3, 1),
+        )
+    )
+    capital_schemes.add(capital_scheme2)
+    capital_scheme3 = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00003"),
+        overview=CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="Hospital Fields Road",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        ),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme3.change_milestone(
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            milestone=Milestone.CONSTRUCTION_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 4, 1),
+        )
+    )
+    capital_schemes.add(capital_scheme3)
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"current-milestone": ["detailed design completed", "construction started"]},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            f"{client.base_url}/capital-schemes/ATE00001",
+            f"{client.base_url}/capital-schemes/ATE00002",
+        ],
+    }
+
+
+@respx.mock
 def test_get_authority_bid_submitting_capital_schemes_when_none(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:

@@ -82,6 +82,6 @@ class CapitalSchemeRepository:
         self,
         authority_abbreviation: AuthorityAbbreviation,
         bid_status: BidStatus | None = None,
-        current_milestone: Milestone | None = None,
+        current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
         raise NotImplementedError()

@@ -273,12 +273,33 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
         capital_schemes.add(capital_scheme2)
+        capital_scheme3 = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00003"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Hospital Fields Road",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme3.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.CONSTRUCTION_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 4, 1),
+            )
+        )
+        capital_schemes.add(capital_scheme3)
 
         references = capital_schemes.get_references_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"), current_milestone=Milestone.DETAILED_DESIGN_COMPLETED
+            AuthorityAbbreviation("LIV"),
+            current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
         )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     def test_get_references_by_bid_submitting_authority_orders_by_reference(
         self, capital_schemes: MemoryCapitalSchemeRepository

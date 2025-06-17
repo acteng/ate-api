@@ -204,7 +204,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self,
         authority_abbreviation: AuthorityAbbreviation,
         bid_status: BidStatus | None = None,
-        current_milestone: Milestone | None = None,
+        current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
         statement = (
             select(CapitalSchemeEntity.scheme_reference)
@@ -232,7 +232,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status)
             )
 
-        if current_milestone:
+        if current_milestones:
             ranked_actual_capital_scheme_milestones = self._select_ranked_actual_capital_scheme_milestones().cte()
             ranked_actual_capital_scheme_milestones_alias = aliased(
                 CapitalSchemeMilestoneEntity, ranked_actual_capital_scheme_milestones
@@ -247,7 +247,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                     ),
                 )
                 .join(MilestoneEntity)
-                .where(MilestoneEntity.milestone_name == MilestoneName.from_domain(current_milestone))
+                .where(
+                    MilestoneEntity.milestone_name.in_(
+                        MilestoneName.from_domain(milestone) for milestone in current_milestones
+                    )
+                )
             )
 
         result = self._session.scalars(statement)

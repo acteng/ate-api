@@ -25,7 +25,7 @@ def get_authority_bid_submitting_capital_schemes(
     request: Request,
     abbreviation: str,
     bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status")] = None,
-    current_milestone: Annotated[MilestoneModel | None, Query(alias="current-milestone")] = None,
+    current_milestones: Annotated[list[MilestoneModel] | None, Query(alias="current-milestone")] = None,
 ) -> CollectionModel[AnyUrl]:
     """
     Gets the capital schemes submitted by an authority.
@@ -38,7 +38,7 @@ def get_authority_bid_submitting_capital_schemes(
     references = capital_schemes.get_references_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),
         bid_status=bid_status.to_domain() if bid_status else None,
-        current_milestone=current_milestone.to_domain() if current_milestone else None,
+        current_milestones=[milestone.to_domain() for milestone in current_milestones] if current_milestones else None,
     )
     capital_scheme_links = [
         AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))) for reference in references
