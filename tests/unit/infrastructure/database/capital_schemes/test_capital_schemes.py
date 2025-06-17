@@ -942,6 +942,180 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert references == [CapitalSchemeReference("ATE00001")]
 
+    def test_get_references_by_bid_submitting_authority_filters_by_current_milestone(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    detailed_design_completed := MilestoneEntity(
+                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    ),
+                    construction_started := MilestoneEntity(
+                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                    ),
+                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                        ],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                status_date=date(2020, 2, 1),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                    ),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00002",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="School Streets",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                        ],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                status_date=date(2020, 3, 1),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_to=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeMilestoneEntity(
+                                milestone=construction_started,
+                                status_date=date(2020, 4, 1),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV"), current_milestone=Milestone.DETAILED_DESIGN_COMPLETED
+            )
+
+        assert references == [CapitalSchemeReference("ATE00001")]
+
+    def test_get_references_by_bid_submitting_authority_selects_actual_observation_type(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    detailed_design_completed := MilestoneEntity(
+                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    ),
+                    planned := ObservationTypeEntity(observation_type_name=ObservationTypeName.PLANNED),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                status_date=date(2020, 2, 1),
+                                observation_type=planned,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV"), current_milestone=Milestone.DETAILED_DESIGN_COMPLETED
+            )
+
+        assert not references
+
+    def test_get_references_by_bid_submitting_authority_selects_latest_milestone(self, engine: Engine) -> None:
+        with Session(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    detailed_design_completed := MilestoneEntity(
+                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    ),
+                    construction_started := MilestoneEntity(
+                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                    ),
+                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=detailed_design_completed,
+                                status_date=date(2020, 2, 1),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                            CapitalSchemeMilestoneEntity(
+                                milestone=construction_started,
+                                status_date=date(2020, 2, 1),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        with Session(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = capital_schemes.get_references_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV"), current_milestone=Milestone.DETAILED_DESIGN_COMPLETED
+            )
+
+        assert not references
+
     def test_get_references_by_bid_submitting_authority_orders_by_reference(self, engine: Engine) -> None:
         with Session(engine) as session, session.begin():
             session.add_all(

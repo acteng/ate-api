@@ -79,6 +79,9 @@ class CapitalSchemeRepository:
         raise NotImplementedError()
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: AuthorityAbbreviation, bid_status: BidStatus | None = None
+        self,
+        authority_abbreviation: AuthorityAbbreviation,
+        bid_status: BidStatus | None = None,
+        current_milestone: Milestone | None = None,
     ) -> list[CapitalSchemeReference]:
         raise NotImplementedError()

@@ -10,6 +10,7 @@ from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReposito
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
+from ate_api.routes.capital_schemes.milestones import MilestoneModel
 from ate_api.routes.collections import CollectionModel
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
@@ -24,6 +25,7 @@ def get_authority_bid_submitting_capital_schemes(
     request: Request,
     abbreviation: str,
     bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status")] = None,
+    current_milestone: Annotated[MilestoneModel | None, Query(alias="current-milestone")] = None,
 ) -> CollectionModel[AnyUrl]:
     """
     Gets the capital schemes submitted by an authority.
@@ -34,7 +36,9 @@ def get_authority_bid_submitting_capital_schemes(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
     references = capital_schemes.get_references_by_bid_submitting_authority(
-        AuthorityAbbreviation(abbreviation), bid_status=bid_status.to_domain() if bid_status else None
+        AuthorityAbbreviation(abbreviation),
+        bid_status=bid_status.to_domain() if bid_status else None,
+        current_milestone=current_milestone.to_domain() if current_milestone else None,
     )
     capital_scheme_links = [
         AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))) for reference in references

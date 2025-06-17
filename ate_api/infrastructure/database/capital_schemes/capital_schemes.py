@@ -201,7 +201,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return row.to_domain()
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: AuthorityAbbreviation, bid_status: BidStatus | None = None
+        self,
+        authority_abbreviation: AuthorityAbbreviation,
+        bid_status: BidStatus | None = None,
+        current_milestone: Milestone | None = None,
     ) -> list[CapitalSchemeReference]:
         statement = (
             select(CapitalSchemeEntity.scheme_reference)
@@ -227,6 +230,24 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         if bid_status:
             statement = statement.join(BidStatusEntity).where(
                 BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status)
+            )
+
+        if current_milestone:
+            ranked_actual_capital_scheme_milestones = self._select_ranked_actual_capital_scheme_milestones().cte()
+            ranked_actual_capital_scheme_milestones_alias = aliased(
+                CapitalSchemeMilestoneEntity, ranked_actual_capital_scheme_milestones
+            )
+            statement = (
+                statement.join(
+                    ranked_actual_capital_scheme_milestones_alias,
+                    and_(
+                        CapitalSchemeEntity.capital_scheme_id
+                        == ranked_actual_capital_scheme_milestones_alias.capital_scheme_id,
+                        ranked_actual_capital_scheme_milestones.c.rank == 1,
+                    ),
+                )
+                .join(MilestoneEntity)
+                .where(MilestoneEntity.milestone_name == MilestoneName.from_domain(current_milestone))
             )
 
         result = self._session.scalars(statement)
@@ -316,4 +337,22 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 order_by=CapitalSchemeAuthorityReviewEntity.review_date.desc(),
             )
             .label("rank"),
+        )
+
+    @staticmethod
+    def _select_ranked_actual_capital_scheme_milestones() -> Select[tuple[CapitalSchemeMilestoneEntity, int]]:
+        return (
+            select(
+                CapitalSchemeMilestoneEntity,
+                func.rank()
+                .over(
+                    partition_by=CapitalSchemeMilestoneEntity.capital_scheme_id,
+                    order_by=MilestoneEntity.stage_order.desc(),
+                )
+                .label("rank"),
+            )
+            .join(MilestoneEntity)
+            .join(ObservationTypeEntity)
+            .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
+            .where(ObservationTypeEntity.observation_type_name == ObservationTypeName.ACTUAL)
         )

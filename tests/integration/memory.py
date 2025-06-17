@@ -5,6 +5,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeReference,
     CapitalSchemeRepository,
 )
+from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 
 
@@ -41,7 +42,10 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         return self._capital_schemes.get(reference)
 
     def get_references_by_bid_submitting_authority(
-        self, authority_abbreviation: AuthorityAbbreviation, bid_status: BidStatus | None = None
+        self,
+        authority_abbreviation: AuthorityAbbreviation,
+        bid_status: BidStatus | None = None,
+        current_milestone: Milestone | None = None,
     ) -> list[CapitalSchemeReference]:
         return sorted(
             [
@@ -49,6 +53,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
                 and (not bid_status or capital_scheme.bid_status_details.bid_status == bid_status)
+                and (not current_milestone or capital_scheme.current_milestone == current_milestone)
             ],
             key=lambda reference: str(reference),
         )
