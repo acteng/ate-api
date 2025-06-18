@@ -1,4 +1,4 @@
-from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
@@ -6,29 +6,6 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeRepository,
 )
 from ate_api.domain.capital_schemes.milestones import Milestone
-from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
-
-
-class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
-    def __init__(self) -> None:
-        self._funding_programmes: dict[FundingProgrammeCode, FundingProgramme] = {}
-
-    def add(self, funding_programme: FundingProgramme) -> None:
-        self._funding_programmes[funding_programme.code] = funding_programme
-
-    def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
-        return self._funding_programmes.get(code)
-
-
-class MemoryAuthorityRepository(AuthorityRepository):
-    def __init__(self) -> None:
-        self._authorities: dict[AuthorityAbbreviation, Authority] = {}
-
-    def add(self, authority: Authority) -> None:
-        self._authorities[authority.abbreviation] = authority
-
-    def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
-        return self._authorities.get(abbreviation)
 
 
 class MemoryCapitalSchemeRepository(CapitalSchemeRepository):

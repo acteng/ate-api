@@ -2,80 +2,16 @@ from datetime import date, datetime
 
 import pytest
 
-from ate_api.domain.authorities import Authority, AuthorityAbbreviation
+from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details
-from tests.unit.infrastructure.memory import (
-    MemoryAuthorityRepository,
-    MemoryCapitalSchemeRepository,
-    MemoryFundingProgrammeRepository,
-)
-
-
-class TestMemoryFundingProgrammeRepository:
-    @pytest.fixture(name="funding_programmes")
-    def funding_programmes_fixture(self) -> MemoryFundingProgrammeRepository:
-        return MemoryFundingProgrammeRepository()
-
-    def test_add(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
-
-        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
-        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
-
-    def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
-
-        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
-
-        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
-
-    def test_get_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
-
-        assert not funding_programme
-
-
-class TestMemoryAuthorityRepository:
-    @pytest.fixture(name="authorities")
-    def authorities_fixture(self) -> MemoryAuthorityRepository:
-        return MemoryAuthorityRepository()
-
-    def test_add(self, authorities: MemoryAuthorityRepository) -> None:
-        authorities.add(
-            Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-        )
-
-        authority = authorities.get(AuthorityAbbreviation("LIV"))
-        assert (
-            authority
-            and authority.abbreviation == AuthorityAbbreviation("LIV")
-            and authority.full_name == "Liverpool City Region Combined Authority"
-        )
-
-    def test_get(self, authorities: MemoryAuthorityRepository) -> None:
-        authorities.add(
-            Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-        )
-
-        authority = authorities.get(AuthorityAbbreviation("LIV"))
-
-        assert (
-            authority
-            and authority.abbreviation == AuthorityAbbreviation("LIV")
-            and authority.full_name == "Liverpool City Region Combined Authority"
-        )
-
-    def test_get_when_not_found(self, authorities: MemoryAuthorityRepository) -> None:
-        authority = authorities.get(AuthorityAbbreviation("LIV"))
-
-        assert not authority
+from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
 
 class TestMemoryCapitalSchemeRepository:
