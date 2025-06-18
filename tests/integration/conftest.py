@@ -12,12 +12,12 @@ from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
 from ate_api.routes.funding_programmes import get_funding_programme_repository
 from ate_api.settings import Settings, get_settings
-from tests.integration.memory import (
+from tests.integration.oauth import StubAuthorizationServer
+from tests.unit.infrastructure.memory import (
     MemoryAuthorityRepository,
     MemoryCapitalSchemeRepository,
     MemoryFundingProgrammeRepository,
 )
-from tests.integration.oauth import StubAuthorizationServer
 
 
 @pytest.fixture(name="resource_server_identifier", scope="package")

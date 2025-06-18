@@ -10,12 +10,12 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
-from tests.integration.memory import (
+from tests.unit.domain.dummies import dummy_bid_status_details
+from tests.unit.infrastructure.memory import (
     MemoryAuthorityRepository,
     MemoryCapitalSchemeRepository,
     MemoryFundingProgrammeRepository,
 )
-from tests.unit.domain.dummies import dummy_bid_status_details
 
 
 class TestMemoryFundingProgrammeRepository:
