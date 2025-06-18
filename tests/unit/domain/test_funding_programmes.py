@@ -30,6 +30,11 @@ class TestFundingProgrammeCode:
 
         assert hash(code1) == hash(code2)
 
+    def test_repr(self) -> None:
+        code = FundingProgrammeCode("ATF3")
+
+        assert repr(code) == "FundingProgrammeCode('ATF3')"
+
 
 class TestFundingProgramme:
     def test_create(self) -> None:

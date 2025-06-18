@@ -30,6 +30,11 @@ class TestAuthorityAbbreviation:
 
         assert hash(abbreviation1) == hash(abbreviation2)
 
+    def test_repr(self) -> None:
+        abbreviation = AuthorityAbbreviation("LIV")
+
+        assert repr(abbreviation) == "AuthorityAbbreviation('LIV')"
+
 
 class TestAuthority:
     def test_create(self) -> None:

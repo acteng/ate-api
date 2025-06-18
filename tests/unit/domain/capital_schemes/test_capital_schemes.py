@@ -41,6 +41,11 @@ class TestCapitalSchemeReference:
 
         assert hash(reference1) == hash(reference2)
 
+    def test_repr(self) -> None:
+        reference = CapitalSchemeReference("ATE00001")
+
+        assert repr(reference) == "CapitalSchemeReference('ATE00001')"
+
 
 class TestCapitalScheme:
     def test_create(self) -> None:

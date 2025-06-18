@@ -21,6 +21,9 @@ class CapitalSchemeReference:
     def __str__(self) -> str:
         return self._reference
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({repr(self._reference)})"
+
 
 class CapitalScheme:
     def __init__(

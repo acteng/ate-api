@@ -14,6 +14,9 @@ class FundingProgrammeCode:
     def __str__(self) -> str:
         return self._code
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({repr(self._code)})"
+
 
 class FundingProgramme:
     def __init__(self, code: FundingProgrammeCode):

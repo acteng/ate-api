@@ -14,6 +14,9 @@ class AuthorityAbbreviation:
     def __str__(self) -> str:
         return self._abbreviation
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({repr(self._abbreviation)})"
+
 
 class Authority:
     def __init__(self, abbreviation: AuthorityAbbreviation, full_name: str):
