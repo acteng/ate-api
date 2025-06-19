@@ -1,15 +1,7 @@
 from typing import Self
 
 from sqlalchemy import Select, and_, false, func, select
-from sqlalchemy.orm import (
-    Mapped,
-    Session,
-    aliased,
-    contains_eager,
-    joinedload,
-    mapped_column,
-    relationship,
-)
+from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload, mapped_column, relationship
 from sqlalchemy.orm.attributes import set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
