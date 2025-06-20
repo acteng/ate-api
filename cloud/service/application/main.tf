@@ -10,6 +10,7 @@ resource "google_cloud_run_v2_service" "ate_api" {
   name     = "ate-api"
   project  = var.project
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   template {
     containers {
