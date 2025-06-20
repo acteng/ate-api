@@ -95,26 +95,12 @@ docker run --rm -it --network=host -e CREATE_DATABASE_SCHEMA=true -e PORT=8001 a
 
 To invoke the server running in an environment:
 
-1. Obtain the identity provider details:
+1. Request an access token from the identity provider:
 
    ```bash
    cd cloud/identity
    terraform workspace select ${ENVIRONMENT}
-   TOKEN_ENDPOINT=$(curl -s $(terraform output -raw oidc_server_metadata_url) | jq -r .token_endpoint)
-   RESOURCE_SERVER_IDENTIFIER=$(terraform output -raw resource_server_identifier)
-   CLIENT_ID=$(terraform output -raw example_client_id)
-   CLIENT_SECRET=$(terraform output -raw example_client_secret)
-   ```
-
-1. Obtain an access token from the identity provider:
-
-   ```bash
-   ACCESS_TOKEN=$(curl -s ${TOKEN_ENDPOINT} \
-      -H 'Content-Type: application/x-www-form-urlencoded' \
-      -d 'grant_type=client_credentials' \
-      -d "audience=${RESOURCE_SERVER_IDENTIFIER}" \
-      -d "client_id=${CLIENT_ID}" \
-      -d "client_secret=${CLIENT_SECRET}" | jq -r .access_token)
+   ACCESS_TOKEN=$(./request-access-token.sh)
    ```
 
 1. Obtain the server details:
