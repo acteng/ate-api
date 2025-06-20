@@ -40,3 +40,29 @@ To configure the [CI workflow](../../.github/workflows/ci.yml) with credentials 
    ```
    
 1. [Set the GitHub Actions repository secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository) `GCP_CREDENTIALS_PUSH` to the private key
+
+## Destroying
+
+1. Change directory:
+
+   ```bash
+   cd cloud/docker-repository
+   ```
+
+1. Authenticate with Google Cloud:
+
+   ```bash
+   gcloud auth application-default login
+   ```
+
+1. Initialise Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+1. Delete the resources:
+
+   ```bash
+   terraform destroy
+   ```
