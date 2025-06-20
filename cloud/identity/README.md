@@ -80,6 +80,34 @@ To create an OAuth client for the Auth0 Terraform provider:
    unselect_client
    ```
 
+## Requesting an access token
+
+To request an access token from the identity provider:
+
+1. Change directory:
+
+   ```bash
+   cd cloud/identity
+   ```
+
+1. Initialise Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+1. Select the Terraform workspace for the environment:
+
+   ```bash
+   terraform workspace select ${ENVIRONMENT}
+   ```
+   
+1. Request an access token from the identity provider:
+
+   ```bash
+   ./request-access-token.sh
+   ```
+
 ## Destroying
 
 ### Resources
