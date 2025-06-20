@@ -1,6 +1,6 @@
-output "url" {
-  description = "Application service URL"
-  value       = google_cloud_run_v2_service.ate_api.uri
+output "name" {
+  description = "Cloud Run service name"
+  value       = google_cloud_run_v2_service.ate_api.name
 }
 
 output "service_account_id" {

@@ -14,18 +14,22 @@ locals {
   project                  = "${var.project_prefix}-${local.env}"
   database_project         = "${var.database_project_prefix}-${local.env}"
   database_connection_name = "${local.database_project}:europe-west1:dft-ate-capital-schemes"
+  domain                   = "api.activetravelengland.gov.uk"
 
   config = {
     dev = {
       image_tag            = "latest"
+      domain               = "dev.${local.domain}"
       github_action_deploy = true
     }
     test = {
       image_tag            = "0.5.0"
+      domain               = "test.${local.domain}"
       github_action_deploy = false
     }
     prod = {
       image_tag            = "0.5.0"
+      domain               = local.domain
       github_action_deploy = false
     }
   }
@@ -81,6 +85,13 @@ module "application" {
     google_project_service.secret_manager,
     google_project_service.sql_admin
   ]
+}
+
+module "load_balancer" {
+  source                 = "./load-balancer"
+  region                 = var.location
+  domain                 = local.config[local.env].domain
+  cloud_run_service_name = module.application.name
 }
 
 module "github_action_deploy" {

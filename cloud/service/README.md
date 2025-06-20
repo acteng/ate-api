@@ -51,6 +51,16 @@ Repeat the steps below for each environment as required. The target environment 
    bw get notes "API Secrets ($ENVIRONMENT)" | sh
    ```
    
+1. Provision an IP address for the load balancer:
+
+   ```bash
+   terraform plan -target module.load_balancer.google_compute_global_address.ate_api -out plan.out
+   terraform apply plan.out
+   terraform output -raw ip_address
+   ```
+
+1. Update the DNS A record for the environment's domain to the IP address
+
 1. Apply the changes:
 
    ```bash

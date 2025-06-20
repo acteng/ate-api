@@ -1,6 +1,11 @@
 output "url" {
-  description = "Application service URL"
-  value       = module.application.url
+  description = "Load balancer URL"
+  value       = module.load_balancer.url
+}
+
+output "ip_address" {
+  description = "Load balancer IP address"
+  value       = module.load_balancer.ip_address
 }
 
 output "github_action_deploy_private_key" {
