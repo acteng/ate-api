@@ -38,10 +38,17 @@ resource "google_compute_url_map" "ate_api" {
   default_service = google_compute_backend_service.ate_api.id
 }
 
+resource "google_compute_ssl_policy" "ate_api" {
+  name            = "ate-api"
+  profile         = "RESTRICTED"
+  min_tls_version = "TLS_1_2"
+}
+
 resource "google_compute_target_https_proxy" "ate_api_https" {
   name             = "ate-api-https"
   url_map          = google_compute_url_map.ate_api.id
   ssl_certificates = [google_compute_managed_ssl_certificate.ate_api.id]
+  ssl_policy       = google_compute_ssl_policy.ate_api.id
 }
 
 resource "google_compute_global_forwarding_rule" "ate_api_https" {
