@@ -38,3 +38,58 @@ As the state for this root module cannot be easily stored within itself, we stor
    ```
 
 1. Store the new Terraform state in Bitwarden as "API tf-backend State"
+
+## Destroying
+
+1. Change directory:
+
+   ```bash
+   cd cloud/tf-backend
+   ```
+
+1. Authenticate with Google Cloud:
+
+   ```bash
+   gcloud auth application-default login
+   ```
+
+1. Initialise Terraform:
+
+   ```bash
+   terraform init
+   ```
+
+1. Fetch the previous Terraform state from Bitwarden, if any:
+
+   ```bash
+   bw get notes "API tf-backend State" > terraform.tfstate
+   ```
+
+1. Force deletion of bucket objects by modifying `cloud/tf-backend/main.tf`:
+
+   ```diff
+    resource "google_storage_bucket" "main" {
+   +  force_destroy = true
+      ...
+    }
+   ```
+
+1. Apply the change:
+
+   ```bash
+   terraform apply
+   ```
+
+1. Revert the modification:
+
+   ```bash
+   git checkout main.tf
+   ```
+   
+1. Delete the resources:
+
+   ```bash
+   terraform destroy
+   ```
+
+1. Delete the Terraform state "API tf-backend State" from Bitwarden 
