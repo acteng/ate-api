@@ -1,3 +1,7 @@
+locals {
+  year_in_seconds = 365 * 24 * 60 * 60
+}
+
 resource "google_compute_global_address" "ate_api" {
   name = "ate-api"
 }
@@ -21,8 +25,9 @@ resource "google_compute_region_network_endpoint_group" "ate_api" {
 }
 
 resource "google_compute_backend_service" "ate_api" {
-  name                  = "ate-api"
-  load_balancing_scheme = "EXTERNAL_MANAGED"
+  name                    = "ate-api"
+  load_balancing_scheme   = "EXTERNAL_MANAGED"
+  custom_response_headers = ["Strict-Transport-Security: max-age=${local.year_in_seconds}"]
 
   backend {
     group = google_compute_region_network_endpoint_group.ate_api.id
