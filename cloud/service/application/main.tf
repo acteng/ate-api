@@ -45,6 +45,7 @@ resource "google_cloud_run_v2_service" "ate_api" {
       ]
     }
     scaling {
+      min_instance_count = var.keep_idle ? 1 : 0
       max_instance_count = 10
     }
     service_account = google_service_account.cloud_run_ate_api.email

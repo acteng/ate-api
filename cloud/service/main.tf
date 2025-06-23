@@ -19,16 +19,19 @@ locals {
   config = {
     dev = {
       image_tag            = "latest"
+      keep_idle            = false
       domain               = "dev.${local.domain}"
       github_action_deploy = true
     }
     test = {
       image_tag            = "0.5.0"
+      keep_idle            = false
       domain               = "test.${local.domain}"
       github_action_deploy = false
     }
     prod = {
       image_tag            = "0.5.0"
+      keep_idle            = true
       domain               = local.domain
       github_action_deploy = false
     }
@@ -79,6 +82,7 @@ module "application" {
   database_url_secret_id     = "database-url"
   oidc_server_metadata_url   = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
   resource_server_identifier = data.terraform_remote_state.identity.outputs.resource_server_identifier
+  keep_idle                  = local.config[local.env].keep_idle
 
   depends_on = [
     google_project_service.run,

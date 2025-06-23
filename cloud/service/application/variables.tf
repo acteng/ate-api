@@ -47,3 +47,8 @@ variable "resource_server_identifier" {
   description = "Resource server identifier"
   type        = string
 }
+
+variable "keep_idle" {
+  description = "Whether to keep an instance idle to prevent cold starts"
+  type        = bool
+}
