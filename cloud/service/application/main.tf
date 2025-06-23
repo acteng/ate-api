@@ -44,6 +44,9 @@ resource "google_cloud_run_v2_service" "ate_api" {
         var.database_connection_name,
       ]
     }
+    scaling {
+      max_instance_count = 10
+    }
     service_account = google_service_account.cloud_run_ate_api.email
   }
 }
