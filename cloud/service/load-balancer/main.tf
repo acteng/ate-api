@@ -27,6 +27,7 @@ resource "google_compute_region_network_endpoint_group" "ate_api" {
 resource "google_compute_backend_service" "ate_api" {
   name                    = "ate-api"
   load_balancing_scheme   = "EXTERNAL_MANAGED"
+  security_policy         = var.security_policy_id
   custom_response_headers = ["Strict-Transport-Security: max-age=${local.year_in_seconds}"]
 
   backend {
