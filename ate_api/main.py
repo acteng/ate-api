@@ -2,6 +2,8 @@ from importlib.metadata import version
 
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
+from starlette.middleware import Middleware
+from starlette.middleware.gzip import GZipMiddleware
 from starlette.status import HTTP_403_FORBIDDEN
 
 from ate_api.auth import authorize
@@ -17,6 +19,7 @@ app = FastAPI(
     description="The Active Travel England Web API.",
     version=version("ate_api"),
     dependencies=[Depends(authorize)],
+    middleware=[Middleware(GZipMiddleware)],
     responses={HTTP_403_FORBIDDEN: {"model": HTTPError}},
 )
 app.include_router(authorities.router)
