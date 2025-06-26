@@ -67,11 +67,8 @@ def test_get_capital_scheme(
 
 @respx.mock
 def test_get_capital_scheme_with_milestones(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+    capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
     capital_scheme = CapitalScheme(
         reference=CapitalSchemeReference("ATE00001"),
         overview=dummy_overview(),
@@ -104,11 +101,8 @@ def test_get_capital_scheme_with_milestones(
 
 @respx.mock
 def test_get_capital_scheme_with_authority_review(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+    capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
     capital_scheme = CapitalScheme(
         reference=CapitalSchemeReference("ATE00001"),
         overview=dummy_overview(),
