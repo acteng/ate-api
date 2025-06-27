@@ -1,7 +1,9 @@
-from typing import Generator
+from typing import AsyncGenerator, Generator
 
 import pytest
-from sqlalchemy import Engine, create_engine, text
+import pytest_asyncio
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.sql.ddl import CreateSchema
 from testcontainers.postgres import PostgresContainer
 
@@ -16,34 +18,33 @@ def debug_fixture() -> bool:
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
     with PostgresContainer("postgres:16") as postgres:
-        yield postgres.get_connection_url(driver="pg8000")
+        yield postgres.get_connection_url(driver="asyncpg")
 
 
 @pytest.fixture(name="engine", scope="package")
-def engine_fixture(database_url: str, debug: bool) -> Engine:
-    engine = create_engine(database_url, echo=debug)
-    _create_schema(engine)
+async def engine_fixture(database_url: str, debug: bool) -> AsyncEngine:
+    engine = create_async_engine(database_url, echo=debug)
+    await _create_schema(engine)
     return engine
 
 
-@pytest.fixture(name="data")
-def data_fixture(engine: Engine) -> Generator[None]:
+@pytest_asyncio.fixture(name="data", loop_scope="package")
+async def data_fixture(engine: AsyncEngine) -> AsyncGenerator[None]:
     yield
-    _delete_all(engine)
+    await _delete_all(engine)
 
 
-def _create_schema(engine: Engine) -> None:
-    with engine.begin() as connection:
-        connection.execute(CreateSchema("authority"))
-        connection.execute(CreateSchema("capital_scheme"))
-        connection.execute(CreateSchema("common"))
+async def _create_schema(engine: AsyncEngine) -> None:
+    async with engine.begin() as connection:
+        await connection.execute(CreateSchema("authority"))
+        await connection.execute(CreateSchema("capital_scheme"))
+        await connection.execute(CreateSchema("common"))
+        await connection.run_sync(BaseEntity.metadata.create_all)
 
-    BaseEntity.metadata.create_all(engine)
 
-
-def _delete_all(engine: Engine) -> None:
-    with engine.begin() as connection:
-        connection.execute(
+async def _delete_all(engine: AsyncEngine) -> None:
+    async with engine.begin() as connection:
+        await connection.execute(
             text(
                 """
                 TRUNCATE

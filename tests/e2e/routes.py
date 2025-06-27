@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Response
 from fastapi.params import Depends
 from sqlalchemy import delete
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
@@ -30,57 +30,57 @@ router = APIRouter(prefix="/test")
 
 
 @router.post("/funding-programmes", status_code=HTTP_201_CREATED, response_class=Response)
-def create_funding_programme(
+async def create_funding_programme(
     funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
-    session: Annotated[Session, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
     funding_programme: FundingProgrammeModel,
 ) -> None:
-    funding_programmes.add(funding_programme.to_domain())
-    session.commit()
+    await funding_programmes.add(funding_programme.to_domain())
+    await session.commit()
 
 
 @router.delete("/funding-programmes", status_code=HTTP_204_NO_CONTENT)
-def delete_funding_programmes(session: Annotated[Session, Depends(get_session)]) -> Response:
-    session.execute(delete(FundingProgrammeEntity))
-    session.commit()
+async def delete_funding_programmes(session: Annotated[AsyncSession, Depends(get_session)]) -> Response:
+    await session.execute(delete(FundingProgrammeEntity))
+    await session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
 
 
 @router.post("/authorities", status_code=HTTP_201_CREATED, response_class=Response)
-def create_authority(
+async def create_authority(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
-    session: Annotated[Session, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
     authority: AuthorityModel,
 ) -> None:
-    authorities.add(authority.to_domain())
-    session.commit()
+    await authorities.add(authority.to_domain())
+    await session.commit()
 
 
 @router.delete("/authorities", status_code=HTTP_204_NO_CONTENT)
-def delete_authorities(session: Annotated[Session, Depends(get_session)]) -> Response:
-    session.execute(delete(AuthorityEntity))
-    session.commit()
+async def delete_authorities(session: Annotated[AsyncSession, Depends(get_session)]) -> Response:
+    await session.execute(delete(AuthorityEntity))
+    await session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
 
 
 @router.post("/capital-schemes", status_code=HTTP_201_CREATED, response_class=Response)
-def create_capital_scheme(
+async def create_capital_scheme(
     clock: Annotated[Clock, Depends(get_clock)],
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
-    session: Annotated[Session, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
     request: Request,
     capital_scheme: CapitalSchemeModel,
 ) -> None:
-    capital_schemes.add(capital_scheme.to_domain(clock.now, request))
-    session.commit()
+    await capital_schemes.add(capital_scheme.to_domain(clock.now, request))
+    await session.commit()
 
 
 @router.delete("/capital-schemes", status_code=HTTP_204_NO_CONTENT)
-def delete_capital_schemes(session: Annotated[Session, Depends(get_session)]) -> Response:
-    session.execute(delete(CapitalSchemeOverviewEntity))
-    session.execute(delete(CapitalSchemeBidStatusEntity))
-    session.execute(delete(CapitalSchemeMilestoneEntity))
-    session.execute(delete(CapitalSchemeAuthorityReviewEntity))
-    session.execute(delete(CapitalSchemeEntity))
-    session.commit()
+async def delete_capital_schemes(session: Annotated[AsyncSession, Depends(get_session)]) -> Response:
+    await session.execute(delete(CapitalSchemeOverviewEntity))
+    await session.execute(delete(CapitalSchemeBidStatusEntity))
+    await session.execute(delete(CapitalSchemeMilestoneEntity))
+    await session.execute(delete(CapitalSchemeAuthorityReviewEntity))
+    await session.execute(delete(CapitalSchemeEntity))
+    await session.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)

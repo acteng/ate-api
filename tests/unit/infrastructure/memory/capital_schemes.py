@@ -12,13 +12,13 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     def __init__(self) -> None:
         self._capital_schemes: dict[CapitalSchemeReference, CapitalScheme] = {}
 
-    def add(self, capital_scheme: CapitalScheme) -> None:
+    async def add(self, capital_scheme: CapitalScheme) -> None:
         self._capital_schemes[capital_scheme.reference] = capital_scheme
 
-    def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
+    async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         return self._capital_schemes.get(reference)
 
-    def get_references_by_bid_submitting_authority(
+    async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
         bid_status: BidStatus | None = None,

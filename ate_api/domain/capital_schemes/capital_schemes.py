@@ -75,13 +75,13 @@ class CapitalScheme:
 
 
 class CapitalSchemeRepository:
-    def add(self, capital_scheme: CapitalScheme) -> None:
+    async def add(self, capital_scheme: CapitalScheme) -> None:
         raise NotImplementedError()
 
-    def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
+    async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         raise NotImplementedError()
 
-    def get_references_by_bid_submitting_authority(
+    async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
         bid_status: BidStatus | None = None,

@@ -19,8 +19,8 @@ from tests.unit.domain.dummies import dummy_bid_status_details
 
 
 @respx.mock
-def test_get_authority(authorities: AuthorityRepository, client: TestClient, access_token: str) -> None:
-    authorities.add(
+async def test_get_authority(authorities: AuthorityRepository, client: TestClient, access_token: str) -> None:
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
 
@@ -42,13 +42,13 @@ def test_get_authority_when_not_found(client: TestClient, access_token: str) -> 
 
 
 @respx.mock
-def test_get_authority_bid_submitting_capital_schemes(
+async def test_get_authority_bid_submitting_capital_schemes(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
-    capital_schemes.add(
+    await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
@@ -61,7 +61,7 @@ def test_get_authority_bid_submitting_capital_schemes(
             bid_status_details=dummy_bid_status_details(),
         )
     )
-    capital_schemes.add(
+    await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
@@ -74,8 +74,10 @@ def test_get_authority_bid_submitting_capital_schemes(
             bid_status_details=dummy_bid_status_details(),
         )
     )
-    authorities.add(Authority(abbreviation=AuthorityAbbreviation("WYO"), full_name="West Yorkshire Combined Authority"))
-    capital_schemes.add(
+    await authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("WYO"), full_name="West Yorkshire Combined Authority")
+    )
+    await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00003"),
             overview=CapitalSchemeOverview(
@@ -103,13 +105,13 @@ def test_get_authority_bid_submitting_capital_schemes(
 
 
 @respx.mock
-def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
+async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
-    capital_schemes.add(
+    await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
@@ -124,7 +126,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
             ),
         )
     )
-    capital_schemes.add(
+    await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
@@ -155,10 +157,10 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
 
 
 @respx.mock
-def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestone(
+async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestone(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     capital_scheme1 = CapitalScheme(
@@ -180,7 +182,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
             status_date=date(2020, 2, 1),
         )
     )
-    capital_schemes.add(capital_scheme1)
+    await capital_schemes.add(capital_scheme1)
     capital_scheme2 = CapitalScheme(
         reference=CapitalSchemeReference("ATE00002"),
         overview=CapitalSchemeOverview(
@@ -200,7 +202,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
             status_date=date(2020, 3, 1),
         )
     )
-    capital_schemes.add(capital_scheme2)
+    await capital_schemes.add(capital_scheme2)
 
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
@@ -217,10 +219,10 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
 
 
 @respx.mock
-def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestones(
+async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestones(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     capital_scheme1 = CapitalScheme(
@@ -242,7 +244,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
             status_date=date(2020, 2, 1),
         )
     )
-    capital_schemes.add(capital_scheme1)
+    await capital_schemes.add(capital_scheme1)
     capital_scheme2 = CapitalScheme(
         reference=CapitalSchemeReference("ATE00002"),
         overview=CapitalSchemeOverview(
@@ -262,7 +264,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
             status_date=date(2020, 3, 1),
         )
     )
-    capital_schemes.add(capital_scheme2)
+    await capital_schemes.add(capital_scheme2)
     capital_scheme3 = CapitalScheme(
         reference=CapitalSchemeReference("ATE00003"),
         overview=CapitalSchemeOverview(
@@ -282,7 +284,7 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
             status_date=date(2020, 4, 1),
         )
     )
-    capital_schemes.add(capital_scheme3)
+    await capital_schemes.add(capital_scheme3)
 
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
@@ -300,10 +302,10 @@ def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milesto
 
 
 @respx.mock
-def test_get_authority_bid_submitting_capital_schemes_when_none(
+async def test_get_authority_bid_submitting_capital_schemes_when_none(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
 

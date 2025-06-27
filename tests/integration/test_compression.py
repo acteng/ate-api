@@ -15,10 +15,10 @@ from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
 @respx.mock
-def test_can_request_uncompressed_response(
+async def test_can_request_uncompressed_response(
     capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    capital_schemes.add(_build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
+    await capital_schemes.add(_build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
 
     response = client.get(
         "/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}", "Accept-Encoding": "identity"}
@@ -28,10 +28,10 @@ def test_can_request_uncompressed_response(
 
 
 @respx.mock
-def test_can_request_compressed_response(
+async def test_can_request_compressed_response(
     capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    capital_schemes.add(_build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
+    await capital_schemes.add(_build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
 
     response = client.get(
         "/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}", "Accept-Encoding": "gzip"}

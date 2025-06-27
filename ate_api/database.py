@@ -1,9 +1,9 @@
 from functools import lru_cache
-from typing import Annotated, Generator
+from typing import Annotated, AsyncGenerator
 
 from fastapi.params import Depends
-from sqlalchemy import Engine, create_engine, text
-from sqlalchemy.orm import Session
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.sql.ddl import CreateSchema
 
 from ate_api.infrastructure.database import (
@@ -21,24 +21,24 @@ from ate_api.settings import Settings, get_settings
 
 
 @lru_cache
-def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> Engine:
-    return create_engine(settings.database_url)
+def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncEngine:
+    return create_async_engine(settings.database_url)
 
 
-def get_session(engine: Annotated[Engine, Depends(get_engine)]) -> Generator[Session]:
-    with Session(engine) as session:
+async def get_session(engine: Annotated[AsyncEngine, Depends(get_engine)]) -> AsyncGenerator[AsyncSession]:
+    async with AsyncSession(engine) as session:
         yield session
 
 
-def create_database_schema(engine: Engine) -> None:
-    if not _schema_exists(engine):
-        _create_schema(engine)
-        _create_reference_data(engine)
+async def create_database_schema(engine: AsyncEngine) -> None:
+    if not await _schema_exists(engine):
+        await _create_schema(engine)
+        await _create_reference_data(engine)
 
 
-def _schema_exists(engine: Engine) -> bool:
-    with engine.begin() as connection:
-        result = connection.execute(
+async def _schema_exists(engine: AsyncEngine) -> bool:
+    async with engine.begin() as connection:
+        result = await connection.execute(
             text(
                 "SELECT EXISTS(SELECT schema_name FROM information_schema.schemata WHERE schema_name = :schema_name);"
             ),
@@ -47,17 +47,16 @@ def _schema_exists(engine: Engine) -> bool:
         return bool(result.scalar_one())
 
 
-def _create_schema(engine: Engine) -> None:
-    with engine.begin() as connection:
-        connection.execute(CreateSchema("authority"))
-        connection.execute(CreateSchema("capital_scheme"))
-        connection.execute(CreateSchema("common"))
+async def _create_schema(engine: AsyncEngine) -> None:
+    async with engine.begin() as connection:
+        await connection.execute(CreateSchema("authority"))
+        await connection.execute(CreateSchema("capital_scheme"))
+        await connection.execute(CreateSchema("common"))
+        await connection.run_sync(BaseEntity.metadata.create_all)
 
-    BaseEntity.metadata.create_all(engine)
 
-
-def _create_reference_data(engine: Engine) -> None:
-    with Session(engine) as session:
+async def _create_reference_data(engine: AsyncEngine) -> None:
+    async with AsyncSession(engine) as session:
         # common
         session.add_all(
             [
@@ -74,4 +73,4 @@ def _create_reference_data(engine: Engine) -> None:
             ]
         )
         session.add_all([SchemeTypeEntity(scheme_type_name=scheme_type_name) for scheme_type_name in SchemeTypeName])
-        session.commit()
+        await session.commit()

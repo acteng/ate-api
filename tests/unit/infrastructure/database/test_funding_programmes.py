@@ -1,6 +1,6 @@
 import pytest
-from sqlalchemy import Engine, select
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
 from ate_api.infrastructure.database import FundingProgrammeEntity
@@ -27,18 +27,19 @@ class TestFundingProgrammeEntity:
 
 
 @pytest.mark.usefixtures("data")
+@pytest.mark.asyncio(loop_scope="package")
 class TestDatabaseFundingProgrammeRepository:
-    def test_add(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
+    async def test_add(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+            await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
-        with Session(engine) as session:
-            (row,) = session.scalars(select(FundingProgrammeEntity))
+        async with AsyncSession(engine) as session:
+            (row,) = await session.scalars(select(FundingProgrammeEntity))
         assert row.funding_programme_code == "ATF3"
 
-    def test_get(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
+    async def test_get(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
@@ -46,25 +47,25 @@ class TestDatabaseFundingProgrammeRepository:
                 ]
             )
 
-        with Session(engine) as session:
+        async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+            funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
 
-    def test_get_filters_under_embargo(self, engine: Engine) -> None:
-        with Session(engine) as session, session.begin():
+    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
             session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
 
-        with Session(engine) as session:
+        async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+            funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme
 
-    def test_get_when_not_found(self, engine: Engine) -> None:
-        with Session(engine) as session:
+    async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+            funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme

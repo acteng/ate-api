@@ -93,7 +93,7 @@ resource "google_secret_manager_secret" "database_url" {
 resource "google_secret_manager_secret_version" "database_url" {
   secret = google_secret_manager_secret.database_url.id
   secret_data = join("", [
-    "postgresql+pg8000://",
+    "postgresql+asyncpg://",
     var.database_username,
     ":",
     var.database_password,

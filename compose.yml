@@ -6,7 +6,7 @@ services:
       - path: .env
         required: false
     environment:
-      DATABASE_URL: "postgresql+pg8000://ate:password@database/ate"
+      DATABASE_URL: "postgresql+asyncpg://ate:password@database/ate"
       CREATE_DATABASE_SCHEMA: true
     ports:
       - "8000:8000"

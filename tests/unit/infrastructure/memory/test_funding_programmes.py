@@ -9,20 +9,20 @@ class TestMemoryFundingProgrammeRepository:
     def funding_programmes_fixture(self) -> MemoryFundingProgrammeRepository:
         return MemoryFundingProgrammeRepository()
 
-    def test_add(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+    async def test_add(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
-        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+        funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
         assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
 
-    def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+    async def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
 
-        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+        funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
 
-    def test_get_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programme = funding_programmes.get(FundingProgrammeCode("ATF3"))
+    async def test_get_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme

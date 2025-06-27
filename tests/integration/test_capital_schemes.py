@@ -20,13 +20,13 @@ from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
 @respx.mock
-def test_get_capital_scheme(
+async def test_get_capital_scheme(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
-    capital_schemes.add(
+    await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
@@ -66,7 +66,7 @@ def test_get_capital_scheme(
 
 
 @respx.mock
-def test_get_capital_scheme_with_milestones(
+async def test_get_capital_scheme_with_milestones(
     capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
     capital_scheme = CapitalScheme(
@@ -82,7 +82,7 @@ def test_get_capital_scheme_with_milestones(
             status_date=date(2020, 2, 1),
         )
     )
-    capital_schemes.add(capital_scheme)
+    await capital_schemes.add(capital_scheme)
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -100,7 +100,7 @@ def test_get_capital_scheme_with_milestones(
 
 
 @respx.mock
-def test_get_capital_scheme_with_authority_review(
+async def test_get_capital_scheme_with_authority_review(
     capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
     capital_scheme = CapitalScheme(
@@ -111,7 +111,7 @@ def test_get_capital_scheme_with_authority_review(
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=timezone.utc))
     )
-    capital_schemes.add(capital_scheme)
+    await capital_schemes.add(capital_scheme)
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 

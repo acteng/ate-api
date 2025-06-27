@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     engine = app.dependency_overrides.get(get_engine, get_engine)(settings=settings)
 
     if settings.create_database_schema:
-        create_database_schema(engine)
+        await create_database_schema(engine)
 
     yield
 

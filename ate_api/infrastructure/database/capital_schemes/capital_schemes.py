@@ -1,7 +1,8 @@
 from typing import Self
 
 from sqlalchemy import Select, and_, false, func, select
-from sqlalchemy.orm import Mapped, Session, aliased, contains_eager, joinedload, mapped_column, relationship
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, aliased, contains_eager, joinedload, mapped_column, relationship
 from sqlalchemy.orm.attributes import set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
@@ -100,16 +101,16 @@ class CapitalSchemeEntity(BaseEntity):
 
 
 class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self._session = session
 
-    def add(self, capital_scheme: CapitalScheme) -> None:
-        authority_ids = self._get_authority_ids(capital_scheme)
-        funding_programme_ids = self._get_funding_programme_ids(capital_scheme)
-        scheme_type_ids = self._get_scheme_type_ids(capital_scheme)
-        bid_status_ids = self._get_bid_status_ids(capital_scheme)
-        milestone_ids = self._get_milestone_ids(capital_scheme)
-        observation_type_ids = self._get_observation_type_ids(capital_scheme)
+    async def add(self, capital_scheme: CapitalScheme) -> None:
+        authority_ids = await self._get_authority_ids(capital_scheme)
+        funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
+        scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
+        bid_status_ids = await self._get_bid_status_ids(capital_scheme)
+        milestone_ids = await self._get_milestone_ids(capital_scheme)
+        observation_type_ids = await self._get_observation_type_ids(capital_scheme)
 
         self._session.add(
             CapitalSchemeEntity.from_domain(
@@ -123,7 +124,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
 
-    def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
+    async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         statement = select(CapitalSchemeEntity).where(CapitalSchemeEntity.scheme_reference == str(reference))
 
         # fetch current overview
@@ -177,22 +178,22 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             ),
         )
 
-        result = self._session.scalars(statement)
+        result = await self._session.scalars(statement)
         row = result.unique().one_or_none()
 
         if not row:
             return None
 
         # fetch current milestones
-        capital_scheme_milestones = self._session.scalars(
-            self._select_current_capital_scheme_milestones(row.capital_scheme_id)
+        capital_scheme_milestones = (
+            await self._session.scalars(self._select_current_capital_scheme_milestones(row.capital_scheme_id))
         ).all()
         # untyped function, see: https://github.com/sqlalchemy/sqlalchemy/issues/12669
         set_committed_value(row, "capital_scheme_milestones", capital_scheme_milestones)  # type: ignore
 
         return row.to_domain()
 
-    def get_references_by_bid_submitting_authority(
+    async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
         bid_status: BidStatus | None = None,
@@ -246,59 +247,59 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 )
             )
 
-        result = self._session.scalars(statement)
+        result = await self._session.scalars(statement)
         return [CapitalSchemeReference(reference) for reference in result.all()]
 
-    def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[AuthorityAbbreviation, int]:
+    async def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[AuthorityAbbreviation, int]:
         authority_abbreviation = str(capital_scheme.overview.bid_submitting_authority)
-        rows = self._session.execute(
+        rows = await self._session.execute(
             select(AuthorityEntity.authority_abbreviation, AuthorityEntity.authority_id).where(
                 AuthorityEntity.authority_abbreviation == authority_abbreviation
             )
         )
         return {AuthorityAbbreviation(row.authority_abbreviation): row.authority_id for row in rows}
 
-    def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[FundingProgrammeCode, int]:
+    async def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[FundingProgrammeCode, int]:
         funding_programme_code = str(capital_scheme.overview.funding_programme)
-        rows = self._session.execute(
+        rows = await self._session.execute(
             select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
                 FundingProgrammeEntity.funding_programme_code == funding_programme_code
             )
         )
         return {FundingProgrammeCode(row.funding_programme_code): row.funding_programme_id for row in rows}
 
-    def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeType, int]:
+    async def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeType, int]:
         scheme_type_name = SchemeTypeName.from_domain(capital_scheme.overview.type)
-        rows = self._session.execute(
+        rows = await self._session.execute(
             select(SchemeTypeEntity.scheme_type_name, SchemeTypeEntity.scheme_type_id).where(
                 SchemeTypeEntity.scheme_type_name == scheme_type_name
             )
         )
         return {row.scheme_type_name.to_domain(): row.scheme_type_id for row in rows}
 
-    def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[BidStatus, int]:
+    async def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[BidStatus, int]:
         bid_status_name = BidStatusName.from_domain(capital_scheme.bid_status_details.bid_status)
-        rows = self._session.execute(
+        rows = await self._session.execute(
             select(BidStatusEntity.bid_status_name, BidStatusEntity.bid_status_id).where(
                 BidStatusEntity.bid_status_name == bid_status_name
             )
         )
         return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
 
-    def _get_milestone_ids(self, capital_scheme: CapitalScheme) -> dict[Milestone, int]:
+    async def _get_milestone_ids(self, capital_scheme: CapitalScheme) -> dict[Milestone, int]:
         milestone_names = {MilestoneName.from_domain(milestone.milestone) for milestone in capital_scheme.milestones}
-        rows = self._session.execute(
+        rows = await self._session.execute(
             select(MilestoneEntity.milestone_name, MilestoneEntity.milestone_id).where(
                 MilestoneEntity.milestone_name.in_(milestone_names)
             )
         )
         return {row.milestone_name.to_domain(): row.milestone_id for row in rows}
 
-    def _get_observation_type_ids(self, capital_scheme: CapitalScheme) -> dict[ObservationType, int]:
+    async def _get_observation_type_ids(self, capital_scheme: CapitalScheme) -> dict[ObservationType, int]:
         observation_type_names = {
             ObservationTypeName.from_domain(milestone.observation_type) for milestone in capital_scheme.milestones
         }
-        rows = self._session.execute(
+        rows = await self._session.execute(
             select(ObservationTypeEntity.observation_type_name, ObservationTypeEntity.observation_type_id).where(
                 ObservationTypeEntity.observation_type_name.in_(observation_type_names)
             )

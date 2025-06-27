@@ -5,8 +5,8 @@ class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
     def __init__(self) -> None:
         self._funding_programmes: dict[FundingProgrammeCode, FundingProgramme] = {}
 
-    def add(self, funding_programme: FundingProgramme) -> None:
+    async def add(self, funding_programme: FundingProgramme) -> None:
         self._funding_programmes[funding_programme.code] = funding_programme
 
-    def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
+    async def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
         return self._funding_programmes.get(code)

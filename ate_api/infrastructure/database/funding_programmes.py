@@ -1,7 +1,8 @@
 from typing import Self
 
 from sqlalchemy import false, select
-from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.infrastructure.database import BaseEntity
@@ -24,14 +25,14 @@ class FundingProgrammeEntity(BaseEntity):
 
 
 class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self._session = session
 
-    def add(self, funding_programme: FundingProgramme) -> None:
+    async def add(self, funding_programme: FundingProgramme) -> None:
         self._session.add(FundingProgrammeEntity.from_domain(funding_programme))
 
-    def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
-        result = self._session.scalars(
+    async def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
+        result = await self._session.scalars(
             select(FundingProgrammeEntity)
             .where(FundingProgrammeEntity.funding_programme_code == str(code))
             .where(FundingProgrammeEntity.is_under_embargo == false())

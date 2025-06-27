@@ -28,8 +28,8 @@ class FundingProgramme:
 
 
 class FundingProgrammeRepository:
-    def add(self, funding_programme: FundingProgramme) -> None:
+    async def add(self, funding_programme: FundingProgramme) -> None:
         raise NotImplementedError()
 
-    def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
+    async def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
         raise NotImplementedError()

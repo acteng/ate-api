@@ -4,11 +4,11 @@ version = "0.6.0"
 description = "Operational data API for Active Travel England."
 requires-python = ">=3.13"
 dependencies = [
+    "asyncpg~=0.30.0",
     "authlib~=1.6.0",
     "fastapi[standard]~=0.115.0",
-    "pg8000~=1.31.0",
     "pydantic-settings~=2.10.0",
-    "sqlalchemy~=2.0.0"
+    "sqlalchemy[asyncio]~=2.0.0"
 ]
 
 [project.optional-dependencies]
@@ -17,6 +17,7 @@ dev = [
     "isort~=6.0.0",
     "mypy~=1.16.0",
     "pytest~=8.4.0",
+    "pytest-asyncio~=1.0.0",
     "respx~=0.22.0",
     "ruff~=0.12.0",
     "testcontainers~=4.10.0"
@@ -49,6 +50,11 @@ module = [
     "testcontainers.postgres.*"
 ]
 ignore_missing_imports = true
+
+# pytest
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 # ruff
 

@@ -33,8 +33,8 @@ class Authority:
 
 
 class AuthorityRepository:
-    def add(self, authority: Authority) -> None:
+    async def add(self, authority: Authority) -> None:
         raise NotImplementedError()
 
-    def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
+    async def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
         raise NotImplementedError()

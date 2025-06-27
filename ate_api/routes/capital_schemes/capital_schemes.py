@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -71,12 +71,12 @@ class CapitalSchemeModel(BaseModel):
 router = APIRouter()
 
 
-def get_capital_scheme_repository(session: Annotated[Session, Depends(get_session)]) -> CapitalSchemeRepository:
+def get_capital_scheme_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> CapitalSchemeRepository:
     return DatabaseCapitalSchemeRepository(session)
 
 
 @router.get("/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})
-def get_capital_scheme(
+async def get_capital_scheme(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     request: Request,
     reference: str,
@@ -84,7 +84,7 @@ def get_capital_scheme(
     """
     Gets a capital scheme.
     """
-    capital_scheme = capital_schemes.get(CapitalSchemeReference(reference))
+    capital_scheme = await capital_schemes.get(CapitalSchemeReference(reference))
 
     if not capital_scheme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)

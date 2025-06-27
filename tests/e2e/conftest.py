@@ -34,7 +34,7 @@ class _ResourceServer:
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
     with PostgresContainer("postgres:16") as postgres:
-        yield postgres.get_connection_url(driver="pg8000")
+        yield postgres.get_connection_url(driver="asyncpg")
 
 
 @pytest.fixture(name="resource_server", scope="package")

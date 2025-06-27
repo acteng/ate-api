@@ -1,7 +1,7 @@
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session
@@ -24,18 +24,20 @@ class FundingProgrammeModel(BaseModel):
 router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])
 
 
-def get_funding_programme_repository(session: Annotated[Session, Depends(get_session)]) -> FundingProgrammeRepository:
+def get_funding_programme_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> FundingProgrammeRepository:
     return DatabaseFundingProgrammeRepository(session)
 
 
 @router.get("/{code}", summary="Get funding programme", responses={HTTP_404_NOT_FOUND: {}})
-def get_funding_programme(
+async def get_funding_programme(
     funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)], code: str
 ) -> FundingProgrammeModel:
     """
     Gets a funding programme.
     """
-    funding_programme = funding_programmes.get(FundingProgrammeCode(code))
+    funding_programme = await funding_programmes.get(FundingProgrammeCode(code))
 
     if not funding_programme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)

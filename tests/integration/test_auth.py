@@ -8,10 +8,10 @@ from tests.integration.oauth import StubAuthorizationServer
 
 
 @respx.mock
-def test_can_access_with_valid_access_token(
+async def test_can_access_with_valid_access_token(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
-    authorities.add(
+    await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
 

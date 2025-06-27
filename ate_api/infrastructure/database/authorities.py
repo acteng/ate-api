@@ -1,7 +1,8 @@
 from typing import Self
 
 from sqlalchemy import select
-from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Mapped, mapped_column
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.infrastructure.database.base import BaseEntity
@@ -26,14 +27,14 @@ class AuthorityEntity(BaseEntity):
 
 
 class DatabaseAuthorityRepository(AuthorityRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self._session = session
 
-    def add(self, authority: Authority) -> None:
+    async def add(self, authority: Authority) -> None:
         self._session.add(AuthorityEntity.from_domain(authority))
 
-    def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
-        result = self._session.scalars(
+    async def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
+        result = await self._session.scalars(
             select(AuthorityEntity).where(AuthorityEntity.authority_abbreviation == str(abbreviation))
         )
         row = result.one_or_none()
