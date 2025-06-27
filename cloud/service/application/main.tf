@@ -19,7 +19,7 @@ resource "google_cloud_run_v2_service" "ate_api" {
         name = "DATABASE_URL"
         value_source {
           secret_key_ref {
-            secret  = data.google_secret_manager_secret.database_url.id
+            secret  = google_secret_manager_secret.database_url.id
             version = "latest"
           }
         }
@@ -50,6 +50,12 @@ resource "google_cloud_run_v2_service" "ate_api" {
     }
     service_account = google_service_account.cloud_run_ate_api.email
   }
+
+  depends_on = [
+    # database URL
+    google_secret_manager_secret_version.database_url,
+    google_secret_manager_secret_iam_member.cloud_run_ate_api_database_url,
+  ]
 }
 
 resource "google_cloud_run_v2_service_iam_binding" "ate_api_run_invoker" {
@@ -75,12 +81,29 @@ resource "google_project_iam_member" "cloud_run_ate_api_database_cloud_sql_clien
   member  = "serviceAccount:${google_service_account.cloud_run_ate_api.email}"
 }
 
-data "google_secret_manager_secret" "database_url" {
-  secret_id = var.database_url_secret_id
+resource "google_secret_manager_secret" "database_url" {
+  secret_id = "database-url"
+
+  replication {
+    auto {
+    }
+  }
+}
+
+resource "google_secret_manager_secret_version" "database_url" {
+  secret = google_secret_manager_secret.database_url.id
+  secret_data = join("", [
+    "postgresql+pg8000://",
+    var.database_username,
+    ":",
+    var.database_password,
+    "@127.0.0.1:5432/",
+    var.database_name,
+  ])
 }
 
 resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_database_url" {
   member    = "serviceAccount:${google_service_account.cloud_run_ate_api.email}"
   role      = "roles/secretmanager.secretAccessor"
-  secret_id = data.google_secret_manager_secret.database_url.id
+  secret_id = google_secret_manager_secret.database_url.id
 }

@@ -10,11 +10,9 @@ provider "google" {
 }
 
 locals {
-  env                      = terraform.workspace
-  project                  = "${var.project_prefix}-${local.env}"
-  database_project         = "${var.database_project_prefix}-${local.env}"
-  database_connection_name = "${local.database_project}:europe-west1:dft-ate-capital-schemes"
-  domain                   = "api.activetravelengland.gov.uk"
+  env     = terraform.workspace
+  project = "${var.project_prefix}-${local.env}"
+  domain  = "api.activetravelengland.gov.uk"
 
   config = {
     dev = {
@@ -44,6 +42,15 @@ data "terraform_remote_state" "docker_repository" {
     bucket = "${var.project_prefix}-common-tf-backend"
     prefix = "docker-repository"
   }
+}
+
+data "terraform_remote_state" "schemes_database" {
+  backend = "gcs"
+  config = {
+    bucket = "${var.database_project_prefix}-common-tf-backend"
+    prefix = "schemes-database"
+  }
+  workspace = local.env
 }
 
 data "terraform_remote_state" "identity" {
@@ -77,9 +84,11 @@ module "application" {
   docker_repository_project  = data.terraform_remote_state.docker_repository.outputs.project
   docker_repository_url      = data.terraform_remote_state.docker_repository.outputs.url
   image_tag                  = local.config[local.env].image_tag
-  database_project           = local.database_project
-  database_connection_name   = local.database_connection_name
-  database_url_secret_id     = "database-url"
+  database_project           = data.terraform_remote_state.schemes_database.outputs.project
+  database_connection_name   = data.terraform_remote_state.schemes_database.outputs.connection_name
+  database_name              = data.terraform_remote_state.schemes_database.outputs.name
+  database_username          = data.terraform_remote_state.schemes_database.outputs.username
+  database_password          = data.terraform_remote_state.schemes_database.outputs.password
   oidc_server_metadata_url   = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
   resource_server_identifier = data.terraform_remote_state.identity.outputs.resource_server_identifier
   keep_idle                  = local.config[local.env].keep_idle

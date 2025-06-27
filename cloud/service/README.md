@@ -38,19 +38,6 @@ Repeat the steps below for each environment as required. The target environment 
    terraform workspace new ${ENVIRONMENT}
    ```
 
-1. Enable the Google Secret Manager service:
-
-   ```bash
-   terraform plan -target google_project_service.secret_manager -out plan.out
-   terraform apply plan.out
-   ```
-
-1. Create the secrets:
-
-   ```bash
-   bw get notes "API Secrets ($ENVIRONMENT)" | sh
-   ```
-   
 1. Provision an IP address for the load balancer:
 
    ```bash

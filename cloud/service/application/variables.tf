@@ -33,9 +33,20 @@ variable "database_connection_name" {
   type        = string
 }
 
-variable "database_url_secret_id" {
-  description = "Database URL secret ID"
+variable "database_name" {
+  description = "Database name"
   type        = string
+}
+
+variable "database_username" {
+  description = "Database username"
+  type        = string
+}
+
+variable "database_password" {
+  description = "Database password"
+  type        = string
+  sensitive   = true
 }
 
 variable "oidc_server_metadata_url" {
