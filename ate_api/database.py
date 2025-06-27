@@ -22,18 +22,18 @@ from ate_api.settings import Settings, get_settings
 
 @lru_cache
 def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> Engine:
-    engine = create_engine(settings.database_url)
-
-    if settings.create_database_schema and not _schema_exists(engine):
-        _create_schema(engine)
-        _create_reference_data(engine)
-
-    return engine
+    return create_engine(settings.database_url)
 
 
 def get_session(engine: Annotated[Engine, Depends(get_engine)]) -> Generator[Session]:
     with Session(engine) as session:
         yield session
+
+
+def create_database_schema(engine: Engine) -> None:
+    if not _schema_exists(engine):
+        _create_schema(engine)
+        _create_reference_data(engine)
 
 
 def _schema_exists(engine: Engine) -> bool:
