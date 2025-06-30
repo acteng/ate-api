@@ -1,6 +1,6 @@
 from typing import Self
 
-from sqlalchemy import false, select
+from sqlalchemy import exists, false, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -39,3 +39,13 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
         )
         row = result.one_or_none()
         return row.to_domain() if row else None
+
+    async def exists(self, code: FundingProgrammeCode) -> bool:
+        result = await self._session.scalars(
+            select(
+                exists()
+                .where(FundingProgrammeEntity.funding_programme_code == str(code))
+                .where(FundingProgrammeEntity.is_under_embargo == false())
+            )
+        )
+        return result.one()

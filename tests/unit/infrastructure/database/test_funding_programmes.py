@@ -69,3 +69,30 @@ class TestDatabaseFundingProgrammeRepository:
             funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme
+
+    async def test_exists(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False))
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
+
+        assert exists
+
+    async def test_exists_filters_under_embargo(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
+
+        assert not exists
+
+    async def test_exists_when_not_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
+
+        assert not exists

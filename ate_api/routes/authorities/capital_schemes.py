@@ -37,11 +37,8 @@ async def get_authority_bid_submitting_capital_schemes(
     if not await authorities.exists(AuthorityAbbreviation(abbreviation)):
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    if funding_programme_code:
-        funding_programme = await funding_programmes.get(FundingProgrammeCode(funding_programme_code))
-
-        if not funding_programme:
-            raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY)
+    if funding_programme_code and not await funding_programmes.exists(FundingProgrammeCode(funding_programme_code)):
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY)
 
     references = await capital_schemes.get_references_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),

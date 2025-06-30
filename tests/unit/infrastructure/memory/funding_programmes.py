@@ -10,3 +10,6 @@ class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
 
     async def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
         return self._funding_programmes.get(code)
+
+    async def exists(self, code: FundingProgrammeCode) -> bool:
+        return code in self._funding_programmes

@@ -26,3 +26,15 @@ class TestMemoryFundingProgrammeRepository:
         funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
         assert not funding_programme
+
+    async def test_exists(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+
+        exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
+
+        assert exists
+
+    async def test_exists_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
+
+        assert not exists
