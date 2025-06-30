@@ -897,6 +897,7 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
                     atf4 := FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
+                    atf5 := FundingProgrammeEntity(funding_programme_code="ATF5", is_under_embargo=False),
                     construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
@@ -929,16 +930,32 @@ class TestDatabaseCapitalSchemeRepository:
                             CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
                         ],
                     ),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00003",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Hospital Fields Road",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf5,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                        ],
+                    ),
                 ]
             )
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
             references = await capital_schemes.get_references_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), funding_programme_code=FundingProgrammeCode("ATF3")
+                AuthorityAbbreviation("LIV"),
+                funding_programme_codes=[FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")],
             )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     async def test_get_references_by_bid_submitting_authority_filters_by_current_bid_status(
         self, engine: AsyncEngine

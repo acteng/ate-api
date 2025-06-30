@@ -196,7 +196,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
-        funding_programme_code: FundingProgrammeCode | None = None,
+        funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
@@ -221,8 +221,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
 
-        if funding_programme_code:
-            statement = statement.where(FundingProgrammeEntity.funding_programme_code == str(funding_programme_code))
+        if funding_programme_codes:
+            statement = statement.where(
+                FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
+            )
 
         if bid_status:
             statement = statement.join(BidStatusEntity).where(

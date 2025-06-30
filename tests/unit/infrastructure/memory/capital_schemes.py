@@ -22,7 +22,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
-        funding_programme_code: FundingProgrammeCode | None = None,
+        funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
@@ -31,7 +31,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 reference
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
-                and (not funding_programme_code or capital_scheme.overview.funding_programme == funding_programme_code)
+                and (
+                    not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
+                )
                 and (not bid_status or capital_scheme.bid_status_details.bid_status == bid_status)
                 and (not current_milestones or capital_scheme.current_milestone in current_milestones)
             ],

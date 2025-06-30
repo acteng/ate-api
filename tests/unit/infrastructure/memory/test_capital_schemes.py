@@ -155,12 +155,26 @@ class TestMemoryCapitalSchemeRepository:
                 bid_status_details=dummy_bid_status_details(),
             )
         )
-
-        references = await capital_schemes.get_references_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"), funding_programme_code=FundingProgrammeCode("ATF3")
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00003"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Hospital Fields Road",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF5"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
         )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        references = await capital_schemes.get_references_by_bid_submitting_authority(
+            AuthorityAbbreviation("LIV"),
+            funding_programme_codes=[FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")],
+        )
+
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
     async def test_get_references_by_bid_submitting_authority_filters_by_bid_status(
         self, capital_schemes: MemoryCapitalSchemeRepository

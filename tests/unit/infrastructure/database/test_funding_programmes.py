@@ -96,3 +96,45 @@ class TestDatabaseFundingProgrammeRepository:
             exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
 
         assert not exists
+
+    async def test_exists_all(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists_all([FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")])
+
+        assert exists
+
+    async def test_exists_all_filters_under_embargo(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists_all([FundingProgrammeCode("ATF3")])
+
+        assert not exists
+
+    async def test_exists_all_when_some_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False))
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists_all([FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")])
+
+        assert not exists
+
+    async def test_exists_all_when_none_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            exists = await funding_programmes.exists_all([FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")])
+
+        assert not exists

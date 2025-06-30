@@ -36,3 +36,6 @@ class FundingProgrammeRepository:
 
     async def exists(self, code: FundingProgrammeCode) -> bool:
         raise NotImplementedError()
+
+    async def exists_all(self, codes: list[FundingProgrammeCode]) -> bool:
+        raise NotImplementedError()

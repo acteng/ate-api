@@ -3,6 +3,7 @@ from typing import Self
 from sqlalchemy import exists, false, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.sql.functions import count
 
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.infrastructure.database import BaseEntity
@@ -49,3 +50,11 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
             )
         )
         return result.one()
+
+    async def exists_all(self, codes: list[FundingProgrammeCode]) -> bool:
+        result = await self._session.scalars(
+            select(count())
+            .where(FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in codes))
+            .where(FundingProgrammeEntity.is_under_embargo == false())
+        )
+        return result.one() == len(codes)

@@ -13,3 +13,6 @@ class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
 
     async def exists(self, code: FundingProgrammeCode) -> bool:
         return code in self._funding_programmes
+
+    async def exists_all(self, codes: list[FundingProgrammeCode]) -> bool:
+        return all(code in self._funding_programmes for code in codes)

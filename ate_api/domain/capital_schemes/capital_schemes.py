@@ -85,7 +85,7 @@ class CapitalSchemeRepository:
     async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
-        funding_programme_code: FundingProgrammeCode | None = None,
+        funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:

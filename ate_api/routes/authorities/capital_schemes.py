@@ -27,7 +27,7 @@ async def get_authority_bid_submitting_capital_schemes(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     request: Request,
     abbreviation: str,
-    funding_programme_code: Annotated[str | None, Query(alias="funding-programme-code")] = None,
+    funding_programme_codes: Annotated[list[str] | None, Query(alias="funding-programme-code")] = None,
     bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status")] = None,
     current_milestones: Annotated[list[MilestoneModel] | None, Query(alias="current-milestone")] = None,
 ) -> CollectionModel[AnyUrl]:
@@ -37,12 +37,16 @@ async def get_authority_bid_submitting_capital_schemes(
     if not await authorities.exists(AuthorityAbbreviation(abbreviation)):
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    if funding_programme_code and not await funding_programmes.exists(FundingProgrammeCode(funding_programme_code)):
+    if funding_programme_codes and not await funding_programmes.exists_all(
+        [FundingProgrammeCode(code) for code in funding_programme_codes]
+    ):
         raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY)
 
     references = await capital_schemes.get_references_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),
-        funding_programme_code=FundingProgrammeCode(funding_programme_code) if funding_programme_code else None,
+        funding_programme_codes=(
+            [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
+        ),
         bid_status=bid_status.to_domain() if bid_status else None,
         current_milestones=[milestone.to_domain() for milestone in current_milestones] if current_milestones else None,
     )
