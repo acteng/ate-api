@@ -57,3 +57,20 @@ class TestDatabaseAuthorityRepository:
             authority = await authorities.get(AuthorityAbbreviation("LIV"))
 
         assert not authority
+
+    async def test_exists(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"))
+
+        async with AsyncSession(engine) as session:
+            authorities = DatabaseAuthorityRepository(session)
+            exists = await authorities.exists(AuthorityAbbreviation("LIV"))
+
+        assert exists
+
+    async def test_exists_when_not_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session:
+            authorities = DatabaseAuthorityRepository(session)
+            exists = await authorities.get(AuthorityAbbreviation("LIV"))
+
+        assert not exists

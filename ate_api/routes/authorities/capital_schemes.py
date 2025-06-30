@@ -34,9 +34,7 @@ async def get_authority_bid_submitting_capital_schemes(
     """
     Gets the capital schemes submitted by an authority.
     """
-    authority = await authorities.get(AuthorityAbbreviation(abbreviation))
-
-    if not authority:
+    if not await authorities.exists(AuthorityAbbreviation(abbreviation)):
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
     if funding_programme_code:

@@ -38,3 +38,6 @@ class AuthorityRepository:
 
     async def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
         raise NotImplementedError()
+
+    async def exists(self, abbreviation: AuthorityAbbreviation) -> bool:
+        raise NotImplementedError()

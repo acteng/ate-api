@@ -38,3 +38,17 @@ class TestMemoryAuthorityRepository:
         authority = await authorities.get(AuthorityAbbreviation("LIV"))
 
         assert not authority
+
+    async def test_exists(self, authorities: MemoryAuthorityRepository) -> None:
+        await authorities.add(
+            Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+        )
+
+        exists = await authorities.exists(AuthorityAbbreviation("LIV"))
+
+        assert exists
+
+    async def test_exists_when_not_found(self, authorities: MemoryAuthorityRepository) -> None:
+        exists = await authorities.get(AuthorityAbbreviation("LIV"))
+
+        assert not exists

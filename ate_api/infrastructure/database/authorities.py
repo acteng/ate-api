@@ -1,6 +1,6 @@
 from typing import Self
 
-from sqlalchemy import select
+from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -39,3 +39,9 @@ class DatabaseAuthorityRepository(AuthorityRepository):
         )
         row = result.one_or_none()
         return row.to_domain() if row else None
+
+    async def exists(self, abbreviation: AuthorityAbbreviation) -> bool:
+        result = await self._session.scalars(
+            select(exists().where(AuthorityEntity.authority_abbreviation == str(abbreviation)))
+        )
+        return result.one()

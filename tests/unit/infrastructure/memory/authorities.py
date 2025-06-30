@@ -10,3 +10,6 @@ class MemoryAuthorityRepository(AuthorityRepository):
 
     async def get(self, abbreviation: AuthorityAbbreviation) -> Authority | None:
         return self._authorities.get(abbreviation)
+
+    async def exists(self, abbreviation: AuthorityAbbreviation) -> bool:
+        return abbreviation in self._authorities
