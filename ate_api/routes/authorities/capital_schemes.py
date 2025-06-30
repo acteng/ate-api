@@ -3,16 +3,17 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import AnyUrl
 from starlette.requests import Request
-from starlette.status import HTTP_404_NOT_FOUND
+from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
-from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
 from ate_api.routes.capital_schemes.milestones import MilestoneModel
 from ate_api.routes.collections import CollectionModel
+from ate_api.routes.funding_programmes import get_funding_programme_repository
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 
@@ -22,6 +23,7 @@ router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 )
 async def get_authority_bid_submitting_capital_schemes(
     authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
+    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     request: Request,
     abbreviation: str,
@@ -36,6 +38,12 @@ async def get_authority_bid_submitting_capital_schemes(
 
     if not authority:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
+    if funding_programme_code:
+        funding_programme = await funding_programmes.get(FundingProgrammeCode(funding_programme_code))
+
+        if not funding_programme:
+            raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY)
 
     references = await capital_schemes.get_references_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),

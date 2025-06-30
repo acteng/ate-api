@@ -13,7 +13,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details
 
@@ -106,11 +106,17 @@ async def test_get_authority_bid_submitting_capital_schemes(
 
 @respx.mock
 async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_programme(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+    authorities: AuthorityRepository,
+    funding_programmes: FundingProgrammeRepository,
+    capital_schemes: CapitalSchemeRepository,
+    client: TestClient,
+    access_token: str,
 ) -> None:
     await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
     await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -150,6 +156,23 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
             f"{client.base_url}/capital-schemes/ATE00001",
         ],
     }
+
+
+@respx.mock
+async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_funding_programme(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"funding-programme-code": "foo"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 422
 
 
 @respx.mock
