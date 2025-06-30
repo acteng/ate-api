@@ -888,6 +888,58 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert references == [CapitalSchemeReference("ATE00001")]
 
+    async def test_get_references_by_bid_submitting_authority_filters_by_funding_programme(
+        self, engine: AsyncEngine
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    atf3 := FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    atf4 := FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
+                    construction := SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
+                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                        ],
+                    ),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00002",
+                        capital_scheme_overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="School Streets",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf4,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = await capital_schemes.get_references_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV"), funding_programme_code=FundingProgrammeCode("ATF3")
+            )
+
+        assert references == [CapitalSchemeReference("ATE00001")]
+
     async def test_get_references_by_bid_submitting_authority_filters_by_current_bid_status(
         self, engine: AsyncEngine
     ) -> None:

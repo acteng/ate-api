@@ -126,6 +126,42 @@ class TestMemoryCapitalSchemeRepository:
 
         assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
+    async def test_get_references_by_bid_submitting_authority_filters_by_funding_programme(
+        self, capital_schemes: MemoryCapitalSchemeRepository
+    ) -> None:
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="Wirral Package",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
+        )
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00002"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    name="School Streets",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF4"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
+        )
+
+        references = await capital_schemes.get_references_by_bid_submitting_authority(
+            AuthorityAbbreviation("LIV"), funding_programme_code=FundingProgrammeCode("ATF3")
+        )
+
+        assert references == [CapitalSchemeReference("ATE00001")]
+
     async def test_get_references_by_bid_submitting_authority_filters_by_bid_status(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:

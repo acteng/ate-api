@@ -196,6 +196,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
+        funding_programme_code: FundingProgrammeCode | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
@@ -219,6 +220,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
+
+        if funding_programme_code:
+            statement = statement.where(FundingProgrammeEntity.funding_programme_code == str(funding_programme_code))
 
         if bid_status:
             statement = statement.join(BidStatusEntity).where(

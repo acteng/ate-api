@@ -105,6 +105,54 @@ async def test_get_authority_bid_submitting_capital_schemes(
 
 
 @respx.mock
+async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_programme(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
+    await capital_schemes.add(
+        CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            bid_status_details=dummy_bid_status_details(),
+        )
+    )
+    await capital_schemes.add(
+        CapitalScheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="School Streets",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF4"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            bid_status_details=dummy_bid_status_details(),
+        )
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"funding-programme-code": "ATF3"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            f"{client.base_url}/capital-schemes/ATE00001",
+        ],
+    }
+
+
+@respx.mock
 async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:

@@ -7,6 +7,7 @@ from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
@@ -24,6 +25,7 @@ async def get_authority_bid_submitting_capital_schemes(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     request: Request,
     abbreviation: str,
+    funding_programme_code: Annotated[str | None, Query(alias="funding-programme-code")] = None,
     bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status")] = None,
     current_milestones: Annotated[list[MilestoneModel] | None, Query(alias="current-milestone")] = None,
 ) -> CollectionModel[AnyUrl]:
@@ -37,6 +39,7 @@ async def get_authority_bid_submitting_capital_schemes(
 
     references = await capital_schemes.get_references_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),
+        funding_programme_code=FundingProgrammeCode(funding_programme_code) if funding_programme_code else None,
         bid_status=bid_status.to_domain() if bid_status else None,
         current_milestones=[milestone.to_domain() for milestone in current_milestones] if current_milestones else None,
     )

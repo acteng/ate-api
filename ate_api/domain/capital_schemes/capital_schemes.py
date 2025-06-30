@@ -5,6 +5,7 @@ from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthor
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 
 
@@ -84,6 +85,7 @@ class CapitalSchemeRepository:
     async def get_references_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
+        funding_programme_code: FundingProgrammeCode | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone] | None = None,
     ) -> list[CapitalSchemeReference]:
