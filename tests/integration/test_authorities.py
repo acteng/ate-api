@@ -367,6 +367,23 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
 
 
 @respx.mock
+async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_current_milestone(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"current-milestone": "foo"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 422
+
+
+@respx.mock
 async def test_get_authority_bid_submitting_capital_schemes_when_none(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
