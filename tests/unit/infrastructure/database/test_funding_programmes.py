@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
 from ate_api.infrastructure.database import FundingProgrammeEntity
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
+from tests.unit.infrastructure.database.builders import build_funding_programme_entity
 
 
 class TestFundingProgrammeEntity:
@@ -40,12 +41,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_get(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
-                ]
-            )
+            session.add_all([build_funding_programme_entity(code="ATF3"), build_funding_programme_entity(code="ATF4")])
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -55,7 +51,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
+            session.add(build_funding_programme_entity(code="ATF3", is_under_embargo=True))
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -72,12 +68,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_get_all(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
-                ]
-            )
+            session.add_all([build_funding_programme_entity(code="ATF3"), build_funding_programme_entity(code="ATF4")])
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -90,8 +81,8 @@ class TestDatabaseFundingProgrammeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=True),
+                    build_funding_programme_entity(code="ATF3", is_under_embargo=False),
+                    build_funding_programme_entity(code="ATF4", is_under_embargo=True),
                 ]
             )
 
@@ -103,12 +94,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_get_all_orders_by_code(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
-                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                ]
-            )
+            session.add_all([build_funding_programme_entity(code="ATF4"), build_funding_programme_entity(code="ATF3")])
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -126,7 +112,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_exists(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False))
+            session.add(build_funding_programme_entity(code="ATF3"))
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -136,7 +122,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_exists_filters_under_embargo(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
+            session.add(build_funding_programme_entity(code="ATF3", is_under_embargo=True))
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -153,12 +139,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_exists_all(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
-                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=False),
-                ]
-            )
+            session.add_all([build_funding_programme_entity(code="ATF3"), build_funding_programme_entity(code="ATF4")])
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -168,7 +149,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_exists_all_filters_under_embargo(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=True))
+            session.add(build_funding_programme_entity(code="ATF3", is_under_embargo=True))
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -178,7 +159,7 @@ class TestDatabaseFundingProgrammeRepository:
 
     async def test_exists_all_when_some_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False))
+            session.add(build_funding_programme_entity(code="ATF3"))
 
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
