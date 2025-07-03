@@ -1,10 +1,9 @@
 from typing import Annotated, Self
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.params import Depends
 from pydantic import AnyUrl
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.requests import Request
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.database import get_session

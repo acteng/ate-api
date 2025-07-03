@@ -3,9 +3,9 @@ from importlib.metadata import version
 from typing import AsyncGenerator
 
 from fastapi import Depends, FastAPI
+from fastapi.middleware import Middleware
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
-from starlette.middleware import Middleware
-from starlette.middleware.gzip import GZipMiddleware
 from starlette.status import HTTP_403_FORBIDDEN
 
 from ate_api.auth import authorize

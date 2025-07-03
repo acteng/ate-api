@@ -2,8 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Annotated, Self
 
+from fastapi import Request
 from pydantic import AnyUrl, Field
-from starlette.requests import Request
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType

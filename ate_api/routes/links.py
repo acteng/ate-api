@@ -1,5 +1,5 @@
-from starlette.datastructures import URL
-from starlette.requests import Request
+from fastapi import Request
+from fastapi.datastructures import URL
 from starlette.routing import Route, compile_path
 
 
