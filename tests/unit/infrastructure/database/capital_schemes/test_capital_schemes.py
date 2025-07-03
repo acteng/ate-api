@@ -757,9 +757,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00002",
@@ -772,9 +770,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00003",
@@ -787,9 +783,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                 ]
             )
@@ -860,9 +854,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00002",
@@ -875,9 +867,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                 ]
             )
@@ -911,9 +901,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00002",
@@ -926,9 +914,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00003",
@@ -941,9 +927,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                 ]
             )
@@ -1047,9 +1031,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
@@ -1070,9 +1052,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=construction_started,
@@ -1093,9 +1073,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=construction_completed,
@@ -1290,9 +1268,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -1305,9 +1281,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
-                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                 ]
             )
