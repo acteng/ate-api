@@ -37,6 +37,16 @@ class TestMemoryFundingProgrammeRepository:
 
         assert all_funding_programmes == [funding_programme1, funding_programme2]
 
+    async def test_get_all_orders_by_code(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
+        funding_programme1 = FundingProgramme(code=FundingProgrammeCode("ATF3"))
+        funding_programme2 = FundingProgramme(code=FundingProgrammeCode("ATF4"))
+        await funding_programmes.add(funding_programme2)
+        await funding_programmes.add(funding_programme1)
+
+        all_funding_programmes = await funding_programmes.get_all()
+
+        assert all_funding_programmes == [funding_programme1, funding_programme2]
+
     async def test_get_all_when_none(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
         all_funding_programmes = await funding_programmes.get_all()
 

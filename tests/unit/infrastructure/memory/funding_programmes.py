@@ -12,7 +12,7 @@ class MemoryFundingProgrammeRepository(FundingProgrammeRepository):
         return self._funding_programmes.get(code)
 
     async def get_all(self) -> list[FundingProgramme]:
-        return list(self._funding_programmes.values())
+        return sorted(self._funding_programmes.values(), key=lambda funding_programme: str(funding_programme.code))
 
     async def exists(self, code: FundingProgrammeCode) -> bool:
         return code in self._funding_programmes
