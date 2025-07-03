@@ -397,7 +397,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
@@ -456,7 +456,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
@@ -741,8 +741,8 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    wyo := AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
+                    liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
+                    wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
@@ -800,8 +800,8 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    wyo := AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
+                    liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
+                    wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
@@ -838,7 +838,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=False),
                     atf4 := build_funding_programme_entity(code="ATF4", is_under_embargo=True),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
@@ -884,7 +884,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     atf4 := build_funding_programme_entity(code="ATF4"),
                     atf5 := build_funding_programme_entity(code="ATF5"),
@@ -947,7 +947,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
@@ -1006,7 +1006,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
@@ -1101,7 +1101,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     detailed_design_completed := MilestoneEntity(
@@ -1146,7 +1146,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     detailed_design_completed := MilestoneEntity(
@@ -1200,7 +1200,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     detailed_design_completed := MilestoneEntity(
@@ -1253,7 +1253,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
@@ -1296,7 +1296,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    build_authority_entity(abbreviation="LIV"),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
@@ -1314,7 +1314,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
+                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
@@ -1340,7 +1340,7 @@ class TestDatabaseCapitalSchemeRepository:
 
     async def test_get_references_by_bid_submitting_authority_when_none(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"))
+            session.add(build_authority_entity(abbreviation="LIV"))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)

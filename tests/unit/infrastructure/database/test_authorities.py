@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.infrastructure.database.authorities import AuthorityEntity, DatabaseAuthorityRepository
+from tests.unit.infrastructure.database.builders import build_authority_entity
 
 
 class TestAuthorityEntity:
@@ -60,7 +61,7 @@ class TestDatabaseAuthorityRepository:
 
     async def test_exists(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"))
+            session.add(build_authority_entity(abbreviation="LIV"))
 
         async with AsyncSession(engine) as session:
             authorities = DatabaseAuthorityRepository(session)
