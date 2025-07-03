@@ -32,13 +32,13 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
-from tests.unit.infrastructure.database.dummies import (
-    dummy_authority_entity,
-    dummy_bid_status_entity,
-    dummy_capital_scheme_bid_status_entity,
-    dummy_capital_scheme_overview_entity,
-    dummy_funding_programme_entity,
-    dummy_scheme_type_entity,
+from tests.unit.infrastructure.database.builders import (
+    build_authority_entity,
+    build_bid_status_entity,
+    build_capital_scheme_bid_status_entity,
+    build_capital_scheme_overview_entity,
+    build_funding_programme_entity,
+    build_scheme_type_entity,
 )
 
 
@@ -197,8 +197,8 @@ class TestCapitalSchemeEntity:
     def test_to_domain_sets_milestones(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
             scheme_reference="ATE00001",
-            capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
-            capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
             capital_scheme_milestones=[
                 CapitalSchemeMilestoneEntity(
                     milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
@@ -235,8 +235,8 @@ class TestCapitalSchemeEntity:
     def test_to_domain_sets_authority_review(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
             scheme_reference="ATE00001",
-            capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
-            capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
             capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
         )
 
@@ -307,10 +307,10 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    dummy_authority_entity(),
-                    dummy_funding_programme_entity(),
-                    dummy_scheme_type_entity(),
-                    dummy_bid_status_entity(),
+                    build_authority_entity(),
+                    build_funding_programme_entity(),
+                    build_scheme_type_entity(),
+                    build_bid_status_entity(),
                     MilestoneEntity(
                         milestone_id=1, milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
                     ),
@@ -368,10 +368,10 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    dummy_authority_entity(),
-                    dummy_funding_programme_entity(),
-                    dummy_scheme_type_entity(),
-                    dummy_bid_status_entity(),
+                    build_authority_entity(),
+                    build_funding_programme_entity(),
+                    build_scheme_type_entity(),
+                    build_bid_status_entity(),
                 ]
             )
 
@@ -478,7 +478,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -503,7 +503,7 @@ class TestDatabaseCapitalSchemeRepository:
                     not_funded := BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
                         capital_scheme_bid_statuses=[
                             CapitalSchemeBidStatusEntity(
                                 bid_status=funded,
@@ -540,8 +540,8 @@ class TestDatabaseCapitalSchemeRepository:
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
@@ -602,8 +602,8 @@ class TestDatabaseCapitalSchemeRepository:
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=construction_started,
@@ -658,8 +658,8 @@ class TestDatabaseCapitalSchemeRepository:
             session.add(
                 CapitalSchemeEntity(
                     scheme_reference="ATE00001",
-                    capital_scheme_overviews=[dummy_capital_scheme_overview_entity()],
-                    capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                    capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     capital_scheme_authority_reviews=[
                         CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 2, 1)),
                         CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 3, 1)),
@@ -685,13 +685,13 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                bid_submitting_authority=dummy_authority_entity(),
+                                bid_submitting_authority=build_authority_entity(),
                                 funding_programme=atf3,
-                                scheme_type=dummy_scheme_type_entity(),
+                                scheme_type=build_scheme_type_entity(),
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -706,7 +706,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
                 CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()]
+                    scheme_reference="ATE00001", capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()]
                 )
             )
 
@@ -720,7 +720,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
                 CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_overviews=[dummy_capital_scheme_overview_entity()]
+                    scheme_reference="ATE00001", capital_scheme_overviews=[build_capital_scheme_overview_entity()]
                 )
             )
 
@@ -829,7 +829,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -1141,7 +1141,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
@@ -1189,7 +1189,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
@@ -1243,7 +1243,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                         capital_scheme_milestones=[
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
@@ -1325,7 +1325,7 @@ class TestDatabaseCapitalSchemeRepository:
                     AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_bid_statuses=[dummy_capital_scheme_bid_status_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
