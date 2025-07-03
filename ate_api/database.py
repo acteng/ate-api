@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Annotated, AsyncGenerator
 
-from fastapi.params import Depends
+from fastapi import Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.sql.ddl import CreateSchema
