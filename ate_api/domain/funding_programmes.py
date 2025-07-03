@@ -34,6 +34,9 @@ class FundingProgrammeRepository:
     async def get(self, code: FundingProgrammeCode) -> FundingProgramme | None:
         raise NotImplementedError()
 
+    async def get_all(self) -> list[FundingProgramme]:
+        raise NotImplementedError()
+
     async def exists(self, code: FundingProgrammeCode) -> bool:
         raise NotImplementedError()
 

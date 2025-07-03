@@ -41,6 +41,11 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
         row = result.one_or_none()
         return row.to_domain() if row else None
 
+    async def get_all(self) -> list[FundingProgramme]:
+        result = await self._session.scalars(select(FundingProgrammeEntity))
+        rows = result.all()
+        return [row.to_domain() for row in rows]
+
     async def exists(self, code: FundingProgrammeCode) -> bool:
         result = await self._session.scalars(
             select(
