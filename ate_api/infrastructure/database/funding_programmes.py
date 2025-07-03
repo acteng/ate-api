@@ -42,7 +42,9 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
         return row.to_domain() if row else None
 
     async def get_all(self) -> list[FundingProgramme]:
-        result = await self._session.scalars(select(FundingProgrammeEntity))
+        result = await self._session.scalars(
+            select(FundingProgrammeEntity).where(FundingProgrammeEntity.is_under_embargo == false())
+        )
         rows = result.all()
         return [row.to_domain() for row in rows]
 

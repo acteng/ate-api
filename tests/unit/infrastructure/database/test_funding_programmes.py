@@ -86,6 +86,21 @@ class TestDatabaseFundingProgrammeRepository:
         assert funding_programme1.code == FundingProgrammeCode("ATF3")
         assert funding_programme2.code == FundingProgrammeCode("ATF4")
 
+    async def test_get_all_filters_under_embargo(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    FundingProgrammeEntity(funding_programme_code="ATF3", is_under_embargo=False),
+                    FundingProgrammeEntity(funding_programme_code="ATF4", is_under_embargo=True),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            (funding_programme1,) = await funding_programmes.get_all()
+
+        assert funding_programme1.code == FundingProgrammeCode("ATF3")
+
     async def test_get_all_when_none(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
