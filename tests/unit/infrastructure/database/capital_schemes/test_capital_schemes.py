@@ -400,7 +400,7 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -499,8 +499,8 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-                    not_funded := BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
+                    not_funded := build_bid_status_entity(name=BidStatusName.NOT_FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -745,7 +745,7 @@ class TestDatabaseCapitalSchemeRepository:
                     wyo := AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -848,7 +848,7 @@ class TestDatabaseCapitalSchemeRepository:
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=False),
                     atf4 := build_funding_programme_entity(code="ATF4", is_under_embargo=True),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -899,7 +899,7 @@ class TestDatabaseCapitalSchemeRepository:
                     atf4 := build_funding_programme_entity(code="ATF4"),
                     atf5 := build_funding_programme_entity(code="ATF5"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -966,8 +966,8 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-                    not_funded := BidStatusEntity(bid_status_name=BidStatusName.NOT_FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
+                    not_funded := build_bid_status_entity(name=BidStatusName.NOT_FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1025,7 +1025,7 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     detailed_design_completed := MilestoneEntity(
                         milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
                     ),
@@ -1278,7 +1278,7 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    funded := BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00002",
                         capital_scheme_overviews=[
