@@ -17,7 +17,7 @@ def build_authority_entity(full_name: str = "dummy", abbreviation: str = "dummy"
 
 
 def build_capital_scheme_overview_entity(
-    name: str = "",
+    name: str = "dummy",
     bid_submitting_authority: AuthorityEntity | None = None,
     funding_programme: FundingProgrammeEntity | None = None,
     type_: SchemeTypeEntity | None = None,
