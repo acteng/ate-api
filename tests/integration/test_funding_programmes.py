@@ -23,6 +23,29 @@ async def test_get_funding_programmes(
 
 
 @respx.mock
+async def test_get_funding_programmes_filters_by_eligible_for_authority_update(
+    funding_programmes: FundingProgrammeRepository, client: TestClient, access_token: str
+) -> None:
+    await funding_programmes.add(
+        FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
+    )
+    await funding_programmes.add(
+        FundingProgramme(code=FundingProgrammeCode("ATF4"), is_eligible_for_authority_update=False)
+    )
+
+    response = client.get(
+        "/funding-programmes?eligible-for-authority-update=true", headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            f"{client.base_url}/funding-programmes/ATF3",
+        ]
+    }
+
+
+@respx.mock
 async def test_get_funding_programme(
     funding_programmes: FundingProgrammeRepository, client: TestClient, access_token: str
 ) -> None:

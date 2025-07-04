@@ -49,12 +49,19 @@ class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):
         row = result.one_or_none()
         return row.to_domain() if row else None
 
-    async def get_all(self) -> list[FundingProgramme]:
-        result = await self._session.scalars(
+    async def get_all(self, is_eligible_for_authority_update: bool | None = None) -> list[FundingProgramme]:
+        statement = (
             select(FundingProgrammeEntity)
             .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(FundingProgrammeEntity.funding_programme_code)
         )
+
+        if is_eligible_for_authority_update is not None:
+            statement = statement.where(
+                FundingProgrammeEntity.is_eligible_for_authority_update == is_eligible_for_authority_update
+            )
+
+        result = await self._session.scalars(statement)
         rows = result.all()
         return [row.to_domain() for row in rows]
 

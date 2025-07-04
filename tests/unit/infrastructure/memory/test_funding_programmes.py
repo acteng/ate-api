@@ -49,6 +49,26 @@ class TestMemoryFundingProgrammeRepository:
 
         assert all_funding_programmes == [funding_programme1, funding_programme2]
 
+    @pytest.mark.parametrize("is_eligible_for_authority_update, expected_code", [(True, "ATF3"), (False, "ATF4")])
+    async def test_get_all_filters_by_is_eligible_for_authority_update(
+        self,
+        funding_programmes: MemoryFundingProgrammeRepository,
+        is_eligible_for_authority_update: bool,
+        expected_code: str,
+    ) -> None:
+        await funding_programmes.add(
+            FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
+        )
+        await funding_programmes.add(
+            FundingProgramme(code=FundingProgrammeCode("ATF4"), is_eligible_for_authority_update=False)
+        )
+
+        (funding_programme1,) = await funding_programmes.get_all(
+            is_eligible_for_authority_update=is_eligible_for_authority_update
+        )
+
+        assert funding_programme1.code == FundingProgrammeCode(expected_code)
+
     async def test_get_all_orders_by_code(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
         funding_programme1 = FundingProgramme(code=FundingProgrammeCode("ATF3"))
         funding_programme2 = FundingProgramme(code=FundingProgrammeCode("ATF4"))

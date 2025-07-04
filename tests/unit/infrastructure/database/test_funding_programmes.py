@@ -120,6 +120,26 @@ class TestDatabaseFundingProgrammeRepository:
 
         assert funding_programme1.code == FundingProgrammeCode("ATF3")
 
+    @pytest.mark.parametrize("is_eligible_for_authority_update, expected_code", [(True, "ATF3"), (False, "ATF4")])
+    async def test_get_all_filters_by_is_eligible_for_authority_update(
+        self, engine: AsyncEngine, is_eligible_for_authority_update: bool, expected_code: str
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_funding_programme_entity(code="ATF3", is_eligible_for_authority_update=True),
+                    build_funding_programme_entity(code="ATF4", is_eligible_for_authority_update=False),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            funding_programmes = DatabaseFundingProgrammeRepository(session)
+            (funding_programme1,) = await funding_programmes.get_all(
+                is_eligible_for_authority_update=is_eligible_for_authority_update
+            )
+
+        assert funding_programme1.code == FundingProgrammeCode(expected_code)
+
     async def test_get_all_orders_by_code(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all([build_funding_programme_entity(code="ATF4"), build_funding_programme_entity(code="ATF3")])

@@ -1,6 +1,6 @@
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import AnyUrl
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
@@ -42,11 +42,14 @@ def get_funding_programme_repository(
 async def get_funding_programmes(
     funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
     request: Request,
+    is_eligible_for_authority_update: Annotated[bool | None, Query(alias="eligible-for-authority-update")] = None,
 ) -> CollectionModel[AnyUrl]:
     """
     Gets the funding programmes.
     """
-    all_funding_programmes = await funding_programmes.get_all()
+    all_funding_programmes = await funding_programmes.get_all(
+        is_eligible_for_authority_update=is_eligible_for_authority_update
+    )
     funding_programme_links = [
         AnyUrl(str(request.url_for("get_funding_programme", code=str(funding_programme.code))))
         for funding_programme in all_funding_programmes
