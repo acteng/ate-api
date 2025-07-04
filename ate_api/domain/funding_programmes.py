@@ -19,12 +19,17 @@ class FundingProgrammeCode:
 
 
 class FundingProgramme:
-    def __init__(self, code: FundingProgrammeCode):
+    def __init__(self, code: FundingProgrammeCode, is_eligible_for_authority_update: bool = False):
         self._code = code
+        self._is_eligible_for_authority_update = is_eligible_for_authority_update
 
     @property
     def code(self) -> FundingProgrammeCode:
         return self._code
+
+    @property
+    def is_eligible_for_authority_update(self) -> bool:
+        return self._is_eligible_for_authority_update
 
 
 class FundingProgrammeRepository:

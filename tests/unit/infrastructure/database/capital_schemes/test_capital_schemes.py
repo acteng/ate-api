@@ -256,7 +256,10 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
                     FundingProgrammeEntity(
-                        funding_programme_id=1, funding_programme_code="ATF3", is_under_embargo=False
+                        funding_programme_id=1,
+                        funding_programme_code="ATF3",
+                        is_under_embargo=False,
+                        is_eligible_for_authority_update=False,
                     ),
                     SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),

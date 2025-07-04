@@ -32,8 +32,14 @@ def build_capital_scheme_overview_entity(
     )
 
 
-def build_funding_programme_entity(code: str = "dummy", is_under_embargo: bool = False) -> FundingProgrammeEntity:
-    return FundingProgrammeEntity(funding_programme_code=code, is_under_embargo=is_under_embargo)
+def build_funding_programme_entity(
+    code: str = "dummy", is_under_embargo: bool = False, is_eligible_for_authority_update: bool = False
+) -> FundingProgrammeEntity:
+    return FundingProgrammeEntity(
+        funding_programme_code=code,
+        is_under_embargo=is_under_embargo,
+        is_eligible_for_authority_update=is_eligible_for_authority_update,
+    )
 
 
 def build_scheme_type_entity(name: SchemeTypeName = SchemeTypeName.DEVELOPMENT) -> SchemeTypeEntity:

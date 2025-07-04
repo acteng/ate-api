@@ -10,17 +10,29 @@ class TestMemoryFundingProgrammeRepository:
         return MemoryFundingProgrammeRepository()
 
     async def test_add(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+        await funding_programmes.add(
+            FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
+        )
 
         funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
-        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
+        assert (
+            funding_programme
+            and funding_programme.code == FundingProgrammeCode("ATF3")
+            and funding_programme.is_eligible_for_authority_update
+        )
 
     async def test_get(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+        await funding_programmes.add(
+            FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
+        )
 
         funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
 
-        assert funding_programme and funding_programme.code == FundingProgrammeCode("ATF3")
+        assert (
+            funding_programme
+            and funding_programme.code == FundingProgrammeCode("ATF3")
+            and funding_programme.is_eligible_for_authority_update
+        )
 
     async def test_get_when_not_found(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
         funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
@@ -28,9 +40,9 @@ class TestMemoryFundingProgrammeRepository:
         assert not funding_programme
 
     async def test_get_all(self, funding_programmes: MemoryFundingProgrammeRepository) -> None:
-        funding_programme1 = FundingProgramme(code=FundingProgrammeCode("ATF3"))
+        funding_programme1 = FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
         await funding_programmes.add(funding_programme1)
-        funding_programme2 = FundingProgramme(code=FundingProgrammeCode("ATF4"))
+        funding_programme2 = FundingProgramme(code=FundingProgrammeCode("ATF4"), is_eligible_for_authority_update=True)
         await funding_programmes.add(funding_programme2)
 
         all_funding_programmes = await funding_programmes.get_all()

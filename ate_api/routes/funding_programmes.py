@@ -14,13 +14,19 @@ from ate_api.routes.collections import CollectionModel
 
 class FundingProgrammeModel(BaseModel):
     code: str
+    eligible_for_authority_update: bool
 
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme) -> Self:
-        return cls(code=str(funding_programme.code))
+        return cls(
+            code=str(funding_programme.code),
+            eligible_for_authority_update=funding_programme.is_eligible_for_authority_update,
+        )
 
     def to_domain(self) -> FundingProgramme:
-        return FundingProgramme(code=FundingProgrammeCode(self.code))
+        return FundingProgramme(
+            code=FundingProgrammeCode(self.code), is_eligible_for_authority_update=self.eligible_for_authority_update
+        )
 
 
 router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])

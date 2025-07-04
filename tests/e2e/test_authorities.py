@@ -17,7 +17,7 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
 
 
 def test_get_authority_bid_submitting_capital_schemes(client: Client, access_token: str, app_client: AppClient) -> None:
-    app_client.create_funding_programme({"code": "ATF3"})
+    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
         {

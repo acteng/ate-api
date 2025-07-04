@@ -16,13 +16,21 @@ class FundingProgrammeEntity(BaseEntity):
     funding_programme_id: Mapped[int] = mapped_column(primary_key=True)
     funding_programme_code: Mapped[str] = mapped_column(unique=True)
     is_under_embargo: Mapped[bool]
+    is_eligible_for_authority_update: Mapped[bool]
 
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme) -> Self:
-        return cls(funding_programme_code=str(funding_programme.code), is_under_embargo=False)
+        return cls(
+            funding_programme_code=str(funding_programme.code),
+            is_under_embargo=False,
+            is_eligible_for_authority_update=funding_programme.is_eligible_for_authority_update,
+        )
 
     def to_domain(self) -> FundingProgramme:
-        return FundingProgramme(code=FundingProgrammeCode(self.funding_programme_code))
+        return FundingProgramme(
+            code=FundingProgrammeCode(self.funding_programme_code),
+            is_eligible_for_authority_update=self.is_eligible_for_authority_update,
+        )
 
 
 class DatabaseFundingProgrammeRepository(FundingProgrammeRepository):

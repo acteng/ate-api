@@ -38,6 +38,14 @@ class TestFundingProgrammeCode:
 
 class TestFundingProgramme:
     def test_create(self) -> None:
+        funding_programme = FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
+
+        assert (
+            funding_programme.code == FundingProgrammeCode("ATF3")
+            and funding_programme.is_eligible_for_authority_update
+        )
+
+    def test_create_with_defaults(self) -> None:
         funding_programme = FundingProgramme(code=FundingProgrammeCode("ATF3"))
 
-        assert funding_programme.code == FundingProgrammeCode("ATF3")
+        assert not funding_programme.is_eligible_for_authority_update

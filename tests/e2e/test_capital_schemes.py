@@ -4,7 +4,7 @@ from tests.e2e.app_client import AppClient
 
 
 def test_get_capital_scheme(client: Client, access_token: str, app_client: AppClient) -> None:
-    app_client.create_funding_programme({"code": "ATF3"})
+    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
         {
