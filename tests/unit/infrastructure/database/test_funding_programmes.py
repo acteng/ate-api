@@ -16,7 +16,7 @@ class TestFundingProgrammeEntity:
 
         assert (
             funding_programme_entity.funding_programme_code == "ATF3"
-            and funding_programme_entity.is_under_embargo is False
+            and not funding_programme_entity.is_under_embargo
         )
 
     def test_to_domain(self) -> None:
