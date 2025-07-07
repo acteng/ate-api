@@ -9,6 +9,8 @@ from ate_api.infrastructure.database import (
     FundingProgrammeEntity,
     MilestoneEntity,
     MilestoneName,
+    ObservationTypeEntity,
+    ObservationTypeName,
     SchemeTypeEntity,
     SchemeTypeName,
 )
@@ -58,6 +60,12 @@ def build_milestone_entity(
     id_: int | None = None, name: MilestoneName = MilestoneName.PUBLIC_CONSULTATION_COMPLETED, stage_order: int = 0
 ) -> MilestoneEntity:
     return MilestoneEntity(milestone_id=id_, milestone_name=name, stage_order=stage_order)
+
+
+def build_observation_type_entity(
+    id_: int | None = None, name: ObservationTypeName = ObservationTypeName.PLANNED
+) -> ObservationTypeEntity:
+    return ObservationTypeEntity(observation_type_id=id_, observation_type_name=name)
 
 
 def build_funding_programme_entity(

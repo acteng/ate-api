@@ -39,6 +39,7 @@ from tests.unit.infrastructure.database.builders import (
     build_capital_scheme_overview_entity,
     build_funding_programme_entity,
     build_milestone_entity,
+    build_observation_type_entity,
     build_scheme_type_entity,
 )
 
@@ -312,7 +313,7 @@ class TestDatabaseCapitalSchemeRepository:
                     build_bid_status_entity(),
                     build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED),
-                    ObservationTypeEntity(observation_type_id=1, observation_type_name=ObservationTypeName.ACTUAL),
+                    build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
                 ]
             )
 
@@ -530,7 +531,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
-                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -591,8 +592,8 @@ class TestDatabaseCapitalSchemeRepository:
                     construction_started := build_milestone_entity(
                         name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
                     ),
-                    planned := ObservationTypeEntity(observation_type_name=ObservationTypeName.PLANNED),
-                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -958,7 +959,7 @@ class TestDatabaseCapitalSchemeRepository:
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     construction_completed := build_milestone_entity(name=MilestoneName.CONSTRUCTION_COMPLETED),
-                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1032,7 +1033,7 @@ class TestDatabaseCapitalSchemeRepository:
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    planned := ObservationTypeEntity(observation_type_name=ObservationTypeName.PLANNED),
+                    planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1076,7 +1077,7 @@ class TestDatabaseCapitalSchemeRepository:
                     construction_started := build_milestone_entity(
                         name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
                     ),
-                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1122,7 +1123,7 @@ class TestDatabaseCapitalSchemeRepository:
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
-                    actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
