@@ -255,15 +255,10 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    AuthorityEntity(authority_id=1, authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    FundingProgrammeEntity(
-                        funding_programme_id=1,
-                        funding_programme_code="ATF3",
-                        is_under_embargo=False,
-                        is_eligible_for_authority_update=False,
-                    ),
-                    SchemeTypeEntity(scheme_type_id=1, scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    BidStatusEntity(bid_status_id=1, bid_status_name=BidStatusName.FUNDED),
+                    build_authority_entity(id_=1, full_name="Liverpool", abbreviation="LIV"),
+                    build_funding_programme_entity(id_=1, code="ATF3"),
+                    build_scheme_type_entity(id_=1, name=SchemeTypeName.CONSTRUCTION),
+                    build_bid_status_entity(id_=1, name=BidStatusName.FUNDED),
                 ]
             )
 
@@ -315,10 +310,8 @@ class TestDatabaseCapitalSchemeRepository:
                     build_funding_programme_entity(),
                     build_scheme_type_entity(),
                     build_bid_status_entity(),
-                    MilestoneEntity(
-                        milestone_id=1, milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
-                    MilestoneEntity(milestone_id=2, milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
+                    build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED),
                     ObservationTypeEntity(observation_type_id=1, observation_type_name=ObservationTypeName.ACTUAL),
                 ]
             )

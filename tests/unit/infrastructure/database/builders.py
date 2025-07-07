@@ -14,8 +14,10 @@ from ate_api.infrastructure.database import (
 )
 
 
-def build_authority_entity(full_name: str = "dummy", abbreviation: str = "dummy") -> AuthorityEntity:
-    return AuthorityEntity(authority_full_name=full_name, authority_abbreviation=abbreviation)
+def build_authority_entity(
+    id_: int | None = None, full_name: str = "dummy", abbreviation: str = "dummy"
+) -> AuthorityEntity:
+    return AuthorityEntity(authority_id=id_, authority_full_name=full_name, authority_abbreviation=abbreviation)
 
 
 def build_capital_scheme_overview_entity(
@@ -34,8 +36,10 @@ def build_capital_scheme_overview_entity(
     )
 
 
-def build_scheme_type_entity(name: SchemeTypeName = SchemeTypeName.DEVELOPMENT) -> SchemeTypeEntity:
-    return SchemeTypeEntity(scheme_type_name=name)
+def build_scheme_type_entity(
+    id_: int | None = None, name: SchemeTypeName = SchemeTypeName.DEVELOPMENT
+) -> SchemeTypeEntity:
+    return SchemeTypeEntity(scheme_type_id=id_, scheme_type_name=name)
 
 
 def build_capital_scheme_bid_status_entity(
@@ -46,18 +50,24 @@ def build_capital_scheme_bid_status_entity(
     )
 
 
-def build_bid_status_entity(name: BidStatusName = BidStatusName.SUBMITTED) -> BidStatusEntity:
-    return BidStatusEntity(bid_status_name=name)
+def build_bid_status_entity(id_: int | None = None, name: BidStatusName = BidStatusName.SUBMITTED) -> BidStatusEntity:
+    return BidStatusEntity(bid_status_id=id_, bid_status_name=name)
 
 
-def build_milestone_entity(name: MilestoneName, stage_order: int = 0) -> MilestoneEntity:
-    return MilestoneEntity(milestone_name=name, stage_order=stage_order)
+def build_milestone_entity(
+    id_: int | None = None, name: MilestoneName = MilestoneName.PUBLIC_CONSULTATION_COMPLETED, stage_order: int = 0
+) -> MilestoneEntity:
+    return MilestoneEntity(milestone_id=id_, milestone_name=name, stage_order=stage_order)
 
 
 def build_funding_programme_entity(
-    code: str = "dummy", is_under_embargo: bool = False, is_eligible_for_authority_update: bool = False
+    id_: int | None = None,
+    code: str = "dummy",
+    is_under_embargo: bool = False,
+    is_eligible_for_authority_update: bool = False,
 ) -> FundingProgrammeEntity:
     return FundingProgrammeEntity(
+        funding_programme_id=id_,
         funding_programme_code=code,
         is_under_embargo=is_under_embargo,
         is_eligible_for_authority_update=is_eligible_for_authority_update,
