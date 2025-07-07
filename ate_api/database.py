@@ -6,6 +6,10 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.sql.ddl import CreateSchema
 
+from ate_api.domain.capital_schemes.bid_statuses import BidStatus
+from ate_api.domain.capital_schemes.milestones import Milestone
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     BaseEntity,
     BidStatusEntity,
@@ -60,17 +64,21 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
         # common
         session.add_all(
             [
-                ObservationTypeEntity(observation_type_name=observation_type_name)
-                for observation_type_name in ObservationTypeName
+                ObservationTypeEntity(observation_type_name=ObservationTypeName.from_domain(observation_type))
+                for observation_type in ObservationType
             ]
         )
         # capital_scheme
-        session.add_all([BidStatusEntity(bid_status_name=bid_status_name) for bid_status_name in BidStatusName])
+        session.add_all(
+            [BidStatusEntity(bid_status_name=BidStatusName.from_domain(bid_status)) for bid_status in BidStatus]
+        )
         session.add_all(
             [
-                MilestoneEntity(milestone_name=milestone_name, stage_order=index)
-                for index, milestone_name in enumerate(MilestoneName)
+                MilestoneEntity(milestone_name=MilestoneName.from_domain(milestone), stage_order=index)
+                for index, milestone in enumerate(Milestone)
             ]
         )
-        session.add_all([SchemeTypeEntity(scheme_type_name=scheme_type_name) for scheme_type_name in SchemeTypeName])
+        session.add_all(
+            [SchemeTypeEntity(scheme_type_name=SchemeTypeName.from_domain(type_)) for type_ in CapitalSchemeType]
+        )
         await session.commit()
