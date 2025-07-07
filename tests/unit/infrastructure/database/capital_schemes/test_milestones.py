@@ -14,6 +14,7 @@ from ate_api.infrastructure.database import (
     ObservationTypeName,
 )
 from ate_api.infrastructure.database.capital_schemes.milestones import DatabaseMilestoneRepository
+from tests.unit.infrastructure.database.builders import build_milestone_entity
 
 
 class TestMilestoneName:
@@ -131,8 +132,8 @@ class TestDatabaseMilestoneRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1),
-                    MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
+                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                 ]
             )
 
@@ -146,8 +147,8 @@ class TestDatabaseMilestoneRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
-                    MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1),
+                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
+                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1),
                 ]
             )
 

@@ -38,6 +38,7 @@ from tests.unit.infrastructure.database.builders import (
     build_capital_scheme_bid_status_entity,
     build_capital_scheme_overview_entity,
     build_funding_programme_entity,
+    build_milestone_entity,
     build_scheme_type_entity,
 )
 
@@ -534,12 +535,8 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
-                    construction_started := MilestoneEntity(
-                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
-                    ),
+                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -595,11 +592,11 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    detailed_design_completed := build_milestone_entity(
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
                     ),
-                    construction_started := MilestoneEntity(
-                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                    construction_started := build_milestone_entity(
+                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
                     ),
                     planned := ObservationTypeEntity(observation_type_name=ObservationTypeName.PLANNED),
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
@@ -965,15 +962,9 @@ class TestDatabaseCapitalSchemeRepository:
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
-                    detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
-                    construction_started := MilestoneEntity(
-                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
-                    ),
-                    construction_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.CONSTRUCTION_COMPLETED, stage_order=3
-                    ),
+                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
+                    construction_completed := build_milestone_entity(name=MilestoneName.CONSTRUCTION_COMPLETED),
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -1047,9 +1038,7 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
+                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     planned := ObservationTypeEntity(observation_type_name=ObservationTypeName.PLANNED),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -1088,11 +1077,11 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                    detailed_design_completed := build_milestone_entity(
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
                     ),
-                    construction_started := MilestoneEntity(
-                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                    construction_started := build_milestone_entity(
+                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
                     ),
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
@@ -1138,12 +1127,8 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    detailed_design_completed := MilestoneEntity(
-                        milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
-                    construction_started := MilestoneEntity(
-                        milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
-                    ),
+                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     actual := ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
