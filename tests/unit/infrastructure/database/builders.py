@@ -57,9 +57,12 @@ def build_bid_status_entity(id_: int | None = None, name: BidStatusName = BidSta
 
 
 def build_milestone_entity(
-    id_: int | None = None, name: MilestoneName = MilestoneName.PUBLIC_CONSULTATION_COMPLETED, stage_order: int = 0
+    id_: int | None = None,
+    name: MilestoneName = MilestoneName.PUBLIC_CONSULTATION_COMPLETED,
+    stage_order: int = 0,
+    is_active: bool = False,
 ) -> MilestoneEntity:
-    return MilestoneEntity(milestone_id=id_, milestone_name=name, stage_order=stage_order)
+    return MilestoneEntity(milestone_id=id_, milestone_name=name, stage_order=stage_order, is_active=is_active)
 
 
 def build_observation_type_entity(

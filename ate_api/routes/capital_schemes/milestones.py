@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ate_api.database import get_session
@@ -72,11 +72,12 @@ def get_milestone_repository(session: Annotated[AsyncSession, Depends(get_sessio
 @router.get("/milestones", summary="Get capital scheme milestones")
 async def get_milestones(
     milestones: Annotated[MilestoneRepository, Depends(get_milestone_repository)],
+    is_active: Annotated[bool | None, Query(alias="active")] = None,
 ) -> CollectionModel[MilestoneModel]:
     """
     Gets the capital scheme milestones.
     """
-    all_milestones = await milestones.get_all()
+    all_milestones = await milestones.get_all(is_active=is_active)
 
     return CollectionModel[MilestoneModel](
         items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones]

@@ -43,6 +43,7 @@ class MilestoneEntity(BaseEntity):
     milestone_id: Mapped[int] = mapped_column(primary_key=True)
     milestone_name: Mapped[MilestoneName] = mapped_column(unique=True)
     stage_order: Mapped[int]
+    is_active: Mapped[bool]
 
 
 class CapitalSchemeMilestoneEntity(BaseEntity):
@@ -90,7 +91,12 @@ class DatabaseMilestoneRepository(MilestoneRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_all(self) -> list[Milestone]:
-        result = await self._session.scalars(select(MilestoneEntity).order_by(MilestoneEntity.stage_order))
+    async def get_all(self, is_active: bool | None = None) -> list[Milestone]:
+        statement = select(MilestoneEntity).order_by(MilestoneEntity.stage_order)
+
+        if is_active is not None:
+            statement = statement.where(MilestoneEntity.is_active == is_active)
+
+        result = await self._session.scalars(statement)
         rows = result.all()
         return [row.milestone_name.to_domain() for row in rows]

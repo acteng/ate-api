@@ -20,6 +20,10 @@ class Milestone(IntEnum):
     SUPERSEDED = auto()
     REMOVED = auto()
 
+    @property
+    def is_active(self) -> bool:
+        return self not in {Milestone.NOT_PROGRESSED, Milestone.SUPERSEDED, Milestone.REMOVED}
+
 
 @dataclass(frozen=True)
 class CapitalSchemeMilestone:
@@ -30,5 +34,5 @@ class CapitalSchemeMilestone:
 
 
 class MilestoneRepository:
-    async def get_all(self) -> list[Milestone]:
+    async def get_all(self, is_active: bool | None = None) -> list[Milestone]:
         raise NotImplementedError()

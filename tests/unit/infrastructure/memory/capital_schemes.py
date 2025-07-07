@@ -42,5 +42,5 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
 
 
 class MemoryMilestoneRepository(MilestoneRepository):
-    async def get_all(self) -> list[Milestone]:
-        return list(Milestone)
+    async def get_all(self, is_active: bool | None = None) -> list[Milestone]:
+        return [milestone for milestone in Milestone if (is_active is None or milestone.is_active == is_active)]

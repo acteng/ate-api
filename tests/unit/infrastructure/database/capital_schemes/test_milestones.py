@@ -143,6 +143,27 @@ class TestDatabaseMilestoneRepository:
 
         assert all_milestones == [Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED]
 
+    @pytest.mark.parametrize(
+        "is_active, expected_milestone",
+        [(True, Milestone.DETAILED_DESIGN_COMPLETED), (False, Milestone.CONSTRUCTION_STARTED)],
+    )
+    async def test_get_all_filters_by_is_active(
+        self, engine: AsyncEngine, is_active: bool, expected_milestone: Milestone
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, is_active=True),
+                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, is_active=False),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            milestones = DatabaseMilestoneRepository(session)
+            all_milestones = await milestones.get_all(is_active=is_active)
+
+        assert all_milestones == [expected_milestone]
+
     async def test_get_all_orders_by_stage_order(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
