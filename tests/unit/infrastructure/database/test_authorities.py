@@ -39,8 +39,8 @@ class TestDatabaseAuthorityRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    AuthorityEntity(authority_full_name="Liverpool", authority_abbreviation="LIV"),
-                    AuthorityEntity(authority_full_name="West Yorkshire", authority_abbreviation="WYO"),
+                    build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
+                    build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
                 ]
             )
 
