@@ -78,6 +78,7 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
                     milestone_name=MilestoneName.from_domain(milestone),
                     stage_order=index,
                     is_active=milestone.is_active,
+                    is_complete=milestone.is_complete,
                 )
                 for index, milestone in enumerate(Milestone)
             ]

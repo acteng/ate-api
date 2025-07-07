@@ -24,6 +24,10 @@ class Milestone(IntEnum):
     def is_active(self) -> bool:
         return self not in {Milestone.NOT_PROGRESSED, Milestone.SUPERSEDED, Milestone.REMOVED}
 
+    @property
+    def is_complete(self) -> bool:
+        return self == Milestone.FUNDING_COMPLETED
+
 
 @dataclass(frozen=True)
 class CapitalSchemeMilestone:
@@ -34,5 +38,5 @@ class CapitalSchemeMilestone:
 
 
 class MilestoneRepository:
-    async def get_all(self, is_active: bool | None = None) -> list[Milestone]:
+    async def get_all(self, is_active: bool | None = None, is_complete: bool | None = None) -> list[Milestone]:
         raise NotImplementedError()

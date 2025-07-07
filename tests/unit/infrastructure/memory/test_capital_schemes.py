@@ -377,3 +377,25 @@ class TestMemoryMilestoneRepository:
             Milestone.SUPERSEDED,
             Milestone.REMOVED,
         ]
+
+    async def test_get_all_filters_by_is_complete(self, milestones: MemoryMilestoneRepository) -> None:
+        all_milestones = await milestones.get_all(is_complete=True)
+
+        assert all_milestones == [Milestone.FUNDING_COMPLETED]
+
+    async def test_get_all_filters_by_is_incomplete(self, milestones: MemoryMilestoneRepository) -> None:
+        all_milestones = await milestones.get_all(is_complete=False)
+
+        assert all_milestones == [
+            Milestone.PUBLIC_CONSULTATION_COMPLETED,
+            Milestone.FEASIBILITY_DESIGN_STARTED,
+            Milestone.FEASIBILITY_DESIGN_COMPLETED,
+            Milestone.PRELIMINARY_DESIGN_COMPLETED,
+            Milestone.OUTLINE_DESIGN_COMPLETED,
+            Milestone.DETAILED_DESIGN_COMPLETED,
+            Milestone.CONSTRUCTION_STARTED,
+            Milestone.CONSTRUCTION_COMPLETED,
+            Milestone.NOT_PROGRESSED,
+            Milestone.SUPERSEDED,
+            Milestone.REMOVED,
+        ]

@@ -169,3 +169,17 @@ async def test_get_milestones_filters_by_active(client: TestClient, access_token
             "funding completed",
         ],
     }
+
+
+@respx.mock
+async def test_get_milestones_filters_by_complete(client: TestClient, access_token: str) -> None:
+    response = client.get(
+        "/capital-schemes/milestones?complete=true", headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            "funding completed",
+        ],
+    }

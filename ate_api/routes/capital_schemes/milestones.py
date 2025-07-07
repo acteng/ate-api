@@ -73,11 +73,12 @@ def get_milestone_repository(session: Annotated[AsyncSession, Depends(get_sessio
 async def get_milestones(
     milestones: Annotated[MilestoneRepository, Depends(get_milestone_repository)],
     is_active: Annotated[bool | None, Query(alias="active")] = None,
+    is_complete: Annotated[bool | None, Query(alias="complete")] = None,
 ) -> CollectionModel[MilestoneModel]:
     """
     Gets the capital scheme milestones.
     """
-    all_milestones = await milestones.get_all(is_active=is_active)
+    all_milestones = await milestones.get_all(is_active=is_active, is_complete=is_complete)
 
     return CollectionModel[MilestoneModel](
         items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones]
