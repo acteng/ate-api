@@ -57,3 +57,25 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
         },
         "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
     }
+
+
+def test_get_milestones(client: Client, access_token: str) -> None:
+    response = client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            "public consultation completed",
+            "feasibility design started",
+            "feasibility design completed",
+            "preliminary design completed",
+            "outline design completed",
+            "detailed design completed",
+            "construction started",
+            "construction completed",
+            "funding completed",
+            "not progressed",
+            "superseded",
+            "removed",
+        ],
+    }

@@ -124,3 +124,26 @@ def test_get_capital_scheme_when_not_found(client: TestClient, access_token: str
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 404
+
+
+@respx.mock
+async def test_get_milestones(client: TestClient, access_token: str) -> None:
+    response = client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            "public consultation completed",
+            "feasibility design started",
+            "feasibility design completed",
+            "preliminary design completed",
+            "outline design completed",
+            "detailed design completed",
+            "construction started",
+            "construction completed",
+            "funding completed",
+            "not progressed",
+            "superseded",
+            "removed",
+        ],
+    }

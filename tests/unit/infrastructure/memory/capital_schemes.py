@@ -5,7 +5,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeReference,
     CapitalSchemeRepository,
 )
-from ate_api.domain.capital_schemes.milestones import Milestone
+from ate_api.domain.capital_schemes.milestones import Milestone, MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 
@@ -39,3 +39,8 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
             ],
             key=lambda reference: str(reference),
         )
+
+
+class MemoryMilestoneRepository(MilestoneRepository):
+    async def get_all(self) -> list[Milestone]:
+        return list(Milestone)

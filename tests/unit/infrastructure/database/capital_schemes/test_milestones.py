@@ -1,5 +1,8 @@
 from datetime import date, datetime, timezone
 
+import pytest
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
@@ -10,6 +13,7 @@ from ate_api.infrastructure.database import (
     ObservationTypeEntity,
     ObservationTypeName,
 )
+from ate_api.infrastructure.database.capital_schemes.milestones import DatabaseMilestoneRepository
 
 
 class TestMilestoneName:
@@ -118,3 +122,37 @@ class TestCapitalSchemeMilestoneEntity:
         assert milestone.effective_date == DateTimeRange(
             datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
         )
+
+
+@pytest.mark.usefixtures("data")
+@pytest.mark.asyncio(loop_scope="package")
+class TestDatabaseMilestoneRepository:
+    async def test_get_all(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1),
+                    MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            milestones = DatabaseMilestoneRepository(session)
+            all_milestones = await milestones.get_all()
+
+        assert all_milestones == [Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED]
+
+    async def test_get_all_orders_by_stage_order(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
+                    MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            milestones = DatabaseMilestoneRepository(session)
+            all_milestones = await milestones.get_all()
+
+        assert all_milestones == [Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED]

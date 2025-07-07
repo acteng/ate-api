@@ -11,7 +11,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details
-from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
+from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository, MemoryMilestoneRepository
 
 
 class TestMemoryCapitalSchemeRepository:
@@ -329,3 +329,27 @@ class TestMemoryCapitalSchemeRepository:
         references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references
+
+
+class TestMemoryMilestoneRepository:
+    @pytest.fixture(name="milestones")
+    def milestones_fixture(self) -> MemoryMilestoneRepository:
+        return MemoryMilestoneRepository()
+
+    async def test_get_all(self, milestones: MemoryMilestoneRepository) -> None:
+        all_milestones = await milestones.get_all()
+
+        assert all_milestones == [
+            Milestone.PUBLIC_CONSULTATION_COMPLETED,
+            Milestone.FEASIBILITY_DESIGN_STARTED,
+            Milestone.FEASIBILITY_DESIGN_COMPLETED,
+            Milestone.PRELIMINARY_DESIGN_COMPLETED,
+            Milestone.OUTLINE_DESIGN_COMPLETED,
+            Milestone.DETAILED_DESIGN_COMPLETED,
+            Milestone.CONSTRUCTION_STARTED,
+            Milestone.CONSTRUCTION_COMPLETED,
+            Milestone.FUNDING_COMPLETED,
+            Milestone.NOT_PROGRESSED,
+            Milestone.SUPERSEDED,
+            Milestone.REMOVED,
+        ]

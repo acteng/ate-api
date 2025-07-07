@@ -2,10 +2,11 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone, MilestoneRepository
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
@@ -83,3 +84,13 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
             observation_type=self.observation_type.observation_type_name.to_domain(),
             status_date=self.status_date,
         )
+
+
+class DatabaseMilestoneRepository(MilestoneRepository):
+    def __init__(self, session: AsyncSession):
+        self._session = session
+
+    async def get_all(self) -> list[Milestone]:
+        result = await self._session.scalars(select(MilestoneEntity).order_by(MilestoneEntity.stage_order))
+        rows = result.all()
+        return [row.milestone_name.to_domain() for row in rows]

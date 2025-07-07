@@ -27,3 +27,8 @@ class CapitalSchemeMilestone:
     milestone: Milestone
     observation_type: ObservationType
     status_date: date
+
+
+class MilestoneRepository:
+    async def get_all(self) -> list[Milestone]:
+        raise NotImplementedError()

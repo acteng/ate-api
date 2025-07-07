@@ -6,15 +6,17 @@ from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.milestones import MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.main import app
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
+from ate_api.routes.capital_schemes.milestones import get_milestone_repository
 from ate_api.routes.funding_programmes import get_funding_programme_repository
 from ate_api.settings import Settings, get_settings
 from tests.integration.oauth import StubAuthorizationServer
 from tests.unit.infrastructure.memory.authorities import MemoryAuthorityRepository
-from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
+from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository, MemoryMilestoneRepository
 from tests.unit.infrastructure.memory.funding_programmes import MemoryFundingProgrammeRepository
 
 
@@ -55,6 +57,11 @@ def authorities_fixture() -> AuthorityRepository:
     return MemoryAuthorityRepository()
 
 
+@pytest.fixture(name="milestones")
+def milestones_fixture() -> MilestoneRepository:
+    return MemoryMilestoneRepository()
+
+
 @pytest.fixture(name="capital_schemes")
 def capital_schemes_fixture() -> CapitalSchemeRepository:
     return MemoryCapitalSchemeRepository()
@@ -65,11 +72,13 @@ def app_fixture(
     settings: Settings,
     funding_programmes: FundingProgrammeRepository,
     authorities: AuthorityRepository,
+    milestones: MilestoneRepository,
     capital_schemes: CapitalSchemeRepository,
 ) -> Generator[FastAPI]:
     app.dependency_overrides[get_settings] = lambda: settings
     app.dependency_overrides[get_funding_programme_repository] = lambda: funding_programmes
     app.dependency_overrides[get_authority_repository] = lambda: authorities
+    app.dependency_overrides[get_milestone_repository] = lambda: milestones
     app.dependency_overrides[get_capital_scheme_repository] = lambda: capital_schemes
     yield app
     app.dependency_overrides = {}

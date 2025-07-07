@@ -1,9 +1,14 @@
 from datetime import date, datetime
 from enum import Enum
-from typing import Self
+from typing import Annotated, Self
 
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ate_api.database import get_session
+from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone, MilestoneRepository
 from ate_api.domain.dates import DateTimeRange
+from ate_api.infrastructure.database.capital_schemes.milestones import DatabaseMilestoneRepository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.observation_types import ObservationTypeModel
@@ -55,3 +60,24 @@ class CapitalSchemeMilestoneModel(BaseModel):
 
 class CapitalSchemeMilestonesModel(CollectionModel[CapitalSchemeMilestoneModel]):
     current_milestone: MilestoneModel | None = None
+
+
+router = APIRouter()
+
+
+def get_milestone_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> MilestoneRepository:
+    return DatabaseMilestoneRepository(session)
+
+
+@router.get("/milestones", summary="Get capital scheme milestones")
+async def get_milestones(
+    milestones: Annotated[MilestoneRepository, Depends(get_milestone_repository)],
+) -> CollectionModel[MilestoneModel]:
+    """
+    Gets the capital scheme milestones.
+    """
+    all_milestones = await milestones.get_all()
+
+    return CollectionModel[MilestoneModel](
+        items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones]
+    )
