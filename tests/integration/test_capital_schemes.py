@@ -47,6 +47,7 @@ async def test_get_capital_scheme(
 
     assert response.status_code == 200
     assert response.json() == {
+        "@id": f"{client.base_url}/capital-schemes/ATE00001",
         "reference": "ATE00001",
         "overview": {
             "name": "Wirral Package",

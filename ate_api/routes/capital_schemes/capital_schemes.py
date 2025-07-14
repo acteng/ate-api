@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import AnyUrl, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -24,6 +25,7 @@ from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 
 
 class CapitalSchemeModel(BaseModel):
+    id: Annotated[AnyUrl | None, Field(alias="@id")] = None
     reference: str
     overview: CapitalSchemeOverviewModel
     bid_status_details: CapitalSchemeBidStatusDetailsModel
@@ -33,6 +35,7 @@ class CapitalSchemeModel(BaseModel):
     @classmethod
     def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
         return cls(
+            id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme.reference)))),
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),

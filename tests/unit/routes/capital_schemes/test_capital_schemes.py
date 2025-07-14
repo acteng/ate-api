@@ -46,6 +46,7 @@ class TestCapitalSchemeModel:
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
 
         assert capital_scheme_model == CapitalSchemeModel(
+            id=AnyUrl(f"{base_url}/capital-schemes/ATE00001"),
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
                 name="Wirral Package",
