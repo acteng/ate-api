@@ -1,6 +1,5 @@
 import pytest
-from fastapi import FastAPI
-from starlette.requests import Request
+from fastapi import FastAPI, Request
 
 from ate_api.main import app
 

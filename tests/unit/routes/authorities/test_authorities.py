@@ -1,5 +1,5 @@
+from fastapi import Request
 from pydantic import AnyUrl
-from starlette.requests import Request
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.routes.authorities.authorities import AuthorityModel

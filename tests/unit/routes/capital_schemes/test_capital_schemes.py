@@ -1,7 +1,7 @@
 from datetime import date, datetime
 
+from fastapi import Request
 from pydantic import AnyUrl
-from starlette.requests import Request
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview

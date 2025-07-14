@@ -3,9 +3,7 @@ from typing import Annotated, Any
 
 from authlib.jose import KeySet, RSAKey
 from authlib.oauth2 import AuthorizationServer
-from fastapi import Depends, FastAPI
-from starlette.requests import Request
-from starlette.responses import Response
+from fastapi import Depends, FastAPI, Request, Response
 
 from tests.e2e.oauth.clients import ClientRepository
 from tests.e2e.oauth.grants import ClientSecretPostClientCredentialsGrant
