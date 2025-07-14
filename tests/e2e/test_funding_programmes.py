@@ -24,4 +24,8 @@ def test_get_funding_programme(client: Client, access_token: str, app_client: Ap
     response = client.get("/funding-programmes/ATF3", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
-    assert response.json() == {"code": "ATF3", "eligibleForAuthorityUpdate": True}
+    assert response.json() == {
+        "@id": f"{client.base_url}/funding-programmes/ATF3",
+        "code": "ATF3",
+        "eligibleForAuthorityUpdate": True,
+    }

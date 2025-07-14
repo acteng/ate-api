@@ -1,7 +1,7 @@
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from pydantic import AnyUrl
+from pydantic import AnyUrl, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -13,12 +13,14 @@ from ate_api.routes.collections import CollectionModel
 
 
 class FundingProgrammeModel(BaseModel):
+    id: Annotated[AnyUrl | None, Field(alias="@id")] = None
     code: str
     eligible_for_authority_update: bool
 
     @classmethod
-    def from_domain(cls, funding_programme: FundingProgramme) -> Self:
+    def from_domain(cls, funding_programme: FundingProgramme, request: Request) -> Self:
         return cls(
+            id=AnyUrl(str(request.url_for("get_funding_programme", code=str(funding_programme.code)))),
             code=str(funding_programme.code),
             eligible_for_authority_update=funding_programme.is_eligible_for_authority_update,
         )
@@ -59,7 +61,9 @@ async def get_funding_programmes(
 
 @router.get("/{code}", summary="Get funding programme", responses={HTTP_404_NOT_FOUND: {}})
 async def get_funding_programme(
-    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)], code: str
+    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
+    request: Request,
+    code: str,
 ) -> FundingProgrammeModel:
     """
     Gets a funding programme.
@@ -69,4 +73,4 @@ async def get_funding_programme(
     if not funding_programme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    return FundingProgrammeModel.from_domain(funding_programme)
+    return FundingProgrammeModel.from_domain(funding_programme, request)
