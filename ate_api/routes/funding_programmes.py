@@ -31,6 +31,18 @@ class FundingProgrammeModel(BaseModel):
         )
 
 
+class FundingProgrammeItemModel(BaseModel):
+    id: Annotated[AnyUrl | None, Field(alias="@id")] = None
+    code: str
+
+    @classmethod
+    def from_domain(cls, funding_programme: FundingProgramme, request: Request) -> Self:
+        return cls(
+            id=AnyUrl(str(request.url_for("get_funding_programme", code=str(funding_programme.code)))),
+            code=str(funding_programme.code),
+        )
+
+
 router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])
 
 
@@ -45,18 +57,18 @@ async def get_funding_programmes(
     funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
     request: Request,
     is_eligible_for_authority_update: Annotated[bool | None, Query(alias="eligible-for-authority-update")] = None,
-) -> CollectionModel[AnyUrl]:
+) -> CollectionModel[FundingProgrammeItemModel]:
     """
     Gets the funding programmes.
     """
     all_funding_programmes = await funding_programmes.get_all(
         is_eligible_for_authority_update=is_eligible_for_authority_update
     )
-    funding_programme_links = [
-        AnyUrl(str(request.url_for("get_funding_programme", code=str(funding_programme.code))))
+    funding_programme_models = [
+        FundingProgrammeItemModel.from_domain(funding_programme, request)
         for funding_programme in all_funding_programmes
     ]
-    return CollectionModel[AnyUrl](items=funding_programme_links)
+    return CollectionModel[FundingProgrammeItemModel](items=funding_programme_models)
 
 
 @router.get("/{code}", summary="Get funding programme", responses={HTTP_404_NOT_FOUND: {}})
