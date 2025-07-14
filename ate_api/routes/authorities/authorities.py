@@ -1,7 +1,7 @@
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import AnyUrl
+from pydantic import AnyUrl, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
@@ -12,6 +12,7 @@ from ate_api.routes.base import BaseModel
 
 
 class AuthorityModel(BaseModel):
+    id: Annotated[AnyUrl | None, Field(alias="@id")] = None
     abbreviation: str
     full_name: str
     bid_submitting_capital_schemes: AnyUrl | None = None
@@ -19,6 +20,7 @@ class AuthorityModel(BaseModel):
     @classmethod
     def from_domain(cls, authority: Authority, request: Request) -> Self:
         return cls(
+            id=AnyUrl(str(request.url_for("get_authority", abbreviation=str(authority.abbreviation)))),
             abbreviation=str(authority.abbreviation),
             full_name=authority.full_name,
             bid_submitting_capital_schemes=AnyUrl(

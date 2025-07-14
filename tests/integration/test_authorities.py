@@ -28,6 +28,7 @@ async def test_get_authority(authorities: AuthorityRepository, client: TestClien
 
     assert response.status_code == 200
     assert response.json() == {
+        "@id": f"{client.base_url}/authorities/LIV",
         "abbreviation": "LIV",
         "fullName": "Liverpool City Region Combined Authority",
         "bidSubmittingCapitalSchemes": f"{client.base_url}/authorities/LIV/capital-schemes/bid-submitting",

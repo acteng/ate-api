@@ -14,6 +14,7 @@ class TestAuthorityModel:
         authority_model = AuthorityModel.from_domain(authority, http_request)
 
         assert authority_model == AuthorityModel(
+            id=AnyUrl(f"{base_url}/authorities/LIV"),
             abbreviation="LIV",
             full_name="Liverpool City Region Combined Authority",
             bid_submitting_capital_schemes=AnyUrl(f"{base_url}/authorities/LIV/capital-schemes/bid-submitting"),
