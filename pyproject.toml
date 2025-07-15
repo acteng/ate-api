@@ -1,6 +1,6 @@
 [project]
 name = "ate-api"
-version = "0.7.0"
+version = "0.8.0"
 description = "Operational data API for Active Travel England."
 requires-python = ">=3.13"
 dependencies = [
