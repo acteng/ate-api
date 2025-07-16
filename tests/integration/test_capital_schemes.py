@@ -1,5 +1,6 @@
 from datetime import UTC, date, datetime
 from decimal import Decimal
+from typing import Any, cast
 
 import respx
 from fastapi.testclient import TestClient
@@ -74,7 +75,8 @@ async def test_get_capital_scheme(
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "type": "construction",
         },
-        "bidStatusDetails": {"bidStatus": "funded"},
+        # Workaround: https://github.com/python/mypy/issues/19474
+        "bidStatusDetails": {"bidStatus": cast(Any, "funded")},
         "financials": {"items": []},
         "milestones": {"currentMilestone": None, "items": []},
         "outputs": {"items": []},
