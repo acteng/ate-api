@@ -6,7 +6,12 @@ terraform {
   }
 }
 
+locals {
+  minute_in_seconds = 60
+}
+
 resource "auth0_resource_server" "server" {
-  name       = "ATE API"
-  identifier = var.identifier
+  name           = "ATE API"
+  identifier     = var.identifier
+  token_lifetime = 15 * local.minute_in_seconds
 }
