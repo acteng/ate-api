@@ -188,8 +188,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         capital_scheme_milestones = (
             await self._session.scalars(self._select_current_capital_scheme_milestones(row.capital_scheme_id))
         ).all()
-        # untyped function, see: https://github.com/sqlalchemy/sqlalchemy/issues/12669
-        set_committed_value(row, "capital_scheme_milestones", capital_scheme_milestones)  # type: ignore
+        set_committed_value(row, "capital_scheme_milestones", capital_scheme_milestones)
 
         return row.to_domain()
 
