@@ -1,9 +1,9 @@
 from typing import Self
 
-from sqlalchemy import Select, and_, false, func, select
+from sqlalchemy import ColumnElement, Select, and_, false, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, aliased, contains_eager, joinedload, mapped_column, relationship
-from sqlalchemy.orm.attributes import set_committed_value
+from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
@@ -197,7 +197,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
-        current_milestones: list[Milestone] | None = None,
+        current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeReference]:
         statement = (
             select(CapitalSchemeEntity.scheme_reference)
@@ -236,7 +236,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 CapitalSchemeMilestoneEntity, ranked_actual_capital_scheme_milestones
             )
             statement = (
-                statement.join(
+                statement.outerjoin(
                     ranked_actual_capital_scheme_milestones_alias,
                     and_(
                         CapitalSchemeEntity.capital_scheme_id
@@ -244,16 +244,28 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                         ranked_actual_capital_scheme_milestones.c.rank == 1,
                     ),
                 )
-                .join(MilestoneEntity)
+                .outerjoin(MilestoneEntity)
                 .where(
-                    MilestoneEntity.milestone_name.in_(
-                        MilestoneName.from_domain(milestone) for milestone in current_milestones
+                    self._optional_in(
+                        MilestoneEntity.milestone_name,
+                        [
+                            None if milestone is None else MilestoneName.from_domain(milestone)
+                            for milestone in current_milestones
+                        ],
                     )
                 )
             )
 
         result = await self._session.scalars(statement)
         return [CapitalSchemeReference(reference) for reference in result.all()]
+
+    @staticmethod
+    def _optional_in[T](attribute: InstrumentedAttribute[T], values: list[T | None]) -> ColumnElement[bool]:
+        in_values = [value for value in values if value is not None]
+        return or_(
+            attribute.in_(in_values) if in_values else false(),
+            attribute.is_(None) if None in values else false(),
+        )
 
     async def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[AuthorityAbbreviation, int]:
         authority_abbreviation = str(capital_scheme.overview.bid_submitting_authority)

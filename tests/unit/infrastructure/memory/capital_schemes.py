@@ -24,7 +24,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
-        current_milestones: list[Milestone] | None = None,
+        current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeReference]:
         return sorted(
             [

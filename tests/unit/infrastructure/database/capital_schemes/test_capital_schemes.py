@@ -1023,6 +1023,55 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
+    async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
+        self, engine: AsyncEngine
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    atf3 := build_funding_programme_entity(code="ATF3"),
+                    construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
+                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
+                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[
+                            build_capital_scheme_overview_entity(
+                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
+                    ),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00002",
+                        capital_scheme_overviews=[
+                            build_capital_scheme_overview_entity(
+                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
+                            ),
+                        ],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
+                        capital_scheme_milestones=[
+                            CapitalSchemeMilestoneEntity(
+                                milestone=construction_started,
+                                status_date=date(2020, 3, 1),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            references = await capital_schemes.get_references_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV"), current_milestones=[None]
+            )
+
+        assert references == [CapitalSchemeReference("ATE00001")]
+
     async def test_get_references_by_bid_submitting_authority_selects_actual_observation_type(
         self, engine: AsyncEngine
     ) -> None:

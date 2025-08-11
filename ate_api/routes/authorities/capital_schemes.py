@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import AnyUrl
@@ -6,6 +6,7 @@ from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.routes.authorities.authorities import get_authority_repository
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
@@ -28,7 +29,7 @@ async def get_authority_bid_submitting_capital_schemes(
     abbreviation: str,
     funding_programme_codes: Annotated[list[str] | None, Query(alias="funding-programme-code")] = None,
     bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status")] = None,
-    current_milestones: Annotated[list[MilestoneModel] | None, Query(alias="current-milestone")] = None,
+    current_milestones: Annotated[list[MilestoneModel | Literal[""]] | None, Query(alias="current-milestone")] = None,
 ) -> CollectionModel[AnyUrl]:
     """
     Gets the capital schemes submitted by an authority.
@@ -47,9 +48,17 @@ async def get_authority_bid_submitting_capital_schemes(
             [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
         ),
         bid_status=bid_status.to_domain() if bid_status else None,
-        current_milestones=[milestone.to_domain() for milestone in current_milestones] if current_milestones else None,
+        current_milestones=[_to_domain(milestone) for milestone in current_milestones] if current_milestones else None,
     )
     capital_scheme_links = [
         AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))) for reference in references
     ]
     return CollectionModel[AnyUrl](items=capital_scheme_links)
+
+
+def _to_domain(milestone: MilestoneModel | Literal[""]) -> Milestone | None:
+    match milestone:
+        case MilestoneModel():
+            return milestone.to_domain()
+        case "":
+            return None

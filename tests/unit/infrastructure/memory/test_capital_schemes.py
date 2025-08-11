@@ -289,6 +289,48 @@ class TestMemoryCapitalSchemeRepository:
 
         assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
 
+    async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
+        self, capital_schemes: MemoryCapitalSchemeRepository
+    ) -> None:
+        capital_scheme1 = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        await capital_schemes.add(capital_scheme1)
+        capital_scheme2 = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="School Streets",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme2.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+            )
+        )
+        await capital_schemes.add(capital_scheme2)
+
+        references = await capital_schemes.get_references_by_bid_submitting_authority(
+            AuthorityAbbreviation("LIV"), current_milestones=[None]
+        )
+
+        assert references == [CapitalSchemeReference("ATE00001")]
+
     async def test_get_references_by_bid_submitting_authority_orders_by_reference(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:

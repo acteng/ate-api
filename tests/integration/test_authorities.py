@@ -460,6 +460,61 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
 
 
 @respx.mock
+async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_current_milestone(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(
+        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
+    await capital_schemes.add(
+        CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                name="Wirral Package",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            bid_status_details=dummy_bid_status_details(),
+        )
+    )
+    capital_scheme2 = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00002"),
+        overview=CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            name="School Streets",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        ),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme2.change_milestone(
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            milestone=Milestone.CONSTRUCTION_STARTED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 3, 1),
+        )
+    )
+    await capital_schemes.add(capital_scheme2)
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"current-milestone": ""},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            f"{client.base_url}/capital-schemes/ATE00001",
+        ],
+    }
+
+
+@respx.mock
 async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_current_milestone(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
