@@ -7,7 +7,6 @@ from authlib.jose import JsonWebKey, jwt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
-from httpx import Response
 
 
 class StubAuthorizationServer:
@@ -53,10 +52,10 @@ class StubAuthorizationServer:
         return access_token
 
     def given_configuration_endpoint_returns_configuration(self) -> None:
-        respx.get(self.configuration_endpoint).mock(
-            return_value=Response(200, json={"issuer": self._url, "jwks_uri": self._key_set_endpoint})
+        respx.get(self.configuration_endpoint).respond(
+            200, json={"issuer": self._url, "jwks_uri": self._key_set_endpoint}
         )
-        respx.get(self._key_set_endpoint).mock(return_value=Response(200, json=self._key_set()))
+        respx.get(self._key_set_endpoint).respond(200, json=self._key_set())
 
     @staticmethod
     def _generate_key_pair() -> tuple[bytes, bytes]:
