@@ -3,6 +3,7 @@ from typing import Any
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -36,6 +37,7 @@ class CapitalScheme:
         self._reference = reference
         self._overview = overview
         self._bid_status_details = bid_status_details
+        self._financials: list[CapitalSchemeFinancial] = []
         self._milestones: list[CapitalSchemeMilestone] = []
         self._authority_review: CapitalSchemeAuthorityReview | None = None
 
@@ -50,6 +52,13 @@ class CapitalScheme:
     @property
     def bid_status_details(self) -> CapitalSchemeBidStatusDetails:
         return self._bid_status_details
+
+    @property
+    def financials(self) -> list[CapitalSchemeFinancial]:
+        return list(self._financials)
+
+    def change_financial(self, financial: CapitalSchemeFinancial) -> None:
+        self._financials.append(financial)
 
     @property
     def milestones(self) -> list[CapitalSchemeMilestone]:

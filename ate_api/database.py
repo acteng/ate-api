@@ -9,11 +9,14 @@ from sqlalchemy.sql.ddl import CreateSchema
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     BaseEntity,
     BidStatusEntity,
     BidStatusName,
+    FinancialTypeEntity,
+    FinancialTypeName,
     MilestoneEntity,
     MilestoneName,
     ObservationTypeEntity,
@@ -62,6 +65,12 @@ async def _create_schema(engine: AsyncEngine) -> None:
 async def _create_reference_data(engine: AsyncEngine) -> None:
     async with AsyncSession(engine) as session:
         # common
+        session.add_all(
+            [
+                FinancialTypeEntity(financial_type_name=FinancialTypeName.from_domain(financial_type))
+                for financial_type in FinancialType
+            ]
+        )
         session.add_all(
             [
                 ObservationTypeEntity(observation_type_name=ObservationTypeName.from_domain(observation_type))

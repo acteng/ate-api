@@ -9,6 +9,9 @@ from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatusEntity as CapitalSchemeBidStatusEntity,
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity as CapitalSchemeEntity
+from ate_api.infrastructure.database.capital_schemes.financials import (
+    CapitalSchemeFinancialEntity as CapitalSchemeFinancialEntity,
+)
 from ate_api.infrastructure.database.capital_schemes.milestones import (
     CapitalSchemeMilestoneEntity as CapitalSchemeMilestoneEntity,
 )
@@ -19,6 +22,8 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
 )
 from ate_api.infrastructure.database.capital_schemes.overviews import SchemeTypeEntity as SchemeTypeEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import SchemeTypeName as SchemeTypeName
+from ate_api.infrastructure.database.financial_types import FinancialTypeEntity as FinancialTypeEntity
+from ate_api.infrastructure.database.financial_types import FinancialTypeName as FinancialTypeName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity as FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity as ObservationTypeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeName as ObservationTypeName

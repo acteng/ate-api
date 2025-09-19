@@ -16,12 +16,14 @@ from ate_api.infrastructure.database.capital_schemes.capital_schemes import Data
 from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel
+from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialModel
 from ate_api.routes.capital_schemes.milestones import (
     CapitalSchemeMilestoneModel,
     CapitalSchemeMilestonesModel,
     MilestoneModel,
 )
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
+from ate_api.routes.collections import CollectionModel
 
 
 class CapitalSchemeModel(BaseModel):
@@ -29,6 +31,7 @@ class CapitalSchemeModel(BaseModel):
     reference: str
     overview: CapitalSchemeOverviewModel
     bid_status_details: CapitalSchemeBidStatusDetailsModel
+    financials: CollectionModel[CapitalSchemeFinancialModel]
     milestones: CapitalSchemeMilestonesModel
     authority_review: CapitalSchemeAuthorityReviewModel | None = None
 
@@ -39,6 +42,9 @@ class CapitalSchemeModel(BaseModel):
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
+            financials=CollectionModel(
+                items=[CapitalSchemeFinancialModel.from_domain(financial) for financial in capital_scheme.financials]
+            ),
             milestones=CapitalSchemeMilestonesModel(
                 current_milestone=(
                     MilestoneModel.from_domain(capital_scheme.current_milestone)
@@ -60,6 +66,9 @@ class CapitalSchemeModel(BaseModel):
             overview=self.overview.to_domain(now, request),
             bid_status_details=self.bid_status_details.to_domain(now),
         )
+
+        for financial in self.financials.items:
+            capital_scheme.change_financial(financial.to_domain(now))
 
         for milestone in self.milestones.items:
             capital_scheme.change_milestone(milestone.to_domain(now))

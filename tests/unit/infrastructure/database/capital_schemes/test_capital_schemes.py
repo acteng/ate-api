@@ -8,9 +8,11 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
@@ -20,8 +22,11 @@ from ate_api.infrastructure.database import (
     CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
+    CapitalSchemeFinancialEntity,
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
+    FinancialTypeEntity,
+    FinancialTypeName,
     FundingProgrammeEntity,
     MilestoneEntity,
     MilestoneName,
@@ -37,6 +42,7 @@ from tests.unit.infrastructure.database.builders import (
     build_bid_status_entity,
     build_capital_scheme_bid_status_entity,
     build_capital_scheme_overview_entity,
+    build_financial_type_entity,
     build_funding_programme_entity,
     build_milestone_entity,
     build_observation_type_entity,
@@ -69,6 +75,7 @@ class TestCapitalSchemeEntity:
             {BidStatus.FUNDED: 4},
             {},
             {},
+            {},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -88,6 +95,52 @@ class TestCapitalSchemeEntity:
             and not bid_status_entity.effective_date_to
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
+
+    def test_from_domain_sets_financials(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_financial(
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=FinancialType.FUNDING_ALLOCATION,
+                amount=2_000_000,
+            )
+        )
+        capital_scheme.change_financial(
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=FinancialType.SPEND_TO_DATE,
+                amount=1_000_000,
+            )
+        )
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme,
+            {AuthorityAbbreviation("dummy"): 0},
+            {FundingProgrammeCode("dummy"): 0},
+            {CapitalSchemeType.DEVELOPMENT: 0},
+            {BidStatus.SUBMITTED: 0},
+            {FinancialType.FUNDING_ALLOCATION: 1, FinancialType.SPEND_TO_DATE: 2},
+            {},
+            {},
+        )
+
+        financial_entity1, financial_entity2 = capital_scheme_entity.capital_scheme_financials
+        assert (
+            financial_entity1.financial_type_id == 1
+            and financial_entity1.amount == 2_000_000
+            and financial_entity1.effective_date_from == datetime(2020, 1, 1)
+            and not financial_entity1.effective_date_to
+        )
+        assert (
+            financial_entity2.financial_type_id == 2
+            and financial_entity2.amount == 1_000_000
+            and financial_entity2.effective_date_from == datetime(2020, 1, 1)
+            and not financial_entity2.effective_date_to
+        )
 
     def test_from_domain_sets_milestones(self) -> None:
         capital_scheme = CapitalScheme(
@@ -118,6 +171,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {},
             {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
             {ObservationType.ACTUAL: 3},
         )
@@ -152,6 +206,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {},
             {},
             {},
         )
@@ -193,8 +248,43 @@ class TestCapitalSchemeEntity:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
             bid_status=BidStatus.FUNDED,
         )
+        assert not capital_scheme.financials
         assert not capital_scheme.milestones
         assert not capital_scheme.authority_review
+
+    def test_to_domain_sets_financials(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+            capital_scheme_financials=[
+                CapitalSchemeFinancialEntity(
+                    financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
+                    amount=2_000_000,
+                    effective_date_from=datetime(2020, 1, 1),
+                ),
+                CapitalSchemeFinancialEntity(
+                    financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.SPEND_TO_DATE),
+                    amount=1_000_000,
+                    effective_date_from=datetime(2020, 1, 1),
+                ),
+            ],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.financials == [
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=FinancialType.FUNDING_ALLOCATION,
+                amount=2_000_000,
+            ),
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=FinancialType.SPEND_TO_DATE,
+                amount=1_000_000,
+            ),
+        ]
 
     def test_to_domain_sets_milestones(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
@@ -301,6 +391,60 @@ class TestDatabaseCapitalSchemeRepository:
             and bid_status_row.bid_status_id == 1
             and bid_status_row.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_row.effective_date_to
+        )
+
+    async def test_add_stores_financials(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_authority_entity(),
+                    build_funding_programme_entity(),
+                    build_scheme_type_entity(),
+                    build_bid_status_entity(),
+                    build_financial_type_entity(id_=1, name=FinancialTypeName.FUNDING_ALLOCATION),
+                    build_financial_type_entity(id_=2, name=FinancialTypeName.SPEND_TO_DATE),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=dummy_overview(),
+                bid_status_details=dummy_bid_status_details(),
+            )
+            capital_scheme.change_financial(
+                CapitalSchemeFinancial(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    type=FinancialType.FUNDING_ALLOCATION,
+                    amount=2_000_000,
+                )
+            )
+            capital_scheme.change_financial(
+                CapitalSchemeFinancial(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    type=FinancialType.SPEND_TO_DATE,
+                    amount=1_000_000,
+                )
+            )
+            await capital_schemes.add(capital_scheme)
+
+        async with AsyncSession(engine) as session:
+            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
+            financial_row1, financial_row2 = await session.scalars(select(CapitalSchemeFinancialEntity))
+        assert (
+            financial_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and financial_row1.financial_type_id == 1
+            and financial_row1.amount == 2_000_000
+            and financial_row1.effective_date_from == datetime(2020, 1, 1)
+            and not financial_row1.effective_date_to
+        )
+        assert (
+            financial_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and financial_row2.financial_type_id == 2
+            and financial_row2.amount == 1_000_000
+            and financial_row2.effective_date_from == datetime(2020, 1, 1)
+            and not financial_row2.effective_date_to
         )
 
     async def test_add_stores_milestones(self, engine: AsyncEngine) -> None:
@@ -524,6 +668,55 @@ class TestDatabaseCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
             bid_status=BidStatus.NOT_FUNDED,
         )
+
+    async def test_get_fetches_current_financials(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
+                    spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_financials=[
+                            CapitalSchemeFinancialEntity(
+                                financial_type=funding_allocation,
+                                amount=3_000_000,
+                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_to=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeFinancialEntity(
+                                financial_type=funding_allocation,
+                                amount=2_000_000,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeFinancialEntity(
+                                financial_type=spend_to_date,
+                                amount=1_000_000,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.financials == [
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                type=FinancialType.FUNDING_ALLOCATION,
+                amount=2_000_000,
+            ),
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                type=FinancialType.SPEND_TO_DATE,
+                amount=1_000_000,
+            ),
+        ]
 
     async def test_get_fetches_current_milestones(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():

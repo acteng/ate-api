@@ -14,6 +14,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 )
 from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.authorities import AuthorityEntity
@@ -24,6 +25,7 @@ from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusName,
     CapitalSchemeBidStatusEntity,
 )
+from ate_api.infrastructure.database.capital_schemes.financials import CapitalSchemeFinancialEntity
 from ate_api.infrastructure.database.capital_schemes.milestones import (
     CapitalSchemeMilestoneEntity,
     MilestoneEntity,
@@ -34,6 +36,7 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from ate_api.infrastructure.database.financial_types import FinancialTypeEntity, FinancialTypeName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
@@ -46,6 +49,7 @@ class CapitalSchemeEntity(BaseEntity):
     scheme_reference: Mapped[str] = mapped_column(unique=True)
     capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
     capital_scheme_bid_statuses: Mapped[list[CapitalSchemeBidStatusEntity]] = relationship(lazy="raise")
+    capital_scheme_financials: Mapped[list[CapitalSchemeFinancialEntity]] = relationship(lazy="raise")
     capital_scheme_milestones: Mapped[list[CapitalSchemeMilestoneEntity]] = relationship(lazy="raise")
     capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
 
@@ -57,6 +61,7 @@ class CapitalSchemeEntity(BaseEntity):
         funding_programme_ids: dict[FundingProgrammeCode, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
         bid_status_ids: dict[BidStatus, int],
+        financial_type_ids: dict[FinancialType, int],
         milestone_ids: dict[Milestone, int],
         observation_type_ids: dict[ObservationType, int],
     ) -> Self:
@@ -69,6 +74,10 @@ class CapitalSchemeEntity(BaseEntity):
             ],
             capital_scheme_bid_statuses=[
                 CapitalSchemeBidStatusEntity.from_domain(capital_scheme.bid_status_details, bid_status_ids)
+            ],
+            capital_scheme_financials=[
+                CapitalSchemeFinancialEntity.from_domain(financial, financial_type_ids)
+                for financial in capital_scheme.financials
             ],
             capital_scheme_milestones=[
                 CapitalSchemeMilestoneEntity.from_domain(milestone, milestone_ids, observation_type_ids)
@@ -90,6 +99,9 @@ class CapitalSchemeEntity(BaseEntity):
             bid_status_details=capital_scheme_bid_status.to_domain(),
         )
 
+        for capital_scheme_financial in self.capital_scheme_financials:
+            capital_scheme.change_financial(capital_scheme_financial.to_domain())
+
         for capital_scheme_milestone in self.capital_scheme_milestones:
             capital_scheme.change_milestone(capital_scheme_milestone.to_domain())
 
@@ -109,6 +121,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
+        financial_type_ids = await self._get_financial_type_ids(capital_scheme)
         milestone_ids = await self._get_milestone_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
 
@@ -119,6 +132,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 funding_programme_ids,
                 scheme_type_ids,
                 bid_status_ids,
+                financial_type_ids,
                 milestone_ids,
                 observation_type_ids,
             )
@@ -183,6 +197,12 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         if not row:
             return None
+
+        # fetch current financials
+        capital_scheme_financials = (
+            await self._session.scalars(self._select_current_capital_scheme_financials(row.capital_scheme_id))
+        ).all()
+        set_committed_value(row, "capital_scheme_financials", capital_scheme_financials)
 
         # fetch current milestones
         capital_scheme_milestones = (
@@ -303,6 +323,17 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
         return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
 
+    async def _get_financial_type_ids(self, capital_scheme: CapitalScheme) -> dict[FinancialType, int]:
+        financial_type_names = {
+            FinancialTypeName.from_domain(financial.type) for financial in capital_scheme.financials
+        }
+        rows = await self._session.execute(
+            select(FinancialTypeEntity.financial_type_name, FinancialTypeEntity.financial_type_id).where(
+                FinancialTypeEntity.financial_type_name.in_(financial_type_names)
+            )
+        )
+        return {row.financial_type_name.to_domain(): row.financial_type_id for row in rows}
+
     async def _get_milestone_ids(self, capital_scheme: CapitalScheme) -> dict[Milestone, int]:
         milestone_names = {MilestoneName.from_domain(milestone.milestone) for milestone in capital_scheme.milestones}
         rows = await self._session.execute(
@@ -322,6 +353,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
+
+    @staticmethod
+    def _select_current_capital_scheme_financials(
+        capital_scheme_id: int,
+    ) -> Select[tuple[CapitalSchemeFinancialEntity]]:
+        return (
+            select(CapitalSchemeFinancialEntity)
+            .options(contains_eager(CapitalSchemeFinancialEntity.financial_type))
+            .join(FinancialTypeEntity)
+            .where(CapitalSchemeFinancialEntity.capital_scheme_id == capital_scheme_id)
+            .where(CapitalSchemeFinancialEntity.effective_date_to.is_(None))
+        )
 
     @staticmethod
     def _select_current_capital_scheme_milestones(

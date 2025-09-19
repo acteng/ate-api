@@ -17,6 +17,7 @@ from ate_api.infrastructure.database import (
     CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
+    CapitalSchemeFinancialEntity,
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
@@ -78,6 +79,7 @@ async def create_capital_scheme(
 async def delete_capital_schemes(session: Annotated[AsyncSession, Depends(get_session)]) -> Response:
     await session.execute(delete(CapitalSchemeOverviewEntity))
     await session.execute(delete(CapitalSchemeBidStatusEntity))
+    await session.execute(delete(CapitalSchemeFinancialEntity))
     await session.execute(delete(CapitalSchemeMilestoneEntity))
     await session.execute(delete(CapitalSchemeAuthorityReviewEntity))
     await session.execute(delete(CapitalSchemeEntity))

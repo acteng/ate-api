@@ -32,6 +32,9 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             "bidStatusDetails": {
                 "bidStatus": "funded",
             },
+            "financials": {
+                "items": [],
+            },
             "milestones": {
                 "items": [],
             },
@@ -48,6 +51,9 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             },
             "bidStatusDetails": {
                 "bidStatus": "funded",
+            },
+            "financials": {
+                "items": [],
             },
             "milestones": {
                 "items": [],

@@ -11,9 +11,11 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeReference,
     CapitalSchemeRepository,
 )
+from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
@@ -58,11 +60,45 @@ async def test_get_capital_scheme(
         "bidStatusDetails": {
             "bidStatus": "funded",
         },
+        "financials": {
+            "items": [],
+        },
         "milestones": {
             "currentMilestone": None,
             "items": [],
         },
         "authorityReview": None,
+    }
+
+
+@respx.mock
+async def test_get_capital_scheme_with_financials(
+    capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    capital_scheme = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00001"),
+        overview=dummy_overview(),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme.change_financial(
+        CapitalSchemeFinancial(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            type=FinancialType.FUNDING_ALLOCATION,
+            amount=2_000_000,
+        )
+    )
+    await capital_schemes.add(capital_scheme)
+
+    response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200
+    assert response.json()["financials"] == {
+        "items": [
+            {
+                "type": "funding allocation",
+                "amount": 2_000_000,
+            }
+        ],
     }
 
 

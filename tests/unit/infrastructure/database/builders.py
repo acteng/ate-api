@@ -6,6 +6,8 @@ from ate_api.infrastructure.database import (
     BidStatusName,
     CapitalSchemeBidStatusEntity,
     CapitalSchemeOverviewEntity,
+    FinancialTypeEntity,
+    FinancialTypeName,
     FundingProgrammeEntity,
     MilestoneEntity,
     MilestoneName,
@@ -54,6 +56,12 @@ def build_capital_scheme_bid_status_entity(
 
 def build_bid_status_entity(id_: int | None = None, name: BidStatusName = BidStatusName.SUBMITTED) -> BidStatusEntity:
     return BidStatusEntity(bid_status_id=id_, bid_status_name=name)
+
+
+def build_financial_type_entity(
+    id_: int | None = None, name: FinancialTypeName = FinancialTypeName.EXPECTED_COST
+) -> FinancialTypeEntity:
+    return FinancialTypeEntity(financial_type_id=id_, financial_type_name=name)
 
 
 def build_milestone_entity(
