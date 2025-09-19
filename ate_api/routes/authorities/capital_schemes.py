@@ -2,7 +2,7 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import AnyUrl
-from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
+from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_CONTENT
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
@@ -40,7 +40,7 @@ async def get_authority_bid_submitting_capital_schemes(
     if funding_programme_codes and not await funding_programmes.exists_all(
         [FundingProgrammeCode(code) for code in funding_programme_codes]
     ):
-        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_ENTITY)
+        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_CONTENT)
 
     references = await capital_schemes.get_references_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),
