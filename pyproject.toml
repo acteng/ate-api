@@ -13,7 +13,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "black~=25.1.0",
+    "black~=25.9.0",
     "isort~=6.0.0",
     "mypy~=1.16.0",
     "pytest~=8.4.0",
