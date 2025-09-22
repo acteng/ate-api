@@ -719,7 +719,9 @@ class TestDatabaseCapitalSchemeRepository:
             ),
         ]
 
-    async def test_get_fetches_current_financials_ordered_by_financial_type(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_financials_ordered_by_financial_type_then_effective_date_from(
+        self, engine: AsyncEngine
+    ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -734,6 +736,11 @@ class TestDatabaseCapitalSchemeRepository:
                                 financial_type=spend_to_date,
                                 amount=1_000_000,
                                 effective_date_from=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeFinancialEntity(
+                                financial_type=funding_allocation,
+                                amount=3_000_000,
+                                effective_date_from=datetime(2020, 3, 1),
                             ),
                             CapitalSchemeFinancialEntity(
                                 financial_type=funding_allocation,
@@ -754,6 +761,11 @@ class TestDatabaseCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+            ),
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=timezone.utc)),
+                type=FinancialType.FUNDING_ALLOCATION,
+                amount=Money(3_000_000),
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),

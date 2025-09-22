@@ -365,6 +365,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(CapitalSchemeFinancialEntity.capital_scheme_id == capital_scheme_id)
             .where(CapitalSchemeFinancialEntity.effective_date_to.is_(None))
             .order_by(FinancialTypeEntity.financial_type_id)
+            .order_by(CapitalSchemeFinancialEntity.effective_date_from)
         )
 
     @staticmethod
