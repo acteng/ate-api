@@ -4,13 +4,13 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
-from ate_api.infrastructure.database.authorities import AuthorityEntity
-from ate_api.infrastructure.database.capital_schemes.overviews import (
+from ate_api.infrastructure.database import (
+    AuthorityEntity,
     CapitalSchemeOverviewEntity,
+    FundingProgrammeEntity,
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 
 
 class TestSchemeTypeName:
