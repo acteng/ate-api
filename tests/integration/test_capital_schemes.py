@@ -17,6 +17,7 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
@@ -84,7 +85,7 @@ async def test_get_capital_scheme_with_financials(
         CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
     )
     await capital_schemes.add(capital_scheme)

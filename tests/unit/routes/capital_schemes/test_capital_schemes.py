@@ -13,6 +13,7 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel, CapitalSchemeBidStatusDetailsModel
@@ -75,14 +76,14 @@ class TestCapitalSchemeModel:
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 type=FinancialType.FUNDING_ALLOCATION,
-                amount=2_000_000,
+                amount=Money(2_000_000),
             )
         )
         capital_scheme.change_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 type=FinancialType.SPEND_TO_DATE,
-                amount=1_000_000,
+                amount=Money(1_000_000),
             )
         )
 
@@ -227,12 +228,12 @@ class TestCapitalSchemeModel:
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 type=FinancialType.FUNDING_ALLOCATION,
-                amount=2_000_000,
+                amount=Money(2_000_000),
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1)),
                 type=FinancialType.SPEND_TO_DATE,
-                amount=1_000_000,
+                amount=Money(1_000_000),
             ),
         ]
 

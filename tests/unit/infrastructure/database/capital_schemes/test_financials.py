@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
+from ate_api.domain.moneys import Money
 from ate_api.infrastructure.database import CapitalSchemeFinancialEntity, FinancialTypeEntity, FinancialTypeName
 
 
@@ -11,7 +12,7 @@ class TestCapitalSchemeFinancialEntity:
         financial = CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
 
         financial_entity = CapitalSchemeFinancialEntity.from_domain(financial, {FinancialType.FUNDING_ALLOCATION: 1})
@@ -27,7 +28,7 @@ class TestCapitalSchemeFinancialEntity:
         financial = CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
 
         financial_entity = CapitalSchemeFinancialEntity.from_domain(financial, {FinancialType.FUNDING_ALLOCATION: 0})
@@ -40,7 +41,7 @@ class TestCapitalSchemeFinancialEntity:
                 datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
             ),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
 
         financial_entity = CapitalSchemeFinancialEntity.from_domain(financial, {FinancialType.FUNDING_ALLOCATION: 0})
@@ -63,7 +64,7 @@ class TestCapitalSchemeFinancialEntity:
                 datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
             ),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
 
     def test_to_domain_when_current(self) -> None:

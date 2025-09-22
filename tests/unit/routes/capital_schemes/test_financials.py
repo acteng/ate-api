@@ -3,6 +3,7 @@ from datetime import datetime
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
+from ate_api.domain.moneys import Money
 from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialModel
 from ate_api.routes.financial_types import FinancialTypeModel
 
@@ -12,7 +13,7 @@ class TestCapitalSchemeFinancialModel:
         financial = CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
 
         financial_model = CapitalSchemeFinancialModel.from_domain(financial)
@@ -33,5 +34,5 @@ class TestCapitalSchemeFinancialModel:
         assert financial == CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1)),
             type=FinancialType.FUNDING_ALLOCATION,
-            amount=2_000_000,
+            amount=Money(2_000_000),
         )
