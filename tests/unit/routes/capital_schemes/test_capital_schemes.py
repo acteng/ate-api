@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 
 from fastapi import Request
 from pydantic import AnyUrl
@@ -9,6 +10,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
@@ -24,6 +26,7 @@ from ate_api.routes.capital_schemes.milestones import (
     CapitalSchemeMilestonesModel,
     MilestoneModel,
 )
+from ate_api.routes.capital_schemes.outputs import CapitalSchemeOutputModel, OutputMeasureModel, OutputTypeModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.financial_types import FinancialTypeModel
@@ -63,6 +66,7 @@ class TestCapitalSchemeModel:
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
             financials=CollectionModel[CapitalSchemeFinancialModel](items=[]),
             milestones=CapitalSchemeMilestonesModel(current_milestone=None, items=[]),
+            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
             authority_review=None,
         )
 
@@ -159,6 +163,48 @@ class TestCapitalSchemeModel:
             ),
         ]
 
+    def test_from_domain_sets_outputs(self, http_request: Request) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_output(
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(1.5),
+            )
+        )
+        capital_scheme.change_output(
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(2),
+            )
+        )
+
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
+
+        assert capital_scheme_model.outputs.items == [
+            CapitalSchemeOutputModel(
+                type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasureModel.MILES,
+                observation_type=ObservationTypeModel.ACTUAL,
+                value=Decimal(1.5),
+            ),
+            CapitalSchemeOutputModel(
+                type=OutputTypeModel.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasureModel.MILES,
+                observation_type=ObservationTypeModel.ACTUAL,
+                value=Decimal(2),
+            ),
+        ]
+
     def test_from_domain_sets_authority_review(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -185,6 +231,7 @@ class TestCapitalSchemeModel:
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
             financials=CollectionModel[CapitalSchemeFinancialModel](items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
+            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
             authority_review=None,
         )
 
@@ -220,6 +267,7 @@ class TestCapitalSchemeModel:
                 ]
             ),
             milestones=CapitalSchemeMilestonesModel(items=[]),
+            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
         )
 
         capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1), http_request)
@@ -257,6 +305,7 @@ class TestCapitalSchemeModel:
                     ),
                 ]
             ),
+            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
         )
 
         capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1), http_request)
@@ -276,6 +325,50 @@ class TestCapitalSchemeModel:
             ),
         ]
 
+    def test_to_domain_sets_outputs(self, http_request: Request, base_url: str) -> None:
+        capital_scheme_model = CapitalSchemeModel(
+            reference="ATE00001",
+            overview=dummy_overview_model(base_url),
+            bid_status_details=dummy_bid_status_details_model(),
+            financials=CollectionModel[CapitalSchemeFinancialModel](items=[]),
+            milestones=CapitalSchemeMilestonesModel(items=[]),
+            outputs=CollectionModel[CapitalSchemeOutputModel](
+                items=[
+                    CapitalSchemeOutputModel(
+                        type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
+                        measure=OutputMeasureModel.MILES,
+                        observation_type=ObservationTypeModel.ACTUAL,
+                        value=Decimal(1.5),
+                    ),
+                    CapitalSchemeOutputModel(
+                        type=OutputTypeModel.NEW_SEGREGATED_CYCLING_FACILITY,
+                        measure=OutputMeasureModel.MILES,
+                        observation_type=ObservationTypeModel.ACTUAL,
+                        value=Decimal(2),
+                    ),
+                ]
+            ),
+        )
+
+        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1), http_request)
+
+        assert capital_scheme.outputs == [
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(1.5),
+            ),
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(2),
+            ),
+        ]
+
     def test_to_domain_sets_authority_review(self, http_request: Request, base_url: str) -> None:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
@@ -283,6 +376,7 @@ class TestCapitalSchemeModel:
             bid_status_details=dummy_bid_status_details_model(),
             financials=CollectionModel[CapitalSchemeFinancialModel](items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
+            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
             authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1)),
         )
 

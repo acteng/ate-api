@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
@@ -6,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
@@ -204,6 +206,44 @@ class TestCapitalScheme:
         capital_scheme.change_milestone(milestone)
 
         assert capital_scheme.milestones == [milestone]
+
+    def test_outputs_is_copy(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_output(
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                value=Decimal(1.5),
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+            )
+        )
+
+        capital_scheme.outputs.clear()
+
+        assert capital_scheme.outputs
+
+    def test_change_output(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        output = CapitalSchemeOutput(
+            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            type=OutputType.WIDENING_EXISTING_FOOTWAY,
+            value=Decimal(1.5),
+            measure=OutputMeasure.MILES,
+            observation_type=ObservationType.ACTUAL,
+        )
+
+        capital_scheme.change_output(output)
+
+        assert capital_scheme.outputs == [output]
 
     def test_perform_authority_review(self) -> None:
         capital_scheme = CapitalScheme(

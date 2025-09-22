@@ -8,6 +8,7 @@ from sqlalchemy.sql.ddl import CreateSchema
 
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.milestones import Milestone
+from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.observation_types import ObservationType
@@ -17,6 +18,11 @@ from ate_api.infrastructure.database import (
     BidStatusName,
     FinancialTypeEntity,
     FinancialTypeName,
+    InterventionMeasureEntity,
+    InterventionMeasureName,
+    InterventionTypeEntity,
+    InterventionTypeMeasureEntity,
+    InterventionTypeName,
     MilestoneEntity,
     MilestoneName,
     ObservationTypeEntity,
@@ -81,6 +87,24 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
         session.add_all(
             [BidStatusEntity(bid_status_name=BidStatusName.from_domain(bid_status)) for bid_status in BidStatus]
         )
+        intervention_measures = {
+            measure: InterventionMeasureEntity(intervention_measure_name=InterventionMeasureName.from_domain(measure))
+            for measure in OutputMeasure
+        }
+        session.add_all(intervention_measures.values())
+        intervention_types = {
+            type_: InterventionTypeEntity(intervention_type_name=InterventionTypeName.from_domain(type_))
+            for type_ in OutputType
+        }
+        session.add_all(intervention_types.values())
+        session.add_all(
+            [
+                InterventionTypeMeasureEntity(
+                    intervention_type=intervention_types[type_], intervention_measure=intervention_measures[measure]
+                )
+                for (type_, measure) in _get_output_type_measures()
+            ]
+        )
         session.add_all(
             [
                 MilestoneEntity(
@@ -96,3 +120,35 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
             [SchemeTypeEntity(scheme_type_name=SchemeTypeName.from_domain(type_)) for type_ in CapitalSchemeType]
         )
         await session.commit()
+
+
+def _get_output_type_measures() -> list[tuple[OutputType, OutputMeasure]]:
+    return [
+        (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES),
+        (OutputType.RESTRICTION_OR_REDUCTION_OF_CAR_PARKING_AVAILABILITY, OutputMeasure.MILES),
+        (OutputType.BUS_PRIORITY_MEASURES, OutputMeasure.MILES),
+        (OutputType.IMPROVEMENTS_TO_EXISTING_ROUTE, OutputMeasure.MILES),
+        (OutputType.NEW_SHARED_USE_WALKING_WHEELING_AND_CYCLING_FACILITIES, OutputMeasure.MILES),
+        (OutputType.NEW_SHARED_USE_WALKING_AND_CYCLING_FACILITIES, OutputMeasure.MILES),
+        (OutputType.NEW_TEMPORARY_FOOTWAY, OutputMeasure.MILES),
+        (OutputType.NEW_PERMANENT_FOOTWAY, OutputMeasure.MILES),
+        (OutputType.NEW_TEMPORARY_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES),
+        (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES),
+        (OutputType.IMPROVEMENTS_TO_EXISTING_ROUTE, OutputMeasure.NUMBER_OF_JUNCTIONS),
+        (OutputType.NEW_PERMANENT_FOOTWAY, OutputMeasure.NUMBER_OF_JUNCTIONS),
+        (OutputType.NEW_JUNCTION_TREATMENT, OutputMeasure.NUMBER_OF_JUNCTIONS),
+        (OutputType.NEW_TEMPORARY_SEGREGATED_CYCLING_FACILITY, OutputMeasure.NUMBER_OF_JUNCTIONS),
+        (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.NUMBER_OF_JUNCTIONS),
+        (OutputType.AREA_WIDE_TRAFFIC_MANAGEMENT, OutputMeasure.SIZE_OF_AREA),
+        (OutputType.PARK_AND_CYCLE_STRIDE_FACILITIES, OutputMeasure.NUMBER_OF_PARKING_SPACES),
+        (OutputType.RESTRICTION_OR_REDUCTION_OF_CAR_PARKING_AVAILABILITY, OutputMeasure.NUMBER_OF_PARKING_SPACES),
+        (OutputType.SECURE_CYCLE_PARKING, OutputMeasure.NUMBER_OF_PARKING_SPACES),
+        (OutputType.NEW_ROAD_CROSSINGS, OutputMeasure.NUMBER_OF_CROSSINGS),
+        (OutputType.SCHOOL_STREETS, OutputMeasure.NUMBER_OF_SCHOOL_STREETS),
+        (OutputType.E_SCOOTER_TRIALS, OutputMeasure.NUMBER_OF_TRIALS),
+        (OutputType.BUS_PRIORITY_MEASURES, OutputMeasure.NUMBER_OF_BUS_GATES),
+        (OutputType.UPGRADES_TO_EXISTING_FACILITIES, OutputMeasure.NUMBER_OF_UPGRADES),
+        (OutputType.SCHOOL_STREETS, OutputMeasure.NUMBER_OF_CHILDREN_AFFECTED),
+        (OutputType.OTHER_INTERVENTIONS, OutputMeasure.NUMBER_OF_MEASURES_PLANNED),
+        (OutputType.TRAFFIC_CALMING, OutputMeasure.NUMBER_OF_MEASURES_PLANNED),
+    ]

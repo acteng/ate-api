@@ -22,6 +22,7 @@ from ate_api.routes.capital_schemes.milestones import (
     CapitalSchemeMilestonesModel,
     MilestoneModel,
 )
+from ate_api.routes.capital_schemes.outputs import CapitalSchemeOutputModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 from ate_api.routes.collections import CollectionModel
 
@@ -33,6 +34,7 @@ class CapitalSchemeModel(BaseModel):
     bid_status_details: CapitalSchemeBidStatusDetailsModel
     financials: CollectionModel[CapitalSchemeFinancialModel]
     milestones: CapitalSchemeMilestonesModel
+    outputs: CollectionModel[CapitalSchemeOutputModel]
     authority_review: CapitalSchemeAuthorityReviewModel | None = None
 
     @classmethod
@@ -53,6 +55,9 @@ class CapitalSchemeModel(BaseModel):
                 ),
                 items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in capital_scheme.milestones],
             ),
+            outputs=CollectionModel[CapitalSchemeOutputModel](
+                items=[CapitalSchemeOutputModel.from_domain(output) for output in capital_scheme.outputs]
+            ),
             authority_review=(
                 CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme.authority_review)
                 if capital_scheme.authority_review
@@ -72,6 +77,9 @@ class CapitalSchemeModel(BaseModel):
 
         for milestone in self.milestones.items:
             capital_scheme.change_milestone(milestone.to_domain(now))
+
+        for output in self.outputs.items:
+            capital_scheme.change_output(output.to_domain(now))
 
         if self.authority_review:
             capital_scheme.perform_authority_review(self.authority_review.to_domain())

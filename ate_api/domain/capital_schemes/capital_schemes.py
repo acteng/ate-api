@@ -5,6 +5,7 @@ from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthor
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -39,6 +40,7 @@ class CapitalScheme:
         self._bid_status_details = bid_status_details
         self._financials: list[CapitalSchemeFinancial] = []
         self._milestones: list[CapitalSchemeMilestone] = []
+        self._outputs: list[CapitalSchemeOutput] = []
         self._authority_review: CapitalSchemeAuthorityReview | None = None
 
     @property
@@ -75,6 +77,13 @@ class CapitalScheme:
 
     def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
         self._milestones.append(milestone)
+
+    @property
+    def outputs(self) -> list[CapitalSchemeOutput]:
+        return list(self._outputs)
+
+    def change_output(self, output: CapitalSchemeOutput) -> None:
+        self._outputs.append(output)
 
     @property
     def authority_review(self) -> CapitalSchemeAuthorityReview | None:

@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from decimal import Decimal
 
 import pytest
 from sqlalchemy import select
@@ -10,6 +11,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
@@ -24,11 +26,17 @@ from ate_api.infrastructure.database import (
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeFinancialEntity,
+    CapitalSchemeInterventionEntity,
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
     FinancialTypeEntity,
     FinancialTypeName,
     FundingProgrammeEntity,
+    InterventionMeasureEntity,
+    InterventionMeasureName,
+    InterventionTypeEntity,
+    InterventionTypeMeasureEntity,
+    InterventionTypeName,
     MilestoneEntity,
     MilestoneName,
     ObservationTypeEntity,
@@ -45,6 +53,9 @@ from tests.unit.infrastructure.database.builders import (
     build_capital_scheme_overview_entity,
     build_financial_type_entity,
     build_funding_programme_entity,
+    build_intervention_measure_entity,
+    build_intervention_type_entity,
+    build_intervention_type_measure_entity,
     build_milestone_entity,
     build_observation_type_entity,
     build_scheme_type_entity,
@@ -74,6 +85,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("ATF3"): 2},
             {CapitalSchemeType.CONSTRUCTION: 3},
             {BidStatus.FUNDED: 4},
+            {},
             {},
             {},
             {},
@@ -127,6 +139,7 @@ class TestCapitalSchemeEntity:
             {FinancialType.FUNDING_ALLOCATION: 1, FinancialType.SPEND_TO_DATE: 2},
             {},
             {},
+            {},
         )
 
         financial_entity1, financial_entity2 = capital_scheme_entity.capital_scheme_financials
@@ -175,6 +188,7 @@ class TestCapitalSchemeEntity:
             {},
             {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
             {ObservationType.ACTUAL: 3},
+            {},
         )
 
         milestone_entity1, milestone_entity2 = capital_scheme_entity.capital_scheme_milestones
@@ -193,6 +207,62 @@ class TestCapitalSchemeEntity:
             and not milestone_entity2.effective_date_to
         )
 
+    def test_from_domain_sets_outputs(self) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.change_output(
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(1.5),
+            )
+        )
+        capital_scheme.change_output(
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(2),
+            )
+        )
+
+        capital_scheme_entity = CapitalSchemeEntity.from_domain(
+            capital_scheme,
+            {AuthorityAbbreviation("dummy"): 0},
+            {FundingProgrammeCode("dummy"): 0},
+            {CapitalSchemeType.DEVELOPMENT: 0},
+            {BidStatus.SUBMITTED: 0},
+            {},
+            {},
+            {ObservationType.ACTUAL: 3},
+            {
+                (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
+                (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
+            },
+        )
+
+        intervention_entity1, intervention_entity2 = capital_scheme_entity.capital_scheme_interventions
+        assert (
+            intervention_entity1.intervention_type_measure_id == 1
+            and intervention_entity1.intervention_value == Decimal(1.5)
+            and intervention_entity1.observation_type_id == 3
+            and intervention_entity1.effective_date_from == datetime(2020, 1, 1)
+            and not intervention_entity1.effective_date_to
+        )
+        assert (
+            intervention_entity2.intervention_type_measure_id == 2
+            and intervention_entity2.intervention_value == Decimal(2)
+            and intervention_entity2.observation_type_id == 3
+            and intervention_entity2.effective_date_from == datetime(2020, 1, 1)
+            and not intervention_entity2.effective_date_to
+        )
+
     def test_from_domain_sets_authority_review(self) -> None:
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -207,6 +277,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {},
             {},
             {},
             {},
@@ -322,6 +393,60 @@ class TestCapitalSchemeEntity:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+            ),
+        ]
+
+    def test_to_domain_sets_outputs(self) -> None:
+        capital_scheme_entity = CapitalSchemeEntity(
+            scheme_reference="ATE00001",
+            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+            capital_scheme_interventions=[
+                CapitalSchemeInterventionEntity(
+                    intervention_type_measure=InterventionTypeMeasureEntity(
+                        intervention_type=InterventionTypeEntity(
+                            intervention_type_name=InterventionTypeName.WIDENING_EXISTING_FOOTWAY
+                        ),
+                        intervention_measure=InterventionMeasureEntity(
+                            intervention_measure_name=InterventionMeasureName.MILES
+                        ),
+                    ),
+                    intervention_value=Decimal("1.500000"),
+                    observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    effective_date_from=datetime(2020, 1, 1),
+                ),
+                CapitalSchemeInterventionEntity(
+                    intervention_type_measure=InterventionTypeMeasureEntity(
+                        intervention_type=InterventionTypeEntity(
+                            intervention_type_name=InterventionTypeName.NEW_SEGREGATED_CYCLING_FACILITY
+                        ),
+                        intervention_measure=InterventionMeasureEntity(
+                            intervention_measure_name=InterventionMeasureName.MILES
+                        ),
+                    ),
+                    intervention_value=Decimal("2.000000"),
+                    observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
+                    effective_date_from=datetime(2020, 1, 1),
+                ),
+            ],
+        )
+
+        capital_scheme = capital_scheme_entity.to_domain()
+
+        assert capital_scheme.outputs == [
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(1.5),
+            ),
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(2),
             ),
         ]
 
@@ -505,6 +630,74 @@ class TestDatabaseCapitalSchemeRepository:
             and milestone_row2.observation_type_id == 1
             and milestone_row2.effective_date_from == datetime(2020, 1, 1)
             and not milestone_row2.effective_date_to
+        )
+
+    async def test_add_stores_outputs(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_authority_entity(),
+                    build_funding_programme_entity(),
+                    build_scheme_type_entity(),
+                    build_bid_status_entity(),
+                    widening_existing_footway := build_intervention_type_entity(
+                        name=InterventionTypeName.WIDENING_EXISTING_FOOTWAY
+                    ),
+                    new_segregated_cycling_facility := build_intervention_type_entity(
+                        name=InterventionTypeName.NEW_SEGREGATED_CYCLING_FACILITY
+                    ),
+                    miles := build_intervention_measure_entity(name=InterventionMeasureName.MILES),
+                    build_intervention_type_measure_entity(id_=1, type_=widening_existing_footway, measure=miles),
+                    build_intervention_type_measure_entity(id_=2, type_=new_segregated_cycling_facility, measure=miles),
+                    build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=dummy_overview(),
+                bid_status_details=dummy_bid_status_details(),
+            )
+            capital_scheme.change_output(
+                CapitalSchemeOutput(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                    measure=OutputMeasure.MILES,
+                    observation_type=ObservationType.ACTUAL,
+                    value=Decimal(1.5),
+                )
+            )
+            capital_scheme.change_output(
+                CapitalSchemeOutput(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                    measure=OutputMeasure.MILES,
+                    observation_type=ObservationType.ACTUAL,
+                    value=Decimal(2),
+                )
+            )
+            await capital_schemes.add(capital_scheme)
+
+        async with AsyncSession(engine) as session:
+            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
+            intervention_row1, intervention_row2 = await session.scalars(select(CapitalSchemeInterventionEntity))
+        assert (
+            intervention_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and intervention_row1.intervention_type_measure_id == 1
+            and intervention_row1.intervention_value == Decimal(1.5)
+            and intervention_row1.observation_type_id == 1
+            and intervention_row1.effective_date_from == datetime(2020, 1, 1)
+            and not intervention_row1.effective_date_to
+        )
+        assert (
+            intervention_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and intervention_row2.intervention_type_measure_id == 2
+            and intervention_row2.intervention_value == Decimal(2)
+            and intervention_row2.observation_type_id == 1
+            and intervention_row2.effective_date_from == datetime(2020, 1, 1)
+            and not intervention_row2.effective_date_to
         )
 
     async def test_add_stores_authority_review(self, engine: AsyncEngine) -> None:
@@ -893,6 +1086,74 @@ class TestDatabaseCapitalSchemeRepository:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
+            ),
+        ]
+
+    async def test_get_fetches_current_outputs(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    widening_existing_footway := build_intervention_type_entity(
+                        name=InterventionTypeName.WIDENING_EXISTING_FOOTWAY
+                    ),
+                    new_segregated_cycling_facility := build_intervention_type_entity(
+                        name=InterventionTypeName.NEW_SEGREGATED_CYCLING_FACILITY
+                    ),
+                    miles := build_intervention_measure_entity(name=InterventionMeasureName.MILES),
+                    widening_existing_footway_miles := build_intervention_type_measure_entity(
+                        type_=widening_existing_footway, measure=miles
+                    ),
+                    new_segregated_cycling_facility_miles := build_intervention_type_measure_entity(
+                        type_=new_segregated_cycling_facility, measure=miles
+                    ),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_interventions=[
+                            CapitalSchemeInterventionEntity(
+                                intervention_type_measure=widening_existing_footway_miles,
+                                intervention_value=Decimal("1.000000"),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_to=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeInterventionEntity(
+                                intervention_type_measure=widening_existing_footway_miles,
+                                intervention_value=Decimal("1.500000"),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeInterventionEntity(
+                                intervention_type_measure=new_segregated_cycling_facility_miles,
+                                intervention_value=Decimal("2.000000"),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.outputs == [
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(1.5),
+            ),
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(2),
             ),
         ]
 

@@ -1,6 +1,6 @@
 from typing import Self
 
-from sqlalchemy import ColumnElement, Select, and_, false, func, or_, select
+from sqlalchemy import ColumnElement, Select, and_, false, func, or_, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, aliased, contains_eager, joinedload, mapped_column, relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
@@ -13,6 +13,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeRepository,
 )
 from ate_api.domain.capital_schemes.milestones import Milestone
+from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -26,6 +27,14 @@ from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     CapitalSchemeBidStatusEntity,
 )
 from ate_api.infrastructure.database.capital_schemes.financials import CapitalSchemeFinancialEntity
+from ate_api.infrastructure.database.capital_schemes.interventions import (
+    CapitalSchemeInterventionEntity,
+    InterventionMeasureEntity,
+    InterventionMeasureName,
+    InterventionTypeEntity,
+    InterventionTypeMeasureEntity,
+    InterventionTypeName,
+)
 from ate_api.infrastructure.database.capital_schemes.milestones import (
     CapitalSchemeMilestoneEntity,
     MilestoneEntity,
@@ -51,6 +60,7 @@ class CapitalSchemeEntity(BaseEntity):
     capital_scheme_bid_statuses: Mapped[list[CapitalSchemeBidStatusEntity]] = relationship(lazy="raise")
     capital_scheme_financials: Mapped[list[CapitalSchemeFinancialEntity]] = relationship(lazy="raise")
     capital_scheme_milestones: Mapped[list[CapitalSchemeMilestoneEntity]] = relationship(lazy="raise")
+    capital_scheme_interventions: Mapped[list[CapitalSchemeInterventionEntity]] = relationship(lazy="raise")
     capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
 
     @classmethod
@@ -64,6 +74,7 @@ class CapitalSchemeEntity(BaseEntity):
         financial_type_ids: dict[FinancialType, int],
         milestone_ids: dict[Milestone, int],
         observation_type_ids: dict[ObservationType, int],
+        intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
     ) -> Self:
         return cls(
             scheme_reference=str(capital_scheme.reference),
@@ -82,6 +93,10 @@ class CapitalSchemeEntity(BaseEntity):
             capital_scheme_milestones=[
                 CapitalSchemeMilestoneEntity.from_domain(milestone, milestone_ids, observation_type_ids)
                 for milestone in capital_scheme.milestones
+            ],
+            capital_scheme_interventions=[
+                CapitalSchemeInterventionEntity.from_domain(output, intervention_type_measure_ids, observation_type_ids)
+                for output in capital_scheme.outputs
             ],
             capital_scheme_authority_reviews=(
                 [CapitalSchemeAuthorityReviewEntity.from_domain(capital_scheme.authority_review)]
@@ -105,6 +120,9 @@ class CapitalSchemeEntity(BaseEntity):
         for capital_scheme_milestone in self.capital_scheme_milestones:
             capital_scheme.change_milestone(capital_scheme_milestone.to_domain())
 
+        for capital_scheme_intervention in self.capital_scheme_interventions:
+            capital_scheme.change_output(capital_scheme_intervention.to_domain())
+
         if self.capital_scheme_authority_reviews:
             (capital_scheme_authority_review,) = self.capital_scheme_authority_reviews
             capital_scheme.perform_authority_review(capital_scheme_authority_review.to_domain())
@@ -124,6 +142,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         financial_type_ids = await self._get_financial_type_ids(capital_scheme)
         milestone_ids = await self._get_milestone_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
+        intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
 
         self._session.add(
             CapitalSchemeEntity.from_domain(
@@ -135,6 +154,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 financial_type_ids,
                 milestone_ids,
                 observation_type_ids,
+                intervention_type_measure_ids,
             )
         )
 
@@ -209,6 +229,12 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             await self._session.scalars(self._select_current_capital_scheme_milestones(row.capital_scheme_id))
         ).all()
         set_committed_value(row, "capital_scheme_milestones", capital_scheme_milestones)
+
+        # fetch current interventions
+        capital_scheme_interventions = (
+            await self._session.scalars(self._select_current_capital_scheme_interventions(row.capital_scheme_id))
+        ).all()
+        set_committed_value(row, "capital_scheme_interventions", capital_scheme_interventions)
 
         return row.to_domain()
 
@@ -346,13 +372,42 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     async def _get_observation_type_ids(self, capital_scheme: CapitalScheme) -> dict[ObservationType, int]:
         observation_type_names = {
             ObservationTypeName.from_domain(milestone.observation_type) for milestone in capital_scheme.milestones
-        }
+        } | {ObservationTypeName.from_domain(output.observation_type) for output in capital_scheme.outputs}
         rows = await self._session.execute(
             select(ObservationTypeEntity.observation_type_name, ObservationTypeEntity.observation_type_id).where(
                 ObservationTypeEntity.observation_type_name.in_(observation_type_names)
             )
         )
         return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
+
+    async def _get_intervention_type_measure_ids(
+        self, capital_scheme: CapitalScheme
+    ) -> dict[tuple[OutputType, OutputMeasure], int]:
+        intervention_type_measure_names = {
+            (InterventionTypeName.from_domain(output.type), InterventionMeasureName.from_domain(output.measure))
+            for output in capital_scheme.outputs
+        }
+        rows = await self._session.execute(
+            select(
+                InterventionTypeEntity.intervention_type_name,
+                InterventionMeasureEntity.intervention_measure_name,
+                InterventionTypeMeasureEntity.intervention_type_measure_id,
+            )
+            .join(InterventionTypeEntity)
+            .join(InterventionMeasureEntity)
+            .where(
+                tuple_(
+                    InterventionTypeEntity.intervention_type_name, InterventionMeasureEntity.intervention_measure_name
+                ).in_(intervention_type_measure_names)
+            )
+        )
+        return {
+            (
+                row.intervention_type_name.to_domain(),
+                row.intervention_measure_name.to_domain(),
+            ): row.intervention_type_measure_id
+            for row in rows
+        }
 
     @staticmethod
     def _select_current_capital_scheme_financials(
@@ -384,6 +439,32 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
             .order_by(MilestoneEntity.stage_order)
             .order_by(ObservationTypeEntity.observation_type_id)
+        )
+
+    @staticmethod
+    def _select_current_capital_scheme_interventions(
+        capital_scheme_id: int,
+    ) -> Select[tuple[CapitalSchemeInterventionEntity]]:
+        return (
+            select(CapitalSchemeInterventionEntity)
+            .options(
+                contains_eager(CapitalSchemeInterventionEntity.intervention_type_measure),
+                contains_eager(
+                    CapitalSchemeInterventionEntity.intervention_type_measure,
+                    InterventionTypeMeasureEntity.intervention_type,
+                ),
+                contains_eager(
+                    CapitalSchemeInterventionEntity.intervention_type_measure,
+                    InterventionTypeMeasureEntity.intervention_measure,
+                ),
+                contains_eager(CapitalSchemeInterventionEntity.observation_type),
+            )
+            .join(InterventionTypeMeasureEntity)
+            .join(InterventionTypeEntity)
+            .join(InterventionMeasureEntity)
+            .join(ObservationTypeEntity)
+            .where(CapitalSchemeInterventionEntity.capital_scheme_id == capital_scheme_id)
+            .where(CapitalSchemeInterventionEntity.effective_date_to.is_(None))
         )
 
     @staticmethod

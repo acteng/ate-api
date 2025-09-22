@@ -35,6 +35,16 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     }
                 ],
             },
+            "outputs": {
+                "items": [
+                    {
+                        "type": "widening existing footway",
+                        "measure": "miles",
+                        "observationType": "actual",
+                        "value": "1.5",
+                    }
+                ],
+            },
             "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
         }
     )
@@ -69,6 +79,16 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
+                }
+            ],
+        },
+        "outputs": {
+            "items": [
+                {
+                    "type": "widening existing footway",
+                    "measure": "miles",
+                    "observationType": "actual",
+                    "value": "1.500000",
                 }
             ],
         },

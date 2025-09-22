@@ -12,6 +12,22 @@ from ate_api.infrastructure.database.capital_schemes.capital_schemes import Capi
 from ate_api.infrastructure.database.capital_schemes.financials import (
     CapitalSchemeFinancialEntity as CapitalSchemeFinancialEntity,
 )
+from ate_api.infrastructure.database.capital_schemes.interventions import (
+    CapitalSchemeInterventionEntity as CapitalSchemeInterventionEntity,
+)
+from ate_api.infrastructure.database.capital_schemes.interventions import (
+    InterventionMeasureEntity as InterventionMeasureEntity,
+)
+from ate_api.infrastructure.database.capital_schemes.interventions import (
+    InterventionMeasureName as InterventionMeasureName,
+)
+from ate_api.infrastructure.database.capital_schemes.interventions import (
+    InterventionTypeEntity as InterventionTypeEntity,
+)
+from ate_api.infrastructure.database.capital_schemes.interventions import (
+    InterventionTypeMeasureEntity as InterventionTypeMeasureEntity,
+)
+from ate_api.infrastructure.database.capital_schemes.interventions import InterventionTypeName as InterventionTypeName
 from ate_api.infrastructure.database.capital_schemes.milestones import (
     CapitalSchemeMilestoneEntity as CapitalSchemeMilestoneEntity,
 )

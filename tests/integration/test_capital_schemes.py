@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from decimal import Decimal
 
 import respx
 from fastapi.testclient import TestClient
@@ -13,6 +14,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 )
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
@@ -66,6 +68,9 @@ async def test_get_capital_scheme(
         },
         "milestones": {
             "currentMilestone": None,
+            "items": [],
+        },
+        "outputs": {
             "items": [],
         },
         "authorityReview": None,
@@ -132,6 +137,41 @@ async def test_get_capital_scheme_with_milestones(
                 "milestone": "detailed design completed",
                 "observationType": "actual",
                 "statusDate": "2020-02-01",
+            }
+        ],
+    }
+
+
+@respx.mock
+async def test_get_capital_scheme_with_outputs(
+    capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    capital_scheme = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00001"),
+        overview=dummy_overview(),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme.change_output(
+        CapitalSchemeOutput(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            type=OutputType.WIDENING_EXISTING_FOOTWAY,
+            measure=OutputMeasure.MILES,
+            observation_type=ObservationType.ACTUAL,
+            value=Decimal(1.5),
+        )
+    )
+    await capital_schemes.add(capital_scheme)
+
+    response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 200
+    assert response.json()["outputs"] == {
+        "items": [
+            {
+                "type": "widening existing footway",
+                "measure": "miles",
+                "observationType": "actual",
+                "value": "1.5",
             }
         ],
     }

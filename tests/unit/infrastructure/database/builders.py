@@ -9,6 +9,11 @@ from ate_api.infrastructure.database import (
     FinancialTypeEntity,
     FinancialTypeName,
     FundingProgrammeEntity,
+    InterventionMeasureEntity,
+    InterventionMeasureName,
+    InterventionTypeEntity,
+    InterventionTypeMeasureEntity,
+    InterventionTypeName,
     MilestoneEntity,
     MilestoneName,
     ObservationTypeEntity,
@@ -74,6 +79,30 @@ def build_milestone_entity(
     return MilestoneEntity(
         milestone_id=id_, milestone_name=name, stage_order=stage_order, is_active=is_active, is_complete=is_complete
     )
+
+
+def build_intervention_type_measure_entity(
+    id_: int | None = None,
+    type_: InterventionTypeEntity | None = None,
+    measure: InterventionMeasureEntity | None = None,
+) -> InterventionTypeMeasureEntity:
+    return InterventionTypeMeasureEntity(
+        intervention_type_measure_id=id_,
+        intervention_type=type_ or build_intervention_type_entity(),
+        intervention_measure=measure or build_intervention_measure_entity(),
+    )
+
+
+def build_intervention_type_entity(
+    id_: int | None = None, name: InterventionTypeName = InterventionTypeName.NEW_SEGREGATED_CYCLING_FACILITY
+) -> InterventionTypeEntity:
+    return InterventionTypeEntity(intervention_type_id=id_, intervention_type_name=name)
+
+
+def build_intervention_measure_entity(
+    id_: int | None = None, name: InterventionMeasureName = InterventionMeasureName.MILES
+) -> InterventionMeasureEntity:
+    return InterventionMeasureEntity(intervention_measure_id=id_, intervention_measure_name=name)
 
 
 def build_observation_type_entity(

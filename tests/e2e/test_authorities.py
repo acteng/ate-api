@@ -38,6 +38,9 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             "milestones": {
                 "items": [],
             },
+            "outputs": {
+                "items": [],
+            },
         }
     )
     app_client.create_capital_scheme(
@@ -56,6 +59,9 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "items": [],
             },
             "milestones": {
+                "items": [],
+            },
+            "outputs": {
                 "items": [],
             },
         }
