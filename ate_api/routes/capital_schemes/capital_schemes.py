@@ -42,7 +42,7 @@ class CapitalSchemeModel(BaseModel):
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
-            financials=CollectionModel(
+            financials=CollectionModel[CapitalSchemeFinancialModel](
                 items=[CapitalSchemeFinancialModel.from_domain(financial) for financial in capital_scheme.financials]
             ),
             milestones=CapitalSchemeMilestonesModel(
