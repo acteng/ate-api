@@ -718,6 +718,49 @@ class TestDatabaseCapitalSchemeRepository:
             ),
         ]
 
+    async def test_get_fetches_current_financials_ordered_by_financial_type(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
+                    spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_financials=[
+                            CapitalSchemeFinancialEntity(
+                                financial_type=spend_to_date,
+                                amount=1_000_000,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeFinancialEntity(
+                                financial_type=funding_allocation,
+                                amount=2_000_000,
+                                effective_date_from=datetime(2020, 2, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.financials == [
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                type=FinancialType.FUNDING_ALLOCATION,
+                amount=2_000_000,
+            ),
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                type=FinancialType.SPEND_TO_DATE,
+                amount=1_000_000,
+            ),
+        ]
+
     async def test_get_fetches_current_milestones(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
