@@ -22,7 +22,7 @@ locals {
       github_action_deploy = true
     }
     test = {
-      image_tag            = "0.8.0"
+      image_tag            = "0.9.0-rc1"
       keep_idle            = false
       domain               = "test.${local.domain}"
       github_action_deploy = false
