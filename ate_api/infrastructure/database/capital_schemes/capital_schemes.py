@@ -465,6 +465,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(ObservationTypeEntity)
             .where(CapitalSchemeInterventionEntity.capital_scheme_id == capital_scheme_id)
             .where(CapitalSchemeInterventionEntity.effective_date_to.is_(None))
+            .order_by(InterventionTypeEntity.intervention_type_id)
+            .order_by(InterventionMeasureEntity.intervention_measure_id)
         )
 
     @staticmethod

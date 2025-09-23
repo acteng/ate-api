@@ -1157,6 +1157,86 @@ class TestDatabaseCapitalSchemeRepository:
             ),
         ]
 
+    async def test_get_fetches_current_outputs_ordered_by_type_then_measure(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    widening_existing_footway := build_intervention_type_entity(
+                        name=InterventionTypeName.WIDENING_EXISTING_FOOTWAY
+                    ),
+                    new_segregated_cycling_facility := build_intervention_type_entity(
+                        name=InterventionTypeName.NEW_SEGREGATED_CYCLING_FACILITY
+                    ),
+                    miles := build_intervention_measure_entity(name=InterventionMeasureName.MILES),
+                    number_of_junctions := build_intervention_measure_entity(
+                        name=InterventionMeasureName.NUMBER_OF_JUNCTIONS
+                    ),
+                    widening_existing_footway_miles := build_intervention_type_measure_entity(
+                        type_=widening_existing_footway, measure=miles
+                    ),
+                    new_segregated_cycling_facility_miles := build_intervention_type_measure_entity(
+                        type_=new_segregated_cycling_facility, measure=miles
+                    ),
+                    new_segregated_cycling_facility_number_of_junctions := build_intervention_type_measure_entity(
+                        type_=new_segregated_cycling_facility, measure=number_of_junctions
+                    ),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_interventions=[
+                            CapitalSchemeInterventionEntity(
+                                intervention_type_measure=new_segregated_cycling_facility_number_of_junctions,
+                                intervention_value=Decimal("3.000000"),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                            CapitalSchemeInterventionEntity(
+                                intervention_type_measure=new_segregated_cycling_facility_miles,
+                                intervention_value=Decimal("2.000000"),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                            CapitalSchemeInterventionEntity(
+                                intervention_type_measure=widening_existing_footway_miles,
+                                intervention_value=Decimal("1.500000"),
+                                observation_type=actual,
+                                effective_date_from=datetime(2020, 1, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.outputs == [
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=OutputType.WIDENING_EXISTING_FOOTWAY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(1.5),
+            ),
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.MILES,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(2),
+            ),
+            CapitalSchemeOutput(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
+                measure=OutputMeasure.NUMBER_OF_JUNCTIONS,
+                observation_type=ObservationType.ACTUAL,
+                value=Decimal(3),
+            ),
+        ]
+
     async def test_get_fetches_latest_authority_review(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
