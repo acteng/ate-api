@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+import pytest
+
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
@@ -13,12 +15,19 @@ from ate_api.infrastructure.database import (
 )
 
 
+@pytest.mark.parametrize(
+    "type_, type_name",
+    [
+        (CapitalSchemeType.DEVELOPMENT, SchemeTypeName.DEVELOPMENT),
+        (CapitalSchemeType.CONSTRUCTION, SchemeTypeName.CONSTRUCTION),
+    ],
+)
 class TestSchemeTypeName:
-    def test_from_domain(self) -> None:
-        assert SchemeTypeName.from_domain(CapitalSchemeType.CONSTRUCTION) == SchemeTypeName.CONSTRUCTION
+    def test_from_domain(self, type_: CapitalSchemeType, type_name: SchemeTypeName) -> None:
+        assert SchemeTypeName.from_domain(type_) == type_name
 
-    def test_to_domain(self) -> None:
-        assert SchemeTypeName.CONSTRUCTION.to_domain() == CapitalSchemeType.CONSTRUCTION
+    def test_to_domain(self, type_: CapitalSchemeType, type_name: SchemeTypeName) -> None:
+        assert type_name.to_domain() == type_
 
 
 class TestCapitalSchemeOverviewEntity:

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from fastapi import Request
 from pydantic import AnyUrl
 
@@ -10,12 +11,19 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 
 
+@pytest.mark.parametrize(
+    "type_, type_model",
+    [
+        (CapitalSchemeType.DEVELOPMENT, CapitalSchemeTypeModel.DEVELOPMENT),
+        (CapitalSchemeType.CONSTRUCTION, CapitalSchemeTypeModel.CONSTRUCTION),
+    ],
+)
 class TestCapitalSchemeTypeModel:
-    def test_from_domain(self) -> None:
-        assert CapitalSchemeTypeModel.from_domain(CapitalSchemeType.CONSTRUCTION) == CapitalSchemeTypeModel.CONSTRUCTION
+    def test_from_domain(self, type_: CapitalSchemeType, type_model: CapitalSchemeTypeModel) -> None:
+        assert CapitalSchemeTypeModel.from_domain(type_) == type_model
 
-    def test_to_domain(self) -> None:
-        assert CapitalSchemeTypeModel.CONSTRUCTION.to_domain() == CapitalSchemeType.CONSTRUCTION
+    def test_to_domain(self, type_: CapitalSchemeType, type_model: CapitalSchemeTypeModel) -> None:
+        assert type_model.to_domain() == type_
 
 
 class TestCapitalSchemeOverviewModel:
