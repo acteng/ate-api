@@ -1,16 +1,28 @@
 from datetime import datetime, timezone
 
+import pytest
+
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.database import BidStatusEntity, BidStatusName, CapitalSchemeBidStatusEntity
 
 
+@pytest.mark.parametrize(
+    "bid_status, bid_status_name",
+    [
+        (BidStatus.SUBMITTED, BidStatusName.SUBMITTED),
+        (BidStatus.FUNDED, BidStatusName.FUNDED),
+        (BidStatus.NOT_FUNDED, BidStatusName.NOT_FUNDED),
+        (BidStatus.SPLIT, BidStatusName.SPLIT),
+        (BidStatus.DELETED, BidStatusName.DELETED),
+    ],
+)
 class TestBidStatusName:
-    def test_to_domain(self) -> None:
-        assert BidStatusName.FUNDED.to_domain() == BidStatus.FUNDED
+    def test_to_domain(self, bid_status: BidStatus, bid_status_name: BidStatusName) -> None:
+        assert bid_status_name.to_domain() == bid_status
 
-    def test_from_domain(self) -> None:
-        assert BidStatusName.from_domain(BidStatus.FUNDED) == BidStatusName.FUNDED
+    def test_from_domain(self, bid_status: BidStatus, bid_status_name: BidStatusName) -> None:
+        assert BidStatusName.from_domain(bid_status) == bid_status_name
 
 
 class TestCapitalSchemeBidStatusEntity:
