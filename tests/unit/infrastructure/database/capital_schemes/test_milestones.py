@@ -17,12 +17,29 @@ from ate_api.infrastructure.database.capital_schemes.milestones import DatabaseM
 from tests.unit.infrastructure.database.builders import build_milestone_entity
 
 
+@pytest.mark.parametrize(
+    "milestone, milestone_name",
+    [
+        (Milestone.PUBLIC_CONSULTATION_COMPLETED, MilestoneName.PUBLIC_CONSULTATION_COMPLETED),
+        (Milestone.FEASIBILITY_DESIGN_STARTED, MilestoneName.FEASIBILITY_DESIGN_STARTED),
+        (Milestone.FEASIBILITY_DESIGN_COMPLETED, MilestoneName.FEASIBILITY_DESIGN_COMPLETED),
+        (Milestone.PRELIMINARY_DESIGN_COMPLETED, MilestoneName.PRELIMINARY_DESIGN_COMPLETED),
+        (Milestone.OUTLINE_DESIGN_COMPLETED, MilestoneName.OUTLINE_DESIGN_COMPLETED),
+        (Milestone.DETAILED_DESIGN_COMPLETED, MilestoneName.DETAILED_DESIGN_COMPLETED),
+        (Milestone.CONSTRUCTION_STARTED, MilestoneName.CONSTRUCTION_STARTED),
+        (Milestone.CONSTRUCTION_COMPLETED, MilestoneName.CONSTRUCTION_COMPLETED),
+        (Milestone.FUNDING_COMPLETED, MilestoneName.FUNDING_COMPLETED),
+        (Milestone.NOT_PROGRESSED, MilestoneName.NOT_PROGRESSED),
+        (Milestone.SUPERSEDED, MilestoneName.SUPERSEDED),
+        (Milestone.REMOVED, MilestoneName.REMOVED),
+    ],
+)
 class TestMilestoneName:
-    def test_from_domain(self) -> None:
-        assert MilestoneName.from_domain(Milestone.DETAILED_DESIGN_COMPLETED) == MilestoneName.DETAILED_DESIGN_COMPLETED
+    def test_from_domain(self, milestone: Milestone, milestone_name: MilestoneName) -> None:
+        assert MilestoneName.from_domain(milestone) == milestone_name
 
-    def test_to_domain(self) -> None:
-        assert MilestoneName.DETAILED_DESIGN_COMPLETED.to_domain() == Milestone.DETAILED_DESIGN_COMPLETED
+    def test_to_domain(self, milestone: Milestone, milestone_name: MilestoneName) -> None:
+        assert milestone_name.to_domain() == milestone
 
 
 class TestCapitalSchemeMilestoneEntity:

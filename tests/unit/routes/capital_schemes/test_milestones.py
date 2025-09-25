@@ -1,5 +1,7 @@
 from datetime import date, datetime
 
+import pytest
+
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
@@ -7,14 +9,29 @@ from ate_api.routes.capital_schemes.milestones import CapitalSchemeMilestoneMode
 from ate_api.routes.observation_types import ObservationTypeModel
 
 
+@pytest.mark.parametrize(
+    "milestone, milestone_model",
+    [
+        (Milestone.PUBLIC_CONSULTATION_COMPLETED, MilestoneModel.PUBLIC_CONSULTATION_COMPLETED),
+        (Milestone.FEASIBILITY_DESIGN_STARTED, MilestoneModel.FEASIBILITY_DESIGN_STARTED),
+        (Milestone.FEASIBILITY_DESIGN_COMPLETED, MilestoneModel.FEASIBILITY_DESIGN_COMPLETED),
+        (Milestone.PRELIMINARY_DESIGN_COMPLETED, MilestoneModel.PRELIMINARY_DESIGN_COMPLETED),
+        (Milestone.OUTLINE_DESIGN_COMPLETED, MilestoneModel.OUTLINE_DESIGN_COMPLETED),
+        (Milestone.DETAILED_DESIGN_COMPLETED, MilestoneModel.DETAILED_DESIGN_COMPLETED),
+        (Milestone.CONSTRUCTION_STARTED, MilestoneModel.CONSTRUCTION_STARTED),
+        (Milestone.CONSTRUCTION_COMPLETED, MilestoneModel.CONSTRUCTION_COMPLETED),
+        (Milestone.FUNDING_COMPLETED, MilestoneModel.FUNDING_COMPLETED),
+        (Milestone.NOT_PROGRESSED, MilestoneModel.NOT_PROGRESSED),
+        (Milestone.SUPERSEDED, MilestoneModel.SUPERSEDED),
+        (Milestone.REMOVED, MilestoneModel.REMOVED),
+    ],
+)
 class TestMilestoneModel:
-    def test_from_domain(self) -> None:
-        assert (
-            MilestoneModel.from_domain(Milestone.DETAILED_DESIGN_COMPLETED) == MilestoneModel.DETAILED_DESIGN_COMPLETED
-        )
+    def test_from_domain(self, milestone: Milestone, milestone_model: MilestoneModel) -> None:
+        assert MilestoneModel.from_domain(milestone) == milestone_model
 
-    def test_to_domain(self) -> None:
-        assert MilestoneModel.DETAILED_DESIGN_COMPLETED.to_domain() == Milestone.DETAILED_DESIGN_COMPLETED
+    def test_to_domain(self, milestone: Milestone, milestone_model: MilestoneModel) -> None:
+        assert milestone_model.to_domain() == milestone
 
 
 class TestCapitalSchemeMilestoneModel:
