@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from decimal import Decimal
 
+import pytest
+
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
@@ -16,23 +18,73 @@ from ate_api.infrastructure.database import (
 )
 
 
+@pytest.mark.parametrize(
+    "type_, type_name",
+    [
+        (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, InterventionTypeName.NEW_SEGREGATED_CYCLING_FACILITY),
+        (
+            OutputType.NEW_TEMPORARY_SEGREGATED_CYCLING_FACILITY,
+            InterventionTypeName.NEW_TEMPORARY_SEGREGATED_CYCLING_FACILITY,
+        ),
+        (OutputType.NEW_JUNCTION_TREATMENT, InterventionTypeName.NEW_JUNCTION_TREATMENT),
+        (OutputType.NEW_PERMANENT_FOOTWAY, InterventionTypeName.NEW_PERMANENT_FOOTWAY),
+        (OutputType.NEW_TEMPORARY_FOOTWAY, InterventionTypeName.NEW_TEMPORARY_FOOTWAY),
+        (
+            OutputType.NEW_SHARED_USE_WALKING_AND_CYCLING_FACILITIES,
+            InterventionTypeName.NEW_SHARED_USE_WALKING_AND_CYCLING_FACILITIES,
+        ),
+        (
+            OutputType.NEW_SHARED_USE_WALKING_WHEELING_AND_CYCLING_FACILITIES,
+            InterventionTypeName.NEW_SHARED_USE_WALKING_WHEELING_AND_CYCLING_FACILITIES,
+        ),
+        (OutputType.IMPROVEMENTS_TO_EXISTING_ROUTE, InterventionTypeName.IMPROVEMENTS_TO_EXISTING_ROUTE),
+        (OutputType.AREA_WIDE_TRAFFIC_MANAGEMENT, InterventionTypeName.AREA_WIDE_TRAFFIC_MANAGEMENT),
+        (OutputType.BUS_PRIORITY_MEASURES, InterventionTypeName.BUS_PRIORITY_MEASURES),
+        (OutputType.SECURE_CYCLE_PARKING, InterventionTypeName.SECURE_CYCLE_PARKING),
+        (OutputType.NEW_ROAD_CROSSINGS, InterventionTypeName.NEW_ROAD_CROSSINGS),
+        (
+            OutputType.RESTRICTION_OR_REDUCTION_OF_CAR_PARKING_AVAILABILITY,
+            InterventionTypeName.RESTRICTION_OR_REDUCTION_OF_CAR_PARKING_AVAILABILITY,
+        ),
+        (OutputType.SCHOOL_STREETS, InterventionTypeName.SCHOOL_STREETS),
+        (OutputType.UPGRADES_TO_EXISTING_FACILITIES, InterventionTypeName.UPGRADES_TO_EXISTING_FACILITIES),
+        (OutputType.E_SCOOTER_TRIALS, InterventionTypeName.E_SCOOTER_TRIALS),
+        (OutputType.PARK_AND_CYCLE_STRIDE_FACILITIES, InterventionTypeName.PARK_AND_CYCLE_STRIDE_FACILITIES),
+        (OutputType.TRAFFIC_CALMING, InterventionTypeName.TRAFFIC_CALMING),
+        (OutputType.WIDENING_EXISTING_FOOTWAY, InterventionTypeName.WIDENING_EXISTING_FOOTWAY),
+        (OutputType.OTHER_INTERVENTIONS, InterventionTypeName.OTHER_INTERVENTIONS),
+    ],
+)
 class TestInterventionTypeName:
-    def test_from_domain(self) -> None:
-        assert (
-            InterventionTypeName.from_domain(OutputType.WIDENING_EXISTING_FOOTWAY)
-            == InterventionTypeName.WIDENING_EXISTING_FOOTWAY
-        )
+    def test_from_domain(self, type_: OutputType, type_name: InterventionTypeName) -> None:
+        assert InterventionTypeName.from_domain(type_) == type_name
 
-    def test_to_domain(self) -> None:
-        assert InterventionTypeName.WIDENING_EXISTING_FOOTWAY.to_domain() == OutputType.WIDENING_EXISTING_FOOTWAY
+    def test_to_domain(self, type_: OutputType, type_name: InterventionTypeName) -> None:
+        assert type_name.to_domain() == type_
 
 
+@pytest.mark.parametrize(
+    "measure, measure_name",
+    [
+        (OutputMeasure.MILES, InterventionMeasureName.MILES),
+        (OutputMeasure.NUMBER_OF_JUNCTIONS, InterventionMeasureName.NUMBER_OF_JUNCTIONS),
+        (OutputMeasure.SIZE_OF_AREA, InterventionMeasureName.SIZE_OF_AREA),
+        (OutputMeasure.NUMBER_OF_PARKING_SPACES, InterventionMeasureName.NUMBER_OF_PARKING_SPACES),
+        (OutputMeasure.NUMBER_OF_CROSSINGS, InterventionMeasureName.NUMBER_OF_CROSSINGS),
+        (OutputMeasure.NUMBER_OF_SCHOOL_STREETS, InterventionMeasureName.NUMBER_OF_SCHOOL_STREETS),
+        (OutputMeasure.NUMBER_OF_TRIALS, InterventionMeasureName.NUMBER_OF_TRIALS),
+        (OutputMeasure.NUMBER_OF_BUS_GATES, InterventionMeasureName.NUMBER_OF_BUS_GATES),
+        (OutputMeasure.NUMBER_OF_UPGRADES, InterventionMeasureName.NUMBER_OF_UPGRADES),
+        (OutputMeasure.NUMBER_OF_CHILDREN_AFFECTED, InterventionMeasureName.NUMBER_OF_CHILDREN_AFFECTED),
+        (OutputMeasure.NUMBER_OF_MEASURES_PLANNED, InterventionMeasureName.NUMBER_OF_MEASURES_PLANNED),
+    ],
+)
 class TestInterventionMeasureName:
-    def test_from_domain(self) -> None:
-        assert InterventionMeasureName.from_domain(OutputMeasure.MILES) == InterventionMeasureName.MILES
+    def test_from_domain(self, measure: OutputMeasure, measure_name: InterventionMeasureName) -> None:
+        assert InterventionMeasureName.from_domain(measure) == measure_name
 
-    def test_to_domain(self) -> None:
-        assert InterventionMeasureName.MILES.to_domain() == OutputMeasure.MILES
+    def test_to_domain(self, measure: OutputMeasure, measure_name: InterventionMeasureName) -> None:
+        assert measure_name.to_domain() == measure
 
 
 class TestCapitalSchemeInterventionEntity:
