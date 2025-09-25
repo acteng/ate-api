@@ -71,55 +71,62 @@ async def _create_schema(engine: AsyncEngine) -> None:
 async def _create_reference_data(engine: AsyncEngine) -> None:
     async with AsyncSession(engine) as session:
         # common
-        session.add_all(
-            [
-                FinancialTypeEntity(financial_type_name=FinancialTypeName.from_domain(financial_type))
-                for financial_type in FinancialType
-            ]
-        )
-        session.add_all(
-            [
-                ObservationTypeEntity(observation_type_name=ObservationTypeName.from_domain(observation_type))
-                for observation_type in ObservationType
-            ]
-        )
+        session.add_all(_create_financial_types())
+        session.add_all(_create_observation_types())
         # capital_scheme
-        session.add_all(
-            [BidStatusEntity(bid_status_name=BidStatusName.from_domain(bid_status)) for bid_status in BidStatus]
-        )
-        intervention_measures = {
-            measure: InterventionMeasureEntity(intervention_measure_name=InterventionMeasureName.from_domain(measure))
-            for measure in OutputMeasure
-        }
-        session.add_all(intervention_measures.values())
-        intervention_types = {
-            type_: InterventionTypeEntity(intervention_type_name=InterventionTypeName.from_domain(type_))
-            for type_ in OutputType
-        }
+        session.add_all(_create_bid_statuses())
+        intervention_types = _create_intervention_types()
         session.add_all(intervention_types.values())
-        session.add_all(
-            [
-                InterventionTypeMeasureEntity(
-                    intervention_type=intervention_types[type_], intervention_measure=intervention_measures[measure]
-                )
-                for (type_, measure) in _get_output_type_measures()
-            ]
-        )
-        session.add_all(
-            [
-                MilestoneEntity(
-                    milestone_name=MilestoneName.from_domain(milestone),
-                    stage_order=index,
-                    is_active=milestone.is_active,
-                    is_complete=milestone.is_complete,
-                )
-                for index, milestone in enumerate(Milestone)
-            ]
-        )
-        session.add_all(
-            [SchemeTypeEntity(scheme_type_name=SchemeTypeName.from_domain(type_)) for type_ in CapitalSchemeType]
-        )
+        intervention_measures = _create_intervention_measures()
+        session.add_all(intervention_measures.values())
+        session.add_all(_create_intervention_type_measures(intervention_types, intervention_measures))
+        session.add_all(_create_milestones())
+        session.add_all(_create_scheme_types())
         await session.commit()
+
+
+def _create_financial_types() -> list[FinancialTypeEntity]:
+    return [
+        FinancialTypeEntity(financial_type_name=FinancialTypeName.from_domain(financial_type))
+        for financial_type in FinancialType
+    ]
+
+
+def _create_observation_types() -> list[ObservationTypeEntity]:
+    return [
+        ObservationTypeEntity(observation_type_name=ObservationTypeName.from_domain(observation_type))
+        for observation_type in ObservationType
+    ]
+
+
+def _create_bid_statuses() -> list[BidStatusEntity]:
+    return [BidStatusEntity(bid_status_name=BidStatusName.from_domain(bid_status)) for bid_status in BidStatus]
+
+
+def _create_intervention_measures() -> dict[OutputMeasure, InterventionMeasureEntity]:
+    return {
+        measure: InterventionMeasureEntity(intervention_measure_name=InterventionMeasureName.from_domain(measure))
+        for measure in OutputMeasure
+    }
+
+
+def _create_intervention_types() -> dict[OutputType, InterventionTypeEntity]:
+    return {
+        type_: InterventionTypeEntity(intervention_type_name=InterventionTypeName.from_domain(type_))
+        for type_ in OutputType
+    }
+
+
+def _create_intervention_type_measures(
+    intervention_types: dict[OutputType, InterventionTypeEntity],
+    intervention_measures: dict[OutputMeasure, InterventionMeasureEntity],
+) -> list[InterventionTypeMeasureEntity]:
+    return [
+        InterventionTypeMeasureEntity(
+            intervention_type=intervention_types[type_], intervention_measure=intervention_measures[measure]
+        )
+        for (type_, measure) in _get_output_type_measures()
+    ]
 
 
 def _get_output_type_measures() -> list[tuple[OutputType, OutputMeasure]]:
@@ -152,3 +159,19 @@ def _get_output_type_measures() -> list[tuple[OutputType, OutputMeasure]]:
         (OutputType.OTHER_INTERVENTIONS, OutputMeasure.NUMBER_OF_MEASURES_PLANNED),
         (OutputType.TRAFFIC_CALMING, OutputMeasure.NUMBER_OF_MEASURES_PLANNED),
     ]
+
+
+def _create_milestones() -> list[MilestoneEntity]:
+    return [
+        MilestoneEntity(
+            milestone_name=MilestoneName.from_domain(milestone),
+            stage_order=index,
+            is_active=milestone.is_active,
+            is_complete=milestone.is_complete,
+        )
+        for index, milestone in enumerate(Milestone)
+    ]
+
+
+def _create_scheme_types() -> list[SchemeTypeEntity]:
+    return [SchemeTypeEntity(scheme_type_name=SchemeTypeName.from_domain(type_)) for type_ in CapitalSchemeType]
