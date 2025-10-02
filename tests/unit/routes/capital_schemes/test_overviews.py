@@ -42,7 +42,7 @@ class TestCapitalSchemeOverviewModel:
             name="Wirral Package",
             bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-            type_=CapitalSchemeTypeModel.CONSTRUCTION,
+            type=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
     def test_to_domain(self, http_request: Request, base_url: str) -> None:
@@ -50,7 +50,7 @@ class TestCapitalSchemeOverviewModel:
             name="Wirral Package",
             bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-            type_=CapitalSchemeTypeModel.CONSTRUCTION,
+            type=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
         overview = overview_model.to_domain(datetime(2020, 1, 1), http_request)

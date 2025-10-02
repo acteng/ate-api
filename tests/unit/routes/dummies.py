@@ -9,7 +9,7 @@ def dummy_overview_model(base_url: str) -> CapitalSchemeOverviewModel:
         name="",
         bid_submitting_authority=AnyUrl(f"{base_url}/authorities/dummy"),
         funding_programme=AnyUrl(f"{base_url}/funding-programmes/dummy"),
-        type_=CapitalSchemeTypeModel.DEVELOPMENT,
+        type=CapitalSchemeTypeModel.DEVELOPMENT,
     )
 
 

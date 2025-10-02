@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Annotated, Self
+from typing import Self
 
 from fastapi import Request
-from pydantic import AnyUrl, Field
+from pydantic import AnyUrl
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -29,7 +29,7 @@ class CapitalSchemeOverviewModel(BaseModel):
     name: str
     bid_submitting_authority: AnyUrl
     funding_programme: AnyUrl
-    type_: Annotated[CapitalSchemeTypeModel, Field(alias="type")]
+    type: CapitalSchemeTypeModel
 
     @classmethod
     def from_domain(cls, overview: CapitalSchemeOverview, request: Request) -> Self:
@@ -41,7 +41,7 @@ class CapitalSchemeOverviewModel(BaseModel):
             funding_programme=AnyUrl(
                 str(request.url_for("get_funding_programme", code=str(overview.funding_programme)))
             ),
-            type_=CapitalSchemeTypeModel.from_domain(overview.type),
+            type=CapitalSchemeTypeModel.from_domain(overview.type),
         )
 
     def to_domain(self, now: datetime, request: Request) -> CapitalSchemeOverview:
@@ -54,5 +54,5 @@ class CapitalSchemeOverviewModel(BaseModel):
             funding_programme=FundingProgrammeCode(
                 path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme))
             ),
-            type=self.type_.to_domain(),
+            type=self.type.to_domain(),
         )
