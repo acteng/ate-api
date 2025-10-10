@@ -3,12 +3,10 @@ from enum import Enum
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from ate_api.database import get_session
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone, MilestoneRepository
 from ate_api.domain.dates import DateTimeRange
-from ate_api.infrastructure.database.capital_schemes.milestones import DatabaseMilestoneRepository
+from ate_api.repositories import get_milestone_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.observation_types import ObservationTypeModel
@@ -63,10 +61,6 @@ class CapitalSchemeMilestonesModel(CollectionModel[CapitalSchemeMilestoneModel])
 
 
 router = APIRouter()
-
-
-def get_milestone_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> MilestoneRepository:
-    return DatabaseMilestoneRepository(session)
 
 
 @router.get("/milestones", summary="Get capital scheme milestones")

@@ -2,12 +2,10 @@ from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import AnyUrl, Field
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
-from ate_api.database import get_session
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
-from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
+from ate_api.repositories import get_authority_repository
 from ate_api.routes.base import BaseModel
 
 
@@ -37,10 +35,6 @@ class AuthorityModel(BaseModel):
 
 
 router = APIRouter()
-
-
-def get_authority_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> AuthorityRepository:
-    return DatabaseAuthorityRepository(session)
 
 
 @router.get("/{abbreviation}", summary="Get authority", responses={HTTP_404_NOT_FOUND: {}})

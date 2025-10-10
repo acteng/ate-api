@@ -3,16 +3,14 @@ from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import AnyUrl, Field
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
-from ate_api.database import get_session
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
     CapitalSchemeRepository,
 )
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
+from ate_api.repositories import get_capital_scheme_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel
@@ -88,10 +86,6 @@ class CapitalSchemeModel(BaseModel):
 
 
 router = APIRouter()
-
-
-def get_capital_scheme_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> CapitalSchemeRepository:
-    return DatabaseCapitalSchemeRepository(session)
 
 
 @router.get("/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})

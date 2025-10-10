@@ -2,12 +2,10 @@ from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import AnyUrl, Field
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_404_NOT_FOUND
 
-from ate_api.database import get_session
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
-from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
+from ate_api.repositories import get_funding_programme_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 
@@ -44,12 +42,6 @@ class FundingProgrammeItemModel(BaseModel):
 
 
 router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])
-
-
-def get_funding_programme_repository(
-    session: Annotated[AsyncSession, Depends(get_session)],
-) -> FundingProgrammeRepository:
-    return DatabaseFundingProgrammeRepository(session)
 
 
 @router.get("", summary="Get funding programmes")

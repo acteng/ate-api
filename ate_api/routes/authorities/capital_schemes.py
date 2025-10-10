@@ -8,12 +8,14 @@ from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepositor
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
-from ate_api.routes.authorities.authorities import get_authority_repository
+from ate_api.repositories import (
+    get_authority_repository,
+    get_capital_scheme_repository,
+    get_funding_programme_repository,
+)
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
-from ate_api.routes.capital_schemes.capital_schemes import get_capital_scheme_repository
 from ate_api.routes.capital_schemes.milestones import MilestoneModel
 from ate_api.routes.collections import CollectionModel
-from ate_api.routes.funding_programmes import get_funding_programme_repository
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 

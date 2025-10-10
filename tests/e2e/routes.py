@@ -23,9 +23,14 @@ from ate_api.infrastructure.database import (
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
 )
-from ate_api.routes.authorities.authorities import AuthorityModel, get_authority_repository
-from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel, get_capital_scheme_repository
-from ate_api.routes.funding_programmes import FundingProgrammeModel, get_funding_programme_repository
+from ate_api.repositories import (
+    get_authority_repository,
+    get_capital_scheme_repository,
+    get_funding_programme_repository,
+)
+from ate_api.routes.authorities.authorities import AuthorityModel
+from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
+from ate_api.routes.funding_programmes import FundingProgrammeModel
 
 router = APIRouter(prefix="/test")
 
