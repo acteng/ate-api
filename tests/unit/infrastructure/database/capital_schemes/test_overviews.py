@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -76,9 +76,7 @@ class TestCapitalSchemeOverviewEntity:
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(
-                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
@@ -108,8 +106,7 @@ class TestCapitalSchemeOverviewEntity:
         overview = overview_entity.to_domain()
 
         assert (
-            overview.effective_date
-            == DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc))
+            overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC))
             and overview.name == "Wirral Package"
             and overview.bid_submitting_authority == AuthorityAbbreviation("LIV")
             and overview.funding_programme == FundingProgrammeCode("ATF3")
@@ -142,5 +139,5 @@ class TestCapitalSchemeOverviewEntity:
         overview = overview_entity.to_domain()
 
         assert overview.effective_date == DateTimeRange(
-            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )

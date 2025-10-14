@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 import pytest
@@ -310,14 +310,14 @@ class TestCapitalSchemeEntity:
 
         assert capital_scheme.reference == CapitalSchemeReference("ATE00001")
         assert capital_scheme.overview == CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
         assert not capital_scheme.financials
@@ -347,12 +347,12 @@ class TestCapitalSchemeEntity:
 
         assert capital_scheme.financials == [
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
             ),
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
             ),
@@ -383,13 +383,13 @@ class TestCapitalSchemeEntity:
 
         assert capital_scheme.milestones == [
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
             ),
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
@@ -435,14 +435,14 @@ class TestCapitalSchemeEntity:
 
         assert capital_scheme.outputs == [
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
                 value=Decimal(1.5),
             ),
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
@@ -461,7 +461,7 @@ class TestCapitalSchemeEntity:
         capital_scheme = capital_scheme_entity.to_domain()
 
         assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 1, 1, tzinfo=timezone.utc)
+            review_date=datetime(2020, 1, 1, tzinfo=UTC)
         )
 
 
@@ -776,14 +776,14 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.reference == CapitalSchemeReference("ATE00001")
         assert capital_scheme.overview == CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
         assert not capital_scheme.authority_review
@@ -824,7 +824,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.overview == CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             name="School Streets",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
@@ -859,7 +859,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.NOT_FUNDED,
         )
 
@@ -901,12 +901,12 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.financials == [
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
             ),
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
             ),
@@ -951,17 +951,17 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.financials == [
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
             ),
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(3_000_000),
             ),
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
             ),
@@ -1009,13 +1009,13 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.milestones == [
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
             ),
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 5, 1),
@@ -1070,19 +1070,19 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.milestones == [
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.PLANNED,
                 status_date=date(2020, 2, 1),
             ),
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
             ),
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
@@ -1142,14 +1142,14 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.outputs == [
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
                 value=Decimal(1.5),
             ),
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
@@ -1215,21 +1215,21 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.outputs == [
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
                 value=Decimal(1.5),
             ),
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
                 value=Decimal(2),
             ),
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
                 measure=OutputMeasure.NUMBER_OF_JUNCTIONS,
                 observation_type=ObservationType.ACTUAL,
@@ -1256,7 +1256,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 3, 1, tzinfo=timezone.utc)
+            review_date=datetime(2020, 3, 1, tzinfo=UTC)
         )
 
     async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:

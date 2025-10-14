@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import respx
 from fastapi.testclient import TestClient
@@ -49,7 +49,7 @@ def _build_capital_scheme(reference: CapitalSchemeReference) -> CapitalScheme:
     )
     capital_scheme.change_milestone(
         CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
@@ -57,7 +57,7 @@ def _build_capital_scheme(reference: CapitalSchemeReference) -> CapitalScheme:
     )
     capital_scheme.change_milestone(
         CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),

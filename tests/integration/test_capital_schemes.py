@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 import respx
@@ -35,14 +35,14 @@ async def test_get_capital_scheme(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=timezone.utc)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 bid_status=BidStatus.FUNDED,
             ),
         )
@@ -88,7 +88,7 @@ async def test_get_capital_scheme_with_financials(
     )
     capital_scheme.change_financial(
         CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )
@@ -119,7 +119,7 @@ async def test_get_capital_scheme_with_milestones(
     )
     capital_scheme.change_milestone(
         CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
@@ -153,7 +153,7 @@ async def test_get_capital_scheme_with_outputs(
     )
     capital_scheme.change_output(
         CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=timezone.utc)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -186,9 +186,7 @@ async def test_get_capital_scheme_with_authority_review(
         overview=dummy_overview(),
         bid_status_details=dummy_bid_status_details(),
     )
-    capital_scheme.perform_authority_review(
-        CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=timezone.utc))
-    )
+    capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC)))
     await capital_schemes.add(capital_scheme)
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})

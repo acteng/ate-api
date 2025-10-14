@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
@@ -79,9 +79,7 @@ class TestCapitalSchemeMilestoneEntity:
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(
-                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
@@ -106,9 +104,7 @@ class TestCapitalSchemeMilestoneEntity:
         milestone = milestone_entity.to_domain()
 
         assert milestone == CapitalSchemeMilestone(
-            effective_date=DateTimeRange(
-                datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
@@ -138,7 +134,7 @@ class TestCapitalSchemeMilestoneEntity:
         milestone = milestone_entity.to_domain()
 
         assert milestone.effective_date == DateTimeRange(
-            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )
 
 

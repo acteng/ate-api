@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -51,9 +51,7 @@ class TestCapitalSchemeBidStatusEntity:
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(
-                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
@@ -72,9 +70,7 @@ class TestCapitalSchemeBidStatusEntity:
         bid_status_details = bid_status_entity.to_domain()
 
         assert bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(
-                datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
@@ -98,5 +94,5 @@ class TestCapitalSchemeBidStatusEntity:
         bid_status_details = bid_status_entity.to_domain()
 
         assert bid_status_details.effective_date == DateTimeRange(
-            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )

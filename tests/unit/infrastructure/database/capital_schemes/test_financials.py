@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.dates import DateTimeRange
@@ -37,9 +37,7 @@ class TestCapitalSchemeFinancialEntity:
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(
-                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )
@@ -60,9 +58,7 @@ class TestCapitalSchemeFinancialEntity:
         financial = financial_entity.to_domain()
 
         assert financial == CapitalSchemeFinancial(
-            effective_date=DateTimeRange(
-                datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )
@@ -89,5 +85,5 @@ class TestCapitalSchemeFinancialEntity:
         financial = financial_entity.to_domain()
 
         assert financial.effective_date == DateTimeRange(
-            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )

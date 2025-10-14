@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -126,9 +126,7 @@ class TestCapitalSchemeInterventionEntity:
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(
-                datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -159,9 +157,7 @@ class TestCapitalSchemeInterventionEntity:
         output = intervention_entity.to_domain()
 
         assert output == CapitalSchemeOutput(
-            effective_date=DateTimeRange(
-                datetime(2020, 1, 1, tzinfo=timezone.utc), datetime(2020, 2, 1, tzinfo=timezone.utc)
-            ),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -202,5 +198,5 @@ class TestCapitalSchemeInterventionEntity:
         output = intervention_entity.to_domain()
 
         assert output.effective_date == DateTimeRange(
-            datetime(2020, 6, 1, 12, tzinfo=timezone.utc), datetime(2020, 7, 1, 12, tzinfo=timezone.utc)
+            datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )
