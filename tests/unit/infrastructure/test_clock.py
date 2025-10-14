@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from unittest.mock import patch
 
@@ -17,6 +17,14 @@ class TestSystemClock:
         mock_datetime.now.return_value = datetime(2020, 1, 2, 12)
 
         assert clock.now == datetime(2020, 1, 2, 12)
+
+    @patch("ate_api.infrastructure.clock.datetime")
+    def test_get_now_returns_utc(self, mock_datetime: Any, clock: SystemClock) -> None:
+        mock_datetime.now.return_value = datetime.min
+
+        _ = clock.now
+
+        assert mock_datetime.now.call_args.args == (UTC,)
 
     def test_set_now(self, clock: SystemClock) -> None:
         with pytest.raises(NotImplementedError):

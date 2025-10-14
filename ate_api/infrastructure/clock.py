@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 
 class Clock:
@@ -14,7 +14,7 @@ class Clock:
 class SystemClock(Clock):
     @property
     def now(self) -> datetime:
-        return datetime.now()
+        return datetime.now(UTC)
 
     @now.setter
     def now(self, now: datetime) -> None:
