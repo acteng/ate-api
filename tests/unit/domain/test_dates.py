@@ -19,9 +19,9 @@ class TestDateTimeRange:
     @pytest.mark.parametrize(
         "from_, to",
         [
-            (datetime(2020, 1, 1), datetime(2020, 2, 1)),
-            (datetime(2020, 2, 1), datetime(2020, 2, 1)),
-            (datetime(2020, 1, 1), None),
+            pytest.param(datetime(2020, 1, 1), datetime(2020, 2, 1), id="before"),
+            pytest.param(datetime(2020, 2, 1), datetime(2020, 2, 1), id="equal to"),
+            pytest.param(datetime(2020, 1, 1), None, id="open"),
         ],
     )
     def test_can_create_range_with_from_before_or_equal_to_to(self, from_: datetime, to: datetime | None) -> None:
