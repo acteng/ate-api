@@ -25,7 +25,9 @@ class TestDateTimeRange:
         ],
     )
     def test_can_create_range_with_from_before_or_equal_to_to(self, from_: datetime, to: datetime | None) -> None:
-        DateTimeRange(from_, to)
+        date_time_range = DateTimeRange(from_, to)
+
+        assert date_time_range.from_ == from_ and date_time_range.to == to
 
     def test_cannot_create_range_with_from_after_to(self) -> None:
         with pytest.raises(ValueError, match="From '2020-01-01 12:00:00' must not be after to '2019-12-31 13:00:00'"):
