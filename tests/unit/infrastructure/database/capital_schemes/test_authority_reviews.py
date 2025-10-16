@@ -6,7 +6,7 @@ from ate_api.infrastructure.database import CapitalSchemeAuthorityReviewEntity
 
 class TestCapitalSchemeAuthorityReviewEntity:
     def test_from_domain(self) -> None:
-        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1))
+        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1, tzinfo=UTC))
 
         authority_review_entity = CapitalSchemeAuthorityReviewEntity.from_domain(authority_review)
 

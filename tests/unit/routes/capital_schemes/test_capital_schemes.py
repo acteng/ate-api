@@ -211,12 +211,14 @@ class TestCapitalSchemeModel:
             overview=dummy_overview(),
             bid_status_details=dummy_bid_status_details(),
         )
-        capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1)))
+        capital_scheme.perform_authority_review(
+            CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1, tzinfo=UTC))
+        )
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
 
         assert capital_scheme_model.authority_review == CapitalSchemeAuthorityReviewModel(
-            review_date=datetime(2020, 1, 1)
+            review_date=datetime(2020, 1, 1, tzinfo=UTC)
         )
 
     def test_to_domain(self, http_request: Request, base_url: str) -> None:
@@ -377,9 +379,11 @@ class TestCapitalSchemeModel:
             financials=CollectionModel[CapitalSchemeFinancialModel](items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
-            authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1)),
+            authority_review=CapitalSchemeAuthorityReviewModel(review_date=datetime(2020, 2, 1, tzinfo=UTC)),
         )
 
         capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC), http_request)
 
-        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1))
+        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC)
+        )

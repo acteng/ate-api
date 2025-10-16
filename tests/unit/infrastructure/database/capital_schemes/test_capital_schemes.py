@@ -269,7 +269,9 @@ class TestCapitalSchemeEntity:
             overview=dummy_overview(),
             bid_status_details=dummy_bid_status_details(),
         )
-        capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
+        capital_scheme.perform_authority_review(
+            CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
+        )
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
@@ -718,7 +720,9 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=dummy_overview(),
                 bid_status_details=dummy_bid_status_details(),
             )
-            capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1)))
+            capital_scheme.perform_authority_review(
+                CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
+            )
             await capital_schemes.add(capital_scheme)
 
         async with AsyncSession(engine) as session:

@@ -251,7 +251,7 @@ class TestCapitalScheme:
             overview=dummy_overview(),
             bid_status_details=dummy_bid_status_details(),
         )
-        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1))
+        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
 
         capital_scheme.perform_authority_review(authority_review)
 
