@@ -90,7 +90,7 @@ class TestInterventionMeasureName:
 class TestCapitalSchemeInterventionEntity:
     def test_from_domain(self) -> None:
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -111,7 +111,7 @@ class TestCapitalSchemeInterventionEntity:
 
     def test_from_domain_when_current(self) -> None:
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -82,7 +82,7 @@ class TestOutputMeasureModel:
 class TestCapitalSchemeOutputModel:
     def test_from_domain(self) -> None:
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -106,10 +106,10 @@ class TestCapitalSchemeOutputModel:
             value=Decimal(1.5),
         )
 
-        output = output_model.to_domain(datetime(2020, 1, 1))
+        output = output_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert output == CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,

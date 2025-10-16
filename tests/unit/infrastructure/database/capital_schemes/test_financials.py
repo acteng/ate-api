@@ -10,7 +10,7 @@ from ate_api.infrastructure.database import CapitalSchemeFinancialEntity, Financ
 class TestCapitalSchemeFinancialEntity:
     def test_from_domain(self) -> None:
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )
@@ -26,7 +26,7 @@ class TestCapitalSchemeFinancialEntity:
 
     def test_from_domain_when_current(self) -> None:
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )

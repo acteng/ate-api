@@ -45,7 +45,7 @@ class TestMilestoneName:
 class TestCapitalSchemeMilestoneEntity:
     def test_from_domain(self) -> None:
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
@@ -65,7 +65,7 @@ class TestCapitalSchemeMilestoneEntity:
 
     def test_from_domain_when_current(self) -> None:
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),

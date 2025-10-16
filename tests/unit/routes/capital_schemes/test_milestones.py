@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -37,7 +37,7 @@ class TestMilestoneModel:
 class TestCapitalSchemeMilestoneModel:
     def test_from_domain(self) -> None:
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
@@ -58,10 +58,10 @@ class TestCapitalSchemeMilestoneModel:
             status_date=date(2020, 2, 1),
         )
 
-        milestone = milestone_model.to_domain(datetime(2020, 1, 1))
+        milestone = milestone_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert milestone == CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),

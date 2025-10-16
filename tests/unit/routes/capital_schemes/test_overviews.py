@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 from fastapi import Request
@@ -29,7 +29,7 @@ class TestCapitalSchemeTypeModel:
 class TestCapitalSchemeOverviewModel:
     def test_from_domain(self, http_request: Request, base_url: str) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
@@ -53,10 +53,10 @@ class TestCapitalSchemeOverviewModel:
             type=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
-        overview = overview_model.to_domain(datetime(2020, 1, 1), http_request)
+        overview = overview_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC), http_request)
 
         assert overview == CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),

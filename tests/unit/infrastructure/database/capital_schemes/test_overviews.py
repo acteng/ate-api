@@ -33,7 +33,7 @@ class TestSchemeTypeName:
 class TestCapitalSchemeOverviewEntity:
     def test_from_domain(self) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
@@ -58,7 +58,7 @@ class TestCapitalSchemeOverviewEntity:
 
     def test_from_domain_when_current(self) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),

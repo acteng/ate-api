@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from ate_api.domain.authorities import AuthorityAbbreviation
@@ -55,14 +55,14 @@ class TestCapitalSchemeReference:
 class TestCapitalScheme:
     def test_create(self) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1)), bid_status=BidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
 
         capital_scheme = CapitalScheme(
@@ -86,7 +86,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_financial(
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
             )
@@ -103,7 +103,7 @@ class TestCapitalScheme:
             bid_status_details=dummy_bid_status_details(),
         )
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )
@@ -120,7 +120,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
@@ -139,7 +139,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.PLANNED,
                 status_date=date(2020, 2, 1),
@@ -147,7 +147,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
@@ -164,7 +164,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
@@ -172,7 +172,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
@@ -197,7 +197,7 @@ class TestCapitalScheme:
             bid_status_details=dummy_bid_status_details(),
         )
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
@@ -215,7 +215,7 @@ class TestCapitalScheme:
         )
         capital_scheme.change_output(
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 value=Decimal(1.5),
                 measure=OutputMeasure.MILES,
@@ -234,7 +234,7 @@ class TestCapitalScheme:
             bid_status_details=dummy_bid_status_details(),
         )
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             value=Decimal(1.5),
             measure=OutputMeasure.MILES,

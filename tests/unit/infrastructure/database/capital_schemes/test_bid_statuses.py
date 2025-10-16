@@ -28,7 +28,7 @@ class TestBidStatusName:
 class TestCapitalSchemeBidStatusEntity:
     def test_from_domain(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1), datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
@@ -42,7 +42,7 @@ class TestCapitalSchemeBidStatusEntity:
 
     def test_from_domain_when_current(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
 
         bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatus.FUNDED: 0})

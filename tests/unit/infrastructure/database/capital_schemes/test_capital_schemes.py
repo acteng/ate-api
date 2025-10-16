@@ -67,14 +67,14 @@ class TestCapitalSchemeEntity:
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1)),
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 bid_status=BidStatus.FUNDED,
             ),
         )
@@ -117,14 +117,14 @@ class TestCapitalSchemeEntity:
         )
         capital_scheme.change_financial(
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
             )
         )
         capital_scheme.change_financial(
             CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
             )
@@ -164,7 +164,7 @@ class TestCapitalSchemeEntity:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
@@ -172,7 +172,7 @@ class TestCapitalSchemeEntity:
         )
         capital_scheme.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
@@ -215,7 +215,7 @@ class TestCapitalSchemeEntity:
         )
         capital_scheme.change_output(
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
@@ -224,7 +224,7 @@ class TestCapitalSchemeEntity:
         )
         capital_scheme.change_output(
             CapitalSchemeOutput(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
@@ -485,14 +485,14 @@ class TestDatabaseCapitalSchemeRepository:
                 CapitalScheme(
                     reference=CapitalSchemeReference("ATE00001"),
                     overview=CapitalSchemeOverview(
-                        effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                        effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                         name="Wirral Package",
                         bid_submitting_authority=AuthorityAbbreviation("LIV"),
                         funding_programme=FundingProgrammeCode("ATF3"),
                         type=CapitalSchemeType.CONSTRUCTION,
                     ),
                     bid_status_details=CapitalSchemeBidStatusDetails(
-                        effective_date=DateTimeRange(datetime(2020, 2, 1)),
+                        effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                         bid_status=BidStatus.FUNDED,
                     ),
                 )
@@ -541,14 +541,14 @@ class TestDatabaseCapitalSchemeRepository:
             )
             capital_scheme.change_financial(
                 CapitalSchemeFinancial(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     type=FinancialType.FUNDING_ALLOCATION,
                     amount=Money(2_000_000),
                 )
             )
             capital_scheme.change_financial(
                 CapitalSchemeFinancial(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     type=FinancialType.SPEND_TO_DATE,
                     amount=Money(1_000_000),
                 )
@@ -596,7 +596,7 @@ class TestDatabaseCapitalSchemeRepository:
             )
             capital_scheme.change_milestone(
                 CapitalSchemeMilestone(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                     observation_type=ObservationType.ACTUAL,
                     status_date=date(2020, 2, 1),
@@ -604,7 +604,7 @@ class TestDatabaseCapitalSchemeRepository:
             )
             capital_scheme.change_milestone(
                 CapitalSchemeMilestone(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     milestone=Milestone.CONSTRUCTION_STARTED,
                     observation_type=ObservationType.ACTUAL,
                     status_date=date(2020, 3, 1),
@@ -662,7 +662,7 @@ class TestDatabaseCapitalSchemeRepository:
             )
             capital_scheme.change_output(
                 CapitalSchemeOutput(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     type=OutputType.WIDENING_EXISTING_FOOTWAY,
                     measure=OutputMeasure.MILES,
                     observation_type=ObservationType.ACTUAL,
@@ -671,7 +671,7 @@ class TestDatabaseCapitalSchemeRepository:
             )
             capital_scheme.change_output(
                 CapitalSchemeOutput(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     type=OutputType.NEW_SEGREGATED_CYCLING_FACILITY,
                     measure=OutputMeasure.MILES,
                     observation_type=ObservationType.ACTUAL,

@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -21,14 +21,14 @@ class TestMemoryCapitalSchemeRepository:
 
     async def test_add(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
@@ -48,14 +48,14 @@ class TestMemoryCapitalSchemeRepository:
 
     async def test_get(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1)),
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
@@ -86,7 +86,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
@@ -99,7 +99,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
@@ -112,7 +112,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("WYO"),
                     funding_programme=FundingProgrammeCode("ATF3"),
@@ -133,7 +133,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
@@ -146,7 +146,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF4"),
@@ -159,7 +159,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF5"),
@@ -183,14 +183,14 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     bid_status=BidStatus.FUNDED,
                 ),
             )
@@ -199,14 +199,14 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     bid_status=BidStatus.NOT_FUNDED,
                 ),
             )
@@ -224,7 +224,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme1 = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
@@ -234,7 +234,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme1.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
@@ -244,7 +244,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme2 = CapitalScheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
@@ -254,7 +254,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme2.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
@@ -264,7 +264,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme3 = CapitalScheme(
             reference=CapitalSchemeReference("ATE00003"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
@@ -274,7 +274,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme3.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
@@ -295,7 +295,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme1 = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
@@ -307,7 +307,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme2 = CapitalScheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
@@ -317,7 +317,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme2.change_milestone(
             CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
@@ -338,7 +338,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
@@ -351,7 +351,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1)),
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.dates import DateTimeRange
@@ -11,7 +11,7 @@ from ate_api.routes.financial_types import FinancialTypeModel
 class TestCapitalSchemeFinancialModel:
     def test_from_domain(self) -> None:
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )
@@ -29,10 +29,10 @@ class TestCapitalSchemeFinancialModel:
             amount=2_000_000,
         )
 
-        financial = financial_model.to_domain(datetime(2020, 1, 1))
+        financial = financial_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert financial == CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
         )

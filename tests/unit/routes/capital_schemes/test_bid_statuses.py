@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 
@@ -28,7 +28,7 @@ class TestBidStatusModel:
 class TestCapitalSchemeBidStatusDetailsModel:
     def test_from_domain(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
 
         bid_status_details_model = CapitalSchemeBidStatusDetailsModel.from_domain(bid_status_details)
@@ -38,8 +38,8 @@ class TestCapitalSchemeBidStatusDetailsModel:
     def test_to_domain(self) -> None:
         bid_status_details_model = CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED)
 
-        bid_status_details = bid_status_details_model.to_domain(datetime(2020, 1, 1))
+        bid_status_details = bid_status_details_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1)), bid_status=BidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
