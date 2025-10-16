@@ -11,3 +11,6 @@ class MemoryCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepository)
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeFinancials | None:
         return self._financials.get(capital_scheme)
+
+    async def update(self, financials: CapitalSchemeFinancials) -> None:
+        self._financials[financials.capital_scheme] = financials

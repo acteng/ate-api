@@ -1,4 +1,6 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from datetime import datetime
+from typing import Self
 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
@@ -14,6 +16,16 @@ class CapitalSchemeFinancial:
     amount: Money
     data_source: DataSource
     surrogate_id: int | None = field(default=None, repr=False, compare=False)
+
+    @property
+    def is_open(self) -> bool:
+        return self.effective_date.is_open
+
+    def close(self, effective_date_to: datetime) -> Self:
+        if not self.is_open:
+            raise ValueError("Capital scheme financial is already closed")
+
+        return replace(self, effective_date=self.effective_date.close(effective_date_to))
 
 
 class CapitalSchemeFinancials:
@@ -32,10 +44,22 @@ class CapitalSchemeFinancials:
     def adjust_financial(self, financial: CapitalSchemeFinancial) -> None:
         self._financials.append(financial)
 
+    def change_financial(self, financial: CapitalSchemeFinancial) -> None:
+        self._financials = list(
+            map(
+                lambda f: f.close(financial.effective_date.from_) if f.type == financial.type and f.is_open else f,
+                self._financials,
+            )
+        )
+        self._financials.append(financial)
+
 
 class CapitalSchemeFinancialsRepository:
     async def add(self, financials: CapitalSchemeFinancials) -> None:
         raise NotImplementedError()
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeFinancials | None:
+        raise NotImplementedError()
+
+    async def update(self, financials: CapitalSchemeFinancials) -> None:
         raise NotImplementedError()

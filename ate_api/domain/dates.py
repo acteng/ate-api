@@ -1,5 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
+from typing import Self
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,16 @@ class DateTimeRange:
 
         if not (self.to is None or self.from_ <= self.to):
             raise ValueError(f"From '{self.from_}' must not be after to '{self.to}'")
+
+    @property
+    def is_open(self) -> bool:
+        return self.to is None
+
+    def close(self, to: datetime) -> Self:
+        if not self.is_open:
+            raise ValueError("Date time range is already closed")
+
+        return replace(self, to=to)
 
 
 def is_zoned(date: datetime) -> bool:

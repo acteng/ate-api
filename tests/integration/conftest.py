@@ -4,11 +4,13 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from ate_api.clock import get_clock
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.milestones import MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.infrastructure.clock import Clock
 from ate_api.main import app
 from ate_api.repositories import (
     get_authority_repository,
@@ -19,6 +21,7 @@ from ate_api.repositories import (
 )
 from ate_api.settings import Settings, get_settings
 from tests.integration.oauth import StubAuthorizationServer
+from tests.unit.infrastructure.clock import FakeClock
 from tests.unit.infrastructure.memory.authorities import MemoryAuthorityRepository
 from tests.unit.infrastructure.memory.capital_scheme_financials import MemoryCapitalSchemeFinancialsRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository, MemoryMilestoneRepository
@@ -42,9 +45,14 @@ def access_token_fixture(authorization_server: StubAuthorizationServer) -> str:
     return authorization_server.create_access_token()
 
 
+@pytest.fixture(name="clock")
+def clock_fixture() -> Clock:
+    return FakeClock()
+
+
 @pytest.fixture(name="settings")
 def settings_fixture(authorization_server: StubAuthorizationServer, resource_server_identifier: str) -> Settings:
-    dummy_database_url = "sqlite:///:memory:"
+    dummy_database_url = "sqlite+aiosqlite:///:memory:"
     return Settings(
         database_url=dummy_database_url,
         oidc_server_metadata_url=authorization_server.configuration_endpoint,
@@ -79,6 +87,7 @@ def capital_scheme_financials_fixture() -> CapitalSchemeFinancialsRepository:
 
 @pytest.fixture(name="app")
 def app_fixture(
+    clock: Clock,
     settings: Settings,
     funding_programmes: FundingProgrammeRepository,
     authorities: AuthorityRepository,
@@ -86,6 +95,7 @@ def app_fixture(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
 ) -> Generator[FastAPI]:
+    app.dependency_overrides[get_clock] = lambda: clock
     app.dependency_overrides[get_settings] = lambda: settings
     app.dependency_overrides[get_funding_programme_repository] = lambda: funding_programmes
     app.dependency_overrides[get_authority_repository] = lambda: authorities

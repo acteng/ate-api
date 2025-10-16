@@ -59,6 +59,30 @@ class TestDateTimeRange:
         with pytest.raises(ValueError, match=expected_message):
             DateTimeRange(from_, to)
 
+    @pytest.mark.parametrize(
+        "to, expected_is_open",
+        [pytest.param(None, True, id="open"), pytest.param(datetime(2020, 2, 1, tzinfo=UTC), False, id="closed")],
+    )
+    def test_is_open(self, to: datetime | None, expected_is_open: bool) -> None:
+        date_time_range = DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), to)
+
+        assert date_time_range.is_open == expected_is_open
+
+    def test_close(self) -> None:
+        open_range = DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC))
+
+        closed_range = open_range.close(datetime(2020, 2, 1, tzinfo=UTC))
+
+        assert closed_range.from_ == datetime(2020, 1, 1, tzinfo=UTC) and closed_range.to == datetime(
+            2020, 2, 1, tzinfo=UTC
+        )
+
+    def test_cannot_close_when_closed(self) -> None:
+        closed_range = DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC))
+
+        with pytest.raises(ValueError, match="Date time range is already closed"):
+            closed_range.close(datetime(2020, 2, 1, tzinfo=UTC))
+
 
 class _UnknownUtcOffsetTimezone(tzinfo):
     """

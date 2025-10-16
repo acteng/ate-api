@@ -1,10 +1,22 @@
 from datetime import datetime
-from typing import Self
+from typing import Annotated, Self
 
-from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancial, CapitalSchemeFinancials
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
+
+from ate_api.clock import get_clock
+from ate_api.database import get_session
+from ate_api.domain.capital_scheme_financials import (
+    CapitalSchemeFinancial,
+    CapitalSchemeFinancials,
+    CapitalSchemeFinancialsRepository,
+)
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.moneys import Money
+from ate_api.infrastructure.clock import Clock
+from ate_api.repositories import get_capital_scheme_financials_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
@@ -43,3 +55,37 @@ class CapitalSchemeFinancialsModel(CollectionModel[CapitalSchemeFinancialModel])
         for financial in self.items:
             financials.adjust_financial(financial.to_domain(now))
         return financials
+
+
+router = APIRouter()
+
+
+@router.post(
+    "/{reference}/financials",
+    status_code=HTTP_201_CREATED,
+    summary="Create capital scheme financial",
+    responses={HTTP_404_NOT_FOUND: {}},
+)
+async def create_financial(
+    clock: Annotated[Clock, Depends(get_clock)],
+    capital_scheme_financials: Annotated[
+        CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
+    ],
+    session: Annotated[AsyncSession, Depends(get_session)],
+    reference: str,
+    financial_model: CapitalSchemeFinancialModel,
+) -> CapitalSchemeFinancialModel:
+    """
+    Creates a financial for a capital scheme.
+    """
+    financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
+
+    if not financials:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
+    financial = financial_model.to_domain(clock.now)
+    financials.change_financial(financial)
+    await capital_scheme_financials.update(financials)
+    await session.commit()
+
+    return CapitalSchemeFinancialModel.from_domain(financial)

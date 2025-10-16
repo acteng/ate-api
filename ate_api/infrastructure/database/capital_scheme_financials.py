@@ -103,6 +103,18 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
             financials.adjust_financial(row.to_domain())
         return financials
 
+    async def update(self, financials: CapitalSchemeFinancials) -> None:
+        capital_scheme_id = await self._get_capital_scheme_id(financials)
+        financial_type_ids = await self._get_financial_type_ids(financials)
+        data_source_ids = await self._get_data_source_ids(financials)
+
+        for financial in financials.financials:
+            await self._session.merge(
+                CapitalSchemeFinancialEntity.from_domain(
+                    financial, capital_scheme_id, financial_type_ids, data_source_ids
+                )
+            )
+
     async def _get_capital_scheme_id(self, financials: CapitalSchemeFinancials) -> int:
         capital_scheme_reference = str(financials.capital_scheme)
         rows = await self._session.scalars(

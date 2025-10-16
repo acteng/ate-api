@@ -288,3 +288,50 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 data_source=DataSource.ATF4_BID,
             ),
         ]
+
+    async def test_update(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    funding_allocation := build_financial_type_entity(id_=2, name=FinancialTypeName.FUNDING_ALLOCATION),
+                    atf4_bid := build_data_source_entity(id_=3, name=DataSourceName.ATF4_BID),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeFinancialEntity(
+                        capital_scheme_id=1,
+                        financial_type=funding_allocation,
+                        amount=3_000_000,
+                        effective_date_from=datetime(2020, 1, 1),
+                        data_source=atf4_bid,
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+            assert financials
+            financials.change_financial(
+                CapitalSchemeFinancial(
+                    effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                    type=FinancialType.FUNDING_ALLOCATION,
+                    amount=Money(2_000_000),
+                    data_source=DataSource.ATF4_BID,
+                )
+            )
+            await capital_scheme_financials.update(financials)
+
+        async with AsyncSession(engine) as session:
+            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
+            financial_row1, financial_row2 = await session.scalars(select(CapitalSchemeFinancialEntity))
+        assert (
+            financial_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and financial_row1.effective_date_to == datetime(2020, 2, 1)
+        )
+        assert (
+            financial_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and financial_row2.financial_type_id == 2
+            and financial_row2.amount == 2_000_000
+            and financial_row2.effective_date_from == datetime(2020, 2, 1)
+            and not financial_row2.effective_date_to
+            and financial_row2.data_source_id == 3
+        )

@@ -26,6 +26,7 @@ from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
+from ate_api.infrastructure.clock import Clock
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 
@@ -227,6 +228,103 @@ async def test_get_capital_scheme_with_authority_review(
 @respx.mock
 def test_get_capital_scheme_when_not_found(client: TestClient, access_token: str) -> None:
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 404
+
+
+@respx.mock
+async def test_create_financial_creates_financial(
+    clock: Clock, capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
+) -> None:
+    clock.now = datetime(2020, 1, 1, tzinfo=UTC)
+    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
+
+    client.post(
+        "/capital-schemes/ATE00001/financials",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "type": "funding allocation",
+            "amount": 3_000_000,
+            "source": "ATF4 bid",
+        },
+    )
+
+    financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+    assert financials and financials.financials == [
+        CapitalSchemeFinancial(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            type=FinancialType.FUNDING_ALLOCATION,
+            amount=Money(3_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+    ]
+
+
+@respx.mock
+async def test_create_financial_closes_current_financial(
+    clock: Clock, capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
+) -> None:
+    clock.now = datetime(2020, 2, 1, tzinfo=UTC)
+    financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+    financials.change_financial(
+        CapitalSchemeFinancial(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            type=FinancialType.FUNDING_ALLOCATION,
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+    )
+    await capital_scheme_financials.add(financials)
+
+    client.post(
+        "/capital-schemes/ATE00001/financials",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "type": "funding allocation",
+            "amount": 3_000_000,
+            "source": "ATF4 bid",
+        },
+    )
+
+    actual_financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+    assert actual_financials and actual_financials.financials[0].effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
+
+
+@respx.mock
+async def test_create_financial_returns_created_financial(
+    capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
+) -> None:
+    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
+
+    response = client.post(
+        "/capital-schemes/ATE00001/financials",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "type": "funding allocation",
+            "amount": 3_000_000,
+            "source": "ATF4 bid",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json() == {
+        "type": "funding allocation",
+        "amount": 3_000_000,
+        "source": "ATF4 bid",
+    }
+
+
+@respx.mock
+def test_create_financial_when_capital_scheme_not_found(client: TestClient, access_token: str) -> None:
+    response = client.post(
+        "/capital-schemes/ATE00001/financials",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "type": "funding allocation",
+            "amount": 3_000_000,
+            "source": "ATF4 bid",
+        },
+    )
 
     assert response.status_code == 404
 
