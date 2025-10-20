@@ -5,16 +5,17 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import AnyUrl, Field
 from starlette.status import HTTP_404_NOT_FOUND
 
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
     CapitalSchemeRepository,
 )
-from ate_api.repositories import get_capital_scheme_repository
+from ate_api.repositories import get_capital_scheme_financials_repository, get_capital_scheme_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetailsModel
-from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialModel
+from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialsModel
 from ate_api.routes.capital_schemes.milestones import (
     CapitalSchemeMilestoneModel,
     CapitalSchemeMilestonesModel,
@@ -30,21 +31,19 @@ class CapitalSchemeModel(BaseModel):
     reference: str
     overview: CapitalSchemeOverviewModel
     bid_status_details: CapitalSchemeBidStatusDetailsModel
-    financials: CollectionModel[CapitalSchemeFinancialModel]
+    financials: CapitalSchemeFinancialsModel
     milestones: CapitalSchemeMilestonesModel
     outputs: CollectionModel[CapitalSchemeOutputModel]
     authority_review: CapitalSchemeAuthorityReviewModel | None = None
 
     @classmethod
-    def from_domain(cls, capital_scheme: CapitalScheme, request: Request) -> Self:
+    def from_domain(cls, capital_scheme: CapitalScheme, financials: CapitalSchemeFinancials, request: Request) -> Self:
         return cls(
             id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme.reference)))),
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
-            financials=CollectionModel[CapitalSchemeFinancialModel](
-                items=[CapitalSchemeFinancialModel.from_domain(financial) for financial in capital_scheme.financials]
-            ),
+            financials=CapitalSchemeFinancialsModel.from_domain(financials),
             milestones=CapitalSchemeMilestonesModel(
                 current_milestone=(
                     MilestoneModel.from_domain(capital_scheme.current_milestone)
@@ -70,9 +69,6 @@ class CapitalSchemeModel(BaseModel):
             bid_status_details=self.bid_status_details.to_domain(now),
         )
 
-        for financial in self.financials.items:
-            capital_scheme.change_financial(financial.to_domain(now))
-
         for milestone in self.milestones.items:
             capital_scheme.change_milestone(milestone.to_domain(now))
 
@@ -91,6 +87,9 @@ router = APIRouter()
 @router.get("/{reference}", summary="Get capital scheme", responses={HTTP_404_NOT_FOUND: {}})
 async def get_capital_scheme(
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
+    capital_scheme_financials: Annotated[
+        CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
+    ],
     request: Request,
     reference: str,
 ) -> CapitalSchemeModel:
@@ -102,4 +101,7 @@ async def get_capital_scheme(
     if not capital_scheme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    return CapitalSchemeModel.from_domain(capital_scheme, request)
+    financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
+    assert financials
+
+    return CapitalSchemeModel.from_domain(capital_scheme, financials, request)

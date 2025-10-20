@@ -5,15 +5,11 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
-from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
-from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
@@ -74,46 +70,9 @@ class TestCapitalScheme:
             capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
             and capital_scheme.bid_status_details == bid_status_details
-            and not capital_scheme.financials
             and not capital_scheme.milestones
             and not capital_scheme.authority_review
         )
-
-    def test_financials_is_copy(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        capital_scheme.change_financial(
-            CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                type=FinancialType.FUNDING_ALLOCATION,
-                amount=Money(2_000_000),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-
-        capital_scheme.financials.clear()
-
-        assert capital_scheme.financials
-
-    def test_change_financial(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
-            amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
-        )
-
-        capital_scheme.change_financial(financial)
-
-        assert capital_scheme.financials == [financial]
 
     def test_milestones_is_copy(self) -> None:
         capital_scheme = CapitalScheme(

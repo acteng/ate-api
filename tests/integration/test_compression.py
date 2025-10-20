@@ -3,6 +3,7 @@ from datetime import UTC, date, datetime
 import respx
 from fastapi.testclient import TestClient
 
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeReference,
@@ -16,9 +17,13 @@ from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 @respx.mock
 async def test_can_request_uncompressed_response(
-    capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+    capital_schemes: CapitalSchemeRepository,
+    capital_scheme_financials: CapitalSchemeFinancialsRepository,
+    client: TestClient,
+    access_token: str,
 ) -> None:
     await capital_schemes.add(_build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
 
     response = client.get(
         "/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}", "Accept-Encoding": "identity"}
@@ -29,9 +34,13 @@ async def test_can_request_uncompressed_response(
 
 @respx.mock
 async def test_can_request_compressed_response(
-    capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+    capital_schemes: CapitalSchemeRepository,
+    capital_scheme_financials: CapitalSchemeFinancialsRepository,
+    client: TestClient,
+    access_token: str,
 ) -> None:
     await capital_schemes.add(_build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
 
     response = client.get(
         "/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}", "Accept-Encoding": "gzip"}
