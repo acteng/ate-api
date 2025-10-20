@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
@@ -13,6 +13,7 @@ class CapitalSchemeFinancial:
     type: FinancialType
     amount: Money
     data_source: DataSource
+    surrogate_id: int | None = field(default=None, repr=False, compare=False)
 
 
 class CapitalSchemeFinancials:

@@ -29,19 +29,21 @@ class TestCapitalSchemeFinancialEntity:
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
+            surrogate_id=1,
         )
 
         financial_entity = CapitalSchemeFinancialEntity.from_domain(
-            financial, 1, {FinancialType.FUNDING_ALLOCATION: 2}, {DataSource.ATF4_BID: 3}
+            financial, 2, {FinancialType.FUNDING_ALLOCATION: 3}, {DataSource.ATF4_BID: 4}
         )
 
         assert (
-            financial_entity.capital_scheme_id == 1
-            and financial_entity.financial_type_id == 2
+            financial_entity.capital_scheme_financial_id == 1
+            and financial_entity.capital_scheme_id == 2
+            and financial_entity.financial_type_id == 3
             and financial_entity.amount == 2_000_000
             and financial_entity.effective_date_from == datetime(2020, 1, 1)
             and financial_entity.effective_date_to == datetime(2020, 2, 1)
-            and financial_entity.data_source_id == 3
+            and financial_entity.data_source_id == 4
         )
 
     def test_from_domain_when_current(self) -> None:
@@ -75,6 +77,7 @@ class TestCapitalSchemeFinancialEntity:
 
     def test_to_domain(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
+            capital_scheme_financial_id=1,
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
             effective_date_from=datetime(2020, 1, 1),
@@ -89,6 +92,7 @@ class TestCapitalSchemeFinancialEntity:
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
+            surrogate_id=1,
         )
 
     def test_to_domain_when_current(self) -> None:

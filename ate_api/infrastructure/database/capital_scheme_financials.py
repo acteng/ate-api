@@ -45,6 +45,7 @@ class CapitalSchemeFinancialEntity(BaseEntity):
         data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
+            capital_scheme_financial_id=financial.surrogate_id,
             capital_scheme_id=capital_scheme_id,
             financial_type_id=financial_type_ids[financial.type],
             amount=financial.amount.amount,
@@ -62,6 +63,7 @@ class CapitalSchemeFinancialEntity(BaseEntity):
             type=self.financial_type.financial_type_name.to_domain(),
             amount=Money(self.amount),
             data_source=self.data_source.data_source_name.to_domain(),
+            surrogate_id=self.capital_scheme_financial_id,
         )
 
 
