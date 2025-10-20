@@ -58,7 +58,6 @@ class TestMemoryCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
-
         await capital_schemes.add(
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"), overview=overview, bid_status_details=bid_status_details
