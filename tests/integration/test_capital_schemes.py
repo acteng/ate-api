@@ -16,6 +16,7 @@ from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -91,6 +92,7 @@ async def test_get_capital_scheme_with_financials(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme)
@@ -103,6 +105,7 @@ async def test_get_capital_scheme_with_financials(
             {
                 "type": "funding allocation",
                 "amount": 2_000_000,
+                "source": "ATF4 bid",
             }
         ],
     }

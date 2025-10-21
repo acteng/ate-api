@@ -9,6 +9,7 @@ from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -89,6 +90,7 @@ class TestCapitalScheme:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
@@ -106,6 +108,7 @@ class TestCapitalScheme:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
 
         capital_scheme.change_financial(financial)

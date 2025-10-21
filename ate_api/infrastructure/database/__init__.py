@@ -38,6 +38,8 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
 )
 from ate_api.infrastructure.database.capital_schemes.overviews import SchemeTypeEntity as SchemeTypeEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import SchemeTypeName as SchemeTypeName
+from ate_api.infrastructure.database.data_sources import DataSourceEntity as DataSourceEntity
+from ate_api.infrastructure.database.data_sources import DataSourceName as DataSourceName
 from ate_api.infrastructure.database.financial_types import FinancialTypeEntity as FinancialTypeEntity
 from ate_api.infrastructure.database.financial_types import FinancialTypeName as FinancialTypeName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity as FundingProgrammeEntity

@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -29,6 +30,7 @@ from ate_api.routes.capital_schemes.milestones import (
 from ate_api.routes.capital_schemes.outputs import CapitalSchemeOutputModel, OutputMeasureModel, OutputTypeModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 from ate_api.routes.collections import CollectionModel
+from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
@@ -81,6 +83,7 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_financial(
@@ -88,14 +91,19 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, http_request)
 
         assert capital_scheme_model.financials.items == [
-            CapitalSchemeFinancialModel(type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000),
-            CapitalSchemeFinancialModel(type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000),
+            CapitalSchemeFinancialModel(
+                type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
+            ),
+            CapitalSchemeFinancialModel(
+                type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000, source=DataSourceModel.ATF4_BID
+            ),
         ]
 
     def test_from_domain_sets_current_milestone(self, http_request: Request) -> None:
@@ -264,8 +272,12 @@ class TestCapitalSchemeModel:
             bid_status_details=dummy_bid_status_details_model(),
             financials=CollectionModel[CapitalSchemeFinancialModel](
                 items=[
-                    CapitalSchemeFinancialModel(type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000),
-                    CapitalSchemeFinancialModel(type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000),
+                    CapitalSchemeFinancialModel(
+                        type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
+                    ),
+                    CapitalSchemeFinancialModel(
+                        type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000, source=DataSourceModel.ATF4_BID
+                    ),
                 ]
             ),
             milestones=CapitalSchemeMilestonesModel(items=[]),
@@ -279,11 +291,13 @@ class TestCapitalSchemeModel:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 

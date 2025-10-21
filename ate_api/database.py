@@ -10,12 +10,15 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     BaseEntity,
     BidStatusEntity,
     BidStatusName,
+    DataSourceEntity,
+    DataSourceName,
     FinancialTypeEntity,
     FinancialTypeName,
     InterventionMeasureEntity,
@@ -71,6 +74,7 @@ async def _create_schema(engine: AsyncEngine) -> None:
 async def _create_reference_data(engine: AsyncEngine) -> None:
     async with AsyncSession(engine) as session:
         # common
+        session.add_all(_create_data_sources())
         session.add_all(_create_financial_types())
         session.add_all(_create_observation_types())
         # capital_scheme
@@ -83,6 +87,10 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
         session.add_all(_create_milestones())
         session.add_all(_create_scheme_types())
         await session.commit()
+
+
+def _create_data_sources() -> list[DataSourceEntity]:
+    return [DataSourceEntity(data_source_name=DataSourceName.from_domain(data_source)) for data_source in DataSource]
 
 
 def _create_financial_types() -> list[FinancialTypeEntity]:

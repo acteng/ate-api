@@ -13,6 +13,7 @@ from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -29,6 +30,8 @@ from ate_api.infrastructure.database import (
     CapitalSchemeInterventionEntity,
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
+    DataSourceEntity,
+    DataSourceName,
     FinancialTypeEntity,
     FinancialTypeName,
     FundingProgrammeEntity,
@@ -51,6 +54,7 @@ from tests.unit.infrastructure.database.builders import (
     build_bid_status_entity,
     build_capital_scheme_bid_status_entity,
     build_capital_scheme_overview_entity,
+    build_data_source_entity,
     build_financial_type_entity,
     build_funding_programme_entity,
     build_intervention_measure_entity,
@@ -89,6 +93,7 @@ class TestCapitalSchemeEntity:
             {},
             {},
             {},
+            {},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -120,6 +125,7 @@ class TestCapitalSchemeEntity:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_financial(
@@ -127,6 +133,7 @@ class TestCapitalSchemeEntity:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
@@ -137,6 +144,7 @@ class TestCapitalSchemeEntity:
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
             {FinancialType.FUNDING_ALLOCATION: 1, FinancialType.SPEND_TO_DATE: 2},
+            {DataSource.ATF4_BID: 3},
             {},
             {},
             {},
@@ -148,12 +156,14 @@ class TestCapitalSchemeEntity:
             and financial_entity1.amount == 2_000_000
             and financial_entity1.effective_date_from == datetime(2020, 1, 1)
             and not financial_entity1.effective_date_to
+            and financial_entity1.data_source_id == 3
         )
         assert (
             financial_entity2.financial_type_id == 2
             and financial_entity2.amount == 1_000_000
             and financial_entity2.effective_date_from == datetime(2020, 1, 1)
             and not financial_entity2.effective_date_to
+            and financial_entity2.data_source_id == 3
         )
 
     def test_from_domain_sets_milestones(self) -> None:
@@ -185,6 +195,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {},
             {},
             {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
             {ObservationType.ACTUAL: 3},
@@ -240,6 +251,7 @@ class TestCapitalSchemeEntity:
             {BidStatus.SUBMITTED: 0},
             {},
             {},
+            {},
             {ObservationType.ACTUAL: 3},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
@@ -279,6 +291,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {},
             {},
             {},
             {},
@@ -336,11 +349,13 @@ class TestCapitalSchemeEntity:
                     financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
                     amount=2_000_000,
                     effective_date_from=datetime(2020, 1, 1),
+                    data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
                 ),
                 CapitalSchemeFinancialEntity(
                     financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.SPEND_TO_DATE),
                     amount=1_000_000,
                     effective_date_from=datetime(2020, 1, 1),
+                    data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
                 ),
             ],
         )
@@ -352,11 +367,13 @@ class TestCapitalSchemeEntity:
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 
@@ -531,6 +548,7 @@ class TestDatabaseCapitalSchemeRepository:
                     build_bid_status_entity(),
                     build_financial_type_entity(id_=1, name=FinancialTypeName.FUNDING_ALLOCATION),
                     build_financial_type_entity(id_=2, name=FinancialTypeName.SPEND_TO_DATE),
+                    build_data_source_entity(id_=3, name=DataSourceName.ATF4_BID),
                 ]
             )
 
@@ -546,6 +564,7 @@ class TestDatabaseCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     type=FinancialType.FUNDING_ALLOCATION,
                     amount=Money(2_000_000),
+                    data_source=DataSource.ATF4_BID,
                 )
             )
             capital_scheme.change_financial(
@@ -553,6 +572,7 @@ class TestDatabaseCapitalSchemeRepository:
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     type=FinancialType.SPEND_TO_DATE,
                     amount=Money(1_000_000),
+                    data_source=DataSource.ATF4_BID,
                 )
             )
             await capital_schemes.add(capital_scheme)
@@ -566,6 +586,7 @@ class TestDatabaseCapitalSchemeRepository:
             and financial_row1.amount == 2_000_000
             and financial_row1.effective_date_from == datetime(2020, 1, 1)
             and not financial_row1.effective_date_to
+            and financial_row1.data_source_id == 3
         )
         assert (
             financial_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
@@ -573,6 +594,7 @@ class TestDatabaseCapitalSchemeRepository:
             and financial_row2.amount == 1_000_000
             and financial_row2.effective_date_from == datetime(2020, 1, 1)
             and not financial_row2.effective_date_to
+            and financial_row2.data_source_id == 3
         )
 
     async def test_add_stores_milestones(self, engine: AsyncEngine) -> None:
@@ -873,6 +895,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
                     spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -883,16 +906,19 @@ class TestDatabaseCapitalSchemeRepository:
                                 amount=3_000_000,
                                 effective_date_from=datetime(2020, 1, 1),
                                 effective_date_to=datetime(2020, 2, 1),
+                                data_source=atf4_bid,
                             ),
                             CapitalSchemeFinancialEntity(
                                 financial_type=funding_allocation,
                                 amount=2_000_000,
                                 effective_date_from=datetime(2020, 2, 1),
+                                data_source=atf4_bid,
                             ),
                             CapitalSchemeFinancialEntity(
                                 financial_type=spend_to_date,
                                 amount=1_000_000,
                                 effective_date_from=datetime(2020, 2, 1),
+                                data_source=atf4_bid,
                             ),
                         ],
                     ),
@@ -908,11 +934,13 @@ class TestDatabaseCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 
@@ -924,6 +952,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
                     spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -933,16 +962,19 @@ class TestDatabaseCapitalSchemeRepository:
                                 financial_type=spend_to_date,
                                 amount=1_000_000,
                                 effective_date_from=datetime(2020, 2, 1),
+                                data_source=atf4_bid,
                             ),
                             CapitalSchemeFinancialEntity(
                                 financial_type=funding_allocation,
                                 amount=3_000_000,
                                 effective_date_from=datetime(2020, 3, 1),
+                                data_source=atf4_bid,
                             ),
                             CapitalSchemeFinancialEntity(
                                 financial_type=funding_allocation,
                                 amount=2_000_000,
                                 effective_date_from=datetime(2020, 2, 1),
+                                data_source=atf4_bid,
                             ),
                         ],
                     ),
@@ -958,16 +990,19 @@ class TestDatabaseCapitalSchemeRepository:
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(3_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 

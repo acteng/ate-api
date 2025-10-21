@@ -1,10 +1,17 @@
 from datetime import UTC, datetime
 
 from ate_api.domain.capital_schemes.financials import CapitalSchemeFinancial
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.moneys import Money
-from ate_api.infrastructure.database import CapitalSchemeFinancialEntity, FinancialTypeEntity, FinancialTypeName
+from ate_api.infrastructure.database import (
+    CapitalSchemeFinancialEntity,
+    DataSourceEntity,
+    DataSourceName,
+    FinancialTypeEntity,
+    FinancialTypeName,
+)
 
 
 class TestCapitalSchemeFinancialEntity:
@@ -13,15 +20,19 @@ class TestCapitalSchemeFinancialEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
 
-        financial_entity = CapitalSchemeFinancialEntity.from_domain(financial, {FinancialType.FUNDING_ALLOCATION: 1})
+        financial_entity = CapitalSchemeFinancialEntity.from_domain(
+            financial, {FinancialType.FUNDING_ALLOCATION: 1}, {DataSource.ATF4_BID: 2}
+        )
 
         assert (
             financial_entity.financial_type_id == 1
             and financial_entity.amount == 2_000_000
             and financial_entity.effective_date_from == datetime(2020, 1, 1)
             and financial_entity.effective_date_to == datetime(2020, 2, 1)
+            and financial_entity.data_source_id == 2
         )
 
     def test_from_domain_when_current(self) -> None:
@@ -29,9 +40,12 @@ class TestCapitalSchemeFinancialEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
 
-        financial_entity = CapitalSchemeFinancialEntity.from_domain(financial, {FinancialType.FUNDING_ALLOCATION: 0})
+        financial_entity = CapitalSchemeFinancialEntity.from_domain(
+            financial, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
+        )
 
         assert not financial_entity.effective_date_to
 
@@ -40,9 +54,12 @@ class TestCapitalSchemeFinancialEntity:
             effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
 
-        financial_entity = CapitalSchemeFinancialEntity.from_domain(financial, {FinancialType.FUNDING_ALLOCATION: 0})
+        financial_entity = CapitalSchemeFinancialEntity.from_domain(
+            financial, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
+        )
 
         assert financial_entity.effective_date_from == datetime(2020, 6, 1, 13)
         assert financial_entity.effective_date_to == datetime(2020, 7, 1, 13)
@@ -53,6 +70,7 @@ class TestCapitalSchemeFinancialEntity:
             amount=2_000_000,
             effective_date_from=datetime(2020, 1, 1),
             effective_date_to=datetime(2020, 2, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         financial = financial_entity.to_domain()
@@ -61,6 +79,7 @@ class TestCapitalSchemeFinancialEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
 
     def test_to_domain_when_current(self) -> None:
@@ -68,6 +87,7 @@ class TestCapitalSchemeFinancialEntity:
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
             effective_date_from=datetime(2020, 1, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         financial = financial_entity.to_domain()
@@ -80,6 +100,7 @@ class TestCapitalSchemeFinancialEntity:
             amount=2_000_000,
             effective_date_from=datetime(2020, 6, 1, 13),
             effective_date_to=datetime(2020, 7, 1, 13),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         financial = financial_entity.to_domain()

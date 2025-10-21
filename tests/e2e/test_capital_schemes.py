@@ -23,6 +23,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     {
                         "type": "funding allocation",
                         "amount": 2_000_000,
+                        "source": "ATF4 bid",
                     }
                 ],
             },
@@ -69,6 +70,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                 {
                     "type": "funding allocation",
                     "amount": 2_000_000,
+                    "source": "ATF4 bid",
                 }
             ],
         },
