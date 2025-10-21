@@ -29,7 +29,7 @@ class CapitalSchemeFinancials:
     def financials(self) -> list[CapitalSchemeFinancial]:
         return list(self._financials)
 
-    def change_financial(self, financial: CapitalSchemeFinancial) -> None:
+    def adjust_financial(self, financial: CapitalSchemeFinancial) -> None:
         self._financials.append(financial)
 
 

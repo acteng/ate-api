@@ -41,5 +41,5 @@ class CapitalSchemeFinancialsModel(CollectionModel[CapitalSchemeFinancialModel])
     def to_domain(self, capital_scheme: CapitalSchemeReference, now: datetime) -> CapitalSchemeFinancials:
         financials = CapitalSchemeFinancials(capital_scheme=capital_scheme)
         for financial in self.items:
-            financials.change_financial(financial.to_domain(now))
+            financials.adjust_financial(financial.to_domain(now))
         return financials

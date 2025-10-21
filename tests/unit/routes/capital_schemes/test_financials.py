@@ -48,7 +48,7 @@ class TestCapitalSchemeFinancialModel:
 class TestCapitalSchemeFinancialsModel:
     def test_from_domain(self) -> None:
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-        financials.change_financial(
+        financials.adjust_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
@@ -56,7 +56,7 @@ class TestCapitalSchemeFinancialsModel:
                 data_source=DataSource.ATF4_BID,
             )
         )
-        financials.change_financial(
+        financials.adjust_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,

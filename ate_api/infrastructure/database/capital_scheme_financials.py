@@ -100,7 +100,7 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
 
         financials = CapitalSchemeFinancials(capital_scheme=capital_scheme)
         for row in rows:
-            financials.change_financial(row.to_domain())
+            financials.adjust_financial(row.to_domain())
         return financials
 
     async def _get_capital_scheme_id(self, financials: CapitalSchemeFinancials) -> int:

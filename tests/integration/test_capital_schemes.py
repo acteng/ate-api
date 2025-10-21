@@ -101,7 +101,7 @@ async def test_get_capital_scheme_with_financials(
     )
     await capital_schemes.add(capital_scheme)
     financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-    financials.change_financial(
+    financials.adjust_financial(
         CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,

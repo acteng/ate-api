@@ -24,14 +24,14 @@ class TestMemoryCapitalSchemeFinancialsRepository:
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
-        financials.change_financial(financial1)
+        financials.adjust_financial(financial1)
         financial2 = CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.SPEND_TO_DATE,
             amount=Money(1_000_000),
             data_source=DataSource.ATF4_BID,
         )
-        financials.change_financial(financial2)
+        financials.adjust_financial(financial2)
 
         await capital_scheme_financials.add(financials)
 
@@ -50,14 +50,14 @@ class TestMemoryCapitalSchemeFinancialsRepository:
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
-        financials.change_financial(financial1)
+        financials.adjust_financial(financial1)
         financial2 = CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.SPEND_TO_DATE,
             amount=Money(1_000_000),
             data_source=DataSource.ATF4_BID,
         )
-        financials.change_financial(financial2)
+        financials.adjust_financial(financial2)
         await capital_scheme_financials.add(financials)
 
         actual_financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))

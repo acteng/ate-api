@@ -80,7 +80,7 @@ class TestCapitalSchemeModel:
             bid_status_details=dummy_bid_status_details(),
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-        financials.change_financial(
+        financials.adjust_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.FUNDING_ALLOCATION,
@@ -88,7 +88,7 @@ class TestCapitalSchemeModel:
                 data_source=DataSource.ATF4_BID,
             )
         )
-        financials.change_financial(
+        financials.adjust_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=FinancialType.SPEND_TO_DATE,
