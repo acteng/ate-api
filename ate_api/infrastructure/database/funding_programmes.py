@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.functions import count
 
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
-from ate_api.infrastructure.database import BaseEntity
+from ate_api.infrastructure.database.base import BaseEntity
 
 
 class FundingProgrammeEntity(BaseEntity):

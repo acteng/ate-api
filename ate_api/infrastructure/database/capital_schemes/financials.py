@@ -9,7 +9,7 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.moneys import Money
-from ate_api.infrastructure.database import BaseEntity
+from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.financial_types import FinancialTypeEntity

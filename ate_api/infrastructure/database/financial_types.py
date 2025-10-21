@@ -4,7 +4,7 @@ from typing import Self
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ate_api.domain.financial_types import FinancialType
-from ate_api.infrastructure.database import BaseEntity
+from ate_api.infrastructure.database.base import BaseEntity
 
 
 class FinancialTypeName(Enum):
