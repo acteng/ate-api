@@ -1,6 +1,10 @@
 resource "google_compute_security_policy" "ate_api" {
   name = "ate-api"
 
+  advanced_options_config {
+    json_parsing = "STANDARD"
+  }
+
   rule {
     description = "SQL injection"
     action      = "deny(403)"
