@@ -1,6 +1,7 @@
+# See: https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc#find-your-apps-openid-configuration-document-uri
 output "oidc_server_metadata_url" {
   description = "OIDC configuration URL"
-  value       = "https://${data.auth0_tenant.main.domain}/.well-known/openid-configuration"
+  value       = "https://login.microsoftonline.com/${data.azuread_client_config.main.tenant_id}/v2.0/.well-known/openid-configuration"
 }
 
 output "resource_server_identifier" {

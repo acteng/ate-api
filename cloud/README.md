@@ -1,11 +1,13 @@
 # Cloud infrastructure
 
-This service is hosted on [Google Cloud Platform](https://console.cloud.google.com/).
+This service is hosted on [Google Cloud Platform](https://console.cloud.google.com/) and
+[Microsoft Azure](https://azure.microsoft.com/).
 
 ## Prerequisites
 
 1. Install [Google Cloud CLI](https://cloud.google.com/sdk/docs/install)
-1. Install [Auth0 CLI](https://auth0.github.io/auth0-cli/)
+1. Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) and
+   [log in](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/guides/azure_cli#logging-into-the-azure-cli)
 1. Install [jq](https://jqlang.org/download/)
 1. Install [Bitwarden CLI](https://bitwarden.com/help/cli/#download-and-install)
 

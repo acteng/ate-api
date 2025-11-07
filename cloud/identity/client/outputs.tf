@@ -1,10 +1,10 @@
 output "client_id" {
   description = "OAuth client ID"
-  value       = auth0_client.main.client_id
+  value       = azuread_application.main.client_id
 }
 
 output "client_secret" {
   description = "OAuth client secret"
-  value       = auth0_client_credentials.client_secret_post.client_secret
+  value       = tolist(azuread_application.main.password)[0].value
   sensitive   = true
 }

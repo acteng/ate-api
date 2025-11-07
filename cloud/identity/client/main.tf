@@ -24,3 +24,22 @@ resource "auth0_client_grant" "client_grant" {
   audience  = var.audience
   scopes    = []
 }
+
+resource "azuread_application" "main" {
+  display_name = "${var.name} (${var.env})"
+  description  = var.description
+  owners       = [var.owner]
+
+  password {
+    display_name = "Client secret"
+  }
+}
+
+resource "azuread_service_principal" "main" {
+  client_id = azuread_application.main.client_id
+  owners    = [var.owner]
+
+  feature_tags {
+    enterprise = true
+  }
+}

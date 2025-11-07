@@ -1,6 +1,7 @@
 # Identity provider
 
-This root module provisions OAuth clients for the API in [Auth0](https://auth0.com/).
+This root module provisions OAuth clients for the API in
+[Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/fundamentals/what-is-entra).
 
 ## Environments
 
