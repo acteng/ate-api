@@ -15,3 +15,9 @@ resource "auth0_resource_server" "server" {
   identifier     = var.identifier
   token_lifetime = 15 * local.minute_in_seconds
 }
+
+resource "azuread_application" "main" {
+  display_name    = "ATE API (${var.env})"
+  owners          = [var.owner]
+  identifier_uris = [var.identifier]
+}

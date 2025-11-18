@@ -30,6 +30,8 @@ data "azuread_client_config" "main" {
 
 module "resource_server" {
   source     = "./resource-server"
+  env        = local.env
+  owner      = data.azuread_client_config.main.object_id
   identifier = local.config[local.env].resource_server_identifier
 }
 

@@ -9,6 +9,11 @@ output "resource_server_identifier" {
   value       = module.resource_server.identifier
 }
 
+output "resource_server_application_id" {
+  description = "Resource server application ID"
+  value       = module.resource_server.application_id
+}
+
 output "example_client_id" {
   description = "Example client ID"
   value       = module.example_client.client_id
