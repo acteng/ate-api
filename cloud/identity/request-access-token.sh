@@ -13,6 +13,6 @@ CLIENT_SECRET=$(terraform output -raw example_client_secret)
 curl -s "${TOKEN_ENDPOINT}" \
 	-H 'Content-Type: application/x-www-form-urlencoded' \
 	-d 'grant_type=client_credentials' \
-	-d "audience=${RESOURCE_SERVER_IDENTIFIER}" \
+	-d "scope=${RESOURCE_SERVER_IDENTIFIER}/.default" \
 	-d "client_id=${CLIENT_ID}" \
 	-d "client_secret=${CLIENT_SECRET}" | jq -r .access_token
