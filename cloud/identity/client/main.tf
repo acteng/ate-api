@@ -30,6 +30,10 @@ resource "azuread_application" "main" {
   description  = var.description
   owners       = [var.owner]
 
+  api {
+    requested_access_token_version = 2
+  }
+
   password {
     display_name = "Client secret"
   }

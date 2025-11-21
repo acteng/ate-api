@@ -20,4 +20,8 @@ resource "azuread_application" "main" {
   display_name    = "ATE API (${var.env})"
   owners          = [var.owner]
   identifier_uris = [var.identifier]
+
+  api {
+    requested_access_token_version = 2
+  }
 }
