@@ -32,4 +32,9 @@ resource "aws_cognito_user_pool_client" "main" {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["client_credentials"]
   allowed_oauth_scopes                 = var.scopes
+  access_token_validity                = 15
+
+  token_validity_units {
+    access_token = "minutes"
+  }
 }
