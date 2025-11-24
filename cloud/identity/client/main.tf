@@ -26,7 +26,10 @@ resource "auth0_client_grant" "client_grant" {
 }
 
 resource "aws_cognito_user_pool_client" "main" {
-  name            = var.name
-  user_pool_id    = var.user_pool_id
-  generate_secret = true
+  name                                 = var.name
+  user_pool_id                         = var.user_pool_id
+  generate_secret                      = true
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["client_credentials"]
+  allowed_oauth_scopes                 = var.scopes
 }

@@ -17,3 +17,8 @@ variable "user_pool_id" {
   description = "User pool the client belongs to"
   type        = string
 }
+
+variable "scopes" {
+  description = "OAuth scopes allowed for this client"
+  type        = list(string)
+}

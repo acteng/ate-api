@@ -20,4 +20,9 @@ resource "aws_cognito_resource_server" "main" {
   name         = "ATE API"
   identifier   = var.identifier
   user_pool_id = var.user_pool_id
+
+  scope {
+    scope_name        = "default"
+    scope_description = "Default scope"
+  }
 }

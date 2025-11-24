@@ -45,6 +45,7 @@ module "example_client" {
   description  = "Client used for API development."
   audience     = module.resource_server.identifier
   user_pool_id = aws_cognito_user_pool.main.id
+  scopes       = ["${module.resource_server.identifier}/default"]
 }
 
 module "update_your_capital_schemes_client" {
@@ -53,4 +54,5 @@ module "update_your_capital_schemes_client" {
   description  = "Client used for the Update your capital schemes service."
   audience     = module.resource_server.identifier
   user_pool_id = aws_cognito_user_pool.main.id
+  scopes       = ["${module.resource_server.identifier}/default"]
 }
