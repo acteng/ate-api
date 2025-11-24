@@ -12,3 +12,8 @@ variable "audience" {
   description = "Resource server identifier to grant client access to"
   type        = string
 }
+
+variable "user_pool_id" {
+  description = "User pool the client belongs to"
+  type        = string
+}

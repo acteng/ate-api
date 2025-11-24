@@ -1,6 +1,6 @@
 output "oidc_server_metadata_url" {
   description = "OIDC configuration URL"
-  value       = "https://${data.auth0_tenant.main.domain}/.well-known/openid-configuration"
+  value       = "https://${aws_cognito_user_pool.main.endpoint}/.well-known/openid-configuration"
 }
 
 output "resource_server_identifier" {

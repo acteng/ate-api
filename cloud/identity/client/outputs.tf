@@ -1,10 +1,10 @@
 output "client_id" {
   description = "OAuth client ID"
-  value       = auth0_client.main.client_id
+  value       = aws_cognito_user_pool_client.main.id
 }
 
 output "client_secret" {
   description = "OAuth client secret"
-  value       = auth0_client_credentials.client_secret_post.client_secret
+  value       = aws_cognito_user_pool_client.main.client_secret
   sensitive   = true
 }

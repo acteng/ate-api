@@ -24,3 +24,9 @@ resource "auth0_client_grant" "client_grant" {
   audience  = var.audience
   scopes    = []
 }
+
+resource "aws_cognito_user_pool_client" "main" {
+  name            = var.name
+  user_pool_id    = var.user_pool_id
+  generate_secret = true
+}
