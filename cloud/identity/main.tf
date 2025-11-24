@@ -34,8 +34,9 @@ resource "aws_cognito_user_pool" "main" {
 }
 
 module "resource_server" {
-  source     = "./resource-server"
-  identifier = local.config[local.env].resource_server_identifier
+  source       = "./resource-server"
+  identifier   = local.config[local.env].resource_server_identifier
+  user_pool_id = aws_cognito_user_pool.main.id
 }
 
 module "example_client" {

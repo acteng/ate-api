@@ -15,3 +15,9 @@ resource "auth0_resource_server" "server" {
   identifier     = var.identifier
   token_lifetime = 15 * local.minute_in_seconds
 }
+
+resource "aws_cognito_resource_server" "main" {
+  name         = "ATE API"
+  identifier   = var.identifier
+  user_pool_id = var.user_pool_id
+}
