@@ -47,3 +47,9 @@ resource "azuread_service_principal" "main" {
     enterprise = true
   }
 }
+
+resource "azuread_app_role_assignment" "ate_api_default" {
+  app_role_id         = "00000000-0000-0000-0000-000000000000"
+  principal_object_id = azuread_service_principal.main.client_id
+  resource_object_id  = var.service_principal_id
+}

@@ -36,19 +36,23 @@ module "resource_server" {
 }
 
 module "example_client" {
-  source      = "./client"
-  name        = "Example"
-  env         = local.env
-  description = "Client used for API development."
-  owner       = data.azuread_client_config.main.object_id
-  audience    = module.resource_server.identifier
+  source               = "./client"
+  name                 = "Example"
+  env                  = local.env
+  description          = "Client used for API development."
+  owner                = data.azuread_client_config.main.object_id
+  audience             = module.resource_server.identifier
+  # app_role_id          = module.resource_server.app_role_id
+  service_principal_id = module.resource_server.service_principal_id
 }
 
 module "update_your_capital_schemes_client" {
-  source      = "./client"
-  name        = "Update your capital schemes"
-  env         = local.env
-  description = "Client used for the Update your capital schemes service."
-  owner       = data.azuread_client_config.main.object_id
-  audience    = module.resource_server.identifier
+  source               = "./client"
+  name                 = "Update your capital schemes"
+  env                  = local.env
+  description          = "Client used for the Update your capital schemes service."
+  owner                = data.azuread_client_config.main.object_id
+  audience             = module.resource_server.identifier
+  # app_role_id          = module.resource_server.app_role_id
+  service_principal_id = module.resource_server.service_principal_id
 }

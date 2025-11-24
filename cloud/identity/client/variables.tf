@@ -22,3 +22,13 @@ variable "audience" {
   description = "Resource server identifier to grant client access to"
   type        = string
 }
+
+# variable "app_role_id" {
+#   description = "Resource server app role ID to grant client access to"
+#   type        = string
+# }
+
+variable "service_principal_id" {
+  description = "Resource server service principal object ID to grant client access to"
+  type        = string
+}
