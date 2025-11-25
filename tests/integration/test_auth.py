@@ -33,6 +33,16 @@ def test_cannot_access_with_invalid_signature(
 
 
 @respx.mock
+def test_cannot_access_with_missing_issuer(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
+    access_token = authorization_server.create_access_token(issuer=None)
+
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "missing_claim: Missing 'iss' claim"}
+
+
+@respx.mock
 def test_cannot_access_with_invalid_issuer(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
     access_token = authorization_server.create_access_token(issuer="https://malicious.example/")
 

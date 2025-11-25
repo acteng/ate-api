@@ -34,7 +34,7 @@ async def authorize(
             token,
             key=jwks,
             claims_options={
-                "iss": {"value": server_metadata.get("issuer")},
+                "iss": {"essential": True, "value": server_metadata.get("issuer")},
                 "aud": {"essential": True, "value": settings.resource_server_identifier},
             },
         )
