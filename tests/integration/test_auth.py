@@ -97,6 +97,18 @@ def test_cannot_access_with_expired_access_token(
 
 
 @respx.mock
+def test_cannot_access_with_missing_issued_at(
+    authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    access_token = authorization_server.create_access_token(issued_at=None)
+
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "missing_claim: Missing 'iat' claim"}
+
+
+@respx.mock
 def test_cannot_access_with_access_token_issued_in_future(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:

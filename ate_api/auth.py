@@ -37,6 +37,7 @@ async def authorize(
                 "iss": {"essential": True, "value": server_metadata.get("issuer")},
                 "aud": {"essential": True, "value": settings.resource_server_identifier},
                 "exp": {"essential": True},
+                "iat": {"essential": True},
             },
         )
     except Exception as error:
