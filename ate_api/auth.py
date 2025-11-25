@@ -3,7 +3,7 @@ from typing import Annotated
 
 from authlib.integrations.starlette_client import OAuth
 from authlib.jose import jwt
-from authlib.jose.errors import ExpiredTokenError, InvalidClaimError, InvalidTokenError
+from authlib.jose.errors import ExpiredTokenError, InvalidClaimError, InvalidTokenError, MissingClaimError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -35,7 +35,7 @@ async def authorize(
             key=jwks,
             claims_options={
                 "iss": {"value": server_metadata.get("issuer")},
-                "aud": {"value": settings.resource_server_identifier},
+                "aud": {"essential": True, "value": settings.resource_server_identifier},
             },
         )
     except Exception as error:
@@ -44,5 +44,5 @@ async def authorize(
     # validate claims
     try:
         claims.validate()
-    except (InvalidClaimError, ExpiredTokenError, InvalidTokenError) as error:
+    except (MissingClaimError, InvalidClaimError, ExpiredTokenError, InvalidTokenError) as error:
         raise HTTPException(status.HTTP_403_FORBIDDEN, str(error))

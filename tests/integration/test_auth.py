@@ -43,6 +43,16 @@ def test_cannot_access_with_invalid_issuer(authorization_server: StubAuthorizati
 
 
 @respx.mock
+def test_cannot_access_with_missing_audience(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
+    access_token = authorization_server.create_access_token(audience=None)
+
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "missing_claim: Missing 'aud' claim"}
+
+
+@respx.mock
 def test_cannot_access_with_invalid_audience(authorization_server: StubAuthorizationServer, client: TestClient) -> None:
     access_token = authorization_server.create_access_token(audience="https://malicious.example/")
 
