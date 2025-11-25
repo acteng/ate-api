@@ -24,7 +24,7 @@ async def test_can_access_with_valid_access_token(
 def test_cannot_access_with_invalid_signature(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
-    access_token = authorization_server.create_access_token(signature="invalid_signature".encode())
+    access_token = authorization_server.create_access_token(signature=b"invalid_signature")
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
