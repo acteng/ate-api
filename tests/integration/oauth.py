@@ -9,6 +9,13 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
 
 
+class UnsetType:
+    pass
+
+
+Unset = UnsetType()
+
+
 class StubAuthorizationServer:
     def __init__(self, resource_server_identifier: str) -> None:
         self._url = "https://stub.example"
@@ -22,10 +29,10 @@ class StubAuthorizationServer:
 
     def create_access_token(
         self,
-        issuer: str | None = None,
-        audience: str | None = None,
-        expiration_time: int | None = None,
-        issued_at: int | None = None,
+        issuer: str | None | UnsetType = Unset,
+        audience: str | None | UnsetType = Unset,
+        expiration_time: int | None | UnsetType = Unset,
+        issued_at: int | None | UnsetType = Unset,
         signature: bytes | None = None,
     ) -> str:
         subject = "stub_client_id"
@@ -36,13 +43,19 @@ class StubAuthorizationServer:
             "alg": "RS256",
         }
 
-        payload = {
-            "iss": issuer or self._url,
-            "sub": subject,
-            "aud": audience or self._resource_server_identifier,
-            "exp": expiration_time or now + 60,
-            "iat": issued_at or now,
-        }
+        payload: dict[str, Any] = {"sub": subject}
+
+        if issuer is not None:
+            payload["iss"] = issuer if issuer is not Unset else self._url
+
+        if audience is not None:
+            payload["aud"] = audience if audience is not Unset else self._resource_server_identifier
+
+        if expiration_time is not None:
+            payload["exp"] = expiration_time if expiration_time is not Unset else now + 60
+
+        if issued_at is not None:
+            payload["iat"] = issued_at if issued_at is not Unset else now
 
         access_token: str = jwt.encode(header, payload, self._private_key).decode()
 
