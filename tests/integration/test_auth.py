@@ -73,6 +73,18 @@ def test_cannot_access_with_invalid_audience(authorization_server: StubAuthoriza
 
 
 @respx.mock
+def test_cannot_access_with_missing_expiration_time(
+    authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    access_token = authorization_server.create_access_token(expiration_time=None)
+
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "missing_claim: Missing 'exp' claim"}
+
+
+@respx.mock
 def test_cannot_access_with_expired_access_token(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:

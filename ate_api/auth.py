@@ -36,6 +36,7 @@ async def authorize(
             claims_options={
                 "iss": {"essential": True, "value": server_metadata.get("issuer")},
                 "aud": {"essential": True, "value": settings.resource_server_identifier},
+                "exp": {"essential": True},
             },
         )
     except Exception as error:
