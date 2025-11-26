@@ -21,6 +21,18 @@ async def test_can_access_with_valid_access_token(
 
 
 @respx.mock
+def test_cannot_access_with_missing_signature(
+    authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    access_token = authorization_server.create_access_token(signature=b"")
+
+    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "bad_signature: "}
+
+
+@respx.mock
 def test_cannot_access_with_invalid_signature(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:

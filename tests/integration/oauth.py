@@ -59,7 +59,7 @@ class StubAuthorizationServer:
 
         access_token: str = jwt.encode(header, payload, self._private_key).decode()
 
-        if signature:
+        if signature is not None:
             access_token = self._replace_signature(access_token, signature)
 
         return access_token
