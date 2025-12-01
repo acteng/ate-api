@@ -136,3 +136,4 @@ def test_cannot_access_without_bearer(client: TestClient) -> None:
     response = client.get("/authorities/LIV")
 
     assert response.status_code == 403
+    assert response.json() == {"detail": "Not authenticated"}
