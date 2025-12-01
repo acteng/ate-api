@@ -135,5 +135,6 @@ def test_cannot_access_with_access_token_issued_in_future(
 def test_cannot_access_without_bearer(client: TestClient) -> None:
     response = client.get("/authorities/LIV")
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "Not authenticated"}
