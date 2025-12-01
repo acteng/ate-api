@@ -28,7 +28,8 @@ def test_cannot_access_with_missing_signature(
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "bad_signature: "}
 
 
@@ -40,7 +41,8 @@ def test_cannot_access_with_invalid_signature(
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "bad_signature: "}
 
 
@@ -50,7 +52,8 @@ def test_cannot_access_with_missing_issuer(authorization_server: StubAuthorizati
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "missing_claim: Missing 'iss' claim"}
 
 
@@ -60,7 +63,8 @@ def test_cannot_access_with_invalid_issuer(authorization_server: StubAuthorizati
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "invalid_claim: Invalid claim 'iss'"}
 
 
@@ -70,7 +74,8 @@ def test_cannot_access_with_missing_audience(authorization_server: StubAuthoriza
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "missing_claim: Missing 'aud' claim"}
 
 
@@ -80,7 +85,8 @@ def test_cannot_access_with_invalid_audience(authorization_server: StubAuthoriza
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "invalid_claim: Invalid claim 'aud'"}
 
 
@@ -92,7 +98,8 @@ def test_cannot_access_with_missing_expiration_time(
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "missing_claim: Missing 'exp' claim"}
 
 
@@ -104,7 +111,8 @@ def test_cannot_access_with_expired_access_token(
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "expired_token: The token is expired"}
 
 
@@ -116,7 +124,8 @@ def test_cannot_access_with_missing_issued_at(
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "missing_claim: Missing 'iat' claim"}
 
 
@@ -128,7 +137,8 @@ def test_cannot_access_with_access_token_issued_in_future(
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
     assert response.json() == {"detail": "invalid_token: The token is not valid as it was issued in the future"}
 
 

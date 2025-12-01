@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware import Middleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
+from starlette.status import HTTP_401_UNAUTHORIZED
 
 from ate_api.auth import authorize
 from ate_api.database import create_database_schema, get_engine
@@ -36,7 +36,7 @@ app = FastAPI(
     dependencies=[Depends(authorize)],
     middleware=[Middleware(GZipMiddleware)],
     lifespan=lifespan,
-    responses={HTTP_401_UNAUTHORIZED: {"model": HTTPError}, HTTP_403_FORBIDDEN: {"model": HTTPError}},
+    responses={HTTP_401_UNAUTHORIZED: {"model": HTTPError}},
 )
 app.include_router(authorities.router)
 app.include_router(capital_schemes.router)

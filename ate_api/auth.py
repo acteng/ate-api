@@ -41,10 +41,10 @@ async def authorize(
             },
         )
     except Exception as error:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, str(error))
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, str(error), bearer_scheme.make_authenticate_headers())
 
     # validate claims
     try:
         claims.validate()
     except (MissingClaimError, InvalidClaimError, ExpiredTokenError, InvalidTokenError) as error:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, str(error))
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, str(error), bearer_scheme.make_authenticate_headers())
