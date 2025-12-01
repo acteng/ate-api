@@ -14,7 +14,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "aiosqlite~=0.21.0",
-    "black~=25.9.0",
+    "black~=25.11.0",
     "isort~=7.0.0",
     "mypy~=1.16.0",
     "pytest~=8.4.0",
