@@ -7,9 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone, MilestoneRepository
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.data_sources import DataSourceEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity
 
@@ -58,6 +60,8 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
     status_date: Mapped[date]
     observation_type_id = mapped_column(ForeignKey(ObservationTypeEntity.observation_type_id), nullable=False)
     observation_type: Mapped[ObservationTypeEntity] = relationship(lazy="raise")
+    data_source_id = mapped_column(ForeignKey(DataSourceEntity.data_source_id), nullable=False)
+    data_source: Mapped[DataSourceEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
     effective_date_to: Mapped[datetime | None]
 
@@ -67,11 +71,13 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
         milestone: CapitalSchemeMilestone,
         milestone_ids: dict[Milestone, int],
         observation_type_ids: dict[ObservationType, int],
+        data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
             milestone_id=milestone_ids[milestone.milestone],
             status_date=milestone.status_date,
             observation_type_id=observation_type_ids[milestone.observation_type],
+            data_source_id=data_source_ids[milestone.data_source],
             effective_date_from=zoned_to_local(milestone.effective_date.from_),
             effective_date_to=zoned_to_local(milestone.effective_date.to) if milestone.effective_date.to else None,
         )
@@ -85,6 +91,7 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
             milestone=self.milestone.milestone_name.to_domain(),
             observation_type=self.observation_type.observation_type_name.to_domain(),
             status_date=self.status_date,
+            data_source=self.data_source.data_source_name.to_domain(),
         )
 
 

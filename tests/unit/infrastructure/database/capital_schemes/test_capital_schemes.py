@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, Capita
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -25,6 +26,8 @@ from ate_api.infrastructure.database import (
     CapitalSchemeInterventionEntity,
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
+    DataSourceEntity,
+    DataSourceName,
     FundingProgrammeEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
@@ -45,6 +48,7 @@ from tests.unit.infrastructure.database.builders import (
     build_bid_status_entity,
     build_capital_scheme_bid_status_entity,
     build_capital_scheme_overview_entity,
+    build_data_source_entity,
     build_funding_programme_entity,
     build_intervention_measure_entity,
     build_intervention_type_entity,
@@ -81,6 +85,7 @@ class TestCapitalSchemeEntity:
             {},
             {},
             {},
+            {},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -113,6 +118,7 @@ class TestCapitalSchemeEntity:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_milestone(
@@ -121,6 +127,7 @@ class TestCapitalSchemeEntity:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
@@ -132,6 +139,7 @@ class TestCapitalSchemeEntity:
             {BidStatus.SUBMITTED: 0},
             {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
             {ObservationType.ACTUAL: 3},
+            {DataSource.ATF4_BID: 4},
             {},
         )
 
@@ -140,6 +148,7 @@ class TestCapitalSchemeEntity:
             milestone_entity1.milestone_id == 1
             and milestone_entity1.status_date == date(2020, 2, 1)
             and milestone_entity1.observation_type_id == 3
+            and milestone_entity1.data_source_id == 4
             and milestone_entity1.effective_date_from == datetime(2020, 1, 1)
             and not milestone_entity1.effective_date_to
         )
@@ -147,6 +156,7 @@ class TestCapitalSchemeEntity:
             milestone_entity2.milestone_id == 2
             and milestone_entity2.status_date == date(2020, 3, 1)
             and milestone_entity2.observation_type_id == 3
+            and milestone_entity2.data_source_id == 4
             and milestone_entity2.effective_date_from == datetime(2020, 1, 1)
             and not milestone_entity2.effective_date_to
         )
@@ -184,6 +194,7 @@ class TestCapitalSchemeEntity:
             {BidStatus.SUBMITTED: 0},
             {},
             {ObservationType.ACTUAL: 3},
+            {},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
                 (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
@@ -222,6 +233,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {},
             {},
             {},
             {},
@@ -277,12 +289,14 @@ class TestCapitalSchemeEntity:
                     milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     status_date=date(2020, 2, 1),
+                    data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
                     effective_date_from=datetime(2020, 1, 1),
                 ),
                 CapitalSchemeMilestoneEntity(
                     milestone=MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED),
                     observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
                     status_date=date(2020, 3, 1),
+                    data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
                     effective_date_from=datetime(2020, 1, 1),
                 ),
             ],
@@ -296,12 +310,14 @@ class TestCapitalSchemeEntity:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 
@@ -439,6 +455,7 @@ class TestDatabaseCapitalSchemeRepository:
                     build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED),
                     build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
+                    build_data_source_entity(id_=1, name=DataSourceName.ATF4_BID),
                 ]
             )
 
@@ -455,6 +472,7 @@ class TestDatabaseCapitalSchemeRepository:
                     milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                     observation_type=ObservationType.ACTUAL,
                     status_date=date(2020, 2, 1),
+                    data_source=DataSource.ATF4_BID,
                 )
             )
             capital_scheme.change_milestone(
@@ -463,6 +481,7 @@ class TestDatabaseCapitalSchemeRepository:
                     milestone=Milestone.CONSTRUCTION_STARTED,
                     observation_type=ObservationType.ACTUAL,
                     status_date=date(2020, 3, 1),
+                    data_source=DataSource.ATF4_BID,
                 )
             )
             await capital_schemes.add(capital_scheme)
@@ -475,6 +494,7 @@ class TestDatabaseCapitalSchemeRepository:
             and milestone_row1.milestone_id == 1
             and milestone_row1.status_date == date(2020, 2, 1)
             and milestone_row1.observation_type_id == 1
+            and milestone_row1.data_source_id == 1
             and milestone_row1.effective_date_from == datetime(2020, 1, 1)
             and not milestone_row1.effective_date_to
         )
@@ -483,6 +503,7 @@ class TestDatabaseCapitalSchemeRepository:
             and milestone_row2.milestone_id == 2
             and milestone_row2.status_date == date(2020, 3, 1)
             and milestone_row2.observation_type_id == 1
+            and milestone_row2.data_source_id == 1
             and milestone_row2.effective_date_from == datetime(2020, 1, 1)
             and not milestone_row2.effective_date_to
         )
@@ -727,6 +748,7 @@ class TestDatabaseCapitalSchemeRepository:
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -736,6 +758,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=detailed_design_completed,
                                 observation_type=actual,
                                 status_date=date(2020, 3, 1),
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                                 effective_date_to=datetime(2020, 2, 1),
                             ),
@@ -743,12 +766,14 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=detailed_design_completed,
                                 observation_type=actual,
                                 status_date=date(2020, 4, 1),
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                             CapitalSchemeMilestoneEntity(
                                 milestone=construction_started,
                                 observation_type=actual,
                                 status_date=date(2020, 5, 1),
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],
@@ -766,12 +791,14 @@ class TestDatabaseCapitalSchemeRepository:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 5, 1),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 
@@ -789,6 +816,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity()],
@@ -798,18 +826,21 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=construction_started,
                                 observation_type=actual,
                                 status_date=date(2020, 4, 1),
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
                                 observation_type=actual,
                                 status_date=date(2020, 3, 1),
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                             CapitalSchemeMilestoneEntity(
                                 milestone=detailed_design_completed,
                                 observation_type=planned,
                                 status_date=date(2020, 2, 1),
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -827,18 +858,21 @@ class TestDatabaseCapitalSchemeRepository:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.PLANNED,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 
@@ -1303,6 +1337,7 @@ class TestDatabaseCapitalSchemeRepository:
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     construction_completed := build_milestone_entity(name=MilestoneName.CONSTRUCTION_COMPLETED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1316,6 +1351,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=detailed_design_completed,
                                 status_date=date(2020, 2, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -1333,6 +1369,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=construction_started,
                                 status_date=date(2020, 3, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -1350,6 +1387,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=construction_completed,
                                 status_date=date(2020, 4, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -1378,6 +1416,7 @@ class TestDatabaseCapitalSchemeRepository:
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1400,6 +1439,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=construction_started,
                                 status_date=date(2020, 3, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -1426,6 +1466,7 @@ class TestDatabaseCapitalSchemeRepository:
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1439,6 +1480,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=detailed_design_completed,
                                 status_date=date(2020, 2, 1),
                                 observation_type=planned,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -1470,6 +1512,7 @@ class TestDatabaseCapitalSchemeRepository:
                         name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1483,12 +1526,14 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=detailed_design_completed,
                                 status_date=date(2020, 2, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                             CapitalSchemeMilestoneEntity(
                                 milestone=construction_started,
                                 status_date=date(2020, 2, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                             ),
                         ],
@@ -1516,6 +1561,7 @@ class TestDatabaseCapitalSchemeRepository:
                     detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -1529,6 +1575,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=detailed_design_completed,
                                 status_date=date(2020, 2, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 1, 1),
                                 effective_date_to=datetime(2020, 2, 1),
                             ),
@@ -1536,6 +1583,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 milestone=construction_started,
                                 status_date=date(2020, 3, 1),
                                 observation_type=actual,
+                                data_source=atf4_bid,
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],

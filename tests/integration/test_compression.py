@@ -10,6 +10,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalSchemeRepository,
 )
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
@@ -62,6 +63,7 @@ def _build_capital_scheme(reference: CapitalSchemeReference) -> CapitalScheme:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     capital_scheme.change_milestone(
@@ -70,6 +72,7 @@ def _build_capital_scheme(reference: CapitalSchemeReference) -> CapitalScheme:
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     return capital_scheme

@@ -144,6 +144,7 @@ async def test_get_capital_scheme_with_milestones(
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme)
@@ -159,6 +160,7 @@ async def test_get_capital_scheme_with_milestones(
                 "milestone": "detailed design completed",
                 "observationType": "actual",
                 "statusDate": "2020-02-01",
+                "source": "ATF4 bid",
             }
         ],
     }

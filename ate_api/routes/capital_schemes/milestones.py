@@ -9,6 +9,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.repositories import get_milestone_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
+from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.observation_types import ObservationTypeModel
 
 
@@ -38,6 +39,7 @@ class CapitalSchemeMilestoneModel(BaseModel):
     milestone: MilestoneModel
     observation_type: ObservationTypeModel
     status_date: date
+    source: DataSourceModel
 
     @classmethod
     def from_domain(cls, milestone: CapitalSchemeMilestone) -> Self:
@@ -45,6 +47,7 @@ class CapitalSchemeMilestoneModel(BaseModel):
             milestone=MilestoneModel.from_domain(milestone.milestone),
             observation_type=ObservationTypeModel.from_domain(milestone.observation_type),
             status_date=milestone.status_date,
+            source=DataSourceModel.from_domain(milestone.data_source),
         )
 
     def to_domain(self, now: datetime) -> CapitalSchemeMilestone:
@@ -53,6 +56,7 @@ class CapitalSchemeMilestoneModel(BaseModel):
             milestone=self.milestone.to_domain(),
             observation_type=self.observation_type.to_domain(),
             status_date=self.status_date,
+            data_source=self.source.to_domain(),
         )
 
 

@@ -15,6 +15,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.authorities import AuthorityEntity
@@ -43,6 +44,7 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
@@ -69,6 +71,7 @@ class CapitalSchemeEntity(BaseEntity):
         bid_status_ids: dict[BidStatus, int],
         milestone_ids: dict[Milestone, int],
         observation_type_ids: dict[ObservationType, int],
+        data_source_ids: dict[DataSource, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
     ) -> Self:
         return cls(
@@ -82,7 +85,9 @@ class CapitalSchemeEntity(BaseEntity):
                 CapitalSchemeBidStatusEntity.from_domain(capital_scheme.bid_status_details, bid_status_ids)
             ],
             capital_scheme_milestones=[
-                CapitalSchemeMilestoneEntity.from_domain(milestone, milestone_ids, observation_type_ids)
+                CapitalSchemeMilestoneEntity.from_domain(
+                    milestone, milestone_ids, observation_type_ids, data_source_ids
+                )
                 for milestone in capital_scheme.milestones
             ],
             capital_scheme_interventions=[
@@ -129,6 +134,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
         milestone_ids = await self._get_milestone_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
+        data_source_ids = await self._get_data_source_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
 
         self._session.add(
@@ -140,6 +146,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 bid_status_ids,
                 milestone_ids,
                 observation_type_ids,
+                data_source_ids,
                 intervention_type_measure_ids,
             )
         )
@@ -349,6 +356,17 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
         return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
 
+    async def _get_data_source_ids(self, capital_scheme: CapitalScheme) -> dict[DataSource, int]:
+        data_source_names = {
+            DataSourceName.from_domain(milestone.data_source) for milestone in capital_scheme.milestones
+        }
+        rows = await self._session.execute(
+            select(DataSourceEntity.data_source_name, DataSourceEntity.data_source_id).where(
+                DataSourceEntity.data_source_name.in_(data_source_names)
+            )
+        )
+        return {row.data_source_name.to_domain(): row.data_source_id for row in rows}
+
     async def _get_intervention_type_measure_ids(
         self, capital_scheme: CapitalScheme
     ) -> dict[tuple[OutputType, OutputMeasure], int]:
@@ -387,9 +405,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .options(
                 contains_eager(CapitalSchemeMilestoneEntity.milestone),
                 contains_eager(CapitalSchemeMilestoneEntity.observation_type),
+                contains_eager(CapitalSchemeMilestoneEntity.data_source),
             )
             .join(MilestoneEntity)
             .join(ObservationTypeEntity)
+            .join(DataSourceEntity)
             .where(CapitalSchemeMilestoneEntity.capital_scheme_id == capital_scheme_id)
             .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
             .order_by(MilestoneEntity.stage_order)

@@ -8,6 +8,7 @@ from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, Capita
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -86,6 +87,7 @@ class TestCapitalScheme:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
@@ -105,6 +107,7 @@ class TestCapitalScheme:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.PLANNED,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_milestone(
@@ -113,6 +116,7 @@ class TestCapitalScheme:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
@@ -130,6 +134,7 @@ class TestCapitalScheme:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_milestone(
@@ -138,6 +143,7 @@ class TestCapitalScheme:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
 
@@ -163,6 +169,7 @@ class TestCapitalScheme:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )
 
         capital_scheme.change_milestone(milestone)

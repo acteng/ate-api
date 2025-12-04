@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 from enum import IntEnum, auto
 
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 
@@ -35,6 +36,7 @@ class CapitalSchemeMilestone:
     milestone: Milestone
     observation_type: ObservationType
     status_date: date
+    data_source: DataSource
 
 
 class MilestoneRepository:

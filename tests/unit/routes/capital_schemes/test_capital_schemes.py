@@ -120,6 +120,7 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_milestone(
@@ -128,6 +129,7 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -148,6 +150,7 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         capital_scheme.change_milestone(
@@ -156,6 +159,7 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -167,11 +171,13 @@ class TestCapitalSchemeModel:
                 milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationTypeModel.ACTUAL,
                 status_date=date(2020, 2, 1),
+                source=DataSourceModel.ATF4_BID,
             ),
             CapitalSchemeMilestoneModel(
                 milestone=MilestoneModel.CONSTRUCTION_STARTED,
                 observation_type=ObservationTypeModel.ACTUAL,
                 status_date=date(2020, 3, 1),
+                source=DataSourceModel.ATF4_BID,
             ),
         ]
 
@@ -283,11 +289,13 @@ class TestCapitalSchemeModel:
                         milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
                         observation_type=ObservationTypeModel.ACTUAL,
                         status_date=date(2020, 2, 1),
+                        source=DataSourceModel.ATF4_BID,
                     ),
                     CapitalSchemeMilestoneModel(
                         milestone=MilestoneModel.CONSTRUCTION_STARTED,
                         observation_type=ObservationTypeModel.ACTUAL,
                         status_date=date(2020, 3, 1),
+                        source=DataSourceModel.ATF4_BID,
                     ),
                 ]
             ),
@@ -302,12 +310,14 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             ),
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             ),
         ]
 

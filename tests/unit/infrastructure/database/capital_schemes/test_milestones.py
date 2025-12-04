@@ -4,10 +4,13 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     CapitalSchemeMilestoneEntity,
+    DataSourceEntity,
+    DataSourceName,
     MilestoneEntity,
     MilestoneName,
     ObservationTypeEntity,
@@ -49,16 +52,18 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
-            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 1}, {ObservationType.ACTUAL: 2}
+            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 1}, {ObservationType.ACTUAL: 2}, {DataSource.ATF4_BID: 3}
         )
 
         assert (
             milestone_entity.milestone_id == 1
             and milestone_entity.status_date == date(2020, 3, 1)
             and milestone_entity.observation_type_id == 2
+            and milestone_entity.data_source_id == 3
             and milestone_entity.effective_date_from == datetime(2020, 1, 1)
             and milestone_entity.effective_date_to == datetime(2020, 2, 1)
         )
@@ -69,10 +74,11 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
-            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 0}, {ObservationType.ACTUAL: 0}
+            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 0}, {ObservationType.ACTUAL: 0}, {DataSource.ATF4_BID: 0}
         )
 
         assert not milestone_entity.effective_date_to
@@ -83,10 +89,11 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
-            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 0}, {ObservationType.ACTUAL: 0}
+            milestone, {Milestone.DETAILED_DESIGN_COMPLETED: 0}, {ObservationType.ACTUAL: 0}, {DataSource.ATF4_BID: 0}
         )
 
         assert milestone_entity.effective_date_from == datetime(2020, 6, 1, 13)
@@ -97,6 +104,7 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
             effective_date_from=datetime(2020, 1, 1),
             effective_date_to=datetime(2020, 2, 1),
         )
@@ -108,6 +116,7 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
 
     def test_to_domain_when_current(self) -> None:
@@ -116,6 +125,7 @@ class TestCapitalSchemeMilestoneEntity:
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
             effective_date_from=datetime(2020, 1, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         milestone = milestone_entity.to_domain()
@@ -127,6 +137,7 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
             effective_date_from=datetime(2020, 6, 1, 13),
             effective_date_to=datetime(2020, 7, 1, 13),
         )

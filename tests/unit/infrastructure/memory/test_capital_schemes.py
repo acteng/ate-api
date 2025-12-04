@@ -7,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -237,6 +238,7 @@ class TestMemoryCapitalSchemeRepository:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         await capital_schemes.add(capital_scheme1)
@@ -257,6 +259,7 @@ class TestMemoryCapitalSchemeRepository:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         await capital_schemes.add(capital_scheme2)
@@ -277,6 +280,7 @@ class TestMemoryCapitalSchemeRepository:
                 milestone=Milestone.CONSTRUCTION_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         await capital_schemes.add(capital_scheme3)
@@ -320,6 +324,7 @@ class TestMemoryCapitalSchemeRepository:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
             )
         )
         await capital_schemes.add(capital_scheme2)

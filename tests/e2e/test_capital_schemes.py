@@ -33,6 +33,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                         "milestone": "detailed design completed",
                         "observationType": "actual",
                         "statusDate": "2020-03-01",
+                        "source": "ATF4 bid",
                     }
                 ],
             },
@@ -81,6 +82,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
                 }
             ],
         },

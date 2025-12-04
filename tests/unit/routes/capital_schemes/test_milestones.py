@@ -3,9 +3,11 @@ from datetime import UTC, date, datetime
 import pytest
 
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 from ate_api.routes.capital_schemes.milestones import CapitalSchemeMilestoneModel, MilestoneModel
+from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.observation_types import ObservationTypeModel
 
 
@@ -41,6 +43,7 @@ class TestCapitalSchemeMilestoneModel:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )
 
         milestone_model = CapitalSchemeMilestoneModel.from_domain(milestone)
@@ -49,6 +52,7 @@ class TestCapitalSchemeMilestoneModel:
             milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationTypeModel.ACTUAL,
             status_date=date(2020, 2, 1),
+            source=DataSourceModel.ATF4_BID,
         )
 
     def test_to_domain(self) -> None:
@@ -56,6 +60,7 @@ class TestCapitalSchemeMilestoneModel:
             milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationTypeModel.ACTUAL,
             status_date=date(2020, 2, 1),
+            source=DataSourceModel.ATF4_BID,
         )
 
         milestone = milestone_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
@@ -65,4 +70,5 @@ class TestCapitalSchemeMilestoneModel:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )

@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes.capital_schemes import (
 )
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.domain.observation_types import ObservationType
@@ -338,6 +339,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme1)
@@ -358,6 +360,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme2)
@@ -400,6 +403,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme1)
@@ -420,6 +424,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme2)
@@ -440,6 +445,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
             milestone=Milestone.CONSTRUCTION_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 4, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme3)
@@ -496,6 +502,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
         )
     )
     await capital_schemes.add(capital_scheme2)
