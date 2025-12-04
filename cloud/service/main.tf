@@ -22,13 +22,13 @@ locals {
       github_action_deploy = true
     }
     test = {
-      image_tag            = "0.11.0"
+      image_tag            = "0.11.1"
       keep_idle            = false
       domain               = "test.${local.domain}"
       github_action_deploy = false
     }
     prod = {
-      image_tag            = "0.11.0"
+      image_tag            = "0.11.1"
       keep_idle            = true
       domain               = local.domain
       github_action_deploy = false
