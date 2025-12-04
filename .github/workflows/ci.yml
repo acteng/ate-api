@@ -13,7 +13,6 @@ env:
   IMAGE_LOCATION: europe-west1
   IMAGE_REPOSITORY_ID: docker
   IMAGE_NAME: ate-api
-  IMAGE_TAG: latest
   SERVICE_LOCATION: europe-west1
   SERVICE_NAME: ate-api
 
@@ -21,6 +20,8 @@ jobs:
 
   build:
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -96,5 +97,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE_NAME }}
-          image: ${{ env.IMAGE_LOCATION }}-docker.pkg.dev/${{ env.IMAGE_PROJECT }}/${{ env.IMAGE_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          image: ${{ env.IMAGE_LOCATION }}-docker.pkg.dev/${{ env.IMAGE_PROJECT }}/${{ env.IMAGE_REPOSITORY_ID }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.version }}
           region: ${{ env.SERVICE_LOCATION }}
