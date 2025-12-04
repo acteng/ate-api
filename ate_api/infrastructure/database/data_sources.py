@@ -33,6 +33,7 @@ class DataSourceName(Enum):
     CRSTS_QUARTERLY_UPDATE = "CRSTS quarterly update"
     MRN_SCHEME_LIST = "MRN scheme list"
     MRN_QUARTERLY_UPDATE = "MRN quarterly update"
+    CATF_SCHEME_SUBMISSION = "CATF scheme submission"
 
     @classmethod
     def from_domain(cls, data_source: DataSource) -> Self:

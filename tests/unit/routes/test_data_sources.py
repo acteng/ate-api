@@ -32,6 +32,7 @@ from ate_api.routes.data_sources import DataSourceModel
         (DataSource.CRSTS_QUARTERLY_UPDATE, DataSourceModel.CRSTS_QUARTERLY_UPDATE),
         (DataSource.MRN_SCHEME_LIST, DataSourceModel.MRN_SCHEME_LIST),
         (DataSource.MRN_QUARTERLY_UPDATE, DataSourceModel.MRN_QUARTERLY_UPDATE),
+        (DataSource.CATF_SCHEME_SUBMISSION, DataSourceModel.CATF_SCHEME_SUBMISSION),
     ],
 )
 class TestDataSourceModel:
