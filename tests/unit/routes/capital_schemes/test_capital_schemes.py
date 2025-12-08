@@ -99,14 +99,16 @@ class TestCapitalSchemeModel:
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, http_request)
 
-        assert capital_scheme_model.financials.items == [
-            CapitalSchemeFinancialModel(
-                type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
-            ),
-            CapitalSchemeFinancialModel(
-                type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000, source=DataSourceModel.ATF4_BID
-            ),
-        ]
+        assert capital_scheme_model.financials == CapitalSchemeFinancialsModel(
+            items=[
+                CapitalSchemeFinancialModel(
+                    type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
+                ),
+                CapitalSchemeFinancialModel(
+                    type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000, source=DataSourceModel.ATF4_BID
+                ),
+            ]
+        )
 
     def test_from_domain_sets_current_milestone(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
@@ -209,20 +211,22 @@ class TestCapitalSchemeModel:
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, http_request)
 
-        assert capital_scheme_model.outputs.items == [
-            CapitalSchemeOutputModel(
-                type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
-                measure=OutputMeasureModel.MILES,
-                observation_type=ObservationTypeModel.ACTUAL,
-                value=Decimal(1.5),
-            ),
-            CapitalSchemeOutputModel(
-                type=OutputTypeModel.NEW_SEGREGATED_CYCLING_FACILITY,
-                measure=OutputMeasureModel.MILES,
-                observation_type=ObservationTypeModel.ACTUAL,
-                value=Decimal(2),
-            ),
-        ]
+        assert capital_scheme_model.outputs == CollectionModel[CapitalSchemeOutputModel](
+            items=[
+                CapitalSchemeOutputModel(
+                    type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
+                    measure=OutputMeasureModel.MILES,
+                    observation_type=ObservationTypeModel.ACTUAL,
+                    value=Decimal(1.5),
+                ),
+                CapitalSchemeOutputModel(
+                    type=OutputTypeModel.NEW_SEGREGATED_CYCLING_FACILITY,
+                    measure=OutputMeasureModel.MILES,
+                    observation_type=ObservationTypeModel.ACTUAL,
+                    value=Decimal(2),
+                ),
+            ]
+        )
 
     def test_from_domain_sets_authority_review(self, http_request: Request) -> None:
         capital_scheme = CapitalScheme(
