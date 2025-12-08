@@ -3,6 +3,11 @@ from ate_api.infrastructure.database.base import BaseEntity as BaseEntity
 from ate_api.infrastructure.database.capital_scheme_financials import (
     CapitalSchemeFinancialEntity as CapitalSchemeFinancialEntity,
 )
+from ate_api.infrastructure.database.capital_scheme_milestones import (
+    CapitalSchemeMilestoneEntity as CapitalSchemeMilestoneEntity,
+)
+from ate_api.infrastructure.database.capital_scheme_milestones import MilestoneEntity as MilestoneEntity
+from ate_api.infrastructure.database.capital_scheme_milestones import MilestoneName as MilestoneName
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import (
     CapitalSchemeAuthorityReviewEntity as CapitalSchemeAuthorityReviewEntity,
 )
@@ -28,11 +33,6 @@ from ate_api.infrastructure.database.capital_schemes.interventions import (
     InterventionTypeMeasureEntity as InterventionTypeMeasureEntity,
 )
 from ate_api.infrastructure.database.capital_schemes.interventions import InterventionTypeName as InterventionTypeName
-from ate_api.infrastructure.database.capital_schemes.milestones import (
-    CapitalSchemeMilestoneEntity as CapitalSchemeMilestoneEntity,
-)
-from ate_api.infrastructure.database.capital_schemes.milestones import MilestoneEntity as MilestoneEntity
-from ate_api.infrastructure.database.capital_schemes.milestones import MilestoneName as MilestoneName
 from ate_api.infrastructure.database.capital_schemes.overviews import (
     CapitalSchemeOverviewEntity as CapitalSchemeOverviewEntity,
 )

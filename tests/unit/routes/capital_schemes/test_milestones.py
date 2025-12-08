@@ -2,11 +2,16 @@ from datetime import UTC, date, datetime
 
 import pytest
 
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
+from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestone, CapitalSchemeMilestones, Milestone
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
-from ate_api.routes.capital_schemes.milestones import CapitalSchemeMilestoneModel, MilestoneModel
+from ate_api.routes.capital_schemes.milestones import (
+    CapitalSchemeMilestoneModel,
+    CapitalSchemeMilestonesModel,
+    MilestoneModel,
+)
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.observation_types import ObservationTypeModel
 
@@ -72,3 +77,112 @@ class TestCapitalSchemeMilestoneModel:
             status_date=date(2020, 2, 1),
             data_source=DataSource.ATF4_BID,
         )
+
+
+class TestCapitalSchemeMilestonesModel:
+    def test_from_domain(self) -> None:
+        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+
+        milestones_model = CapitalSchemeMilestonesModel.from_domain(milestones)
+
+        assert milestones_model == CapitalSchemeMilestonesModel(current_milestone=None, items=[])
+
+    def test_from_domain_sets_current_milestone(self) -> None:
+        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+
+        milestones_model = CapitalSchemeMilestonesModel.from_domain(milestones)
+
+        assert milestones_model.current_milestone == MilestoneModel.CONSTRUCTION_STARTED
+
+    def test_from_domain_sets_items(self) -> None:
+        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+
+        milestones_model = CapitalSchemeMilestonesModel.from_domain(milestones)
+
+        assert milestones_model.items == [
+            CapitalSchemeMilestoneModel(
+                milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationTypeModel.ACTUAL,
+                status_date=date(2020, 2, 1),
+                source=DataSourceModel.ATF4_BID,
+            ),
+            CapitalSchemeMilestoneModel(
+                milestone=MilestoneModel.CONSTRUCTION_STARTED,
+                observation_type=ObservationTypeModel.ACTUAL,
+                status_date=date(2020, 3, 1),
+                source=DataSourceModel.ATF4_BID,
+            ),
+        ]
+
+    def test_to_domain(self) -> None:
+        milestones_model = CapitalSchemeMilestonesModel(
+            items=[
+                CapitalSchemeMilestoneModel(
+                    milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
+                    observation_type=ObservationTypeModel.ACTUAL,
+                    status_date=date(2020, 2, 1),
+                    source=DataSourceModel.ATF4_BID,
+                ),
+                CapitalSchemeMilestoneModel(
+                    milestone=MilestoneModel.CONSTRUCTION_STARTED,
+                    observation_type=ObservationTypeModel.ACTUAL,
+                    status_date=date(2020, 3, 1),
+                    source=DataSourceModel.ATF4_BID,
+                ),
+            ]
+        )
+
+        milestones = milestones_model.to_domain(CapitalSchemeReference("ATE00001"), datetime(2020, 1, 1, tzinfo=UTC))
+
+        assert milestones.capital_scheme == CapitalSchemeReference("ATE00001") and milestones.milestones == [
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
+            ),
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
+            ),
+        ]

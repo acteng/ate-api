@@ -5,8 +5,8 @@ from pydantic import AnyUrl
 from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_CONTENT
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.repositories import (
     get_authority_repository,

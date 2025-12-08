@@ -3,22 +3,34 @@ from datetime import UTC, date, datetime
 import pytest
 
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_milestones import (
+    CapitalSchemeMilestone,
+    CapitalSchemeMilestones,
+    CapitalSchemeMilestonesRepository,
+    Milestone,
+)
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details
-from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository, MemoryMilestoneRepository
+from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
+from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
 
 class TestMemoryCapitalSchemeRepository:
+    @pytest.fixture(name="capital_scheme_milestones")
+    def capital_scheme_milestones_fixture(self) -> CapitalSchemeMilestonesRepository:
+        return MemoryCapitalSchemeMilestonesRepository()
+
     @pytest.fixture(name="capital_schemes")
-    def capital_schemes_fixture(self) -> MemoryCapitalSchemeRepository:
-        return MemoryCapitalSchemeRepository()
+    def capital_schemes_fixture(
+        self, capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository
+    ) -> MemoryCapitalSchemeRepository:
+        return MemoryCapitalSchemeRepository(capital_scheme_milestones)
 
     async def test_add(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         overview = CapitalSchemeOverview(
@@ -219,81 +231,9 @@ class TestMemoryCapitalSchemeRepository:
         assert references == [CapitalSchemeReference("ATE00001")]
 
     async def test_get_references_by_bid_submitting_authority_filters_by_current_milestone(
-        self, capital_schemes: MemoryCapitalSchemeRepository
-    ) -> None:
-        capital_scheme1 = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        capital_scheme1.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_schemes.add(capital_scheme1)
-        capital_scheme2 = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        capital_scheme2.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_schemes.add(capital_scheme2)
-        capital_scheme3 = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00003"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Hospital Fields Road",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        capital_scheme3.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 4, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_schemes.add(capital_scheme3)
-
-        references = await capital_schemes.get_references_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"),
-            current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
-        )
-
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
-
-    async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
-        self, capital_schemes: MemoryCapitalSchemeRepository
+        self,
+        capital_schemes: MemoryCapitalSchemeRepository,
+        capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
     ) -> None:
         await capital_schemes.add(
             CapitalScheme(
@@ -308,18 +248,32 @@ class TestMemoryCapitalSchemeRepository:
                 bid_status_details=dummy_bid_status_details(),
             )
         )
-        capital_scheme2 = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+        milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestones1.change_milestone(
+            CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=dummy_bid_status_details(),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
+            )
         )
-        capital_scheme2.change_milestone(
+        await capital_scheme_milestones.add(milestones1)
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00002"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="School Streets",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
+        )
+        milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
+        milestones2.change_milestone(
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.CONSTRUCTION_STARTED,
@@ -328,7 +282,82 @@ class TestMemoryCapitalSchemeRepository:
                 data_source=DataSource.ATF4_BID,
             )
         )
-        await capital_schemes.add(capital_scheme2)
+        await capital_scheme_milestones.add(milestones2)
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00003"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="Hospital Fields Road",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
+        )
+        milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
+        milestones3.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.CONSTRUCTION_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 4, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+        await capital_scheme_milestones.add(milestones3)
+
+        references = await capital_schemes.get_references_by_bid_submitting_authority(
+            AuthorityAbbreviation("LIV"),
+            current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
+        )
+
+        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+
+    async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
+        self,
+        capital_schemes: MemoryCapitalSchemeRepository,
+        capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
+    ) -> None:
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="Wirral Package",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
+        )
+        await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00002"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="School Streets",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
+        )
+        milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
+        milestones2.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+        await capital_scheme_milestones.add(milestones2)
 
         references = await capital_schemes.get_references_by_bid_submitting_authority(
             AuthorityAbbreviation("LIV"), current_milestones=[None]
@@ -376,73 +405,3 @@ class TestMemoryCapitalSchemeRepository:
         references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references
-
-
-class TestMemoryMilestoneRepository:
-    @pytest.fixture(name="milestones")
-    def milestones_fixture(self) -> MemoryMilestoneRepository:
-        return MemoryMilestoneRepository()
-
-    async def test_get_all(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all()
-
-        assert all_milestones == [
-            Milestone.PUBLIC_CONSULTATION_COMPLETED,
-            Milestone.FEASIBILITY_DESIGN_STARTED,
-            Milestone.FEASIBILITY_DESIGN_COMPLETED,
-            Milestone.PRELIMINARY_DESIGN_COMPLETED,
-            Milestone.OUTLINE_DESIGN_COMPLETED,
-            Milestone.DETAILED_DESIGN_COMPLETED,
-            Milestone.CONSTRUCTION_STARTED,
-            Milestone.CONSTRUCTION_COMPLETED,
-            Milestone.FUNDING_COMPLETED,
-            Milestone.NOT_PROGRESSED,
-            Milestone.SUPERSEDED,
-            Milestone.REMOVED,
-        ]
-
-    async def test_get_all_filters_by_is_active(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_active=True)
-
-        assert all_milestones == [
-            Milestone.PUBLIC_CONSULTATION_COMPLETED,
-            Milestone.FEASIBILITY_DESIGN_STARTED,
-            Milestone.FEASIBILITY_DESIGN_COMPLETED,
-            Milestone.PRELIMINARY_DESIGN_COMPLETED,
-            Milestone.OUTLINE_DESIGN_COMPLETED,
-            Milestone.DETAILED_DESIGN_COMPLETED,
-            Milestone.CONSTRUCTION_STARTED,
-            Milestone.CONSTRUCTION_COMPLETED,
-            Milestone.FUNDING_COMPLETED,
-        ]
-
-    async def test_get_all_filters_by_is_inactive(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_active=False)
-
-        assert all_milestones == [
-            Milestone.NOT_PROGRESSED,
-            Milestone.SUPERSEDED,
-            Milestone.REMOVED,
-        ]
-
-    async def test_get_all_filters_by_is_complete(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_complete=True)
-
-        assert all_milestones == [Milestone.FUNDING_COMPLETED]
-
-    async def test_get_all_filters_by_is_incomplete(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_complete=False)
-
-        assert all_milestones == [
-            Milestone.PUBLIC_CONSULTATION_COMPLETED,
-            Milestone.FEASIBILITY_DESIGN_STARTED,
-            Milestone.FEASIBILITY_DESIGN_COMPLETED,
-            Milestone.PRELIMINARY_DESIGN_COMPLETED,
-            Milestone.OUTLINE_DESIGN_COMPLETED,
-            Milestone.DETAILED_DESIGN_COMPLETED,
-            Milestone.CONSTRUCTION_STARTED,
-            Milestone.CONSTRUCTION_COMPLETED,
-            Milestone.NOT_PROGRESSED,
-            Milestone.SUPERSEDED,
-            Milestone.REMOVED,
-        ]

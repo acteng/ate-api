@@ -4,7 +4,13 @@ from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, Query
 
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone, MilestoneRepository
+from ate_api.domain.capital_scheme_milestones import (
+    CapitalSchemeMilestone,
+    CapitalSchemeMilestones,
+    Milestone,
+    MilestoneRepository,
+)
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.dates import DateTimeRange
 from ate_api.repositories import get_milestone_repository
 from ate_api.routes.base import BaseModel
@@ -62,6 +68,21 @@ class CapitalSchemeMilestoneModel(BaseModel):
 
 class CapitalSchemeMilestonesModel(CollectionModel[CapitalSchemeMilestoneModel]):
     current_milestone: MilestoneModel | None = None
+
+    @classmethod
+    def from_domain(cls, milestones: CapitalSchemeMilestones) -> Self:
+        return cls(
+            current_milestone=(
+                MilestoneModel.from_domain(milestones.current_milestone) if milestones.current_milestone else None
+            ),
+            items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in milestones.milestones],
+        )
+
+    def to_domain(self, capital_scheme: CapitalSchemeReference, now: datetime) -> CapitalSchemeMilestones:
+        milestones = CapitalSchemeMilestones(capital_scheme=capital_scheme)
+        for milestone in self.items:
+            milestones.change_milestone(milestone.to_domain(now))
+        return milestones
 
 
 router = APIRouter()

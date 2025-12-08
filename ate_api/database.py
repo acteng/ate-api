@@ -6,8 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.sql.ddl import CreateSchema
 
+from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.data_sources import DataSource

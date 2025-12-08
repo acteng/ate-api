@@ -6,13 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
-from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -101,70 +100,6 @@ class TestDatabaseCapitalSchemeRepository:
             and bid_status_row.bid_status_id == 1
             and bid_status_row.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_row.effective_date_to
-        )
-
-    async def test_add_stores_milestones(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    build_authority_entity(),
-                    build_funding_programme_entity(),
-                    build_scheme_type_entity(),
-                    build_bid_status_entity(),
-                    build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED),
-                    build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
-                    build_data_source_entity(id_=1, name=DataSourceName.ATF4_BID),
-                ]
-            )
-
-        async with AsyncSession(engine) as session, session.begin():
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = CapitalScheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=dummy_overview(),
-                bid_status_details=dummy_bid_status_details(),
-            )
-            capital_scheme.change_milestone(
-                CapitalSchemeMilestone(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                    observation_type=ObservationType.ACTUAL,
-                    status_date=date(2020, 2, 1),
-                    data_source=DataSource.ATF4_BID,
-                )
-            )
-            capital_scheme.change_milestone(
-                CapitalSchemeMilestone(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    milestone=Milestone.CONSTRUCTION_STARTED,
-                    observation_type=ObservationType.ACTUAL,
-                    status_date=date(2020, 3, 1),
-                    data_source=DataSource.ATF4_BID,
-                )
-            )
-            await capital_schemes.add(capital_scheme)
-
-        async with AsyncSession(engine) as session:
-            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
-            milestone_row1, milestone_row2 = await session.scalars(select(CapitalSchemeMilestoneEntity))
-        assert (
-            milestone_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and milestone_row1.milestone_id == 1
-            and milestone_row1.status_date == date(2020, 2, 1)
-            and milestone_row1.observation_type_id == 1
-            and milestone_row1.data_source_id == 1
-            and milestone_row1.effective_date_from == datetime(2020, 1, 1)
-            and not milestone_row1.effective_date_to
-        )
-        assert (
-            milestone_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and milestone_row2.milestone_id == 2
-            and milestone_row2.status_date == date(2020, 3, 1)
-            and milestone_row2.observation_type_id == 1
-            and milestone_row2.data_source_id == 1
-            and milestone_row2.effective_date_from == datetime(2020, 1, 1)
-            and not milestone_row2.effective_date_to
         )
 
     async def test_add_stores_outputs(self, engine: AsyncEngine) -> None:
@@ -399,141 +334,6 @@ class TestDatabaseCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.NOT_FUNDED,
         )
-
-    async def test_get_fetches_current_milestones(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                observation_type=actual,
-                                status_date=date(2020, 3, 1),
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
-                            ),
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                observation_type=actual,
-                                status_date=date(2020, 4, 1),
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 2, 1),
-                            ),
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_started,
-                                observation_type=actual,
-                                status_date=date(2020, 5, 1),
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 2, 1),
-                            ),
-                        ],
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
-
-        assert capital_scheme and capital_scheme.milestones == [
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 4, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 5, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-        ]
-
-    async def test_get_fetches_current_milestones_ordered_by_milestone_stage_order_then_observation_type(
-        self, engine: AsyncEngine
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    detailed_design_completed := build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
-                    construction_started := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
-                    ),
-                    planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_started,
-                                observation_type=actual,
-                                status_date=date(2020, 4, 1),
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                observation_type=actual,
-                                status_date=date(2020, 3, 1),
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                observation_type=planned,
-                                status_date=date(2020, 2, 1),
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
-
-        assert capital_scheme and capital_scheme.milestones == [
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.PLANNED,
-                status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 4, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-        ]
 
     async def test_get_fetches_current_outputs(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -998,6 +798,7 @@ class TestDatabaseCapitalSchemeRepository:
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
+                        capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1005,17 +806,17 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                status_date=date(2020, 2, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=detailed_design_completed,
+                        status_date=date(2020, 2, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                     CapitalSchemeEntity(
+                        capital_scheme_id=2,
                         scheme_reference="ATE00002",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1023,17 +824,17 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_started,
-                                status_date=date(2020, 3, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=2,
+                        milestone=construction_started,
+                        status_date=date(2020, 3, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                     CapitalSchemeEntity(
+                        capital_scheme_id=3,
                         scheme_reference="ATE00003",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1041,15 +842,14 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_completed,
-                                status_date=date(2020, 4, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=3,
+                        milestone=construction_completed,
+                        status_date=date(2020, 4, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1086,6 +886,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
                     CapitalSchemeEntity(
+                        capital_scheme_id=2,
                         scheme_reference="ATE00002",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1093,15 +894,14 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_started,
-                                status_date=date(2020, 3, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=2,
+                        milestone=construction_started,
+                        status_date=date(2020, 3, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1127,6 +927,7 @@ class TestDatabaseCapitalSchemeRepository:
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
+                        capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1134,15 +935,14 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                status_date=date(2020, 2, 1),
-                                observation_type=planned,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=detailed_design_completed,
+                        status_date=date(2020, 2, 1),
+                        observation_type=planned,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1173,6 +973,7 @@ class TestDatabaseCapitalSchemeRepository:
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
+                        capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1180,22 +981,22 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                status_date=date(2020, 2, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_started,
-                                status_date=date(2020, 2, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=detailed_design_completed,
+                        status_date=date(2020, 2, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=construction_started,
+                        status_date=date(2020, 2, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1222,6 +1023,7 @@ class TestDatabaseCapitalSchemeRepository:
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
+                        capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
@@ -1229,23 +1031,23 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_milestones=[
-                            CapitalSchemeMilestoneEntity(
-                                milestone=detailed_design_completed,
-                                status_date=date(2020, 2, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
-                            ),
-                            CapitalSchemeMilestoneEntity(
-                                milestone=construction_started,
-                                status_date=date(2020, 3, 1),
-                                observation_type=actual,
-                                data_source=atf4_bid,
-                                effective_date_from=datetime(2020, 2, 1),
-                            ),
-                        ],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=detailed_design_completed,
+                        status_date=date(2020, 2, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_to=datetime(2020, 2, 1),
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=construction_started,
+                        status_date=date(2020, 3, 1),
+                        observation_type=actual,
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 2, 1),
                     ),
                 ]
             )

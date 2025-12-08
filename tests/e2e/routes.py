@@ -10,6 +10,7 @@ from ate_api.clock import get_clock
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
+from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
@@ -28,6 +29,7 @@ from ate_api.infrastructure.database import (
 from ate_api.repositories import (
     get_authority_repository,
     get_capital_scheme_financials_repository,
+    get_capital_scheme_milestones_repository,
     get_capital_scheme_repository,
     get_funding_programme_repository,
 )
@@ -79,6 +81,9 @@ async def create_capital_scheme(
     capital_scheme_financials: Annotated[
         CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
     ],
+    capital_scheme_milestones: Annotated[
+        CapitalSchemeMilestonesRepository, Depends(get_capital_scheme_milestones_repository)
+    ],
     session: Annotated[AsyncSession, Depends(get_session)],
     request: Request,
     capital_scheme: CapitalSchemeModel,
@@ -87,6 +92,9 @@ async def create_capital_scheme(
     await capital_schemes.add(capital_scheme.to_domain(now, request))
     await capital_scheme_financials.add(
         capital_scheme.financials.to_domain(CapitalSchemeReference(capital_scheme.reference), now)
+    )
+    await capital_scheme_milestones.add(
+        capital_scheme.milestones.to_domain(CapitalSchemeReference(capital_scheme.reference), now)
     )
     await session.commit()
 

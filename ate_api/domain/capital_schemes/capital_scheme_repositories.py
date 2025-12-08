@@ -1,7 +1,7 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 

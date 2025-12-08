@@ -7,14 +7,15 @@ from fastapi.testclient import TestClient
 from ate_api.clock import get_clock
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
+from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, MilestoneRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.milestones import MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.clock import Clock
 from ate_api.main import app
 from ate_api.repositories import (
     get_authority_repository,
     get_capital_scheme_financials_repository,
+    get_capital_scheme_milestones_repository,
     get_capital_scheme_repository,
     get_funding_programme_repository,
     get_milestone_repository,
@@ -24,7 +25,11 @@ from tests.integration.oauth import StubAuthorizationServer
 from tests.unit.infrastructure.clock import FakeClock
 from tests.unit.infrastructure.memory.authorities import MemoryAuthorityRepository
 from tests.unit.infrastructure.memory.capital_scheme_financials import MemoryCapitalSchemeFinancialsRepository
-from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository, MemoryMilestoneRepository
+from tests.unit.infrastructure.memory.capital_scheme_milestones import (
+    MemoryCapitalSchemeMilestonesRepository,
+    MemoryMilestoneRepository,
+)
+from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 from tests.unit.infrastructure.memory.funding_programmes import MemoryFundingProgrammeRepository
 
 
@@ -76,13 +81,18 @@ def milestones_fixture() -> MilestoneRepository:
 
 
 @pytest.fixture(name="capital_schemes")
-def capital_schemes_fixture() -> CapitalSchemeRepository:
-    return MemoryCapitalSchemeRepository()
+def capital_schemes_fixture(capital_scheme_milestones: CapitalSchemeMilestonesRepository) -> CapitalSchemeRepository:
+    return MemoryCapitalSchemeRepository(capital_scheme_milestones)
 
 
 @pytest.fixture(name="capital_scheme_financials")
 def capital_scheme_financials_fixture() -> CapitalSchemeFinancialsRepository:
     return MemoryCapitalSchemeFinancialsRepository()
+
+
+@pytest.fixture(name="capital_scheme_milestones")
+def capital_scheme_milestones_fixture() -> CapitalSchemeMilestonesRepository:
+    return MemoryCapitalSchemeMilestonesRepository()
 
 
 @pytest.fixture(name="app")
@@ -94,6 +104,7 @@ def app_fixture(
     milestones: MilestoneRepository,
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
+    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
 ) -> Generator[FastAPI]:
     app.dependency_overrides[get_clock] = lambda: clock
     app.dependency_overrides[get_settings] = lambda: settings
@@ -102,6 +113,7 @@ def app_fixture(
     app.dependency_overrides[get_milestone_repository] = lambda: milestones
     app.dependency_overrides[get_capital_scheme_repository] = lambda: capital_schemes
     app.dependency_overrides[get_capital_scheme_financials_repository] = lambda: capital_scheme_financials
+    app.dependency_overrides[get_capital_scheme_milestones_repository] = lambda: capital_scheme_milestones
     yield app
     app.dependency_overrides = {}
 

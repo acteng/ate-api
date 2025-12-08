@@ -4,16 +4,20 @@ from sqlalchemy.orm import aliased, contains_eager, joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.milestones import Milestone
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
-from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.authorities import AuthorityEntity
+from ate_api.infrastructure.database.capital_scheme_milestones import (
+    CapitalSchemeMilestoneEntity,
+    MilestoneEntity,
+    MilestoneName,
+)
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusEntity,
@@ -29,17 +33,11 @@ from ate_api.infrastructure.database.capital_schemes.interventions import (
     InterventionTypeMeasureEntity,
     InterventionTypeName,
 )
-from ate_api.infrastructure.database.capital_schemes.milestones import (
-    CapitalSchemeMilestoneEntity,
-    MilestoneEntity,
-    MilestoneName,
-)
 from ate_api.infrastructure.database.capital_schemes.overviews import (
     CapitalSchemeOverviewEntity,
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
@@ -53,9 +51,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
-        milestone_ids = await self._get_milestone_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
-        data_source_ids = await self._get_data_source_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
 
         self._session.add(
@@ -65,9 +61,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 funding_programme_ids,
                 scheme_type_ids,
                 bid_status_ids,
-                milestone_ids,
                 observation_type_ids,
-                data_source_ids,
                 intervention_type_measure_ids,
             )
         )
@@ -131,12 +125,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         if not row:
             return None
-
-        # fetch current milestones
-        capital_scheme_milestones = (
-            await self._session.scalars(self._select_current_capital_scheme_milestones(row.capital_scheme_id))
-        ).all()
-        set_committed_value(row, "capital_scheme_milestones", capital_scheme_milestones)
 
         # fetch current interventions
         capital_scheme_interventions = (
@@ -257,36 +245,16 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
         return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
 
-    async def _get_milestone_ids(self, capital_scheme: CapitalScheme) -> dict[Milestone, int]:
-        milestone_names = {MilestoneName.from_domain(milestone.milestone) for milestone in capital_scheme.milestones}
-        rows = await self._session.execute(
-            select(MilestoneEntity.milestone_name, MilestoneEntity.milestone_id).where(
-                MilestoneEntity.milestone_name.in_(milestone_names)
-            )
-        )
-        return {row.milestone_name.to_domain(): row.milestone_id for row in rows}
-
     async def _get_observation_type_ids(self, capital_scheme: CapitalScheme) -> dict[ObservationType, int]:
         observation_type_names = {
-            ObservationTypeName.from_domain(milestone.observation_type) for milestone in capital_scheme.milestones
-        } | {ObservationTypeName.from_domain(output.observation_type) for output in capital_scheme.outputs}
+            ObservationTypeName.from_domain(output.observation_type) for output in capital_scheme.outputs
+        }
         rows = await self._session.execute(
             select(ObservationTypeEntity.observation_type_name, ObservationTypeEntity.observation_type_id).where(
                 ObservationTypeEntity.observation_type_name.in_(observation_type_names)
             )
         )
         return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
-
-    async def _get_data_source_ids(self, capital_scheme: CapitalScheme) -> dict[DataSource, int]:
-        data_source_names = {
-            DataSourceName.from_domain(milestone.data_source) for milestone in capital_scheme.milestones
-        }
-        rows = await self._session.execute(
-            select(DataSourceEntity.data_source_name, DataSourceEntity.data_source_id).where(
-                DataSourceEntity.data_source_name.in_(data_source_names)
-            )
-        )
-        return {row.data_source_name.to_domain(): row.data_source_id for row in rows}
 
     async def _get_intervention_type_measure_ids(
         self, capital_scheme: CapitalScheme
@@ -316,26 +284,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             ): row.intervention_type_measure_id
             for row in rows
         }
-
-    @staticmethod
-    def _select_current_capital_scheme_milestones(
-        capital_scheme_id: int,
-    ) -> Select[tuple[CapitalSchemeMilestoneEntity]]:
-        return (
-            select(CapitalSchemeMilestoneEntity)
-            .options(
-                contains_eager(CapitalSchemeMilestoneEntity.milestone),
-                contains_eager(CapitalSchemeMilestoneEntity.observation_type),
-                contains_eager(CapitalSchemeMilestoneEntity.data_source),
-            )
-            .join(MilestoneEntity)
-            .join(ObservationTypeEntity)
-            .join(DataSourceEntity)
-            .where(CapitalSchemeMilestoneEntity.capital_scheme_id == capital_scheme_id)
-            .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
-            .order_by(MilestoneEntity.stage_order)
-            .order_by(ObservationTypeEntity.observation_type_id)
-        )
 
     @staticmethod
     def _select_current_capital_scheme_interventions(

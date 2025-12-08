@@ -1,14 +1,12 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
-from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -20,18 +18,13 @@ from ate_api.infrastructure.database import (
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
-    CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
-    DataSourceEntity,
-    DataSourceName,
     FundingProgrammeEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
     InterventionTypeEntity,
     InterventionTypeMeasureEntity,
     InterventionTypeName,
-    MilestoneEntity,
-    MilestoneName,
     ObservationTypeEntity,
     ObservationTypeName,
     SchemeTypeEntity,
@@ -69,8 +62,6 @@ class TestCapitalSchemeEntity:
             {BidStatus.FUNDED: 4},
             {},
             {},
-            {},
-            {},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -90,61 +81,6 @@ class TestCapitalSchemeEntity:
             and not bid_status_entity.effective_date_to
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
-
-    def test_from_domain_sets_milestones(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        capital_scheme.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        capital_scheme.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-
-        capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme,
-            {AuthorityAbbreviation("dummy"): 0},
-            {FundingProgrammeCode("dummy"): 0},
-            {CapitalSchemeType.DEVELOPMENT: 0},
-            {BidStatus.SUBMITTED: 0},
-            {Milestone.DETAILED_DESIGN_COMPLETED: 1, Milestone.CONSTRUCTION_STARTED: 2},
-            {ObservationType.ACTUAL: 3},
-            {DataSource.ATF4_BID: 4},
-            {},
-        )
-
-        milestone_entity1, milestone_entity2 = capital_scheme_entity.capital_scheme_milestones
-        assert (
-            milestone_entity1.milestone_id == 1
-            and milestone_entity1.status_date == date(2020, 2, 1)
-            and milestone_entity1.observation_type_id == 3
-            and milestone_entity1.data_source_id == 4
-            and milestone_entity1.effective_date_from == datetime(2020, 1, 1)
-            and not milestone_entity1.effective_date_to
-        )
-        assert (
-            milestone_entity2.milestone_id == 2
-            and milestone_entity2.status_date == date(2020, 3, 1)
-            and milestone_entity2.observation_type_id == 3
-            and milestone_entity2.data_source_id == 4
-            and milestone_entity2.effective_date_from == datetime(2020, 1, 1)
-            and not milestone_entity2.effective_date_to
-        )
 
     def test_from_domain_sets_outputs(self) -> None:
         capital_scheme = CapitalScheme(
@@ -177,9 +113,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
-            {},
             {ObservationType.ACTUAL: 3},
-            {},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
                 (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
@@ -218,8 +152,6 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
-            {},
-            {},
             {},
             {},
         )
@@ -261,50 +193,7 @@ class TestCapitalSchemeEntity:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
-        assert not capital_scheme.milestones
         assert not capital_scheme.authority_review
-
-    def test_to_domain_sets_milestones(self) -> None:
-        capital_scheme_entity = CapitalSchemeEntity(
-            scheme_reference="ATE00001",
-            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-            capital_scheme_milestones=[
-                CapitalSchemeMilestoneEntity(
-                    milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-                    status_date=date(2020, 2, 1),
-                    data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
-                    effective_date_from=datetime(2020, 1, 1),
-                ),
-                CapitalSchemeMilestoneEntity(
-                    milestone=MilestoneEntity(milestone_name=MilestoneName.CONSTRUCTION_STARTED),
-                    observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-                    status_date=date(2020, 3, 1),
-                    data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
-                    effective_date_from=datetime(2020, 1, 1),
-                ),
-            ],
-        )
-
-        capital_scheme = capital_scheme_entity.to_domain()
-
-        assert capital_scheme.milestones == [
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
-            ),
-        ]
 
     def test_to_domain_sets_outputs(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(

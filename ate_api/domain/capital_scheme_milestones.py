@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 from enum import IntEnum, auto
 
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
@@ -39,6 +40,40 @@ class CapitalSchemeMilestone:
     data_source: DataSource
 
 
+class CapitalSchemeMilestones:
+    def __init__(self, capital_scheme: CapitalSchemeReference):
+        self._capital_scheme = capital_scheme
+        self._milestones: list[CapitalSchemeMilestone] = []
+
+    @property
+    def capital_scheme(self) -> CapitalSchemeReference:
+        return self._capital_scheme
+
+    @property
+    def milestones(self) -> list[CapitalSchemeMilestone]:
+        return list(self._milestones)
+
+    @property
+    def current_milestone(self) -> Milestone | None:
+        actual_milestones = [
+            milestone.milestone
+            for milestone in self._milestones
+            if milestone.observation_type == ObservationType.ACTUAL
+        ]
+        return sorted(actual_milestones)[-1] if actual_milestones else None
+
+    def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
+        self._milestones.append(milestone)
+
+
 class MilestoneRepository:
     async def get_all(self, is_active: bool | None = None, is_complete: bool | None = None) -> list[Milestone]:
+        raise NotImplementedError()
+
+
+class CapitalSchemeMilestonesRepository:
+    async def add(self, milestones: CapitalSchemeMilestones) -> None:
+        raise NotImplementedError()
+
+    async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeMilestones | None:
         raise NotImplementedError()

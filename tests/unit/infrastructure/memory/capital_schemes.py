@@ -1,13 +1,14 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.milestones import Milestone, MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 
 class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
-    def __init__(self) -> None:
+    def __init__(self, capital_scheme_milestones: CapitalSchemeMilestonesRepository) -> None:
+        self._capital_scheme_milestones = capital_scheme_milestones
         self._capital_schemes: dict[CapitalSchemeReference, CapitalScheme] = {}
 
     async def add(self, capital_scheme: CapitalScheme) -> None:
@@ -32,17 +33,12 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                     not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
                 )
                 and (not bid_status or capital_scheme.bid_status_details.bid_status == bid_status)
-                and (not current_milestones or capital_scheme.current_milestone in current_milestones)
+                and (not current_milestones or (await self._get_current_milestone(reference)) in current_milestones)
             ],
             key=lambda reference: str(reference),
         )
 
-
-class MemoryMilestoneRepository(MilestoneRepository):
-    async def get_all(self, is_active: bool | None = None, is_complete: bool | None = None) -> list[Milestone]:
-        return [
-            milestone
-            for milestone in Milestone
-            if (is_active is None or milestone.is_active == is_active)
-            and (is_complete is None or milestone.is_complete == is_complete)
-        ]
+    async def _get_current_milestone(self, capital_scheme: CapitalSchemeReference) -> Milestone | None:
+        milestones = await self._capital_scheme_milestones.get(capital_scheme)
+        assert milestones
+        return milestones.current_milestone
