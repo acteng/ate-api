@@ -295,18 +295,19 @@ class TestMemoryCapitalSchemeRepository:
     async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
-        capital_scheme1 = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=dummy_bid_status_details(),
+        await capital_schemes.add(
+            CapitalScheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="Wirral Package",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                bid_status_details=dummy_bid_status_details(),
+            )
         )
-        await capital_schemes.add(capital_scheme1)
         capital_scheme2 = CapitalScheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
