@@ -27,7 +27,7 @@ class CapitalSchemeFinancialEntity(BaseEntity):
     __table_args__ = {"schema": "capital_scheme"}
 
     capital_scheme_financial_id: Mapped[int] = mapped_column(primary_key=True)
-    capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
+    capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
     financial_type_id = mapped_column(ForeignKey(FinancialTypeEntity.financial_type_id), nullable=False)
     financial_type: Mapped[FinancialTypeEntity] = relationship(lazy="raise")
     amount: Mapped[int]
