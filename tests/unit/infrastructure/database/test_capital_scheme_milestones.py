@@ -65,22 +65,24 @@ class TestCapitalSchemeMilestoneEntity:
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
             data_source=DataSource.ATF4_BID,
+            surrogate_id=1,
         )
 
         milestone_entity = CapitalSchemeMilestoneEntity.from_domain(
             milestone,
-            1,
-            {Milestone.DETAILED_DESIGN_COMPLETED: 2},
-            {ObservationType.ACTUAL: 3},
-            {DataSource.ATF4_BID: 4},
+            2,
+            {Milestone.DETAILED_DESIGN_COMPLETED: 3},
+            {ObservationType.ACTUAL: 4},
+            {DataSource.ATF4_BID: 5},
         )
 
         assert (
-            milestone_entity.capital_scheme_id == 1
-            and milestone_entity.milestone_id == 2
+            milestone_entity.capital_scheme_milestone_id == 1
+            and milestone_entity.capital_scheme_id == 2
+            and milestone_entity.milestone_id == 3
             and milestone_entity.status_date == date(2020, 3, 1)
-            and milestone_entity.observation_type_id == 3
-            and milestone_entity.data_source_id == 4
+            and milestone_entity.observation_type_id == 4
+            and milestone_entity.data_source_id == 5
             and milestone_entity.effective_date_from == datetime(2020, 1, 1)
             and milestone_entity.effective_date_to == datetime(2020, 2, 1)
         )
@@ -126,6 +128,7 @@ class TestCapitalSchemeMilestoneEntity:
 
     def test_to_domain(self) -> None:
         milestone_entity = CapitalSchemeMilestoneEntity(
+            capital_scheme_milestone_id=1,
             milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
@@ -143,6 +146,7 @@ class TestCapitalSchemeMilestoneEntity:
             status_date=date(2020, 3, 1),
             data_source=DataSource.ATF4_BID,
         )
+        assert milestone.surrogate_id == 1
 
     def test_to_domain_when_current(self) -> None:
         milestone_entity = CapitalSchemeMilestoneEntity(

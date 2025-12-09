@@ -83,6 +83,7 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
         data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
+            capital_scheme_milestone_id=milestone.surrogate_id,
             capital_scheme_id=capital_scheme_id,
             milestone_id=milestone_ids[milestone.milestone],
             status_date=milestone.status_date,
@@ -102,6 +103,7 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
             observation_type=self.observation_type.observation_type_name.to_domain(),
             status_date=self.status_date,
             data_source=self.data_source.data_source_name.to_domain(),
+            surrogate_id=self.capital_scheme_milestone_id,
         )
 
 

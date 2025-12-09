@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from enum import IntEnum, auto
 
@@ -38,6 +38,7 @@ class CapitalSchemeMilestone:
     observation_type: ObservationType
     status_date: date
     data_source: DataSource
+    surrogate_id: int | None = field(default=None, repr=False, compare=False)
 
 
 class CapitalSchemeMilestones:
