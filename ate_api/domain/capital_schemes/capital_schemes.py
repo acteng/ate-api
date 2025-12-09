@@ -1,12 +1,10 @@
 from typing import Any
 
-from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.milestones import CapitalSchemeMilestone, Milestone
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
-from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 
 
@@ -82,20 +80,3 @@ class CapitalScheme:
 
     def perform_authority_review(self, authority_review: CapitalSchemeAuthorityReview) -> None:
         self._authority_review = authority_review
-
-
-class CapitalSchemeRepository:
-    async def add(self, capital_scheme: CapitalScheme) -> None:
-        raise NotImplementedError()
-
-    async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
-        raise NotImplementedError()
-
-    async def get_references_by_bid_submitting_authority(
-        self,
-        authority_abbreviation: AuthorityAbbreviation,
-        funding_programme_codes: list[FundingProgrammeCode] | None = None,
-        bid_status: BidStatus | None = None,
-        current_milestones: list[Milestone | None] | None = None,
-    ) -> list[CapitalSchemeReference]:
-        raise NotImplementedError()

@@ -6,11 +6,8 @@ from pydantic import AnyUrl, Field
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
-from ate_api.domain.capital_schemes.capital_schemes import (
-    CapitalScheme,
-    CapitalSchemeReference,
-    CapitalSchemeRepository,
-)
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.repositories import get_capital_scheme_financials_repository, get_capital_scheme_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel

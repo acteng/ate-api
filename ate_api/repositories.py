@@ -6,12 +6,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.milestones import MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
+from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from ate_api.infrastructure.database.capital_schemes.milestones import DatabaseMilestoneRepository
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
 

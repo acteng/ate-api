@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from ate_api.clock import get_clock
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.milestones import MilestoneRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.clock import Clock
