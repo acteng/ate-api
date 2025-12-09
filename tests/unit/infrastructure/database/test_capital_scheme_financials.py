@@ -92,8 +92,8 @@ class TestCapitalSchemeFinancialEntity:
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
-            surrogate_id=1,
         )
+        assert financial.surrogate_id == 1
 
     def test_to_domain_when_current(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
