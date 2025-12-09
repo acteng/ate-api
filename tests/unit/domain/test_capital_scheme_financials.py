@@ -36,14 +36,13 @@ class TestCapitalSchemeFinancial:
 
         closed_financial = open_financial.close(datetime(2020, 2, 1, tzinfo=UTC))
 
-        assert (
-            closed_financial.effective_date
-            == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC))
-            and closed_financial.type == FinancialType.FUNDING_ALLOCATION
-            and closed_financial.amount == Money(2_000_000)
-            and closed_financial.data_source == DataSource.ATF4_BID
-            and closed_financial.surrogate_id == 1
+        assert closed_financial == CapitalSchemeFinancial(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            type=FinancialType.FUNDING_ALLOCATION,
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
         )
+        assert closed_financial.surrogate_id == 1
 
     def test_cannot_close_when_closed(self) -> None:
         closed_financial = CapitalSchemeFinancial(
