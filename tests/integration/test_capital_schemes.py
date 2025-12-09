@@ -95,12 +95,13 @@ async def test_get_capital_scheme_with_financials(
     client: TestClient,
     access_token: str,
 ) -> None:
-    capital_scheme = CapitalScheme(
-        reference=CapitalSchemeReference("ATE00001"),
-        overview=dummy_overview(),
-        bid_status_details=dummy_bid_status_details(),
+    await capital_schemes.add(
+        CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
     )
-    await capital_schemes.add(capital_scheme)
     financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
     financials.adjust_financial(
         CapitalSchemeFinancial(
