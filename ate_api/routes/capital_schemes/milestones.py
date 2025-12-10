@@ -84,12 +84,6 @@ class CapitalSchemeMilestonesModel(CollectionModel[CapitalSchemeMilestoneModel])
             items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in milestones.milestones],
         )
 
-    def to_domain(self, capital_scheme: CapitalSchemeReference, now: datetime) -> CapitalSchemeMilestones:
-        milestones = CapitalSchemeMilestones(capital_scheme=capital_scheme)
-        for milestone in self.items:
-            milestones.change_milestone(milestone.to_domain(now))
-        return milestones
-
 
 router = APIRouter()
 

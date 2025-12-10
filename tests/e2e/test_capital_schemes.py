@@ -22,14 +22,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                 "items": [],
             },
             "milestones": {
-                "items": [
-                    {
-                        "milestone": "detailed design completed",
-                        "observationType": "actual",
-                        "statusDate": "2020-03-01",
-                        "source": "ATF4 bid",
-                    }
-                ],
+                "items": [],
             },
             "outputs": {
                 "items": [
@@ -50,6 +43,19 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "type": "funding allocation",
             "amount": 2_000_000,
             "source": "ATF4 bid",
+        },
+    )
+    app_client.create_capital_scheme_milestones(
+        "ATE00001",
+        {
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
+                }
+            ],
         },
     )
 
@@ -185,26 +191,32 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
                 "items": [],
             },
             "milestones": {
-                "items": [
-                    {
-                        "milestone": "detailed design completed",
-                        "observationType": "actual",
-                        "statusDate": "2020-02-01",
-                        "source": "ATF4 bid",
-                    },
-                    {
-                        "milestone": "construction started",
-                        "observationType": "actual",
-                        "statusDate": "2020-03-01",
-                        "source": "ATF4 bid",
-                    },
-                ],
+                "items": [],
             },
             "outputs": {
                 "items": [],
             },
             "authorityReview": None,
         }
+    )
+    app_client.create_capital_scheme_milestones(
+        "ATE00001",
+        {
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-02-01",
+                    "source": "ATF4 bid",
+                },
+                {
+                    "milestone": "construction started",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
+                },
+            ],
+        },
     )
 
     response = client.post(
