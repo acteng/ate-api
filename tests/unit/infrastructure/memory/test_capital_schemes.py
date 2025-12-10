@@ -41,8 +41,7 @@ class TestMemoryCapitalSchemeRepository:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-            bid_status=BidStatus.FUNDED,
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
 
         await capital_schemes.add(
@@ -68,8 +67,7 @@ class TestMemoryCapitalSchemeRepository:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-            bid_status=BidStatus.FUNDED,
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
         await capital_schemes.add(
             CapitalScheme(
@@ -202,8 +200,7 @@ class TestMemoryCapitalSchemeRepository:
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_status=BidStatus.FUNDED,
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
                 ),
             )
         )
@@ -218,8 +215,7 @@ class TestMemoryCapitalSchemeRepository:
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_status=BidStatus.NOT_FUNDED,
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
                 ),
             )
         )

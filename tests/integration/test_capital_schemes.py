@@ -55,8 +55,7 @@ async def test_get_capital_scheme(
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                bid_status=BidStatus.FUNDED,
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
         )
     )

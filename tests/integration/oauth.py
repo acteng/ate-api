@@ -38,10 +38,7 @@ class StubAuthorizationServer:
         subject = "stub_client_id"
         now = int(time())
 
-        header = {
-            "kid": self._key_id,
-            "alg": "RS256",
-        }
+        header = {"kid": self._key_id, "alg": "RS256"}
 
         payload: dict[str, Any] = {"sub": subject}
 

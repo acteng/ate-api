@@ -76,8 +76,7 @@ class TestCapitalSchemeBidStatusEntity:
 
     def test_to_domain_when_current(self) -> None:
         bid_status_entity = CapitalSchemeBidStatusEntity(
-            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-            effective_date_from=datetime(2020, 1, 1),
+            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED), effective_date_from=datetime(2020, 1, 1)
         )
 
         bid_status_details = bid_status_entity.to_domain()

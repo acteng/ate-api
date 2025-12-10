@@ -49,8 +49,7 @@ class TestCapitalSchemeEntity:
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                bid_status=BidStatus.FUNDED,
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
         )
 
@@ -190,8 +189,7 @@ class TestCapitalSchemeEntity:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-            bid_status=BidStatus.FUNDED,
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
         assert not capital_scheme.authority_review
 

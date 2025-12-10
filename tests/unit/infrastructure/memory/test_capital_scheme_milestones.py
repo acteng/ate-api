@@ -54,11 +54,7 @@ class TestMemoryMilestoneRepository:
     async def test_get_all_filters_by_is_inactive(self, milestones: MemoryMilestoneRepository) -> None:
         all_milestones = await milestones.get_all(is_active=False)
 
-        assert all_milestones == [
-            Milestone.NOT_PROGRESSED,
-            Milestone.SUPERSEDED,
-            Milestone.REMOVED,
-        ]
+        assert all_milestones == [Milestone.NOT_PROGRESSED, Milestone.SUPERSEDED, Milestone.REMOVED]
 
     async def test_get_all_filters_by_is_complete(self, milestones: MemoryMilestoneRepository) -> None:
         all_milestones = await milestones.get_all(is_complete=True)

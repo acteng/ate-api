@@ -49,8 +49,7 @@ class TestCapitalSchemeModel:
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                bid_status=BidStatus.FUNDED,
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))

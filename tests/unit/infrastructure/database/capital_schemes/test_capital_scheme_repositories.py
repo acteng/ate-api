@@ -75,8 +75,7 @@ class TestDatabaseCapitalSchemeRepository:
                         type=CapitalSchemeType.CONSTRUCTION,
                     ),
                     bid_status_details=CapitalSchemeBidStatusDetails(
-                        effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                        bid_status=BidStatus.FUNDED,
+                        effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
                     ),
                 )
             )
@@ -218,10 +217,10 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
                         ],
                     ),
                     CapitalSchemeEntity(
@@ -255,8 +254,7 @@ class TestDatabaseCapitalSchemeRepository:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            bid_status=BidStatus.FUNDED,
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
         assert not capital_scheme.authority_review
 
@@ -331,8 +329,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-            bid_status=BidStatus.NOT_FUNDED,
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
         )
 
     async def test_get_fetches_current_outputs(self, engine: AsyncEngine) -> None:
@@ -582,7 +579,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -591,7 +588,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=wyo, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -658,7 +655,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -667,7 +664,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf4, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -706,7 +703,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf4, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -715,7 +712,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf5, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -747,10 +744,10 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1)),
+                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
                         ],
                     ),
                     CapitalSchemeEntity(
@@ -803,7 +800,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -821,7 +818,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -839,7 +836,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -881,7 +878,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -891,7 +888,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -932,7 +929,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
@@ -978,7 +975,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
@@ -1028,7 +1025,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
@@ -1073,7 +1070,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -1082,7 +1079,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
                     ),
@@ -1125,7 +1122,7 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
                                 bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            ),
+                            )
                         ],
                     ),
                 ]

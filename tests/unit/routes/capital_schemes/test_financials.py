@@ -23,16 +23,12 @@ class TestCapitalSchemeFinancialModel:
         financial_model = CapitalSchemeFinancialModel.from_domain(financial)
 
         assert financial_model == CapitalSchemeFinancialModel(
-            type=FinancialTypeModel.FUNDING_ALLOCATION,
-            amount=2_000_000,
-            source=DataSourceModel.ATF4_BID,
+            type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
         )
 
     def test_to_domain(self) -> None:
         financial_model = CapitalSchemeFinancialModel(
-            type=FinancialTypeModel.FUNDING_ALLOCATION,
-            amount=2_000_000,
-            source=DataSourceModel.ATF4_BID,
+            type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
         )
 
         financial = financial_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
