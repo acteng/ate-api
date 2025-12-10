@@ -50,12 +50,6 @@ class CapitalSchemeFinancialsModel(CollectionModel[CapitalSchemeFinancialModel])
     def from_domain(cls, financials: CapitalSchemeFinancials) -> Self:
         return cls(items=[CapitalSchemeFinancialModel.from_domain(financial) for financial in financials.financials])
 
-    def to_domain(self, capital_scheme: CapitalSchemeReference, now: datetime) -> CapitalSchemeFinancials:
-        financials = CapitalSchemeFinancials(capital_scheme=capital_scheme)
-        for financial in self.items:
-            financials.adjust_financial(financial.to_domain(now))
-        return financials
-
 
 router = APIRouter()
 
