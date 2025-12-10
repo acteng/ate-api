@@ -75,19 +75,10 @@ async def test_get_capital_scheme(
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "type": "construction",
         },
-        "bidStatusDetails": {
-            "bidStatus": "funded",
-        },
-        "financials": {
-            "items": [],
-        },
-        "milestones": {
-            "currentMilestone": None,
-            "items": [],
-        },
-        "outputs": {
-            "items": [],
-        },
+        "bidStatusDetails": {"bidStatus": "funded"},
+        "financials": {"items": []},
+        "milestones": {"currentMilestone": None, "items": []},
+        "outputs": {"items": []},
         "authorityReview": None,
     }
 
@@ -123,13 +114,7 @@ async def test_get_capital_scheme_with_financials(
 
     assert response.status_code == 200
     assert response.json()["financials"] == {
-        "items": [
-            {
-                "type": "funding allocation",
-                "amount": 2_000_000,
-                "source": "ATF4 bid",
-            }
-        ],
+        "items": [{"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}]
     }
 
 
@@ -208,13 +193,8 @@ async def test_get_capital_scheme_with_outputs(
     assert response.status_code == 200
     assert response.json()["outputs"] == {
         "items": [
-            {
-                "type": "widening existing footway",
-                "measure": "miles",
-                "observationType": "actual",
-                "value": "1.5",
-            }
-        ],
+            {"type": "widening existing footway", "measure": "miles", "observationType": "actual", "value": "1.5"}
+        ]
     }
 
 
@@ -259,11 +239,7 @@ async def test_create_financial_creates_financial(
     client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={
-            "type": "funding allocation",
-            "amount": 3_000_000,
-            "source": "ATF4 bid",
-        },
+        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
@@ -296,11 +272,7 @@ async def test_create_financial_closes_current_financial(
     client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={
-            "type": "funding allocation",
-            "amount": 3_000_000,
-            "source": "ATF4 bid",
-        },
+        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     actual_financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
@@ -316,19 +288,11 @@ async def test_create_financial_returns_created_financial(
     response = client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={
-            "type": "funding allocation",
-            "amount": 3_000_000,
-            "source": "ATF4 bid",
-        },
+        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {
-        "type": "funding allocation",
-        "amount": 3_000_000,
-        "source": "ATF4 bid",
-    }
+    assert response.json() == {"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"}
 
 
 @respx.mock
@@ -336,11 +300,7 @@ def test_create_financial_when_capital_scheme_not_found(client: TestClient, acce
     response = client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={
-            "type": "funding allocation",
-            "amount": 3_000_000,
-            "source": "ATF4 bid",
-        },
+        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 404
@@ -520,7 +480,7 @@ async def test_get_milestones(client: TestClient, access_token: str) -> None:
             "not progressed",
             "superseded",
             "removed",
-        ],
+        ]
     }
 
 
@@ -542,7 +502,7 @@ async def test_get_milestones_filters_by_active(client: TestClient, access_token
             "construction started",
             "construction completed",
             "funding completed",
-        ],
+        ]
     }
 
 
@@ -553,8 +513,4 @@ async def test_get_milestones_filters_by_complete(client: TestClient, access_tok
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "items": [
-            "funding completed",
-        ],
-    }
+    assert response.json() == {"items": ["funding completed"]}
