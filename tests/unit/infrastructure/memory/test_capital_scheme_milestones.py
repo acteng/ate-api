@@ -148,3 +148,32 @@ class TestMemoryCapitalSchemeMilestonesRepository:
         milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
 
         assert not milestones
+
+    async def test_update(self, capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository) -> None:
+        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+        await capital_scheme_milestones.add(milestones)
+        milestone2 = CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2021, 1, 1, tzinfo=UTC)),
+            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2021, 2, 1),
+            data_source=DataSource.ATF4_BID,
+        )
+        milestones.change_milestone(milestone2)
+
+        await capital_scheme_milestones.update(milestones)
+
+        actual_milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+        assert actual_milestones and actual_milestones.capital_scheme == CapitalSchemeReference("ATE00001")
+        (actual_milestone1, actual_milestone2) = actual_milestones.milestones
+        assert actual_milestone1.effective_date.to == datetime(2021, 1, 1, tzinfo=UTC)
+        assert actual_milestone2 == milestone2

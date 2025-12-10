@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
-from datetime import date
+from dataclasses import dataclass, field, replace
+from datetime import date, datetime
 from enum import IntEnum, auto
+from typing import Self
 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
@@ -40,6 +41,16 @@ class CapitalSchemeMilestone:
     data_source: DataSource
     surrogate_id: int | None = field(default=None, repr=False, compare=False)
 
+    @property
+    def is_open(self) -> bool:
+        return self.effective_date.is_open
+
+    def close(self, effective_date_to: datetime) -> Self:
+        if not self.is_open:
+            raise ValueError("Capital scheme milestone is already closed")
+
+        return replace(self, effective_date=self.effective_date.close(effective_date_to))
+
 
 class CapitalSchemeMilestones:
     def __init__(self, capital_scheme: CapitalSchemeReference):
@@ -64,6 +75,18 @@ class CapitalSchemeMilestones:
         return sorted(actual_milestones)[-1] if actual_milestones else None
 
     def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
+        self._milestones = list(
+            map(
+                lambda m: (
+                    m.close(milestone.effective_date.from_)
+                    if m.milestone == milestone.milestone
+                    and m.observation_type == milestone.observation_type
+                    and m.is_open
+                    else m
+                ),
+                self._milestones,
+            )
+        )
         self._milestones.append(milestone)
 
 
@@ -77,4 +100,7 @@ class CapitalSchemeMilestonesRepository:
         raise NotImplementedError()
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeMilestones | None:
+        raise NotImplementedError()
+
+    async def update(self, milestones: CapitalSchemeMilestones) -> None:
         raise NotImplementedError()

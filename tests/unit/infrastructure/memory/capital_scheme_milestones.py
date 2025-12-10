@@ -26,3 +26,6 @@ class MemoryCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepository)
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeMilestones | None:
         return self._milestones.get(capital_scheme)
+
+    async def update(self, milestones: CapitalSchemeMilestones) -> None:
+        self._milestones[milestones.capital_scheme] = milestones

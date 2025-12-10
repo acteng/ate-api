@@ -166,6 +166,19 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
             milestones.change_milestone(row.to_domain())
         return milestones
 
+    async def update(self, milestones: CapitalSchemeMilestones) -> None:
+        capital_scheme_id = await self._get_capital_scheme_id(milestones)
+        milestone_ids = await self._get_milestone_ids(milestones)
+        observation_type_ids = await self._get_observation_type_ids(milestones)
+        data_source_ids = await self._get_data_source_ids(milestones)
+
+        for milestone in milestones.milestones:
+            await self._session.merge(
+                CapitalSchemeMilestoneEntity.from_domain(
+                    milestone, capital_scheme_id, milestone_ids, observation_type_ids, data_source_ids
+                )
+            )
+
     async def _get_capital_scheme_id(self, milestones: CapitalSchemeMilestones) -> int:
         capital_scheme_reference = str(milestones.capital_scheme)
         rows = await self._session.scalars(

@@ -2,17 +2,23 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
+from ate_api.clock import get_clock
+from ate_api.database import get_session
 from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestone,
     CapitalSchemeMilestones,
+    CapitalSchemeMilestonesRepository,
     Milestone,
     MilestoneRepository,
 )
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.dates import DateTimeRange
-from ate_api.repositories import get_milestone_repository
+from ate_api.infrastructure.clock import Clock
+from ate_api.repositories import get_capital_scheme_milestones_repository, get_milestone_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
@@ -101,4 +107,39 @@ async def get_milestones(
 
     return CollectionModel[MilestoneModel](
         items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones]
+    )
+
+
+@router.post(
+    "/{reference}/milestones",
+    status_code=HTTP_201_CREATED,
+    summary="Create capital scheme milestones",
+    responses={HTTP_404_NOT_FOUND: {}},
+)
+async def create_milestones(
+    clock: Annotated[Clock, Depends(get_clock)],
+    capital_scheme_milestones: Annotated[
+        CapitalSchemeMilestonesRepository, Depends(get_capital_scheme_milestones_repository)
+    ],
+    session: Annotated[AsyncSession, Depends(get_session)],
+    reference: str,
+    milestones_model: CollectionModel[CapitalSchemeMilestoneModel],
+) -> CollectionModel[CapitalSchemeMilestoneModel]:
+    """
+    Creates milestones for a capital scheme.
+    """
+    milestones = await capital_scheme_milestones.get(CapitalSchemeReference(reference))
+
+    if not milestones:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
+    now = clock.now
+    new_milestones = [milestone_model.to_domain(now) for milestone_model in milestones_model.items]
+    for milestone in new_milestones:
+        milestones.change_milestone(milestone)
+    await capital_scheme_milestones.update(milestones)
+    await session.commit()
+
+    return CollectionModel[CapitalSchemeMilestoneModel](
+        items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in new_milestones]
     )

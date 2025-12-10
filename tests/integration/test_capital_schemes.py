@@ -347,6 +347,161 @@ def test_create_financial_when_capital_scheme_not_found(client: TestClient, acce
 
 
 @respx.mock
+async def test_create_milestones_creates_milestones(
+    clock: Clock, capital_scheme_milestones: CapitalSchemeMilestonesRepository, client: TestClient, access_token: str
+) -> None:
+    clock.now = datetime(2020, 1, 1, tzinfo=UTC)
+    await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+
+    client.post(
+        "/capital-schemes/ATE00001/milestones",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-02-01",
+                    "source": "ATF4 bid",
+                },
+                {
+                    "milestone": "construction started",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
+                },
+            ]
+        },
+    )
+
+    milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+    assert milestones and milestones.milestones == [
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
+        ),
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            milestone=Milestone.CONSTRUCTION_STARTED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
+        ),
+    ]
+
+
+@respx.mock
+async def test_create_milestones_closes_current_milestones(
+    clock: Clock, capital_scheme_milestones: CapitalSchemeMilestonesRepository, client: TestClient, access_token: str
+) -> None:
+    clock.now = datetime(2020, 2, 1, tzinfo=UTC)
+    milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+    milestones.change_milestone(
+        CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 3, 1),
+            data_source=DataSource.ATF4_BID,
+        )
+    )
+    await capital_scheme_milestones.add(milestones)
+
+    client.post(
+        "/capital-schemes/ATE00001/milestones",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-04-01",
+                    "source": "ATF4 bid",
+                }
+            ]
+        },
+    )
+
+    actual_milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+    assert actual_milestones and actual_milestones.milestones[0].effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
+
+
+@respx.mock
+async def test_create_milestones_returns_created_milestones(
+    capital_scheme_milestones: CapitalSchemeMilestonesRepository, client: TestClient, access_token: str
+) -> None:
+    await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+
+    response = client.post(
+        "/capital-schemes/ATE00001/milestones",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-02-01",
+                    "source": "ATF4 bid",
+                },
+                {
+                    "milestone": "construction started",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
+                },
+            ]
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json() == {
+        "items": [
+            {
+                "milestone": "detailed design completed",
+                "observationType": "actual",
+                "statusDate": "2020-02-01",
+                "source": "ATF4 bid",
+            },
+            {
+                "milestone": "construction started",
+                "observationType": "actual",
+                "statusDate": "2020-03-01",
+                "source": "ATF4 bid",
+            },
+        ]
+    }
+
+
+@respx.mock
+def test_create_milestones_when_capital_scheme_not_found(client: TestClient, access_token: str) -> None:
+    response = client.post(
+        "/capital-schemes/ATE00001/milestones",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={
+            "items": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-02-01",
+                    "source": "ATF4 bid",
+                },
+                {
+                    "milestone": "construction started",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
+                },
+            ]
+        },
+    )
+
+    assert response.status_code == 404
+
+
+@respx.mock
 async def test_get_milestones(client: TestClient, access_token: str) -> None:
     response = client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
 

@@ -447,3 +447,56 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                 data_source=DataSource.ATF4_BID,
             ),
         ]
+
+    async def test_update(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    detailed_design_completed := build_milestone_entity(
+                        id_=2, name=MilestoneName.DETAILED_DESIGN_COMPLETED
+                    ),
+                    actual := build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(id_=4, name=DataSourceName.ATF4_BID),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=detailed_design_completed,
+                        observation_type=actual,
+                        status_date=date(2020, 2, 1),
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
+            milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+            assert milestones
+            milestones.change_milestone(
+                CapitalSchemeMilestone(
+                    effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                    milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                    observation_type=ObservationType.ACTUAL,
+                    status_date=date(2020, 3, 1),
+                    data_source=DataSource.ATF4_BID,
+                )
+            )
+            await capital_scheme_milestones.update(milestones)
+
+        async with AsyncSession(engine) as session:
+            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
+            milestone_row1, milestone_row2 = await session.scalars(select(CapitalSchemeMilestoneEntity))
+        assert (
+            milestone_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and milestone_row1.effective_date_to == datetime(2020, 2, 1)
+        )
+        assert (
+            milestone_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and milestone_row2.milestone_id == 2
+            and milestone_row2.status_date == date(2020, 3, 1)
+            and milestone_row2.observation_type_id == 3
+            and milestone_row2.data_source_id == 4
+            and milestone_row2.effective_date_from == datetime(2020, 2, 1)
+            and not milestone_row2.effective_date_to
+        )
