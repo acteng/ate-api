@@ -29,18 +29,10 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
             },
-            "bidStatusDetails": {
-                "bidStatus": "funded",
-            },
-            "financials": {
-                "items": [],
-            },
-            "milestones": {
-                "items": [],
-            },
-            "outputs": {
-                "items": [],
-            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
+            "outputs": {"items": []},
         }
     )
     app_client.create_capital_scheme(
@@ -52,18 +44,10 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
             },
-            "bidStatusDetails": {
-                "bidStatus": "funded",
-            },
-            "financials": {
-                "items": [],
-            },
-            "milestones": {
-                "items": [],
-            },
-            "outputs": {
-                "items": [],
-            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
+            "outputs": {"items": []},
         }
     )
 
@@ -73,8 +57,5 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
 
     assert response.status_code == 200
     assert response.json() == {
-        "items": [
-            f"{client.base_url}/capital-schemes/ATE00001",
-            f"{client.base_url}/capital-schemes/ATE00002",
-        ],
+        "items": [f"{client.base_url}/capital-schemes/ATE00001", f"{client.base_url}/capital-schemes/ATE00002"]
     }

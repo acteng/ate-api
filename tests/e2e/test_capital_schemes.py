@@ -15,15 +15,9 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
             },
-            "bidStatusDetails": {
-                "bidStatus": "funded",
-            },
-            "financials": {
-                "items": [],
-            },
-            "milestones": {
-                "items": [],
-            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
             "outputs": {
                 "items": [
                     {
@@ -32,18 +26,13 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                         "observationType": "actual",
                         "value": "1.5",
                     }
-                ],
+                ]
             },
             "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
         }
     )
     app_client.create_capital_scheme_financial(
-        "ATE00001",
-        {
-            "type": "funding allocation",
-            "amount": 2_000_000,
-            "source": "ATF4 bid",
-        },
+        "ATE00001", {"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}
     )
     app_client.create_capital_scheme_milestones(
         "ATE00001",
@@ -55,7 +44,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     "statusDate": "2020-03-01",
                     "source": "ATF4 bid",
                 }
-            ],
+            ]
         },
     )
 
@@ -71,18 +60,8 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "type": "construction",
         },
-        "bidStatusDetails": {
-            "bidStatus": "funded",
-        },
-        "financials": {
-            "items": [
-                {
-                    "type": "funding allocation",
-                    "amount": 2_000_000,
-                    "source": "ATF4 bid",
-                }
-            ],
-        },
+        "bidStatusDetails": {"bidStatus": "funded"},
+        "financials": {"items": [{"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}]},
         "milestones": {
             "currentMilestone": "detailed design completed",
             "items": [
@@ -102,7 +81,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     "observationType": "actual",
                     "value": "1.500000",
                 }
-            ],
+            ]
         },
         "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
     }
@@ -120,55 +99,28 @@ def test_create_financial(client: Client, access_token: str, app_client: AppClie
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
             },
-            "bidStatusDetails": {
-                "bidStatus": "funded",
-            },
-            "financials": {
-                "items": [],
-            },
-            "milestones": {
-                "items": [],
-            },
-            "outputs": {
-                "items": [],
-            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
+            "outputs": {"items": []},
             "authorityReview": None,
         }
     )
     app_client.create_capital_scheme_financial(
-        "ATE00001",
-        {
-            "type": "funding allocation",
-            "amount": 2_000_000,
-            "source": "ATF4 bid",
-        },
+        "ATE00001", {"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}
     )
 
     response = client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={
-            "type": "funding allocation",
-            "amount": 3_000_000,
-            "source": "ATF4 bid",
-        },
+        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {
-        "type": "funding allocation",
-        "amount": 3_000_000,
-        "source": "ATF4 bid",
-    }
+    assert response.json() == {"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"}
     capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
     assert capital_scheme["financials"] == {
-        "items": [
-            {
-                "type": "funding allocation",
-                "amount": 3_000_000,
-                "source": "ATF4 bid",
-            }
-        ]
+        "items": [{"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"}]
     }
 
 
@@ -184,18 +136,10 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "type": "construction",
             },
-            "bidStatusDetails": {
-                "bidStatus": "funded",
-            },
-            "financials": {
-                "items": [],
-            },
-            "milestones": {
-                "items": [],
-            },
-            "outputs": {
-                "items": [],
-            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
+            "outputs": {"items": []},
             "authorityReview": None,
         }
     )
@@ -215,7 +159,7 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
                     "statusDate": "2020-03-01",
                     "source": "ATF4 bid",
                 },
-            ],
+            ]
         },
     )
 
@@ -236,7 +180,7 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
                     "statusDate": "2021-03-01",
                     "source": "ATF4 bid",
                 },
-            ],
+            ]
         },
     )
 
@@ -255,7 +199,7 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
                 "statusDate": "2021-03-01",
                 "source": "ATF4 bid",
             },
-        ],
+        ]
     }
     capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
     assert capital_scheme["milestones"]["items"] == [
@@ -292,5 +236,5 @@ def test_get_milestones(client: Client, access_token: str) -> None:
             "not progressed",
             "superseded",
             "removed",
-        ],
+        ]
     }
