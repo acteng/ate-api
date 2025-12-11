@@ -1,5 +1,7 @@
 from datetime import UTC, date, datetime
+from typing import Awaitable, Callable
 
+import pytest
 import respx
 from fastapi.testclient import TestClient
 
@@ -20,23 +22,9 @@ from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 
 @respx.mock
 async def test_can_request_uncompressed_response(
-    capital_schemes: CapitalSchemeRepository,
-    capital_scheme_financials: CapitalSchemeFinancialsRepository,
-    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
-    client: TestClient,
-    access_token: str,
+    add_large_capital_scheme: Callable[[CapitalSchemeReference], Awaitable[None]], client: TestClient, access_token: str
 ) -> None:
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-    )
-    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
-    await capital_scheme_milestones.add(
-        _build_capital_scheme_milestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-    )
+    await add_large_capital_scheme(CapitalSchemeReference("ATE00001"))
 
     response = client.get(
         "/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}", "Accept-Encoding": "identity"}
@@ -47,23 +35,9 @@ async def test_can_request_uncompressed_response(
 
 @respx.mock
 async def test_can_request_compressed_response(
-    capital_schemes: CapitalSchemeRepository,
-    capital_scheme_financials: CapitalSchemeFinancialsRepository,
-    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
-    client: TestClient,
-    access_token: str,
+    add_large_capital_scheme: Callable[[CapitalSchemeReference], Awaitable[None]], client: TestClient, access_token: str
 ) -> None:
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-    )
-    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
-    await capital_scheme_milestones.add(
-        _build_capital_scheme_milestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-    )
+    await add_large_capital_scheme(CapitalSchemeReference("ATE00001"))
 
     response = client.get(
         "/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}", "Accept-Encoding": "gzip"}
@@ -72,25 +46,39 @@ async def test_can_request_compressed_response(
     assert response.status_code == 200 and response.headers["Content-Encoding"] == "gzip"
 
 
-def _build_capital_scheme_milestones(capital_scheme: CapitalSchemeReference) -> CapitalSchemeMilestones:
-    # Representation must be >= 500 bytes for it to be compressed
-    milestones = CapitalSchemeMilestones(capital_scheme=capital_scheme)
-    milestones.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+@pytest.fixture
+def add_large_capital_scheme(
+    capital_schemes: CapitalSchemeRepository,
+    capital_scheme_financials: CapitalSchemeFinancialsRepository,
+    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+) -> Callable[[CapitalSchemeReference], Awaitable[None]]:
+    async def add(reference: CapitalSchemeReference) -> None:
+        await capital_schemes.add(
+            CapitalScheme(reference=reference, overview=dummy_overview(), bid_status_details=dummy_bid_status_details())
         )
-    )
-    milestones.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.CONSTRUCTION_STARTED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
+
+        await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=reference))
+
+        # Representation must be >= 500 bytes for it to be compressed
+        milestones = CapitalSchemeMilestones(capital_scheme=reference)
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 2, 1),
+                data_source=DataSource.ATF4_BID,
+            )
         )
-    )
-    return milestones
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                milestone=Milestone.CONSTRUCTION_STARTED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+        await capital_scheme_milestones.add(milestones)
+
+    return add
