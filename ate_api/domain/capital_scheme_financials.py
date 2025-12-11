@@ -47,11 +47,15 @@ class CapitalSchemeFinancials:
     def change_financial(self, financial: CapitalSchemeFinancial) -> None:
         self._financials = list(
             map(
-                lambda f: f.close(financial.effective_date.from_) if f.type == financial.type and f.is_open else f,
+                lambda f: f.close(financial.effective_date.from_) if f.is_open and self._matches(f, financial) else f,
                 self._financials,
             )
         )
         self._financials.append(financial)
+
+    @staticmethod
+    def _matches(financial1: CapitalSchemeFinancial, financial2: CapitalSchemeFinancial) -> bool:
+        return financial1.type == financial2.type
 
 
 class CapitalSchemeFinancialsRepository:

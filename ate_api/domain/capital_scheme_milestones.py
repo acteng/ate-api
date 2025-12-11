@@ -77,17 +77,17 @@ class CapitalSchemeMilestones:
     def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
         self._milestones = list(
             map(
-                lambda m: (
-                    m.close(milestone.effective_date.from_)
-                    if m.milestone == milestone.milestone
-                    and m.observation_type == milestone.observation_type
-                    and m.is_open
-                    else m
-                ),
+                lambda m: m.close(milestone.effective_date.from_) if m.is_open and self._matches(m, milestone) else m,
                 self._milestones,
             )
         )
         self._milestones.append(milestone)
+
+    @staticmethod
+    def _matches(milestone1: CapitalSchemeMilestone, milestone2: CapitalSchemeMilestone) -> bool:
+        return (
+            milestone1.milestone == milestone2.milestone and milestone1.observation_type == milestone2.observation_type
+        )
 
 
 class MilestoneRepository:
