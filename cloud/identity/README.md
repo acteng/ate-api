@@ -36,6 +36,12 @@ To create an OAuth client for the Auth0 Terraform provider:
    ./create-client.sh
    ```
 
+1. Log out from Auth0:
+
+   ```bash
+   auth0 logout
+   ```
+
 ### Resources
 
 1. Change directory:
@@ -78,6 +84,12 @@ To create an OAuth client for the Auth0 Terraform provider:
 
    ```bash
    unselect_client
+   ```
+
+1. Log out from Auth0:
+
+   ```bash
+   auth0 logout
    ```
 
 ## Requesting an access token
@@ -154,6 +166,12 @@ To request an access token from the identity provider:
    unselect_client
    ```
 
+1. Log out from Auth0:
+
+   ```bash
+   auth0 logout
+   ```
+
 ### Terraform provider
 
 To delete the OAuth client for the Auth0 Terraform provider:
@@ -174,4 +192,10 @@ To delete the OAuth client for the Auth0 Terraform provider:
 
    ```bash
    ./delete-client.sh
+   ```
+
+1. Log out from Auth0:
+
+   ```bash
+   auth0 logout
    ```
