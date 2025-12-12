@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
 
@@ -143,27 +143,37 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
         )
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeMilestones | None:
-        result = await self._session.scalars(
-            select(CapitalSchemeMilestoneEntity)
+        result = await self._session.execute(
+            select(CapitalSchemeEntity, CapitalSchemeMilestoneEntity)
             .options(
                 contains_eager(CapitalSchemeMilestoneEntity.milestone),
                 contains_eager(CapitalSchemeMilestoneEntity.observation_type),
                 contains_eager(CapitalSchemeMilestoneEntity.data_source),
             )
-            .join(CapitalSchemeEntity)
-            .join(MilestoneEntity)
-            .join(ObservationTypeEntity)
-            .join(DataSourceEntity)
+            .outerjoin(
+                CapitalSchemeMilestoneEntity,
+                and_(
+                    CapitalSchemeEntity.capital_scheme_id == CapitalSchemeMilestoneEntity.capital_scheme_id,
+                    CapitalSchemeMilestoneEntity.effective_date_to.is_(None),
+                ),
+            )
+            .outerjoin(MilestoneEntity)
+            .outerjoin(ObservationTypeEntity)
+            .outerjoin(DataSourceEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
-            .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
             .order_by(MilestoneEntity.stage_order)
             .order_by(ObservationTypeEntity.observation_type_id)
         )
         rows = result.all()
 
+        if not rows:
+            return None
+
+        milestone_rows = [row.CapitalSchemeMilestoneEntity for row in rows if row.CapitalSchemeMilestoneEntity]
+
         milestones = CapitalSchemeMilestones(capital_scheme=capital_scheme)
-        for row in rows:
-            milestones.change_milestone(row.to_domain())
+        for milestone_row in milestone_rows:
+            milestones.change_milestone(milestone_row.to_domain())
         return milestones
 
     async def update(self, milestones: CapitalSchemeMilestones) -> None:

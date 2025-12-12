@@ -453,6 +453,13 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             ),
         ]
 
+    async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session:
+            capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
+            milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+
+        assert not milestones
+
     async def test_update(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
