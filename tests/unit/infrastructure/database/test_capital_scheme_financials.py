@@ -19,7 +19,12 @@ from ate_api.infrastructure.database import (
     FinancialTypeName,
 )
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
-from tests.unit.infrastructure.database.builders import build_data_source_entity, build_financial_type_entity
+from tests.unit.infrastructure.database.builders import (
+    build_capital_scheme_overview_entity,
+    build_data_source_entity,
+    build_financial_type_entity,
+    build_funding_programme_entity,
+)
 
 
 class TestCapitalSchemeFinancialEntity:
@@ -180,7 +185,13 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
 
     async def test_get(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
+            session.add(
+                CapitalSchemeEntity(
+                    capital_scheme_id=1,
+                    scheme_reference="ATE00001",
+                    capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                )
+            )
 
         async with AsyncSession(engine) as session:
             capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
@@ -197,7 +208,11 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                     funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
                     spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=funding_allocation,
@@ -251,7 +266,11 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                     funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
                     spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=spend_to_date,
@@ -301,6 +320,34 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             ),
         ]
 
+    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
+                    funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
+                    ),
+                    CapitalSchemeFinancialEntity(
+                        capital_scheme_id=1,
+                        financial_type=funding_allocation,
+                        amount=3_000_000,
+                        effective_date_from=datetime(2020, 1, 1),
+                        data_source=atf4_bid,
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+
+        assert not financials
+
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:
             capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
@@ -314,7 +361,11 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 [
                     funding_allocation := build_financial_type_entity(id_=2, name=FinancialTypeName.FUNDING_ALLOCATION),
                     atf4_bid := build_data_source_entity(id_=3, name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=funding_allocation,

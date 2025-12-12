@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Self
 
-from sqlalchemy import ForeignKey, and_, select
+from sqlalchemy import ForeignKey, and_, false, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
 
@@ -17,9 +17,11 @@ from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.moneys import Money
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
+from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.financial_types import FinancialTypeEntity, FinancialTypeName
+from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 
 
 class CapitalSchemeFinancialEntity(BaseEntity):
@@ -88,6 +90,12 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
                 contains_eager(CapitalSchemeFinancialEntity.financial_type),
                 contains_eager(CapitalSchemeFinancialEntity.data_source),
             )
+            .join(
+                CapitalSchemeEntity.capital_scheme_overviews.and_(
+                    CapitalSchemeOverviewEntity.effective_date_to.is_(None)
+                )
+            )
+            .join(FundingProgrammeEntity)
             .outerjoin(
                 CapitalSchemeFinancialEntity,
                 and_(
@@ -98,6 +106,7 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
             .outerjoin(FinancialTypeEntity)
             .outerjoin(DataSourceEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
+            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(FinancialTypeEntity.financial_type_id)
             .order_by(CapitalSchemeFinancialEntity.effective_date_from)
         )
