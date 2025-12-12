@@ -155,6 +155,27 @@ class TestCapitalSchemeFinancials:
         assert financials.financials[0].effective_date.to == datetime(2020, 3, 1, tzinfo=UTC)
         assert financials.financials[1].effective_date.to == datetime(2020, 3, 1, tzinfo=UTC)
 
+    def test_change_financial_preserves_matching_historic_financial(self) -> None:
+        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+        financial1 = CapitalSchemeFinancial(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            type=FinancialType.FUNDING_ALLOCATION,
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+        financials.adjust_financial(financial1)
+
+        financials.change_financial(
+            CapitalSchemeFinancial(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                type=FinancialType.FUNDING_ALLOCATION,
+                amount=Money(1_000_000),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+
+        assert financials.financials[0] == financial1
+
     def test_change_financial_preserves_other_current_financial(self) -> None:
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         financial1 = CapitalSchemeFinancial(
