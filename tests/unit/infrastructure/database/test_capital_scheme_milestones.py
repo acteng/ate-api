@@ -474,21 +474,10 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             session.add_all(
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=detailed_design_completed,
-                        observation_type=actual,
-                        status_date=date(2020, 3, 1),
-                        data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
                     ),
                 ]
             )

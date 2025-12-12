@@ -325,19 +325,10 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             session.add_all(
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
-                    ),
-                    CapitalSchemeFinancialEntity(
-                        capital_scheme_id=1,
-                        financial_type=funding_allocation,
-                        amount=3_000_000,
-                        effective_date_from=datetime(2020, 1, 1),
-                        data_source=atf4_bid,
                     ),
                 ]
             )
