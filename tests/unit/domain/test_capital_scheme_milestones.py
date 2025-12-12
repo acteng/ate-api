@@ -212,6 +212,29 @@ class TestCapitalSchemeMilestones:
 
         assert milestones.milestones[0].effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
+    def test_change_milestone_preserves_matching_historic_milestone(self) -> None:
+        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestone1 = CapitalSchemeMilestone(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+            observation_type=ObservationType.ACTUAL,
+            status_date=date(2020, 2, 1),
+            data_source=DataSource.ATF4_BID,
+        )
+        milestones.change_milestone(milestone1)
+
+        milestones.change_milestone(
+            CapitalSchemeMilestone(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
+                observation_type=ObservationType.ACTUAL,
+                status_date=date(2020, 3, 1),
+                data_source=DataSource.ATF4_BID,
+            )
+        )
+
+        assert milestones.milestones[0] == milestone1
+
     def test_change_milestone_preserves_other_current_milestones(self) -> None:
         milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
         milestone1 = CapitalSchemeMilestone(
