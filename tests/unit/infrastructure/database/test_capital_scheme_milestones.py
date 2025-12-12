@@ -426,10 +426,10 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             )
 
         async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeMilestonesRepository(session)
-            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+            capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
+            milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
 
-        assert capital_scheme and capital_scheme.milestones == [
+        assert milestones and milestones.milestones == [
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
