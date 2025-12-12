@@ -301,6 +301,13 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             ),
         ]
 
+    async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session:
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+
+        assert not financials
+
     async def test_update(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(

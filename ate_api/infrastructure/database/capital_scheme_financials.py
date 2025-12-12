@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Self
 
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
 
@@ -82,25 +82,35 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
         )
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeFinancials | None:
-        result = await self._session.scalars(
-            select(CapitalSchemeFinancialEntity)
+        result = await self._session.execute(
+            select(CapitalSchemeEntity, CapitalSchemeFinancialEntity)
             .options(
                 contains_eager(CapitalSchemeFinancialEntity.financial_type),
                 contains_eager(CapitalSchemeFinancialEntity.data_source),
             )
-            .join(CapitalSchemeEntity)
-            .join(FinancialTypeEntity)
-            .join(DataSourceEntity)
+            .outerjoin(
+                CapitalSchemeFinancialEntity,
+                and_(
+                    CapitalSchemeEntity.capital_scheme_id == CapitalSchemeFinancialEntity.capital_scheme_id,
+                    CapitalSchemeFinancialEntity.effective_date_to.is_(None),
+                ),
+            )
+            .outerjoin(FinancialTypeEntity)
+            .outerjoin(DataSourceEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
-            .where(CapitalSchemeFinancialEntity.effective_date_to.is_(None))
             .order_by(FinancialTypeEntity.financial_type_id)
             .order_by(CapitalSchemeFinancialEntity.effective_date_from)
         )
         rows = result.all()
 
+        if not rows:
+            return None
+
+        financial_rows = [row.CapitalSchemeFinancialEntity for row in rows if row.CapitalSchemeFinancialEntity]
+
         financials = CapitalSchemeFinancials(capital_scheme=capital_scheme)
-        for row in rows:
-            financials.adjust_financial(row.to_domain())
+        for financial_row in financial_rows:
+            financials.adjust_financial(financial_row.to_domain())
         return financials
 
     async def update(self, financials: CapitalSchemeFinancials) -> None:
