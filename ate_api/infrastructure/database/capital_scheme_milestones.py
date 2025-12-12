@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey, and_, select
+from sqlalchemy import ForeignKey, and_, false, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
 
@@ -19,8 +19,10 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
+from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
+from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
 
@@ -150,6 +152,12 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
                 contains_eager(CapitalSchemeMilestoneEntity.observation_type),
                 contains_eager(CapitalSchemeMilestoneEntity.data_source),
             )
+            .join(
+                CapitalSchemeEntity.capital_scheme_overviews.and_(
+                    CapitalSchemeOverviewEntity.effective_date_to.is_(None)
+                )
+            )
+            .join(FundingProgrammeEntity)
             .outerjoin(
                 CapitalSchemeMilestoneEntity,
                 and_(
@@ -161,6 +169,7 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
             .outerjoin(ObservationTypeEntity)
             .outerjoin(DataSourceEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
+            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(MilestoneEntity.stage_order)
             .order_by(ObservationTypeEntity.observation_type_id)
         )

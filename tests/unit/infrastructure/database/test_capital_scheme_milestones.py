@@ -24,7 +24,9 @@ from ate_api.infrastructure.database.capital_scheme_milestones import (
     DatabaseMilestoneRepository,
 )
 from tests.unit.infrastructure.database.builders import (
+    build_capital_scheme_overview_entity,
     build_data_source_entity,
+    build_funding_programme_entity,
     build_milestone_entity,
     build_observation_type_entity,
 )
@@ -314,7 +316,13 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
 
     async def test_get(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
+            session.add(
+                CapitalSchemeEntity(
+                    capital_scheme_id=1,
+                    scheme_reference="ATE00001",
+                    capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                )
+            )
 
         async with AsyncSession(engine) as session:
             capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
@@ -332,7 +340,11 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=detailed_design_completed,
@@ -397,7 +409,11 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=construction_started,
@@ -453,6 +469,36 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             ),
         ]
 
+    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
+                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
+                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
+                    ),
+                    CapitalSchemeMilestoneEntity(
+                        capital_scheme_id=1,
+                        milestone=detailed_design_completed,
+                        observation_type=actual,
+                        status_date=date(2020, 3, 1),
+                        data_source=atf4_bid,
+                        effective_date_from=datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
+            milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+
+        assert not milestones
+
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:
             capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
@@ -469,7 +515,11 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     ),
                     actual := build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(id_=4, name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=detailed_design_completed,
