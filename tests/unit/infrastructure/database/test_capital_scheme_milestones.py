@@ -312,6 +312,18 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             and not milestone_row2.effective_date_to
         )
 
+    async def test_get(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
+
+        async with AsyncSession(engine) as session:
+            capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
+            milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
+
+        assert (
+            milestones and milestones.capital_scheme == CapitalSchemeReference("ATE00001") and not milestones.milestones
+        )
+
     async def test_get_fetches_current_milestones(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
