@@ -24,8 +24,6 @@ from ate_api.infrastructure.database.capital_scheme_milestones import (
     DatabaseMilestoneRepository,
 )
 from tests.unit.infrastructure.database.builders import (
-    build_capital_scheme_bid_status_entity,
-    build_capital_scheme_overview_entity,
     build_data_source_entity,
     build_milestone_entity,
     build_observation_type_entity,
@@ -387,12 +385,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(
-                        capital_scheme_id=1,
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                    ),
+                    CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=construction_started,
