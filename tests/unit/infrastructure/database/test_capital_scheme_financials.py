@@ -178,6 +178,18 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             and financial_row2.data_source_id == 3
         )
 
+    async def test_get(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(CapitalSchemeEntity(capital_scheme_id=1, scheme_reference="ATE00001"))
+
+        async with AsyncSession(engine) as session:
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+
+        assert (
+            financials and financials.capital_scheme == CapitalSchemeReference("ATE00001") and not financials.financials
+        )
+
     async def test_get_fetches_current_financials(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
