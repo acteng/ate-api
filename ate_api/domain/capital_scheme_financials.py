@@ -45,6 +45,10 @@ class CapitalSchemeFinancials:
         self._financials.append(financial)
 
     def change_financial(self, financial: CapitalSchemeFinancial) -> None:
+        # funding allocation is represented by a series of adjustments that should not be closed
+        if financial.type == FinancialType.FUNDING_ALLOCATION:
+            raise ValueError("Funding allocation cannot be changed")
+
         self._financials = list(
             map(
                 lambda f: f.close(financial.effective_date.from_) if f.is_open and self._matches(f, financial) else f,

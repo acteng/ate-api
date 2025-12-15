@@ -295,6 +295,31 @@ async def test_create_financial_returns_created_financial(
 
 
 @respx.mock
+async def test_cannot_create_funding_allocation(
+    capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
+) -> None:
+    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
+
+    response = client.post(
+        "/capital-schemes/ATE00001/financials",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
+    )
+
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {
+                "input": "funding allocation",
+                "loc": ["body", "type"],
+                "msg": "Funding allocation cannot be created",
+                "type": "enum",
+            }
+        ]
+    }
+
+
+@respx.mock
 def test_create_financial_when_capital_scheme_not_found(client: TestClient, access_token: str) -> None:
     response = client.post(
         "/capital-schemes/ATE00001/financials",

@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import field_validator
+from pydantic_core import PydanticCustomError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
@@ -45,6 +47,15 @@ class CapitalSchemeFinancialModel(BaseModel):
         )
 
 
+class CreateCapitalSchemeFinancialModel(CapitalSchemeFinancialModel):
+    @field_validator("type", mode="before")
+    @classmethod
+    def check_type(cls, type_: FinancialTypeModel) -> FinancialTypeModel:
+        if type_ == FinancialTypeModel.FUNDING_ALLOCATION:
+            raise PydanticCustomError("enum", "Funding allocation cannot be created")
+        return type_
+
+
 class CapitalSchemeFinancialsModel(CollectionModel[CapitalSchemeFinancialModel]):
     @classmethod
     def from_domain(cls, financials: CapitalSchemeFinancials) -> Self:
@@ -67,7 +78,7 @@ async def create_financial(
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
     reference: str,
-    financial_model: CapitalSchemeFinancialModel,
+    financial_model: CreateCapitalSchemeFinancialModel,
 ) -> CapitalSchemeFinancialModel:
     """
     Creates a financial for a capital scheme.

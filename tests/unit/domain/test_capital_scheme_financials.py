@@ -187,3 +187,16 @@ class TestCapitalSchemeFinancials:
         )
 
         assert financials.financials[0] == financial1
+
+    def test_cannot_change_funding_allocation(self) -> None:
+        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+
+        with pytest.raises(ValueError, match="Funding allocation cannot be changed"):
+            financials.change_financial(
+                CapitalSchemeFinancial(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    type=FinancialType.FUNDING_ALLOCATION,
+                    amount=Money(2_000_000),
+                    data_source=DataSource.ATF4_BID,
+                )
+            )
