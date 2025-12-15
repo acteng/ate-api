@@ -32,7 +32,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
         }
     )
     app_client.create_capital_scheme_financial(
-        "ATE00001", {"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}
+        "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
     )
     app_client.create_capital_scheme_milestones(
         "ATE00001",
@@ -61,7 +61,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             "type": "construction",
         },
         "bidStatusDetails": {"bidStatus": "funded"},
-        "financials": {"items": [{"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}]},
+        "financials": {"items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]},
         "milestones": {
             "currentMilestone": "detailed design completed",
             "items": [
@@ -107,20 +107,20 @@ def test_create_financial(client: Client, access_token: str, app_client: AppClie
         }
     )
     app_client.create_capital_scheme_financial(
-        "ATE00001", {"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}
+        "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
     )
 
     response = client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"}
+    assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
     capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
     assert capital_scheme["financials"] == {
-        "items": [{"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"}]
+        "items": [{"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}]
     }
 
 

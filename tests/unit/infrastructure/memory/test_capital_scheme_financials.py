@@ -78,7 +78,7 @@ class TestMemoryCapitalSchemeFinancialsRepository:
         financials.change_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                type=FinancialType.FUNDING_ALLOCATION,
+                type=FinancialType.SPEND_TO_DATE,
                 amount=Money(3_000_000),
                 data_source=DataSource.ATF4_BID,
             )
@@ -86,7 +86,7 @@ class TestMemoryCapitalSchemeFinancialsRepository:
         await capital_scheme_financials.add(financials)
         financial2 = CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
+            type=FinancialType.SPEND_TO_DATE,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )

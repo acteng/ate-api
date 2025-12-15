@@ -350,7 +350,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    funding_allocation := build_financial_type_entity(id_=2, name=FinancialTypeName.FUNDING_ALLOCATION),
+                    spend_to_date := build_financial_type_entity(id_=2, name=FinancialTypeName.SPEND_TO_DATE),
                     atf4_bid := build_data_source_entity(id_=3, name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
@@ -359,7 +359,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
-                        financial_type=funding_allocation,
+                        financial_type=spend_to_date,
                         amount=3_000_000,
                         effective_date_from=datetime(2020, 1, 1),
                         data_source=atf4_bid,
@@ -374,7 +374,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             financials.change_financial(
                 CapitalSchemeFinancial(
                     effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                    type=FinancialType.FUNDING_ALLOCATION,
+                    type=FinancialType.SPEND_TO_DATE,
                     amount=Money(2_000_000),
                     data_source=DataSource.ATF4_BID,
                 )

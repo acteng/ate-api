@@ -101,7 +101,7 @@ async def test_get_capital_scheme_with_financials(
     financials.adjust_financial(
         CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
+            type=FinancialType.SPEND_TO_DATE,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
@@ -113,7 +113,7 @@ async def test_get_capital_scheme_with_financials(
 
     assert response.status_code == 200
     assert response.json()["financials"] == {
-        "items": [{"type": "funding allocation", "amount": 2_000_000, "source": "ATF4 bid"}]
+        "items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]
     }
 
 
@@ -238,14 +238,14 @@ async def test_create_financial_creates_financial(
     client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
     assert financials and financials.financials == [
         CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
+            type=FinancialType.SPEND_TO_DATE,
             amount=Money(3_000_000),
             data_source=DataSource.ATF4_BID,
         )
@@ -261,7 +261,7 @@ async def test_create_financial_closes_current_financial(
     financials.change_financial(
         CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
+            type=FinancialType.SPEND_TO_DATE,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
@@ -271,7 +271,7 @@ async def test_create_financial_closes_current_financial(
     client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     actual_financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
@@ -287,11 +287,11 @@ async def test_create_financial_returns_created_financial(
     response = client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"}
+    assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
 
 
 @respx.mock
@@ -299,7 +299,7 @@ def test_create_financial_when_capital_scheme_not_found(client: TestClient, acce
     response = client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 404
