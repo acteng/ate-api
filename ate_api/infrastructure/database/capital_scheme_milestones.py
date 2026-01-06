@@ -4,7 +4,7 @@ from typing import Self
 
 from sqlalchemy import ForeignKey, and_, false, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
+from sqlalchemy.orm import Mapped, contains_eager, joinedload, mapped_column, relationship
 
 from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestone,
@@ -150,7 +150,7 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
             .options(
                 contains_eager(CapitalSchemeMilestoneEntity.milestone),
                 contains_eager(CapitalSchemeMilestoneEntity.observation_type),
-                contains_eager(CapitalSchemeMilestoneEntity.data_source),
+                joinedload(CapitalSchemeMilestoneEntity.data_source),
             )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
@@ -167,7 +167,6 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
             )
             .outerjoin(MilestoneEntity)
             .outerjoin(ObservationTypeEntity)
-            .outerjoin(DataSourceEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
             .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(MilestoneEntity.stage_order)
