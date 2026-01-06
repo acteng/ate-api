@@ -3,7 +3,7 @@ from typing import Self
 
 from sqlalchemy import ForeignKey, and_, false, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, contains_eager, mapped_column, relationship
+from sqlalchemy.orm import Mapped, contains_eager, joinedload, mapped_column, relationship
 
 from ate_api.domain.capital_scheme_financials import (
     CapitalSchemeFinancial,
@@ -88,7 +88,7 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
             select(CapitalSchemeEntity, CapitalSchemeFinancialEntity)
             .options(
                 contains_eager(CapitalSchemeFinancialEntity.financial_type),
-                contains_eager(CapitalSchemeFinancialEntity.data_source),
+                joinedload(CapitalSchemeFinancialEntity.data_source),
             )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
@@ -104,7 +104,6 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
                 ),
             )
             .outerjoin(FinancialTypeEntity)
-            .outerjoin(DataSourceEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
             .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(FinancialTypeEntity.financial_type_id)
