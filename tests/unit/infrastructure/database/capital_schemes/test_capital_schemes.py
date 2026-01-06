@@ -116,11 +116,11 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("dummy"): 0},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
-            {ObservationType.ACTUAL: 3},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
                 (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
             },
+            {ObservationType.ACTUAL: 3},
             {},
         )
 

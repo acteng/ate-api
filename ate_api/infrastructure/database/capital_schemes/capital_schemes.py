@@ -36,8 +36,8 @@ class CapitalSchemeEntity(BaseEntity):
         funding_programme_ids: dict[FundingProgrammeCode, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
         bid_status_ids: dict[BidStatus, int],
-        observation_type_ids: dict[ObservationType, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
+        observation_type_ids: dict[ObservationType, int],
         data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(

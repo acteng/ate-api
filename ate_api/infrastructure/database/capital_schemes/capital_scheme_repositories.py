@@ -53,8 +53,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
-        observation_type_ids = await self._get_observation_type_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
+        observation_type_ids = await self._get_observation_type_ids(capital_scheme)
         data_source_ids = await self._get_data_source_ids(capital_scheme)
 
         self._session.add(
@@ -64,8 +64,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 funding_programme_ids,
                 scheme_type_ids,
                 bid_status_ids,
-                observation_type_ids,
                 intervention_type_measure_ids,
+                observation_type_ids,
                 data_source_ids,
             )
         )
@@ -252,17 +252,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
         return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
 
-    async def _get_observation_type_ids(self, capital_scheme: CapitalScheme) -> dict[ObservationType, int]:
-        observation_type_names = {
-            ObservationTypeName.from_domain(output.observation_type) for output in capital_scheme.outputs
-        }
-        rows = await self._session.execute(
-            select(ObservationTypeEntity.observation_type_name, ObservationTypeEntity.observation_type_id).where(
-                ObservationTypeEntity.observation_type_name.in_(observation_type_names)
-            )
-        )
-        return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
-
     async def _get_intervention_type_measure_ids(
         self, capital_scheme: CapitalScheme
     ) -> dict[tuple[OutputType, OutputMeasure], int]:
@@ -291,6 +280,17 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             ): row.intervention_type_measure_id
             for row in rows
         }
+
+    async def _get_observation_type_ids(self, capital_scheme: CapitalScheme) -> dict[ObservationType, int]:
+        observation_type_names = {
+            ObservationTypeName.from_domain(output.observation_type) for output in capital_scheme.outputs
+        }
+        rows = await self._session.execute(
+            select(ObservationTypeEntity.observation_type_name, ObservationTypeEntity.observation_type_id).where(
+                ObservationTypeEntity.observation_type_name.in_(observation_type_names)
+            )
+        )
+        return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
 
     async def _get_data_source_ids(self, capital_scheme: CapitalScheme) -> dict[DataSource, int]:
         if not capital_scheme.authority_review:
