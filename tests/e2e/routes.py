@@ -77,8 +77,7 @@ async def create_capital_scheme(
     request: Request,
     capital_scheme: CapitalSchemeModel,
 ) -> None:
-    now = clock.now
-    await capital_schemes.add(capital_scheme.to_domain(now, request))
+    await capital_schemes.add(capital_scheme.to_domain(clock.now, request))
     await session.commit()
 
 
