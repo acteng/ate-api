@@ -28,7 +28,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     }
                 ]
             },
-            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
+            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
         }
     )
     app_client.create_capital_scheme_financial(
@@ -83,7 +83,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                 }
             ]
         },
-        "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
+        "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
     }
 
 

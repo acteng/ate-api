@@ -7,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -116,7 +117,9 @@ class TestCapitalScheme:
             overview=dummy_overview(),
             bid_status_details=dummy_bid_status_details(),
         )
-        authority_review = CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
+        authority_review = CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
 
         capital_scheme.perform_authority_review(authority_review)
 

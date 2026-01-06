@@ -10,8 +10,10 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
+from ate_api.infrastructure.database import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_scheme_milestones import (
     CapitalSchemeMilestoneEntity,
@@ -53,6 +55,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
+        data_source_ids = await self._get_data_source_ids(capital_scheme)
 
         self._session.add(
             CapitalSchemeEntity.from_domain(
@@ -63,6 +66,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 bid_status_ids,
                 observation_type_ids,
                 intervention_type_measure_ids,
+                data_source_ids,
             )
         )
 
@@ -110,7 +114,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
                     ranked_capital_scheme_authority_reviews_alias
                 )
-            )
+            ),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_authority_reviews, CapitalSchemeAuthorityReviewEntity.data_source
+            ),
         ).outerjoin(
             ranked_capital_scheme_authority_reviews_alias,
             and_(
@@ -284,6 +291,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             ): row.intervention_type_measure_id
             for row in rows
         }
+
+    async def _get_data_source_ids(self, capital_scheme: CapitalScheme) -> dict[DataSource, int]:
+        if not capital_scheme.authority_review:
+            return {}
+
+        data_source_name = DataSourceName.from_domain(capital_scheme.authority_review.data_source)
+        rows = await self._session.execute(
+            select(DataSourceEntity.data_source_name, DataSourceEntity.data_source_id).where(
+                DataSourceEntity.data_source_name == data_source_name
+            )
+        )
+        return {row.data_source_name.to_domain(): row.data_source_id for row in rows}
 
     @staticmethod
     def _select_current_capital_scheme_interventions(

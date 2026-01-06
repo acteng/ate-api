@@ -7,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
@@ -37,6 +38,7 @@ class CapitalSchemeEntity(BaseEntity):
         bid_status_ids: dict[BidStatus, int],
         observation_type_ids: dict[ObservationType, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
+        data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
             scheme_reference=str(capital_scheme.reference),
@@ -53,7 +55,7 @@ class CapitalSchemeEntity(BaseEntity):
                 for output in capital_scheme.outputs
             ],
             capital_scheme_authority_reviews=(
-                [CapitalSchemeAuthorityReviewEntity.from_domain(capital_scheme.authority_review)]
+                [CapitalSchemeAuthorityReviewEntity.from_domain(capital_scheme.authority_review, data_source_ids)]
                 if capital_scheme.authority_review
                 else []
             ),

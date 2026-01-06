@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -177,6 +178,7 @@ class TestDatabaseCapitalSchemeRepository:
                     build_funding_programme_entity(),
                     build_scheme_type_entity(),
                     build_bid_status_entity(),
+                    build_data_source_entity(id_=1, name=DataSourceName.AUTHORITY_UPDATE),
                 ]
             )
 
@@ -188,7 +190,9 @@ class TestDatabaseCapitalSchemeRepository:
                 bid_status_details=dummy_bid_status_details(),
             )
             capital_scheme.perform_authority_review(
-                CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
+                CapitalSchemeAuthorityReview(
+                    review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+                )
             )
             await capital_schemes.add(capital_scheme)
 
@@ -198,6 +202,7 @@ class TestDatabaseCapitalSchemeRepository:
         assert (
             authority_review_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and authority_review_row.review_date == datetime(2020, 2, 1)
+            and authority_review_row.data_source_id == 1
         )
 
     async def test_get(self, engine: AsyncEngine) -> None:
@@ -482,16 +487,23 @@ class TestDatabaseCapitalSchemeRepository:
 
     async def test_get_fetches_latest_authority_review(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(
-                CapitalSchemeEntity(
-                    scheme_reference="ATE00001",
-                    capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                    capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                    capital_scheme_authority_reviews=[
-                        CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 2, 1)),
-                        CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 3, 1)),
-                    ],
-                )
+            session.add_all(
+                [
+                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_authority_reviews=[
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                            ),
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=datetime(2020, 3, 1), data_source=authority_review
+                            ),
+                        ],
+                    ),
+                ]
             )
 
         async with AsyncSession(engine) as session:
@@ -499,7 +511,7 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
 
         assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 3, 1, tzinfo=UTC)
+            review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
 
     async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:

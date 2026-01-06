@@ -7,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -19,6 +20,8 @@ from ate_api.infrastructure.database import (
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
     CapitalSchemeOverviewEntity,
+    DataSourceEntity,
+    DataSourceName,
     FundingProgrammeEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
@@ -59,6 +62,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("ATF3"): 2},
             {CapitalSchemeType.CONSTRUCTION: 3},
             {BidStatus.FUNDED: 4},
+            {},
             {},
             {},
         )
@@ -117,6 +121,7 @@ class TestCapitalSchemeEntity:
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
                 (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
             },
+            {},
         )
 
         intervention_entity1, intervention_entity2 = capital_scheme_entity.capital_scheme_interventions
@@ -142,7 +147,9 @@ class TestCapitalSchemeEntity:
             bid_status_details=dummy_bid_status_details(),
         )
         capital_scheme.perform_authority_review(
-            CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
+            CapitalSchemeAuthorityReview(
+                review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            )
         )
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
@@ -153,10 +160,13 @@ class TestCapitalSchemeEntity:
             {BidStatus.SUBMITTED: 0},
             {},
             {},
+            {DataSource.AUTHORITY_UPDATE: 1},
         )
 
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
-        assert authority_review_entity.review_date == datetime(2020, 2, 1)
+        assert (
+            authority_review_entity.review_date == datetime(2020, 2, 1) and authority_review_entity.data_source_id == 1
+        )
 
     def test_to_domain(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
@@ -252,11 +262,16 @@ class TestCapitalSchemeEntity:
             scheme_reference="ATE00001",
             capital_scheme_overviews=[build_capital_scheme_overview_entity()],
             capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-            capital_scheme_authority_reviews=[CapitalSchemeAuthorityReviewEntity(review_date=datetime(2020, 1, 1))],
+            capital_scheme_authority_reviews=[
+                CapitalSchemeAuthorityReviewEntity(
+                    review_date=datetime(2020, 1, 1),
+                    data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
+                )
+            ],
         )
 
         capital_scheme = capital_scheme_entity.to_domain()
 
         assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 1, 1, tzinfo=UTC)
+            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )

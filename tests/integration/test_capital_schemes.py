@@ -210,7 +210,11 @@ async def test_get_capital_scheme_with_authority_review(
         overview=dummy_overview(),
         bid_status_details=dummy_bid_status_details(),
     )
-    capital_scheme.perform_authority_review(CapitalSchemeAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC)))
+    capital_scheme.perform_authority_review(
+        CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
+    )
     await capital_schemes.add(capital_scheme)
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
@@ -218,7 +222,7 @@ async def test_get_capital_scheme_with_authority_review(
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
-    assert response.json()["authorityReview"] == {"reviewDate": "2020-02-01T00:00:00Z"}
+    assert response.json()["authorityReview"] == {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"}
 
 
 @respx.mock
