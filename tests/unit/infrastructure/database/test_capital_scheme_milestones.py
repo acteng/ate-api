@@ -318,9 +318,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
                 CapitalSchemeEntity(
-                    capital_scheme_id=1,
-                    scheme_reference="ATE00001",
-                    capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    scheme_reference="ATE00001", capital_scheme_overviews=[build_capital_scheme_overview_entity()]
                 )
             )
 
@@ -475,7 +473,6 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
                     CapitalSchemeEntity(
-                        capital_scheme_id=1,
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
                     ),
