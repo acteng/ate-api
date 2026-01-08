@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Self
 
-from sqlalchemy import ForeignKey, Select, and_, func, select
+from sqlalchemy import ForeignKey, Select, and_, false, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, aliased, joinedload, mapped_column, relationship
 
@@ -14,8 +14,10 @@ from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReferenc
 from ate_api.domain.data_sources import DataSource
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
+from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
+from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 
 
 class CapitalSchemeAuthorityReviewEntity(BaseEntity):
@@ -78,6 +80,12 @@ class DatabaseCapitalSchemeAuthorityReviewsRepository(CapitalSchemeAuthorityRevi
         result = await self._session.execute(
             select(CapitalSchemeEntity, ranked_capital_scheme_authority_reviews_alias)
             .options(joinedload(ranked_capital_scheme_authority_reviews_alias.data_source))
+            .join(
+                CapitalSchemeEntity.capital_scheme_overviews.and_(
+                    CapitalSchemeOverviewEntity.effective_date_to.is_(None)
+                )
+            )
+            .join(FundingProgrammeEntity)
             .outerjoin(
                 ranked_capital_scheme_authority_reviews_alias,
                 and_(
@@ -87,6 +95,7 @@ class DatabaseCapitalSchemeAuthorityReviewsRepository(CapitalSchemeAuthorityRevi
                 ),
             )
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
+            .where(FundingProgrammeEntity.is_under_embargo == false())
         )
         row = result.one_or_none()
 
