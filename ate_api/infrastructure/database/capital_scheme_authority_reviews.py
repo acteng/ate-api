@@ -36,6 +36,7 @@ class CapitalSchemeAuthorityReviewEntity(BaseEntity):
         data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
+            capital_scheme_authority_review_id=authority_review.surrogate_id,
             capital_scheme_id=capital_scheme_id,
             review_date=zoned_to_local(authority_review.review_date),
             data_source_id=data_source_ids[authority_review.data_source],
@@ -43,7 +44,9 @@ class CapitalSchemeAuthorityReviewEntity(BaseEntity):
 
     def to_domain(self) -> CapitalSchemeAuthorityReview:
         return CapitalSchemeAuthorityReview(
-            review_date=local_to_zoned(self.review_date), data_source=self.data_source.data_source_name.to_domain()
+            review_date=local_to_zoned(self.review_date),
+            data_source=self.data_source.data_source_name.to_domain(),
+            surrogate_id=self.capital_scheme_authority_review_id,
         )
 
 

@@ -22,17 +22,18 @@ from tests.unit.infrastructure.database.builders import build_data_source_entity
 class TestCapitalSchemeAuthorityReviewEntity:
     def test_from_domain(self) -> None:
         authority_review = CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE, surrogate_id=1
         )
 
         authority_review_entity = CapitalSchemeAuthorityReviewEntity.from_domain(
-            authority_review, 1, {DataSource.AUTHORITY_UPDATE: 2}
+            authority_review, 2, {DataSource.AUTHORITY_UPDATE: 3}
         )
 
         assert (
-            authority_review_entity.capital_scheme_id == 1
+            authority_review_entity.capital_scheme_authority_review_id == 1
+            and authority_review_entity.capital_scheme_id == 2
             and authority_review_entity.review_date == datetime(2020, 1, 1)
-            and authority_review_entity.data_source_id == 2
+            and authority_review_entity.data_source_id == 3
         )
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
@@ -48,6 +49,7 @@ class TestCapitalSchemeAuthorityReviewEntity:
 
     def test_to_domain(self) -> None:
         authority_review_entity = CapitalSchemeAuthorityReviewEntity(
+            capital_scheme_authority_review_id=1,
             review_date=datetime(2020, 1, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
         )
@@ -57,6 +59,7 @@ class TestCapitalSchemeAuthorityReviewEntity:
         assert authority_review == CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
+        assert authority_review.surrogate_id == 1
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         authority_review_entity = CapitalSchemeAuthorityReviewEntity(

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
@@ -10,6 +10,7 @@ from ate_api.domain.dates import is_zoned
 class CapitalSchemeAuthorityReview:
     review_date: datetime
     data_source: DataSource
+    surrogate_id: int | None = field(default=None, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         if not is_zoned(self.review_date):
