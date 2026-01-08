@@ -9,7 +9,12 @@ from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from ate_api.clock import get_clock
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
+from ate_api.domain.capital_scheme_authority_reviews import (
+    CapitalSchemeAuthorityReviews,
+    CapitalSchemeAuthorityReviewsRepository,
+)
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.clock import Clock
 from ate_api.infrastructure.database import (
@@ -25,6 +30,7 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.repositories import (
     get_authority_repository,
+    get_capital_scheme_authority_reviews_repository,
     get_capital_scheme_repository,
     get_funding_programme_repository,
 )
@@ -73,11 +79,22 @@ async def delete_authorities(session: Annotated[AsyncSession, Depends(get_sessio
 async def create_capital_scheme(
     clock: Annotated[Clock, Depends(get_clock)],
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
+    capital_scheme_authority_reviews: Annotated[
+        CapitalSchemeAuthorityReviewsRepository, Depends(get_capital_scheme_authority_reviews_repository)
+    ],
     session: Annotated[AsyncSession, Depends(get_session)],
     request: Request,
     capital_scheme: CapitalSchemeModel,
 ) -> None:
     await capital_schemes.add(capital_scheme.to_domain(clock.now, request))
+
+    if capital_scheme.authority_review:
+        authority_reviews = CapitalSchemeAuthorityReviews(
+            capital_scheme=CapitalSchemeReference(capital_scheme.reference)
+        )
+        authority_reviews.perform_authority_review(capital_scheme.authority_review.to_domain())
+        await capital_scheme_authority_reviews.add(authority_reviews)
+
     await session.commit()
 
 

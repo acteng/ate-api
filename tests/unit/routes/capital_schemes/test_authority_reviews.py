@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
+from ate_api.domain.capital_scheme_authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.data_sources import DataSource
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.data_sources import DataSourceModel

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Self
 
-from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
+from ate_api.domain.capital_scheme_authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.routes.base import BaseModel
 from ate_api.routes.data_sources import DataSourceModel
 

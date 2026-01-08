@@ -5,6 +5,10 @@ import pytest
 import respx
 from fastapi.testclient import TestClient
 
+from ate_api.domain.capital_scheme_authority_reviews import (
+    CapitalSchemeAuthorityReviews,
+    CapitalSchemeAuthorityReviewsRepository,
+)
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestone,
@@ -51,6 +55,7 @@ def add_large_capital_scheme(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
 ) -> Callable[[CapitalSchemeReference], Awaitable[None]]:
     async def add(reference: CapitalSchemeReference) -> None:
         await capital_schemes.add(
@@ -80,5 +85,7 @@ def add_large_capital_scheme(
             )
         )
         await capital_scheme_milestones.add(milestones)
+
+        await capital_scheme_authority_reviews.add(CapitalSchemeAuthorityReviews(capital_scheme=reference))
 
     return add

@@ -5,6 +5,11 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.capital_scheme_authority_reviews import (
+    CapitalSchemeAuthorityReview,
+    CapitalSchemeAuthorityReviews,
+    CapitalSchemeAuthorityReviewsRepository,
+)
 from ate_api.domain.capital_scheme_financials import (
     CapitalSchemeFinancial,
     CapitalSchemeFinancials,
@@ -16,7 +21,6 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestonesRepository,
     Milestone,
 )
-from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -38,6 +42,7 @@ async def test_get_capital_scheme(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
@@ -61,6 +66,9 @@ async def test_get_capital_scheme(
     )
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_authority_reviews.add(
+        CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    )
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -87,6 +95,7 @@ async def test_get_capital_scheme_with_financials(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
@@ -108,6 +117,9 @@ async def test_get_capital_scheme_with_financials(
     )
     await capital_scheme_financials.add(financials)
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_authority_reviews.add(
+        CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    )
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -122,6 +134,7 @@ async def test_get_capital_scheme_with_milestones(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
@@ -144,6 +157,9 @@ async def test_get_capital_scheme_with_milestones(
         )
     )
     await capital_scheme_milestones.add(milestones)
+    await capital_scheme_authority_reviews.add(
+        CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    )
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -166,6 +182,7 @@ async def test_get_capital_scheme_with_outputs(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
@@ -186,6 +203,9 @@ async def test_get_capital_scheme_with_outputs(
     await capital_schemes.add(capital_scheme)
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_authority_reviews.add(
+        CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    )
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -202,22 +222,26 @@ async def test_get_capital_scheme_with_authority_review(
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
-    capital_scheme = CapitalScheme(
-        reference=CapitalSchemeReference("ATE00001"),
-        overview=dummy_overview(),
-        bid_status_details=dummy_bid_status_details(),
+    await capital_schemes.add(
+        CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
     )
-    capital_scheme.perform_authority_review(
+    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+    authority_reviews = CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    authority_reviews.perform_authority_review(
         CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
     )
-    await capital_schemes.add(capital_scheme)
-    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
-    await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
+    await capital_scheme_authority_reviews.add(authority_reviews)
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 

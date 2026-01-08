@@ -2,12 +2,10 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
-from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
@@ -15,13 +13,10 @@ from ate_api.infrastructure.database import (
     AuthorityEntity,
     BidStatusEntity,
     BidStatusName,
-    CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
     CapitalSchemeOverviewEntity,
-    DataSourceEntity,
-    DataSourceName,
     FundingProgrammeEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
@@ -64,7 +59,6 @@ class TestCapitalSchemeEntity:
             {BidStatus.FUNDED: 4},
             {},
             {},
-            {},
         )
 
         assert capital_scheme_entity.scheme_reference == "ATE00001"
@@ -83,7 +77,6 @@ class TestCapitalSchemeEntity:
             and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_entity.effective_date_to
         )
-        assert not capital_scheme_entity.capital_scheme_authority_reviews
 
     def test_from_domain_sets_outputs(self) -> None:
         capital_scheme = CapitalScheme(
@@ -121,7 +114,6 @@ class TestCapitalSchemeEntity:
                 (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
             },
             {ObservationType.ACTUAL: 3},
-            {},
         )
 
         intervention_entity1, intervention_entity2 = capital_scheme_entity.capital_scheme_interventions
@@ -138,34 +130,6 @@ class TestCapitalSchemeEntity:
             and intervention_entity2.observation_type_id == 3
             and intervention_entity2.effective_date_from == datetime(2020, 1, 1)
             and not intervention_entity2.effective_date_to
-        )
-
-    def test_from_domain_sets_authority_review(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        capital_scheme.perform_authority_review(
-            CapitalSchemeAuthorityReview(
-                review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
-            )
-        )
-
-        capital_scheme_entity = CapitalSchemeEntity.from_domain(
-            capital_scheme,
-            {AuthorityAbbreviation("dummy"): 0},
-            {FundingProgrammeCode("dummy"): 0},
-            {CapitalSchemeType.DEVELOPMENT: 0},
-            {BidStatus.SUBMITTED: 0},
-            {},
-            {},
-            {DataSource.AUTHORITY_UPDATE: 1},
-        )
-
-        (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
-        assert (
-            authority_review_entity.review_date == datetime(2020, 2, 1) and authority_review_entity.data_source_id == 1
         )
 
     def test_to_domain(self) -> None:
@@ -201,7 +165,6 @@ class TestCapitalSchemeEntity:
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
-        assert not capital_scheme.authority_review
 
     def test_to_domain_sets_outputs(self) -> None:
         capital_scheme_entity = CapitalSchemeEntity(
@@ -256,22 +219,3 @@ class TestCapitalSchemeEntity:
                 value=Decimal(2),
             ),
         ]
-
-    def test_to_domain_sets_authority_review(self) -> None:
-        capital_scheme_entity = CapitalSchemeEntity(
-            scheme_reference="ATE00001",
-            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-            capital_scheme_authority_reviews=[
-                CapitalSchemeAuthorityReviewEntity(
-                    review_date=datetime(2020, 1, 1),
-                    data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
-                )
-            ],
-        )
-
-        capital_scheme = capital_scheme_entity.to_domain()
-
-        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
-        )

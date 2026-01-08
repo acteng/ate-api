@@ -10,17 +10,14 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
-from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
-from ate_api.infrastructure.database import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_scheme_milestones import (
     CapitalSchemeMilestoneEntity,
     MilestoneEntity,
     MilestoneName,
 )
-from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusEntity,
     BidStatusName,
@@ -55,7 +52,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
-        data_source_ids = await self._get_data_source_ids(capital_scheme)
 
         self._session.add(
             CapitalSchemeEntity.from_domain(
@@ -66,7 +62,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 bid_status_ids,
                 intervention_type_measure_ids,
                 observation_type_ids,
-                data_source_ids,
             )
         )
 
@@ -102,29 +97,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
                 CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
             )
-        )
-
-        # fetch latest authority review
-        ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
-        ranked_capital_scheme_authority_reviews_alias = aliased(
-            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
-        )
-        statement = statement.options(
-            contains_eager(
-                CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
-                    ranked_capital_scheme_authority_reviews_alias
-                )
-            ),
-            joinedload(
-                CapitalSchemeEntity.capital_scheme_authority_reviews, CapitalSchemeAuthorityReviewEntity.data_source
-            ),
-        ).outerjoin(
-            ranked_capital_scheme_authority_reviews_alias,
-            and_(
-                CapitalSchemeEntity.capital_scheme_id
-                == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
-                ranked_capital_scheme_authority_reviews.c.rank == 1,
-            ),
         )
 
         result = await self._session.scalars(statement)
@@ -292,18 +264,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
         return {row.observation_type_name.to_domain(): row.observation_type_id for row in rows}
 
-    async def _get_data_source_ids(self, capital_scheme: CapitalScheme) -> dict[DataSource, int]:
-        if not capital_scheme.authority_review:
-            return {}
-
-        data_source_name = DataSourceName.from_domain(capital_scheme.authority_review.data_source)
-        rows = await self._session.execute(
-            select(DataSourceEntity.data_source_name, DataSourceEntity.data_source_id).where(
-                DataSourceEntity.data_source_name == data_source_name
-            )
-        )
-        return {row.data_source_name.to_domain(): row.data_source_id for row in rows}
-
     @staticmethod
     def _select_current_capital_scheme_interventions(
         capital_scheme_id: int,
@@ -330,18 +290,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(CapitalSchemeInterventionEntity.effective_date_to.is_(None))
             .order_by(InterventionTypeEntity.intervention_type_id)
             .order_by(InterventionMeasureEntity.intervention_measure_id)
-        )
-
-    @staticmethod
-    def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:
-        return select(
-            CapitalSchemeAuthorityReviewEntity,
-            func.rank()
-            .over(
-                partition_by=CapitalSchemeAuthorityReviewEntity.capital_scheme_id,
-                order_by=CapitalSchemeAuthorityReviewEntity.review_date.desc(),
-            )
-            .label("rank"),
         )
 
     @staticmethod
