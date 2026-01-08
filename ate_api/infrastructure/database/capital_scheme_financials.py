@@ -114,11 +114,10 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
         if not rows:
             return None
 
-        financial_rows = [row.CapitalSchemeFinancialEntity for row in rows if row.CapitalSchemeFinancialEntity]
-
         financials = CapitalSchemeFinancials(capital_scheme=capital_scheme)
-        for financial_row in financial_rows:
-            financials.adjust_financial(financial_row.to_domain())
+        for row in rows:
+            if row.CapitalSchemeFinancialEntity:
+                financials.adjust_financial(row.CapitalSchemeFinancialEntity.to_domain())
         return financials
 
     async def update(self, financials: CapitalSchemeFinancials) -> None:

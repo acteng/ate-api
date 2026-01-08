@@ -177,11 +177,10 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
         if not rows:
             return None
 
-        milestone_rows = [row.CapitalSchemeMilestoneEntity for row in rows if row.CapitalSchemeMilestoneEntity]
-
         milestones = CapitalSchemeMilestones(capital_scheme=capital_scheme)
-        for milestone_row in milestone_rows:
-            milestones.change_milestone(milestone_row.to_domain())
+        for row in rows:
+            if row.CapitalSchemeMilestoneEntity:
+                milestones.change_milestone(row.CapitalSchemeMilestoneEntity.to_domain())
         return milestones
 
     async def update(self, milestones: CapitalSchemeMilestones) -> None:
