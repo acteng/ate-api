@@ -14,3 +14,6 @@ class MemoryCapitalSchemeAuthorityReviewsRepository(CapitalSchemeAuthorityReview
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeAuthorityReviews | None:
         return self._authority_reviews.get(capital_scheme)
+
+    async def update(self, authority_reviews: CapitalSchemeAuthorityReviews) -> None:
+        self._authority_reviews[authority_reviews.capital_scheme] = authority_reviews

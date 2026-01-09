@@ -7,6 +7,10 @@ class AppClient:
     def __init__(self, url: str, access_token: str):
         self._client = Client(base_url=url, headers={"Authorization": f"Bearer {access_token}"})
 
+    def set_clock(self, now: str) -> None:
+        response = self._client.put("/test/clock", json=now)
+        response.raise_for_status()
+
     def create_funding_programme(self, funding_programme: Any) -> None:
         response = self._client.post("/test/funding-programmes", json=funding_programme)
         response.raise_for_status()

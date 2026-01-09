@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from ate_api.domain.capital_scheme_authority_reviews import CapitalSchemeAuthorityReview, CapitalSchemeAuthorityReviews
@@ -176,3 +176,59 @@ class TestDatabaseCapitalSchemeAuthorityReviewsRepository:
             authority_reviews = await capital_scheme_authority_reviews.get(CapitalSchemeReference("ATE00001"))
 
         assert not authority_reviews
+
+    async def test_update(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    authority_update := build_data_source_entity(id_=2, name=DataSourceName.AUTHORITY_UPDATE),
+                    CapitalSchemeEntity(
+                        capital_scheme_id=1,
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                    ),
+                    CapitalSchemeAuthorityReviewEntity(
+                        capital_scheme_id=1, review_date=datetime(2020, 2, 1), data_source=authority_update
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_authority_reviews = DatabaseCapitalSchemeAuthorityReviewsRepository(session)
+            authority_reviews = await capital_scheme_authority_reviews.get(CapitalSchemeReference("ATE00001"))
+            assert authority_reviews
+            authority_reviews.perform_authority_review(
+                CapitalSchemeAuthorityReview(
+                    review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+                )
+            )
+            await capital_scheme_authority_reviews.update(authority_reviews)
+
+        async with AsyncSession(engine) as session:
+            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
+            _, authority_review_row2 = await session.scalars(select(CapitalSchemeAuthorityReviewEntity))
+        assert (
+            authority_review_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and authority_review_row2.review_date == datetime(2020, 3, 1)
+            and authority_review_row2.data_source_id == 2
+        )
+
+    async def test_update_when_no_authority_reviews(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(
+                CapitalSchemeEntity(
+                    scheme_reference="ATE00001", capital_scheme_overviews=[build_capital_scheme_overview_entity()]
+                )
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_authority_reviews = DatabaseCapitalSchemeAuthorityReviewsRepository(session)
+            authority_reviews = await capital_scheme_authority_reviews.get(CapitalSchemeReference("ATE00001"))
+            assert authority_reviews
+            await capital_scheme_authority_reviews.update(authority_reviews)
+
+        async with AsyncSession(engine) as session:
+            authority_review_count = await session.scalar(
+                select(func.count()).select_from(CapitalSchemeAuthorityReviewEntity)
+            )
+        assert authority_review_count == 0

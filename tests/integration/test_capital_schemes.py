@@ -514,6 +514,66 @@ def test_create_milestones_when_capital_scheme_not_found(client: TestClient, acc
 
 
 @respx.mock
+async def test_create_authority_review_creates_authority_review(
+    clock: Clock,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
+    client: TestClient,
+    access_token: str,
+) -> None:
+    clock.now = datetime(2020, 2, 1, tzinfo=UTC)
+    await capital_scheme_authority_reviews.add(
+        CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    )
+
+    client.post(
+        "/capital-schemes/ATE00001/authority-reviews",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"source": "authority update"},
+    )
+
+    authority_reviews = await capital_scheme_authority_reviews.get(CapitalSchemeReference("ATE00001"))
+    assert authority_reviews and authority_reviews.authority_review == CapitalSchemeAuthorityReview(
+        review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+    )
+
+
+@respx.mock
+async def test_create_authority_review_returns_created_authority_review(
+    clock: Clock,
+    capital_scheme_authority_reviews: CapitalSchemeAuthorityReviewsRepository,
+    client: TestClient,
+    access_token: str,
+) -> None:
+    clock.now = datetime(2020, 2, 1, tzinfo=UTC)
+    await capital_scheme_authority_reviews.add(
+        CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
+    )
+
+    response = client.post(
+        "/capital-schemes/ATE00001/authority-reviews",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"source": "authority update"},
+    )
+
+    assert response.status_code == 201
+    assert response.json() == {
+        "reviewDate": "2020-02-01T00:00:00Z",
+        "source": "authority update",
+    }
+
+
+@respx.mock
+def test_create_authority_review_when_capital_scheme_not_found(client: TestClient, access_token: str) -> None:
+    response = client.post(
+        "/capital-schemes/ATE00001/authority-reviews",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"source": "authority update"},
+    )
+
+    assert response.status_code == 404
+
+
+@respx.mock
 async def test_get_milestones(client: TestClient, access_token: str) -> None:
     response = client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
 

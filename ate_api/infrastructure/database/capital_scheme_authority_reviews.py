@@ -107,6 +107,19 @@ class DatabaseCapitalSchemeAuthorityReviewsRepository(CapitalSchemeAuthorityRevi
             authority_reviews.perform_authority_review(row.CapitalSchemeAuthorityReviewEntity.to_domain())
         return authority_reviews
 
+    async def update(self, authority_reviews: CapitalSchemeAuthorityReviews) -> None:
+        if not authority_reviews.authority_review:
+            return
+
+        capital_scheme_id = await self._get_capital_scheme_id(authority_reviews)
+        data_source_ids = await self._get_data_source_ids(authority_reviews)
+
+        await self._session.merge(
+            CapitalSchemeAuthorityReviewEntity.from_domain(
+                authority_reviews.authority_review, capital_scheme_id, data_source_ids
+            )
+        )
+
     async def _get_capital_scheme_id(self, authority_reviews: CapitalSchemeAuthorityReviews) -> int:
         capital_scheme_reference = str(authority_reviews.capital_scheme)
         rows = await self._session.scalars(

@@ -218,6 +218,39 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
     ]
 
 
+def test_create_authority_review(client: Client, access_token: str, app_client: AppClient) -> None:
+    app_client.set_clock("2021-02-01T00:00:00Z")
+    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
+    app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    app_client.create_capital_scheme(
+        {
+            "reference": "ATE00001",
+            "overview": {
+                "name": "Wirral Package",
+                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
+                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                "type": "construction",
+            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
+            "outputs": {"items": []},
+            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "ATF4 bid"},
+        }
+    )
+
+    response = client.post(
+        "/capital-schemes/ATE00001/authority-reviews",
+        headers={"Authorization": f"Bearer {access_token}"},
+        json={"source": "authority update"},
+    )
+
+    assert response.status_code == 201
+    assert response.json() == {"reviewDate": "2021-02-01T00:00:00Z", "source": "authority update"}
+    capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
+    assert capital_scheme["authorityReview"] == {"reviewDate": "2021-02-01T00:00:00Z", "source": "authority update"}
+
+
 def test_get_milestones(client: Client, access_token: str) -> None:
     response = client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
 

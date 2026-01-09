@@ -2,7 +2,10 @@ from datetime import UTC, datetime
 
 from ate_api.domain.capital_scheme_authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.data_sources import DataSource
-from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
+from ate_api.routes.capital_schemes.authority_reviews import (
+    CapitalSchemeAuthorityReviewModel,
+    CreateCapitalSchemeAuthorityReviewModel,
+)
 from ate_api.routes.data_sources import DataSourceModel
 
 
@@ -24,6 +27,17 @@ class TestCapitalSchemeAuthorityReviewModel:
         )
 
         authority_review = authority_review_model.to_domain()
+
+        assert authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
+
+
+class TestCreateCapitalSchemeAuthorityReviewModel:
+    def test_to_domain(self) -> None:
+        authority_review_model = CreateCapitalSchemeAuthorityReviewModel(source=DataSourceModel.AUTHORITY_UPDATE)
+
+        authority_review = authority_review_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert authority_review == CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE

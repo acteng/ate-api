@@ -8,6 +8,8 @@ from fastapi import FastAPI
 from httpx import Client
 from testcontainers.postgres import PostgresContainer
 
+from ate_api.clock import get_clock
+from ate_api.infrastructure.clock import Clock
 from ate_api.main import app
 from ate_api.settings import Settings, get_settings
 from tests.e2e import routes
@@ -18,6 +20,7 @@ from tests.e2e.oauth.clients import StubClient
 from tests.e2e.oauth.settings import Settings as oauth_Settings
 from tests.e2e.oauth.settings import get_settings as oauth_get_settings
 from tests.e2e.server import Server
+from tests.unit.infrastructure.clock import FakeClock
 
 
 @dataclass(frozen=True)
@@ -91,6 +94,11 @@ def access_token_fixture(
     return str(token["access_token"])
 
 
+@pytest.fixture(name="clock", scope="package")
+def clock_fixture() -> Clock:
+    return FakeClock()
+
+
 @pytest.fixture(name="settings", scope="package")
 def settings_fixture(database_url: str, authorization_server: Server, resource_server: _ResourceServer) -> Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
@@ -103,7 +111,8 @@ def settings_fixture(database_url: str, authorization_server: Server, resource_s
 
 
 @pytest.fixture(name="app", scope="package")
-def app_fixture(settings: Settings) -> Generator[FastAPI]:
+def app_fixture(clock: Clock, settings: Settings) -> Generator[FastAPI]:
+    app.dependency_overrides[get_clock] = lambda: clock
     app.dependency_overrides[get_settings] = lambda: settings
     app.include_router(routes.router)
     yield app

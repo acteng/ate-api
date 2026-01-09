@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Request, Response
-from fastapi.params import Depends
+from fastapi.params import Body, Depends
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -39,6 +40,11 @@ from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
 from ate_api.routes.funding_programmes import FundingProgrammeModel
 
 router = APIRouter(prefix="/test")
+
+
+@router.put("/clock", status_code=HTTP_204_NO_CONTENT, response_class=Response)
+async def set_clock(clock: Annotated[Clock, Depends(get_clock)], now: Annotated[datetime, Body()]) -> None:
+    clock.now = now
 
 
 @router.post("/funding-programmes", status_code=HTTP_201_CREATED, response_class=Response)

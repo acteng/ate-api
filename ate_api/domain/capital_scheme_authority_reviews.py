@@ -40,3 +40,6 @@ class CapitalSchemeAuthorityReviewsRepository:
 
     async def get(self, capital_scheme: CapitalSchemeReference) -> CapitalSchemeAuthorityReviews | None:
         raise NotImplementedError()
+
+    async def update(self, authority_reviews: CapitalSchemeAuthorityReviews) -> None:
+        raise NotImplementedError()
