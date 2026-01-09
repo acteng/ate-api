@@ -170,6 +170,6 @@ class TestMemoryCapitalSchemeMilestonesRepository:
 
         actual_milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
         assert actual_milestones and actual_milestones.capital_scheme == CapitalSchemeReference("ATE00001")
-        (actual_milestone1, actual_milestone2) = actual_milestones.milestones
+        actual_milestone1, actual_milestone2 = actual_milestones.milestones
         assert actual_milestone1.effective_date.to == datetime(2021, 1, 1, tzinfo=UTC)
         assert actual_milestone2 == milestone2

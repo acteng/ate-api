@@ -264,5 +264,5 @@ class TestCapitalSchemeMilestones:
             )
         )
 
-        (actual_milestone1, actual_milestone2, _) = milestones.milestones
+        actual_milestone1, actual_milestone2, _ = milestones.milestones
         assert actual_milestone1 == milestone1 and actual_milestone2 == milestone2
