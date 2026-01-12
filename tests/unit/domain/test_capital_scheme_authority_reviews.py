@@ -10,12 +10,13 @@ from ate_api.domain.data_sources import DataSource
 class TestCapitalSchemeAuthorityReview:
     def test_can_create(self) -> None:
         authority_review = CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE, surrogate_id=1
         )
 
         assert (
             authority_review.review_date == datetime(2020, 1, 1, tzinfo=UTC)
             and authority_review.data_source == DataSource.AUTHORITY_UPDATE
+            and authority_review.surrogate_id == 1
         )
 
     def test_cannot_create_with_local_review_date(self) -> None:
