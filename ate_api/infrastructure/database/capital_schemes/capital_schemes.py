@@ -7,9 +7,11 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.bid_statuses import CapitalSchemeBidStatusEntity
 from ate_api.infrastructure.database.capital_schemes.interventions import CapitalSchemeInterventionEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
@@ -24,6 +26,7 @@ class CapitalSchemeEntity(BaseEntity):
     capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
     capital_scheme_bid_statuses: Mapped[list[CapitalSchemeBidStatusEntity]] = relationship(lazy="raise")
     capital_scheme_interventions: Mapped[list[CapitalSchemeInterventionEntity]] = relationship(lazy="raise")
+    capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
 
     @classmethod
     def from_domain(
@@ -35,6 +38,7 @@ class CapitalSchemeEntity(BaseEntity):
         bid_status_ids: dict[BidStatus, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
         observation_type_ids: dict[ObservationType, int],
+        data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
             scheme_reference=str(capital_scheme.reference),
@@ -50,6 +54,11 @@ class CapitalSchemeEntity(BaseEntity):
                 CapitalSchemeInterventionEntity.from_domain(output, intervention_type_measure_ids, observation_type_ids)
                 for output in capital_scheme.outputs
             ],
+            capital_scheme_authority_reviews=(
+                [CapitalSchemeAuthorityReviewEntity.from_domain(capital_scheme.authority_review, None, data_source_ids)]
+                if capital_scheme.authority_review
+                else []
+            ),
         )
 
     def to_domain(self) -> CapitalScheme:
@@ -63,5 +72,9 @@ class CapitalSchemeEntity(BaseEntity):
 
         for capital_scheme_intervention in self.capital_scheme_interventions:
             capital_scheme.change_output(capital_scheme_intervention.to_domain())
+
+        if self.capital_scheme_authority_reviews:
+            (capital_scheme_authority_review,) = self.capital_scheme_authority_reviews
+            capital_scheme.perform_authority_review(capital_scheme_authority_review.to_domain())
 
         return capital_scheme

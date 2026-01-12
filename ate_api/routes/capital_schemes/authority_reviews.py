@@ -7,13 +7,11 @@ from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
 from ate_api.clock import get_clock
 from ate_api.database import get_session
-from ate_api.domain.capital_scheme_authority_reviews import (
-    CapitalSchemeAuthorityReview,
-    CapitalSchemeAuthorityReviewsRepository,
-)
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.infrastructure.clock import Clock
-from ate_api.repositories import get_capital_scheme_authority_reviews_repository
+from ate_api.repositories import get_capital_scheme_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.data_sources import DataSourceModel
 
@@ -50,9 +48,7 @@ router = APIRouter()
 )
 async def create_authority_review(
     clock: Annotated[Clock, Depends(get_clock)],
-    capital_scheme_authority_reviews: Annotated[
-        CapitalSchemeAuthorityReviewsRepository, Depends(get_capital_scheme_authority_reviews_repository)
-    ],
+    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     session: Annotated[AsyncSession, Depends(get_session)],
     reference: str,
     authority_review_model: CreateCapitalSchemeAuthorityReviewModel,
@@ -60,14 +56,14 @@ async def create_authority_review(
     """
     Creates an authority review for a capital scheme.
     """
-    authority_reviews = await capital_scheme_authority_reviews.get(CapitalSchemeReference(reference))
+    capital_scheme = await capital_schemes.get(CapitalSchemeReference(reference))
 
-    if not authority_reviews:
+    if not capital_scheme:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
     authority_review = authority_review_model.to_domain(clock.now)
-    authority_reviews.perform_authority_review(authority_review)
-    await capital_scheme_authority_reviews.update(authority_reviews)
+    capital_scheme.perform_authority_review(authority_review)
+    await capital_schemes.update(capital_scheme)
     await session.commit()
 
     return CapitalSchemeAuthorityReviewModel.from_domain(authority_review)

@@ -5,15 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
-from ate_api.domain.capital_scheme_authority_reviews import CapitalSchemeAuthorityReviewsRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, MilestoneRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
-from ate_api.infrastructure.database.capital_scheme_authority_reviews import (
-    DatabaseCapitalSchemeAuthorityReviewsRepository,
-)
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
 from ate_api.infrastructure.database.capital_scheme_milestones import (
     DatabaseCapitalSchemeMilestonesRepository,
@@ -47,12 +43,6 @@ def get_capital_scheme_milestones_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> CapitalSchemeMilestonesRepository:
     return DatabaseCapitalSchemeMilestonesRepository(session)
-
-
-def get_capital_scheme_authority_reviews_repository(
-    session: Annotated[AsyncSession, Depends(get_session)],
-) -> CapitalSchemeAuthorityReviewsRepository:
-    return DatabaseCapitalSchemeAuthorityReviewsRepository(session)
 
 
 def get_milestone_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> MilestoneRepository:

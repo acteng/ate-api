@@ -5,9 +5,9 @@ from fastapi import Request
 from pydantic import AnyUrl
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_scheme_authority_reviews import CapitalSchemeAuthorityReview, CapitalSchemeAuthorityReviews
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancial, CapitalSchemeFinancials
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestone, CapitalSchemeMilestones, Milestone
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
@@ -54,11 +54,8 @@ class TestCapitalSchemeModel:
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-        authority_reviews = CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
 
-        capital_scheme_model = CapitalSchemeModel.from_domain(
-            capital_scheme, financials, milestones, authority_reviews, http_request
-        )
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
         assert capital_scheme_model == CapitalSchemeModel(
             id=AnyUrl(f"{base_url}/capital-schemes/ATE00001"),
@@ -100,11 +97,8 @@ class TestCapitalSchemeModel:
             )
         )
         milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-        authority_reviews = CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
 
-        capital_scheme_model = CapitalSchemeModel.from_domain(
-            capital_scheme, financials, milestones, authority_reviews, http_request
-        )
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
         assert capital_scheme_model.financials == CapitalSchemeFinancialsModel(
             items=[
@@ -143,11 +137,8 @@ class TestCapitalSchemeModel:
                 data_source=DataSource.ATF4_BID,
             )
         )
-        authority_reviews = CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
 
-        capital_scheme_model = CapitalSchemeModel.from_domain(
-            capital_scheme, financials, milestones, authority_reviews, http_request
-        )
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
         assert capital_scheme_model.milestones == CapitalSchemeMilestonesModel(
             current_milestone=MilestoneModel.CONSTRUCTION_STARTED,
@@ -193,11 +184,8 @@ class TestCapitalSchemeModel:
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-        authority_reviews = CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
 
-        capital_scheme_model = CapitalSchemeModel.from_domain(
-            capital_scheme, financials, milestones, authority_reviews, http_request
-        )
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
         assert capital_scheme_model.outputs == CollectionModel[CapitalSchemeOutputModel](
             items=[
@@ -222,18 +210,15 @@ class TestCapitalSchemeModel:
             overview=dummy_overview(),
             bid_status_details=dummy_bid_status_details(),
         )
-        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-        authority_reviews = CapitalSchemeAuthorityReviews(capital_scheme=CapitalSchemeReference("ATE00001"))
-        authority_reviews.perform_authority_review(
+        capital_scheme.perform_authority_review(
             CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
             )
         )
+        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
 
-        capital_scheme_model = CapitalSchemeModel.from_domain(
-            capital_scheme, financials, milestones, authority_reviews, http_request
-        )
+        capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
         assert capital_scheme_model.authority_review == CapitalSchemeAuthorityReviewModel(
             review_date=datetime(2020, 1, 1, tzinfo=UTC), source=DataSourceModel.AUTHORITY_UPDATE
@@ -271,6 +256,7 @@ class TestCapitalSchemeModel:
             == CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             )
+            and not capital_scheme.authority_review
         )
 
     def test_to_domain_sets_outputs(self, http_request: Request, base_url: str) -> None:
@@ -316,3 +302,22 @@ class TestCapitalSchemeModel:
                 value=Decimal(2),
             ),
         ]
+
+    def test_to_domain_sets_authority_review(self, http_request: Request, base_url: str) -> None:
+        capital_scheme_model = CapitalSchemeModel(
+            reference="ATE00001",
+            overview=dummy_overview_model(base_url),
+            bid_status_details=dummy_bid_status_details_model(),
+            financials=CapitalSchemeFinancialsModel(items=[]),
+            milestones=CapitalSchemeMilestonesModel(items=[]),
+            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
+            authority_review=CapitalSchemeAuthorityReviewModel(
+                review_date=datetime(2020, 2, 1, tzinfo=UTC), source=DataSourceModel.AUTHORITY_UPDATE
+            ),
+        )
+
+        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC), http_request)
+
+        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )

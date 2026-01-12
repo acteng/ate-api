@@ -1,5 +1,6 @@
 from typing import Any
 
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
@@ -33,6 +34,7 @@ class CapitalScheme:
         self._overview = overview
         self._bid_status_details = bid_status_details
         self._outputs: list[CapitalSchemeOutput] = []
+        self._authority_review: CapitalSchemeAuthorityReview | None = None
 
     @property
     def reference(self) -> CapitalSchemeReference:
@@ -52,3 +54,10 @@ class CapitalScheme:
 
     def change_output(self, output: CapitalSchemeOutput) -> None:
         self._outputs.append(output)
+
+    @property
+    def authority_review(self) -> CapitalSchemeAuthorityReview | None:
+        return self._authority_review
+
+    def perform_authority_review(self, authority_review: CapitalSchemeAuthorityReview) -> None:
+        self._authority_review = authority_review

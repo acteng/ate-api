@@ -38,6 +38,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
             key=lambda reference: str(reference),
         )
 
+    async def update(self, capital_scheme: CapitalScheme) -> None:
+        self._capital_schemes[capital_scheme.reference] = capital_scheme
+
     async def _get_current_milestone(self, capital_scheme: CapitalSchemeReference) -> Milestone | None:
         milestones = await self._capital_scheme_milestones.get(capital_scheme)
         assert milestones

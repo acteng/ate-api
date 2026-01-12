@@ -5,16 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import AnyUrl, Field
 from starlette.status import HTTP_404_NOT_FOUND
 
-from ate_api.domain.capital_scheme_authority_reviews import (
-    CapitalSchemeAuthorityReviews,
-    CapitalSchemeAuthorityReviewsRepository,
-)
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestones, CapitalSchemeMilestonesRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.repositories import (
-    get_capital_scheme_authority_reviews_repository,
     get_capital_scheme_financials_repository,
     get_capital_scheme_milestones_repository,
     get_capital_scheme_repository,
@@ -45,7 +40,6 @@ class CapitalSchemeModel(BaseModel):
         capital_scheme: CapitalScheme,
         financials: CapitalSchemeFinancials,
         milestones: CapitalSchemeMilestones,
-        authority_reviews: CapitalSchemeAuthorityReviews,
         request: Request,
     ) -> Self:
         return cls(
@@ -59,8 +53,8 @@ class CapitalSchemeModel(BaseModel):
                 items=[CapitalSchemeOutputModel.from_domain(output) for output in capital_scheme.outputs]
             ),
             authority_review=(
-                CapitalSchemeAuthorityReviewModel.from_domain(authority_reviews.authority_review)
-                if authority_reviews.authority_review
+                CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme.authority_review)
+                if capital_scheme.authority_review
                 else None
             ),
         )
@@ -74,6 +68,9 @@ class CapitalSchemeModel(BaseModel):
 
         for output in self.outputs.items:
             capital_scheme.change_output(output.to_domain(now))
+
+        if self.authority_review:
+            capital_scheme.perform_authority_review(self.authority_review.to_domain())
 
         return capital_scheme
 
@@ -89,9 +86,6 @@ async def get_capital_scheme(
     ],
     capital_scheme_milestones: Annotated[
         CapitalSchemeMilestonesRepository, Depends(get_capital_scheme_milestones_repository)
-    ],
-    capital_scheme_authority_reviews: Annotated[
-        CapitalSchemeAuthorityReviewsRepository, Depends(get_capital_scheme_authority_reviews_repository)
     ],
     request: Request,
     reference: str,
@@ -110,7 +104,4 @@ async def get_capital_scheme(
     milestones = await capital_scheme_milestones.get(CapitalSchemeReference(reference))
     assert milestones
 
-    authority_reviews = await capital_scheme_authority_reviews.get(CapitalSchemeReference(reference))
-    assert authority_reviews
-
-    return CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, authority_reviews, request)
+    return CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, request)

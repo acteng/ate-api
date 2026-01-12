@@ -20,3 +20,6 @@ class CapitalSchemeRepository:
         current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeReference]:
         raise NotImplementedError()
+
+    async def update(self, capital_scheme: CapitalScheme) -> None:
+        raise NotImplementedError()

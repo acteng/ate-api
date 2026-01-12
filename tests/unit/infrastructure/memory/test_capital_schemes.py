@@ -9,6 +9,7 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestonesRepository,
     Milestone,
 )
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -16,7 +17,7 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.dummies import dummy_bid_status_details
+from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
@@ -401,3 +402,25 @@ class TestMemoryCapitalSchemeRepository:
         references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert not references
+
+    async def test_update_updates_authority_review(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
+        capital_scheme = CapitalScheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=dummy_overview(),
+            bid_status_details=dummy_bid_status_details(),
+        )
+        capital_scheme.perform_authority_review(
+            CapitalSchemeAuthorityReview(
+                review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            )
+        )
+        await capital_schemes.add(capital_scheme)
+        authority_review2 = CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
+        capital_scheme.perform_authority_review(authority_review2)
+
+        await capital_schemes.update(capital_scheme)
+
+        actual_capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+        assert actual_capital_scheme and actual_capital_scheme.authority_review == authority_review2
