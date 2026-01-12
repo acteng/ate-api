@@ -379,14 +379,10 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             await capital_scheme_financials.update(financials)
 
         async with AsyncSession(engine) as session:
-            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
             financial_row1, financial_row2 = await session.scalars(select(CapitalSchemeFinancialEntity))
+        assert financial_row1.capital_scheme_id == 1 and financial_row1.effective_date_to == datetime(2020, 2, 1)
         assert (
-            financial_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and financial_row1.effective_date_to == datetime(2020, 2, 1)
-        )
-        assert (
-            financial_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            financial_row2.capital_scheme_id == 1
             and financial_row2.financial_type_id == 2
             and financial_row2.amount == 2_000_000
             and financial_row2.effective_date_from == datetime(2020, 2, 1)

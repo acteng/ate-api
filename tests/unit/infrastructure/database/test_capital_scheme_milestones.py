@@ -533,14 +533,10 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             await capital_scheme_milestones.update(milestones)
 
         async with AsyncSession(engine) as session:
-            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
             milestone_row1, milestone_row2 = await session.scalars(select(CapitalSchemeMilestoneEntity))
+        assert milestone_row1.capital_scheme_id == 1 and milestone_row1.effective_date_to == datetime(2020, 2, 1)
         assert (
-            milestone_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and milestone_row1.effective_date_to == datetime(2020, 2, 1)
-        )
-        assert (
-            milestone_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            milestone_row2.capital_scheme_id == 1
             and milestone_row2.milestone_id == 2
             and milestone_row2.status_date == date(2020, 3, 1)
             and milestone_row2.observation_type_id == 3
