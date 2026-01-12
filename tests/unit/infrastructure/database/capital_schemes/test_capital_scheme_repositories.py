@@ -1194,7 +1194,7 @@ class TestDatabaseCapitalSchemeRepository:
             and authority_review_row2.data_source_id == 1
         )
 
-    async def test_update_when_no_authority_reviews(self, engine: AsyncEngine) -> None:
+    async def test_update_when_no_authority_review(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
                 CapitalSchemeEntity(
