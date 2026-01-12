@@ -325,6 +325,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return {row.data_source_name.to_domain(): row.data_source_id for row in rows}
 
     @staticmethod
+    def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:
+        return select(
+            CapitalSchemeAuthorityReviewEntity,
+            func.rank()
+            .over(
+                partition_by=CapitalSchemeAuthorityReviewEntity.capital_scheme_id,
+                order_by=CapitalSchemeAuthorityReviewEntity.review_date.desc(),
+            )
+            .label("rank"),
+        )
+
+    @staticmethod
     def _select_current_capital_scheme_interventions(
         capital_scheme_id: int,
     ) -> Select[tuple[CapitalSchemeInterventionEntity]]:
@@ -350,18 +362,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(CapitalSchemeInterventionEntity.effective_date_to.is_(None))
             .order_by(InterventionTypeEntity.intervention_type_id)
             .order_by(InterventionMeasureEntity.intervention_measure_id)
-        )
-
-    @staticmethod
-    def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:
-        return select(
-            CapitalSchemeAuthorityReviewEntity,
-            func.rank()
-            .over(
-                partition_by=CapitalSchemeAuthorityReviewEntity.capital_scheme_id,
-                order_by=CapitalSchemeAuthorityReviewEntity.review_date.desc(),
-            )
-            .label("rank"),
         )
 
     @staticmethod
