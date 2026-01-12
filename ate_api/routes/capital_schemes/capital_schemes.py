@@ -69,9 +69,6 @@ class CapitalSchemeModel(BaseModel):
         for output in self.outputs.items:
             capital_scheme.change_output(output.to_domain(now))
 
-        if self.authority_review:
-            capital_scheme.perform_authority_review(self.authority_review.to_domain())
-
         return capital_scheme
 
 

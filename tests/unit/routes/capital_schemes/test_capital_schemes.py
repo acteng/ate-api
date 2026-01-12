@@ -302,22 +302,3 @@ class TestCapitalSchemeModel:
                 value=Decimal(2),
             ),
         ]
-
-    def test_to_domain_sets_authority_review(self, http_request: Request, base_url: str) -> None:
-        capital_scheme_model = CapitalSchemeModel(
-            reference="ATE00001",
-            overview=dummy_overview_model(base_url),
-            bid_status_details=dummy_bid_status_details_model(),
-            financials=CapitalSchemeFinancialsModel(items=[]),
-            milestones=CapitalSchemeMilestonesModel(items=[]),
-            outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
-            authority_review=CapitalSchemeAuthorityReviewModel(
-                review_date=datetime(2020, 2, 1, tzinfo=UTC), source=DataSourceModel.AUTHORITY_UPDATE
-            ),
-        )
-
-        capital_scheme = capital_scheme_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC), http_request)
-
-        assert capital_scheme.authority_review == CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
-        )

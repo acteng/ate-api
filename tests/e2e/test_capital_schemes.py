@@ -4,6 +4,7 @@ from tests.e2e.app_client import AppClient
 
 
 def test_get_capital_scheme(client: Client, access_token: str, app_client: AppClient) -> None:
+    app_client.set_clock("2020-02-01T00:00:00Z")
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
@@ -28,7 +29,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
                     }
                 ]
             },
-            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
+            "authorityReview": None,
         }
     )
     app_client.create_capital_scheme_financial(
@@ -47,6 +48,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
             ]
         },
     )
+    app_client.create_capital_scheme_authority_review("ATE00001", {"source": "authority update"})
 
     response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -219,7 +221,7 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
 
 
 def test_create_authority_review(client: Client, access_token: str, app_client: AppClient) -> None:
-    app_client.set_clock("2021-02-01T00:00:00Z")
+    app_client.set_clock("2020-02-01T00:00:00Z")
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
@@ -235,9 +237,11 @@ def test_create_authority_review(client: Client, access_token: str, app_client: 
             "financials": {"items": []},
             "milestones": {"items": []},
             "outputs": {"items": []},
-            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "ATF4 bid"},
+            "authorityReview": None,
         }
     )
+    app_client.create_capital_scheme_authority_review("ATE00001", {"source": "ATF4 bid"})
+    app_client.set_clock("2021-02-01T00:00:00Z")
 
     response = client.post(
         "/capital-schemes/ATE00001/authority-reviews",

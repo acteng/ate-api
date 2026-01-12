@@ -39,6 +39,10 @@ class AppClient:
         response = self._client.post(f"/capital-schemes/{capital_scheme}/milestones", json=milestones)
         response.raise_for_status()
 
+    def create_capital_scheme_authority_review(self, capital_scheme: str, authority_review: Any) -> None:
+        response = self._client.post(f"/capital-schemes/{capital_scheme}/authority-reviews", json=authority_review)
+        response.raise_for_status()
+
     def delete_capital_schemes(self) -> None:
         response = self._client.delete("/test/capital-schemes")
         response.raise_for_status()
