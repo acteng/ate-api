@@ -33,6 +33,7 @@ from ate_api.infrastructure.database import DataSourceName
         (DataSource.MRN_SCHEME_LIST, DataSourceName.MRN_SCHEME_LIST),
         (DataSource.MRN_QUARTERLY_UPDATE, DataSourceName.MRN_QUARTERLY_UPDATE),
         (DataSource.CATF_SCHEME_SUBMISSION, DataSourceName.CATF_SCHEME_SUBMISSION),
+        (DataSource.IST_SCHEME_LIST, DataSourceName.IST_SCHEME_LIST),
     ],
 )
 class TestDataSourceName:
