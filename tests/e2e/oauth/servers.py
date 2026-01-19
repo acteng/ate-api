@@ -25,6 +25,7 @@ class StarletteOAuth2Request(OAuth2Request):  # type: ignore
             return form
 
 
+# Workaround: https://github.com/authlib/authlib/pull/278
 class StarletteAuthorizationServer(AuthorizationServer):  # type: ignore
     def __init__(self, query_client: Callable[[str], ClientMixin]):
         super().__init__()
