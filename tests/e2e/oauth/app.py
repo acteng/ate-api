@@ -7,7 +7,7 @@ from fastapi import Depends, FastAPI, Request, Response
 
 from tests.e2e.oauth.clients import ClientRepository
 from tests.e2e.oauth.grants import ClientSecretPostClientCredentialsGrant
-from tests.e2e.oauth.servers import StarletteAuthorizationServer
+from tests.e2e.oauth.servers import StarletteAuthorizationServer, SyncStarletteHttpRequest
 from tests.e2e.oauth.settings import Settings, get_settings
 from tests.e2e.oauth.tokens import StubJWTBearerTokenGenerator
 
@@ -38,8 +38,12 @@ async def key_set() -> Any:
 
 
 @app.post("/token")
-def token(
+async def token(
     authorization_server: Annotated[AuthorizationServer, Depends(_get_authorization_server)], request: Request
 ) -> Response:
-    response: Response = authorization_server.create_token_response(request)
+    # Adapt Starlette's async HTTP request for Authlib's sync AuthorizationServer API
+    async with request.form() as form:
+        sync_request = SyncStarletteHttpRequest(request.method, request.url, request.headers, form)
+
+    response: Response = authorization_server.create_token_response(sync_request)
     return response
