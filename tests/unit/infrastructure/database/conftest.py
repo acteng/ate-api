@@ -44,22 +44,18 @@ async def _create_schema(engine: AsyncEngine) -> None:
 
 async def _delete_all(engine: AsyncEngine) -> None:
     async with engine.begin() as connection:
-        await connection.execute(
-            text(
-                """
-                TRUNCATE
-                    authority.authority,
-                    capital_scheme.bid_status,
-                    capital_scheme.capital_scheme,
-                    capital_scheme.intervention_measure,
-                    capital_scheme.intervention_type,
-                    capital_scheme.milestone,
-                    capital_scheme.scheme_type,
-                    common.data_source,
-                    common.financial_type,
-                    common.funding_programme,
-                    common.observation_type
-                CASCADE;
-                """
-            )
-        )
+        await connection.execute(text("""
+            TRUNCATE
+                authority.authority,
+                capital_scheme.bid_status,
+                capital_scheme.capital_scheme,
+                capital_scheme.intervention_measure,
+                capital_scheme.intervention_type,
+                capital_scheme.milestone,
+                capital_scheme.scheme_type,
+                common.data_source,
+                common.financial_type,
+                common.funding_programme,
+                common.observation_type
+            CASCADE;
+        """))
