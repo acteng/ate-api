@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 from fastapi import Depends, FastAPI
 from fastapi.middleware import Middleware
 from fastapi.middleware.gzip import GZipMiddleware
+from hypercorn.middleware import ProxyFixMiddleware
 from pydantic import BaseModel
 from starlette.status import HTTP_401_UNAUTHORIZED
 
@@ -41,3 +42,7 @@ app = FastAPI(
 app.include_router(authorities.router)
 app.include_router(capital_schemes.router)
 app.include_router(funding_programmes.router)
+# Workaround: https://github.com/pgjones/hypercorn/issues/179
+# TODO: fix incompatible types
+# TODO: fix middleware wrapping app from preventing e2e tests from accessing Starlette methods
+proxy_app = ProxyFixMiddleware(app)  # type: ignore

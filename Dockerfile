@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir . \
 
 USER ate-api
 
-CMD [ "sh", "-c", "uvicorn ate_api.main:app --host 0.0.0.0 --port ${PORT} --forwarded-allow-ips='*'" ]
+CMD [ "sh", "-c", "hypercorn ate_api.main:proxy_app --bind 0.0.0.0:${PORT}" ]
