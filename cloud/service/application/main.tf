@@ -12,6 +12,11 @@ resource "google_cloud_run_v2_service" "ate_api" {
   location = var.region
   ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
+  scaling {
+    min_instance_count = var.keep_idle ? 1 : 0
+    max_instance_count = 10
+  }
+
   template {
     service_account = google_service_account.cloud_run_ate_api.email
 
@@ -48,9 +53,8 @@ resource "google_cloud_run_v2_service" "ate_api" {
       ]
     }
 
+    # TODO: Remove when applied to Prod, until then this will cause a permadiff
     scaling {
-      min_instance_count = var.keep_idle ? 1 : 0
-      max_instance_count = 10
     }
   }
 
