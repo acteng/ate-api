@@ -38,7 +38,11 @@ from ate_api.settings import Settings, get_settings
 
 @lru_cache
 def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncEngine:
-    return create_async_engine(settings.database_url)
+    # TODO: hack to workaround SQLite not supporting pool size when running ITs
+    if settings.database_url == "sqlite+aiosqlite:///:memory:":
+        return create_async_engine(settings.database_url)
+
+    return create_async_engine(settings.database_url, pool_size=40)
 
 
 async def get_session(engine: Annotated[AsyncEngine, Depends(get_engine)]) -> AsyncGenerator[AsyncSession]:
