@@ -13,6 +13,8 @@ resource "google_cloud_run_v2_service" "ate_api" {
   ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   template {
+    service_account = google_service_account.cloud_run_ate_api.email
+
     containers {
       image = "${var.docker_repository_url}/ate-api:${var.image_tag}"
       env {
@@ -36,6 +38,7 @@ resource "google_cloud_run_v2_service" "ate_api" {
         container_port = 8080
       }
     }
+
     containers {
       image = "gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.21.0"
       args = [
@@ -44,11 +47,11 @@ resource "google_cloud_run_v2_service" "ate_api" {
         var.database_connection_name,
       ]
     }
+
     scaling {
       min_instance_count = var.keep_idle ? 1 : 0
       max_instance_count = 10
     }
-    service_account = google_service_account.cloud_run_ate_api.email
   }
 
   depends_on = [
