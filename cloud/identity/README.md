@@ -80,6 +80,14 @@ To create an OAuth client for the Auth0 Terraform provider:
    terraform apply
    ```
 
+1. Add a DNS record to the custom domain with details from:
+
+   ```bash
+   terraform output record
+   ```
+
+1. [Verify the custom domain](https://auth0.com/docs/customize/custom-domains/auth0-managed-certificates#verify-ownership)
+
 1. Unset the Auth0 Terraform provider credentials:
 
    ```bash
@@ -154,6 +162,8 @@ To request an access token from the identity provider:
    source select-client.sh ate-api-${ENVIRONMENT}.uk.auth0.com
    ```
    
+1. Remove the DNS record from the custom domain
+
 1. Delete the resources:
 
    ```bash

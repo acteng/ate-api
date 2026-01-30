@@ -1,3 +1,8 @@
+output "record" {
+  description = "DNS record required to verify the custom domain"
+  value       = module.custom_domain.record
+}
+
 output "oidc_server_metadata_url" {
   description = "OIDC configuration URL"
   value       = "https://${data.auth0_tenant.main.domain}/.well-known/openid-configuration"
