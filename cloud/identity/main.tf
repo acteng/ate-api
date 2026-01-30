@@ -7,22 +7,31 @@ terraform {
 
 locals {
   env                    = terraform.workspace
+  domain                 = "identity.api.activetravelengland.gov.uk"
   resource_server_domain = "api.activetravelengland.gov.uk"
 
   config = {
     dev = {
+      domain                     = "dev.${local.domain}"
       resource_server_identifier = "https://dev.${local.resource_server_domain}"
     }
     test = {
+      domain                     = "test.${local.domain}"
       resource_server_identifier = "https://test.${local.resource_server_domain}"
     }
     prod = {
+      domain                     = local.domain
       resource_server_identifier = "https://${local.resource_server_domain}"
     }
   }
 }
 
 data "auth0_tenant" "main" {
+}
+
+module "custom_domain" {
+  source = "./custom-domain"
+  domain = local.config[local.env].domain
 }
 
 module "resource_server" {
