@@ -5,7 +5,7 @@ output "record" {
 
 output "oidc_server_metadata_url" {
   description = "OIDC configuration URL"
-  value       = "https://${data.auth0_tenant.main.domain}/.well-known/openid-configuration"
+  value       = "https://${module.custom_domain.domain}/.well-known/openid-configuration"
 }
 
 output "resource_server_identifier" {

@@ -26,9 +26,6 @@ locals {
   }
 }
 
-data "auth0_tenant" "main" {
-}
-
 module "custom_domain" {
   source = "./custom-domain"
   domain = local.config[local.env].domain

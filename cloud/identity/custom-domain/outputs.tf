@@ -1,3 +1,8 @@
+output "domain" {
+  description = "Custom domain name"
+  value       = auth0_custom_domain.main.domain
+}
+
 output "record" {
   description = "DNS record required to verify the custom domain"
   value = {
