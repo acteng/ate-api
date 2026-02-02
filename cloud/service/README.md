@@ -73,6 +73,17 @@ images to the service:
    
 1. [Set the GitHub Actions environment secret](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-an-environment) `GCP_CREDENTIALS_DEPLOY` to the private key
 
+## Redeploying
+
+To manually redeploy the Cloud Run service using the latest image in the Docker repository:
+
+```bash
+gcloud run deploy ate-api \
+    --project dft-ate-api-${ENVIRONMENT} \
+    --region europe-west1 \
+    --image europe-west1-docker.pkg.dev/dft-ate-api-common/docker/ate-api
+```
+
 ## Destroying
 
 1. Change directory:
