@@ -95,6 +95,12 @@ docker run --rm -it --network=host -e CREATE_DATABASE_SCHEMA=true -e PORT=8001 a
 
 To invoke the server running in an environment:
 
+1. Set the target environment, for example:
+
+   ```bash
+   export ENVIRONMENT=dev
+   ```
+
 1. Request an access token from the identity provider:
 
    ```bash

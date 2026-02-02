@@ -10,7 +10,13 @@ There are multiple environments that replicate the resources which are represent
 * `test`
 * `prod`
 
-Repeat the steps below for each environment as required. The target environment is denoted as `${ENVIRONMENT}`.
+Set the target environment, for example:
+
+```bash
+export ENVIRONMENT=dev
+```
+
+Then repeat the steps below for each environment as required.
 
 ## Provisioning
 
