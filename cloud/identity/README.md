@@ -143,7 +143,7 @@ To request an access token from the identity provider:
 1. Request an access token from the identity provider:
 
    ```bash
-   ./request-access-token.sh
+   ./request-access-token.sh ${ENVIRONMENT}
    ```
 
 ## Destroying
