@@ -28,4 +28,4 @@ bw_edit_item() {
 
 bw_edit_item "uycs-ate-api-client-${ENVIRONMENT}" \
 	"$(terraform output -raw update_your_capital_schemes_client_id)" \
-	"$(terraform output -raw update_your_capital_schemes_client_secret)"
+	""
