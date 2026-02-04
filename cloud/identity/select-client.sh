@@ -17,7 +17,7 @@ unselect_client () {
 
 if [ $# -ne 1 ]
 then
-	echo "Usage: source select-client.sh [<tenant-domain>]"
+	echo "Usage: source select-client.sh <tenant-domain>"
 else
 	# set client credentials
 	export AUTH0_DOMAIN=$1
