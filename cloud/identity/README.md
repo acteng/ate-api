@@ -86,6 +86,12 @@ To create an OAuth client for the Auth0 Terraform provider:
    terraform apply
    ```
 
+1. (Dev environment only) Set the client details in Bitwarden for downstream projects:
+
+   ```bash
+   ./set-secrets.sh ${ENVIRONMENT}
+   ```
+
 1. Add a DNS record to the custom domain with details from:
 
    ```bash
