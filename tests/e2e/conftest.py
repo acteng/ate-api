@@ -34,6 +34,11 @@ class OAuthResourceServer:
     identifier: str
 
 
+@pytest.fixture(name="clock", scope="package")
+def clock_fixture() -> Clock:
+    return FakeClock()
+
+
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
     with PostgresContainer("postgres:16") as postgres:
@@ -43,60 +48,6 @@ def database_url_fixture() -> Generator[str]:
 @pytest.fixture(name="resource_server", scope="package")
 def resource_server_fixture() -> OAuthResourceServer:
     return OAuthResourceServer(identifier="https://api.example")
-
-
-@pytest.fixture(name="test_oauth_client", scope="package")
-def test_oauth_client_fixture() -> OAuthClient:
-    return OAuthClient(client_id="test", client_secret="secret")
-
-
-@pytest.fixture(name="authorization_server_settings", scope="package")
-def authorization_server_settings_fixture(resource_server: OAuthResourceServer) -> oauth_Settings:
-    return oauth_Settings(resource_server_identifier=resource_server.identifier)
-
-
-@pytest.fixture(name="authorization_server_app", scope="package")
-def authorization_server_app_fixture(
-    authorization_server_settings: oauth_Settings, test_oauth_client: OAuthClient
-) -> Generator[FastAPI]:
-    oauth_app.dependency_overrides[oauth_get_settings] = lambda: authorization_server_settings
-    clients.add(StubClient(client_id=test_oauth_client.client_id, client_secret=test_oauth_client.client_secret))
-    yield oauth_app
-    clients.clear()
-    oauth_app.dependency_overrides = {}
-
-
-@pytest.fixture(name="authorization_server", scope="package")
-def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator[Server]:
-    server = Server(authorization_server_app)
-    server.start()
-    yield server
-    server.stop()
-
-
-@pytest.fixture(name="authorization_client")
-def authorization_client_fixture(test_oauth_client: OAuthClient) -> OAuth2Client:
-    return OAuth2Client(
-        client_id=test_oauth_client.client_id,
-        client_secret=test_oauth_client.client_secret,
-        token_endpoint_auth_method="client_secret_post",
-    )
-
-
-@pytest.fixture(name="access_token")
-def access_token_fixture(
-    authorization_server: Server, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
-) -> str:
-    token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
-    token: OAuth2Token = authorization_client.fetch_token(
-        token_endpoint, grant_type="client_credentials", audience=resource_server.identifier
-    )
-    return str(token["access_token"])
-
-
-@pytest.fixture(name="clock", scope="package")
-def clock_fixture() -> Clock:
-    return FakeClock()
 
 
 @pytest.fixture(name="settings", scope="package")
@@ -132,6 +83,17 @@ def client_fixture(server: Server) -> Client:
     return Client(base_url=server.url)
 
 
+@pytest.fixture(name="access_token")
+def access_token_fixture(
+    authorization_server: Server, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
+) -> str:
+    token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
+    token: OAuth2Token = authorization_client.fetch_token(
+        token_endpoint, grant_type="client_credentials", audience=resource_server.identifier
+    )
+    return str(token["access_token"])
+
+
 @pytest.fixture(name="app_client")
 def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient]:
     app_client = AppClient(server.url, access_token)
@@ -139,3 +101,41 @@ def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient
     app_client.delete_capital_schemes()
     app_client.delete_authorities()
     app_client.delete_funding_programmes()
+
+
+@pytest.fixture(name="authorization_server_settings", scope="package")
+def authorization_server_settings_fixture(resource_server: OAuthResourceServer) -> oauth_Settings:
+    return oauth_Settings(resource_server_identifier=resource_server.identifier)
+
+
+@pytest.fixture(name="authorization_server_app", scope="package")
+def authorization_server_app_fixture(
+    authorization_server_settings: oauth_Settings, test_oauth_client: OAuthClient
+) -> Generator[FastAPI]:
+    oauth_app.dependency_overrides[oauth_get_settings] = lambda: authorization_server_settings
+    clients.add(StubClient(client_id=test_oauth_client.client_id, client_secret=test_oauth_client.client_secret))
+    yield oauth_app
+    clients.clear()
+    oauth_app.dependency_overrides = {}
+
+
+@pytest.fixture(name="authorization_server", scope="package")
+def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator[Server]:
+    server = Server(authorization_server_app)
+    server.start()
+    yield server
+    server.stop()
+
+
+@pytest.fixture(name="test_oauth_client", scope="package")
+def test_oauth_client_fixture() -> OAuthClient:
+    return OAuthClient(client_id="test", client_secret="secret")
+
+
+@pytest.fixture(name="authorization_client")
+def authorization_client_fixture(test_oauth_client: OAuthClient) -> OAuth2Client:
+    return OAuth2Client(
+        client_id=test_oauth_client.client_id,
+        client_secret=test_oauth_client.client_secret,
+        token_endpoint_auth_method="client_secret_post",
+    )
