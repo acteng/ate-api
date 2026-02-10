@@ -34,6 +34,9 @@ class OAuthResourceServer:
     identifier: str
 
 
+# region app fixtures
+
+
 @pytest.fixture(name="clock", scope="package")
 def clock_fixture() -> Clock:
     return FakeClock()
@@ -103,6 +106,12 @@ def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient
     app_client.delete_funding_programmes()
 
 
+# endregion
+
+
+# region authorization server fixtures
+
+
 @pytest.fixture(name="authorization_server_settings", scope="package")
 def authorization_server_settings_fixture(resource_server: OAuthResourceServer) -> oauth_Settings:
     return oauth_Settings(resource_server_identifier=resource_server.identifier)
@@ -139,3 +148,6 @@ def authorization_client_fixture(test_oauth_client: OAuthClient) -> OAuth2Client
         client_secret=test_oauth_client.client_secret,
         token_endpoint_auth_method="client_secret_post",
     )
+
+
+# endregion
