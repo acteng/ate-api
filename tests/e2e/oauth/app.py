@@ -14,14 +14,14 @@ from tests.e2e.oauth.tokens import StubJWTBearerTokenGenerator
 app = FastAPI()
 clients = ClientRepository()
 _issuer = "https://stub.example"
-_key = RSAKey.generate_key(is_private=True)
+_token_key = RSAKey.generate_key(is_private=True)
 
 
 @lru_cache
 def _get_authorization_server(settings: Annotated[Settings, Depends(get_settings)]) -> AuthorizationServer:
     authorization_server = StarletteAuthorizationServer(clients.get)
     authorization_server.register_token_generator(
-        "default", StubJWTBearerTokenGenerator(_issuer, settings.resource_server_identifier, KeySet([_key]))
+        "default", StubJWTBearerTokenGenerator(_issuer, settings.resource_server_identifier, KeySet([_token_key]))
     )
     authorization_server.register_grant(ClientSecretPostClientCredentialsGrant)
     return authorization_server
@@ -34,7 +34,7 @@ async def openid_configuration(request: Request) -> dict[str, str]:
 
 @app.get("/.well-known/jwks.json")
 async def key_set() -> Any:
-    return KeySet([_key]).as_dict()
+    return KeySet([_token_key]).as_dict()
 
 
 @app.post("/token")
