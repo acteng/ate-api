@@ -20,10 +20,10 @@ _key = RSAKey.generate_key(is_private=True)
 @lru_cache
 def _get_authorization_server(settings: Annotated[Settings, Depends(get_settings)]) -> AuthorizationServer:
     authorization_server = StarletteAuthorizationServer(clients.get)
-    authorization_server.register_grant(ClientSecretPostClientCredentialsGrant)
     authorization_server.register_token_generator(
         "default", StubJWTBearerTokenGenerator(_issuer, settings.resource_server_identifier, KeySet([_key]))
     )
+    authorization_server.register_grant(ClientSecretPostClientCredentialsGrant)
     return authorization_server
 
 
