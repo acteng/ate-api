@@ -24,13 +24,13 @@ from tests.unit.infrastructure.clock import FakeClock
 
 
 @dataclass(frozen=True)
-class _Client:
+class OAuthClient:
     client_id: str
     client_secret: str
 
 
 @dataclass(frozen=True)
-class _ResourceServer:
+class OAuthResourceServer:
     identifier: str
 
 
@@ -41,23 +41,23 @@ def database_url_fixture() -> Generator[str]:
 
 
 @pytest.fixture(name="resource_server", scope="package")
-def resource_server_fixture() -> _ResourceServer:
-    return _ResourceServer(identifier="https://api.example")
+def resource_server_fixture() -> OAuthResourceServer:
+    return OAuthResourceServer(identifier="https://api.example")
 
 
 @pytest.fixture(name="test_oauth_client", scope="package")
-def test_oauth_client_fixture() -> _Client:
-    return _Client(client_id="test", client_secret="secret")
+def test_oauth_client_fixture() -> OAuthClient:
+    return OAuthClient(client_id="test", client_secret="secret")
 
 
 @pytest.fixture(name="authorization_server_settings", scope="package")
-def authorization_server_settings_fixture(resource_server: _ResourceServer) -> oauth_Settings:
+def authorization_server_settings_fixture(resource_server: OAuthResourceServer) -> oauth_Settings:
     return oauth_Settings(resource_server_identifier=resource_server.identifier)
 
 
 @pytest.fixture(name="authorization_server_app", scope="package")
 def authorization_server_app_fixture(
-    authorization_server_settings: oauth_Settings, test_oauth_client: _Client
+    authorization_server_settings: oauth_Settings, test_oauth_client: OAuthClient
 ) -> Generator[FastAPI]:
     oauth_app.dependency_overrides[oauth_get_settings] = lambda: authorization_server_settings
     clients.add(StubClient(client_id=test_oauth_client.client_id, client_secret=test_oauth_client.client_secret))
@@ -75,7 +75,7 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
 
 
 @pytest.fixture(name="authorization_client")
-def authorization_client_fixture(test_oauth_client: _Client) -> OAuth2Client:
+def authorization_client_fixture(test_oauth_client: OAuthClient) -> OAuth2Client:
     return OAuth2Client(
         client_id=test_oauth_client.client_id,
         client_secret=test_oauth_client.client_secret,
@@ -85,7 +85,7 @@ def authorization_client_fixture(test_oauth_client: _Client) -> OAuth2Client:
 
 @pytest.fixture(name="access_token")
 def access_token_fixture(
-    authorization_server: Server, resource_server: _ResourceServer, authorization_client: OAuth2Client
+    authorization_server: Server, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
 ) -> str:
     token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
     token: OAuth2Token = authorization_client.fetch_token(
@@ -100,7 +100,7 @@ def clock_fixture() -> Clock:
 
 
 @pytest.fixture(name="settings", scope="package")
-def settings_fixture(database_url: str, authorization_server: Server, resource_server: _ResourceServer) -> Settings:
+def settings_fixture(database_url: str, authorization_server: Server, resource_server: OAuthResourceServer) -> Settings:
     oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
     return Settings(
         database_url=database_url,
