@@ -4,6 +4,11 @@ from typing import Generator
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
 from authlib.oauth2.rfc6749 import OAuth2Token
+from authlib.oauth2.rfc7523 import PrivateKeyJWT
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
 from fastapi import FastAPI
 from httpx import Client
 from testcontainers.postgres import PostgresContainer
@@ -26,7 +31,7 @@ from tests.unit.infrastructure.clock import FakeClock
 @dataclass(frozen=True)
 class OAuthClient:
     client_id: str
-    client_secret: str
+    public_key: bytes
 
 
 @dataclass(frozen=True)
@@ -122,7 +127,7 @@ def authorization_server_app_fixture(
     authorization_server_settings: oauth_Settings, tests_oauth_client: OAuthClient
 ) -> Generator[FastAPI]:
     oauth_app.dependency_overrides[oauth_get_settings] = lambda: authorization_server_settings
-    clients.add(StubClient(client_id=tests_oauth_client.client_id, client_secret=tests_oauth_client.client_secret))
+    clients.add(StubClient(client_id=tests_oauth_client.client_id, public_key=tests_oauth_client.public_key))
     yield oauth_app
     clients.clear()
     oauth_app.dependency_overrides = {}
@@ -136,17 +141,32 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
     server.stop()
 
 
+@pytest.fixture(name="tests_key_pair", scope="package")
+def tests_key_pair_fixture() -> RSAPrivateKey:
+    return rsa.generate_private_key(backend=default_backend(), public_exponent=65537, key_size=2048)
+
+
+@pytest.fixture(name="tests_private_key", scope="package")
+def tests_private_key_fixture(tests_key_pair: RSAPrivateKey) -> bytes:
+    return tests_key_pair.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption())
+
+
+@pytest.fixture(name="tests_public_key", scope="package")
+def tests_public_key_fixture(tests_key_pair: RSAPrivateKey) -> bytes:
+    return tests_key_pair.public_key().public_bytes(Encoding.OpenSSH, PublicFormat.OpenSSH)
+
+
 @pytest.fixture(name="tests_oauth_client", scope="package")
-def tests_oauth_client_fixture() -> OAuthClient:
-    return OAuthClient(client_id="tests", client_secret="secret")
+def tests_oauth_client_fixture(tests_public_key: bytes) -> OAuthClient:
+    return OAuthClient(client_id="tests", public_key=tests_public_key)
 
 
 @pytest.fixture(name="authorization_client")
-def authorization_client_fixture(tests_oauth_client: OAuthClient) -> OAuth2Client:
+def authorization_client_fixture(tests_oauth_client: OAuthClient, tests_private_key: bytes) -> OAuth2Client:
     return OAuth2Client(
         client_id=tests_oauth_client.client_id,
-        client_secret=tests_oauth_client.client_secret,
-        token_endpoint_auth_method="client_secret_post",
+        client_secret=tests_private_key,
+        token_endpoint_auth_method=PrivateKeyJWT(),
     )
 
 

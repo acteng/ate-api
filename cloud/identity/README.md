@@ -80,6 +80,12 @@ To create an OAuth client for the Auth0 Terraform provider:
    source select-client.sh ate-api-${ENVIRONMENT}.uk.auth0.com
    ```
    
+1. Get the Terraform variables for the environment:
+
+   ```bash
+   ./get-vars.sh ${ENVIRONMENT}
+   ```
+
 1. Apply the changes:
 
    ```bash
@@ -137,7 +143,7 @@ To request an access token from the identity provider:
 1. Request an access token from the identity provider:
 
    ```bash
-   ./request-access-token.sh
+   ./request-access-token.sh ${ENVIRONMENT}
    ```
 
 ## Destroying

@@ -18,19 +18,7 @@ output "example_client_id" {
   value       = module.example_client.client_id
 }
 
-output "example_client_secret" {
-  description = "Example client secret"
-  value       = module.example_client.client_secret
-  sensitive   = true
-}
-
 output "update_your_capital_schemes_client_id" {
   description = "Update your capital schemes client ID"
   value       = module.update_your_capital_schemes_client.client_id
-}
-
-output "update_your_capital_schemes_client_secret" {
-  description = "Update your capital schemes client secret"
-  value       = module.update_your_capital_schemes_client.client_secret
-  sensitive   = true
 }

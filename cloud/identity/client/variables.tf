@@ -12,3 +12,8 @@ variable "audience" {
   description = "Resource server identifier to grant client access to"
   type        = string
 }
+
+variable "public_key" {
+  description = "Public key to verify client authentication signature in PEM format"
+  type        = string
+}

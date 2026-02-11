@@ -41,6 +41,7 @@ module "example_client" {
   name        = "Example"
   description = "Client used for API development."
   audience    = module.resource_server.identifier
+  public_key  = var.example_public_key
 }
 
 module "update_your_capital_schemes_client" {
@@ -48,4 +49,5 @@ module "update_your_capital_schemes_client" {
   name        = "Update your capital schemes"
   description = "Client used for the Update your capital schemes service."
   audience    = module.resource_server.identifier
+  public_key  = var.update_your_capital_schemes_public_key
 }

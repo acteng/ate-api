@@ -12,11 +12,22 @@ resource "auth0_client" "main" {
   app_type        = "non_interactive"
   grant_types     = ["client_credentials"]
   oidc_conformant = true
+
+  jwt_configuration {
+    alg = "RS256"
+  }
 }
 
-resource "auth0_client_credentials" "client_secret_post" {
+resource "auth0_client_credentials" "private_key_jwt" {
   client_id             = auth0_client.main.client_id
-  authentication_method = "client_secret_post"
+  authentication_method = "private_key_jwt"
+
+  private_key_jwt {
+    credentials {
+      credential_type = "public_key"
+      pem             = var.public_key
+    }
+  }
 }
 
 resource "auth0_client_grant" "client_grant" {

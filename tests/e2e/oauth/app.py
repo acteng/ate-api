@@ -6,7 +6,8 @@ from authlib.oauth2 import AuthorizationServer
 from fastapi import Depends, FastAPI, Request, Response
 
 from tests.e2e.oauth.clients import ClientRepository
-from tests.e2e.oauth.grants import ClientSecretPostClientCredentialsGrant
+from tests.e2e.oauth.grants import PrivateKeyJwtClientCredentialsGrant
+from tests.e2e.oauth.jwts import PrivateKeyJwtClientAssertion
 from tests.e2e.oauth.servers import StarletteAuthorizationServer, SyncStarletteHttpRequest
 from tests.e2e.oauth.settings import Settings, get_settings
 from tests.e2e.oauth.tokens import StubJWTBearerTokenGenerator
@@ -18,12 +19,18 @@ _token_key = RSAKey.generate_key(is_private=True)
 
 
 @lru_cache
-def _get_authorization_server(settings: Annotated[Settings, Depends(get_settings)]) -> AuthorizationServer:
+def _get_authorization_server(
+    settings: Annotated[Settings, Depends(get_settings)], request: Request
+) -> AuthorizationServer:
     authorization_server = StarletteAuthorizationServer(clients.get)
     authorization_server.register_token_generator(
         "default", StubJWTBearerTokenGenerator(_issuer, settings.resource_server_identifier, KeySet([_token_key]))
     )
-    authorization_server.register_grant(ClientSecretPostClientCredentialsGrant)
+    authorization_server.register_client_auth_method(
+        PrivateKeyJwtClientAssertion.CLIENT_AUTH_METHOD,
+        PrivateKeyJwtClientAssertion(str(request.url_for("token"))),
+    )
+    authorization_server.register_grant(PrivateKeyJwtClientCredentialsGrant)
     return authorization_server
 
 
