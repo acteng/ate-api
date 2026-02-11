@@ -52,10 +52,6 @@ resource "google_cloud_run_v2_service" "ate_api" {
         var.database_connection_name,
       ]
     }
-
-    # TODO: Remove when applied to Prod, until then this will cause a permadiff
-    scaling {
-    }
   }
 
   depends_on = [
