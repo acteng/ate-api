@@ -16,7 +16,7 @@ cat <<EOS >terraform.tfvars
 # Environment ${ENVIRONMENT}
 
 example_public_key                     = <<EOF
-$(bw get notes "ate-api-example-client-public-key-${ENVIRONMENT}")
+$(bw get notes "ate-api-example-public-key-${ENVIRONMENT}")
 EOF
 update_your_capital_schemes_public_key = <<EOF
 $(bw get notes "uycs-ate-api-public-key-${ENVIRONMENT}")

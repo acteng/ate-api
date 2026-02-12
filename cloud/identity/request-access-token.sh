@@ -34,7 +34,7 @@ JWT_PAYLOAD=$((basenc --base64url --wrap=0 | tr -d '=') <<EOF
 EOF
 )
 
-PRIVATE_KEY=$(bw get notes "ate-api-example-client-private-key-${ENVIRONMENT}")
+PRIVATE_KEY=$(bw get notes "ate-api-example-private-key-${ENVIRONMENT}")
 JWT_SIGNATURE=$(echo -n "${JWT_HEADER}.${JWT_PAYLOAD}" \
   | openssl dgst -sha256 -sign <(echo -n "${PRIVATE_KEY}") \
   | basenc --base64url --wrap=0 \
