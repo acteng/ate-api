@@ -18,27 +18,27 @@ RESOURCE_SERVER_IDENTIFIER=$(terraform output -raw resource_server_identifier)
 CLIENT_ID=$(terraform output -raw example_client_id)
 
 JWT_HEADER=$(echo -n '{"alg": "RS256"}' \
-  | basenc --base64url --wrap=0 \
-  | tr -d '=')
+	| basenc --base64url --wrap=0 \
+	| tr -d '=')
 
 ISSUED_AT=$(date +%s)
 JWT_PAYLOAD=$((basenc --base64url --wrap=0 | tr -d '=') <<EOF
 {
-  "iss": "${CLIENT_ID}",
-  "sub": "${CLIENT_ID}",
-  "aud": "${TOKEN_ENDPOINT}",
-  "iat": ${ISSUED_AT},
-  "exp": $((${ISSUED_AT} + 60)),
-  "jti": "$(uuidgen)"
+	"iss": "${CLIENT_ID}",
+	"sub": "${CLIENT_ID}",
+	"aud": "${TOKEN_ENDPOINT}",
+	"iat": ${ISSUED_AT},
+	"exp": $((${ISSUED_AT} + 60)),
+	"jti": "$(uuidgen)"
 }
 EOF
 )
 
 PRIVATE_KEY=$(bw get notes "ate-api-example-private-key-${ENVIRONMENT}")
 JWT_SIGNATURE=$(echo -n "${JWT_HEADER}.${JWT_PAYLOAD}" \
-  | openssl dgst -sha256 -sign <(echo -n "${PRIVATE_KEY}") \
-  | basenc --base64url --wrap=0 \
-  | tr -d '=')
+	| openssl dgst -sha256 -sign <(echo -n "${PRIVATE_KEY}") \
+	| basenc --base64url --wrap=0 \
+	| tr -d '=')
 
 CLIENT_ASSERTION="${JWT_HEADER}.${JWT_PAYLOAD}.${JWT_SIGNATURE}"
 
