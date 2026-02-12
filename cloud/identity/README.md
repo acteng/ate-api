@@ -172,6 +172,12 @@ To add a client to the identity provider:
    }
    ```
 
+1. Change directory:
+
+   ```bash
+   cd cloud/identity
+   ```
+
 1. Get the Terraform variables for the environment:
 
    ```bash
