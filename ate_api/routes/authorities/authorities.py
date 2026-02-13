@@ -1,7 +1,7 @@
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import AnyUrl, Field
+from fastapi import APIRouter, Depends, HTTPException, Path, Request
+from pydantic import AnyUrl, ConfigDict, Field
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
@@ -14,6 +14,19 @@ class AuthorityModel(BaseModel):
     abbreviation: str
     full_name: str
     bid_submitting_capital_schemes: AnyUrl | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "@id": "https://api.activetravelengland.gov.uk/authorities/LIV",
+                    "abbreviation": "LIV",
+                    "fullName": "Liverpool City Region Combined Authority",
+                    "bidSubmittingCapitalSchemes": "https://api.activetravelengland.gov.uk/authorities/LIV/capital-schemes/bid-submitting",
+                }
+            ]
+        }
+    )
 
     @classmethod
     def from_domain(cls, authority: Authority, request: Request) -> Self:
@@ -39,7 +52,9 @@ router = APIRouter()
 
 @router.get("/{abbreviation}", summary="Get authority", responses={HTTP_404_NOT_FOUND: {}})
 async def get_authority(
-    authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)], request: Request, abbreviation: str
+    authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
+    request: Request,
+    abbreviation: Annotated[str, Path(examples=["LIV"])],
 ) -> AuthorityModel:
     """
     Gets an authority.
