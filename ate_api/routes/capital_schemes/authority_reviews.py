@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
+from pydantic import ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
@@ -20,6 +21,10 @@ class CapitalSchemeAuthorityReviewModel(BaseModel):
     review_date: datetime
     source: DataSourceModel
 
+    model_config = ConfigDict(
+        json_schema_extra={"examples": [{"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"}]}
+    )
+
     @classmethod
     def from_domain(cls, authority_review: CapitalSchemeAuthorityReview) -> Self:
         return cls(
@@ -32,6 +37,8 @@ class CapitalSchemeAuthorityReviewModel(BaseModel):
 
 class CreateCapitalSchemeAuthorityReviewModel(BaseModel):
     source: DataSourceModel
+
+    model_config = ConfigDict(json_schema_extra={"examples": [{"source": "authority update"}]})
 
     def to_domain(self, now: datetime) -> CapitalSchemeAuthorityReview:
         return CapitalSchemeAuthorityReview(review_date=now, data_source=self.source.to_domain())
@@ -50,7 +57,7 @@ async def create_authority_review(
     clock: Annotated[Clock, Depends(get_clock)],
     capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
     session: Annotated[AsyncSession, Depends(get_session)],
-    reference: str,
+    reference: Annotated[str, Path(examples=["ATE00001"])],
     authority_review_model: CreateCapitalSchemeAuthorityReviewModel,
 ) -> CapitalSchemeAuthorityReviewModel:
     """
