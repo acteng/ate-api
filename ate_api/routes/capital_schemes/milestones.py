@@ -2,7 +2,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from pydantic import ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
@@ -52,6 +53,19 @@ class CapitalSchemeMilestoneModel(BaseModel):
     observation_type: ObservationTypeModel
     status_date: date
     source: DataSourceModel
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "milestone": "detailed design completed",
+                    "observationType": "actual",
+                    "statusDate": "2020-03-01",
+                    "source": "ATF4 bid",
+                }
+            ]
+        }
+    )
 
     @classmethod
     def from_domain(cls, milestone: CapitalSchemeMilestone) -> Self:
@@ -116,7 +130,7 @@ async def create_milestones(
         CapitalSchemeMilestonesRepository, Depends(get_capital_scheme_milestones_repository)
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
-    reference: str,
+    reference: Annotated[str, Path(examples=["ATE00001"])],
     milestones_model: CollectionModel[CapitalSchemeMilestoneModel],
 ) -> CollectionModel[CapitalSchemeMilestoneModel]:
     """
