@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import AnyUrl, Field
+from fastapi import APIRouter, Depends, HTTPException, Path, Request
+from pydantic import AnyUrl, ConfigDict, Field
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
@@ -33,6 +33,47 @@ class CapitalSchemeModel(BaseModel):
     milestones: CapitalSchemeMilestonesModel
     outputs: CollectionModel[CapitalSchemeOutputModel]
     authority_review: CapitalSchemeAuthorityReviewModel | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001",
+                    "reference": "ATE00001",
+                    "overview": {
+                        "name": "Wirral Package",
+                        "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
+                        "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                        "type": "construction",
+                    },
+                    "bidStatusDetails": {"bidStatus": "funded"},
+                    "financials": {"items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]},
+                    "milestones": {
+                        "currentMilestone": "detailed design completed",
+                        "items": [
+                            {
+                                "milestone": "detailed design completed",
+                                "observationType": "actual",
+                                "statusDate": "2020-03-01",
+                                "source": "ATF4 bid",
+                            }
+                        ],
+                    },
+                    "outputs": {
+                        "items": [
+                            {
+                                "type": "widening existing footway",
+                                "measure": "miles",
+                                "observationType": "actual",
+                                "value": "1.500000",
+                            }
+                        ],
+                    },
+                    "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
+                }
+            ]
+        }
+    )
 
     @classmethod
     def from_domain(
@@ -85,7 +126,7 @@ async def get_capital_scheme(
         CapitalSchemeMilestonesRepository, Depends(get_capital_scheme_milestones_repository)
     ],
     request: Request,
-    reference: str,
+    reference: Annotated[str, Path(examples=["ATE00001"])],
 ) -> CapitalSchemeModel:
     """
     Gets a capital scheme.
