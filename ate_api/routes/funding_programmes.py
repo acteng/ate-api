@@ -1,7 +1,7 @@
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from pydantic import AnyUrl, Field
+from pydantic import AnyUrl, ConfigDict, Field
 from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
@@ -33,6 +33,12 @@ class FundingProgrammeItemModel(BaseModel):
     id: Annotated[AnyUrl | None, Field(alias="@id")] = None
     code: str
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [{"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3", "code": "ATF3"}]
+        }
+    )
+
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme, request: Request) -> Self:
         return cls(
@@ -48,7 +54,9 @@ router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])
 async def get_funding_programmes(
     funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
     request: Request,
-    is_eligible_for_authority_update: Annotated[bool | None, Query(alias="eligible-for-authority-update")] = None,
+    is_eligible_for_authority_update: Annotated[
+        bool | None, Query(alias="eligible-for-authority-update", examples=[True])
+    ] = None,
 ) -> CollectionModel[FundingProgrammeItemModel]:
     """
     Gets the funding programmes.
