@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import field_validator
+from fastapi import APIRouter, Depends, HTTPException, Path
+from pydantic import ConfigDict, field_validator
 from pydantic_core import PydanticCustomError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
@@ -29,6 +29,10 @@ class CapitalSchemeFinancialModel(BaseModel):
     type: FinancialTypeModel
     amount: int
     source: DataSourceModel
+
+    model_config = ConfigDict(
+        json_schema_extra={"examples": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]}
+    )
 
     @classmethod
     def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
@@ -77,7 +81,7 @@ async def create_financial(
         CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
-    reference: str,
+    reference: Annotated[str, Path(examples=["ATE00001"])],
     financial_model: CreateCapitalSchemeFinancialModel,
 ) -> CapitalSchemeFinancialModel:
     """
