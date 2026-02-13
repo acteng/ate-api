@@ -48,6 +48,27 @@ class MilestoneModel(str, Enum):
         return Milestone[self.name]
 
 
+class MilestonesModel(CollectionModel[MilestoneModel]):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "items": [
+                        "public consultation completed",
+                        "feasibility design started",
+                        "feasibility design completed",
+                        "preliminary design completed",
+                        "outline design completed",
+                        "detailed design completed",
+                        "construction started",
+                        "construction completed",
+                    ]
+                }
+            ]
+        }
+    )
+
+
 class CapitalSchemeMilestoneModel(BaseModel):
     milestone: MilestoneModel
     observation_type: ObservationTypeModel
@@ -105,17 +126,15 @@ router = APIRouter()
 @router.get("/milestones", summary="Get capital scheme milestones")
 async def get_milestones(
     milestones: Annotated[MilestoneRepository, Depends(get_milestone_repository)],
-    is_active: Annotated[bool | None, Query(alias="active")] = None,
-    is_complete: Annotated[bool | None, Query(alias="complete")] = None,
-) -> CollectionModel[MilestoneModel]:
+    is_active: Annotated[bool | None, Query(alias="active", examples=[True])] = None,
+    is_complete: Annotated[bool | None, Query(alias="complete", examples=[False])] = None,
+) -> MilestonesModel:
     """
     Gets the capital scheme milestones.
     """
     all_milestones = await milestones.get_all(is_active=is_active, is_complete=is_complete)
 
-    return CollectionModel[MilestoneModel](
-        items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones]
-    )
+    return MilestonesModel(items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones])
 
 
 @router.post(
