@@ -162,4 +162,5 @@ Run the tests:
 
 * [Architecture](docs/architecture)
 * [Cloud infrastructure](cloud/README.md)
+* [Maintenance](docs/maintenance.md)
 * [Releasing](docs/releasing.md)
