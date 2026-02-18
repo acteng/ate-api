@@ -59,6 +59,22 @@ class FundingProgrammeItemModel(BaseModel):
         )
 
 
+class FundingProgrammeItemsModel(CollectionModel[FundingProgrammeItemModel]):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "items": [
+                        {"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3", "code": "ATF3"},
+                        {"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4", "code": "ATF4"},
+                        {"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5", "code": "ATF5"},
+                    ]
+                }
+            ]
+        }
+    )
+
+
 router = APIRouter(prefix="/funding-programmes", tags=["funding-programmes"])
 
 
@@ -69,7 +85,7 @@ async def get_funding_programmes(
     is_eligible_for_authority_update: Annotated[
         bool | None, Query(alias="eligible-for-authority-update", examples=[True])
     ] = None,
-) -> CollectionModel[FundingProgrammeItemModel]:
+) -> FundingProgrammeItemsModel:
     """
     Gets the funding programmes.
     """
@@ -80,7 +96,7 @@ async def get_funding_programmes(
         FundingProgrammeItemModel.from_domain(funding_programme, request)
         for funding_programme in all_funding_programmes
     ]
-    return CollectionModel[FundingProgrammeItemModel](items=funding_programme_models)
+    return FundingProgrammeItemsModel(items=funding_programme_models)
 
 
 @router.get("/{code}", summary="Get funding programme", responses={HTTP_404_NOT_FOUND: {}})
