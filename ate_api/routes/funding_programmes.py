@@ -45,12 +45,6 @@ class FundingProgrammeItemModel(BaseModel):
     id: Annotated[AnyUrl | None, Field(alias="@id")] = None
     code: str
 
-    model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [{"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3", "code": "ATF3"}]
-        }
-    )
-
     @classmethod
     def from_domain(cls, funding_programme: FundingProgramme, request: Request) -> Self:
         return cls(
