@@ -11,10 +11,8 @@ class TestFundingProgrammeModel:
 
         funding_programme_model = FundingProgrammeModel.from_domain(funding_programme, http_request)
 
-        assert (
-            funding_programme_model.id == AnyUrl(f"{base_url}/funding-programmes/ATF3")
-            and funding_programme_model.code == "ATF3"
-            and funding_programme_model.eligible_for_authority_update
+        assert funding_programme_model == FundingProgrammeModel(
+            id=AnyUrl(f"{base_url}/funding-programmes/ATF3"), code="ATF3", eligible_for_authority_update=True
         )
 
     def test_to_domain(self) -> None:
@@ -34,7 +32,6 @@ class TestFundingProgrammeItemModel:
 
         funding_programme_item_model = FundingProgrammeItemModel.from_domain(funding_programme, http_request)
 
-        assert (
-            funding_programme_item_model.id == AnyUrl(f"{base_url}/funding-programmes/ATF3")
-            and funding_programme_item_model.code == "ATF3"
+        assert funding_programme_item_model == FundingProgrammeItemModel(
+            id=AnyUrl(f"{base_url}/funding-programmes/ATF3"), code="ATF3"
         )
