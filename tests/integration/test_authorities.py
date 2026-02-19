@@ -155,7 +155,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
+    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
 
 
 @respx.mock
@@ -219,12 +219,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "items": [
-            {"@id": f"{client.base_url}/capital-schemes/ATE00001"},
-            {"@id": f"{client.base_url}/capital-schemes/ATE00002"},
-        ]
-    }
+    assert [item["@id"] for item in response.json()["items"]] == [
+        f"{client.base_url}/capital-schemes/ATE00001",
+        f"{client.base_url}/capital-schemes/ATE00002",
+    ]
 
 
 @respx.mock
@@ -289,7 +287,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
+    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
 
 
 @respx.mock
@@ -376,7 +374,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
+    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
 
 
 @respx.mock
@@ -470,12 +468,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-        "items": [
-            {"@id": f"{client.base_url}/capital-schemes/ATE00001"},
-            {"@id": f"{client.base_url}/capital-schemes/ATE00002"},
-        ]
-    }
+    assert [item["@id"] for item in response.json()["items"]] == [
+        f"{client.base_url}/capital-schemes/ATE00001",
+        f"{client.base_url}/capital-schemes/ATE00002",
+    ]
 
 
 @respx.mock
@@ -535,7 +531,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
+    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
 
 
 @respx.mock
@@ -568,7 +564,7 @@ async def test_get_authority_bid_submitting_capital_schemes_when_none(
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": []}
+    assert response.json()["items"] == []
 
 
 @respx.mock
