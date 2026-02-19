@@ -23,7 +23,7 @@ router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 
 
 class CapitalSchemeItemModel(BaseModel):
-    id: Annotated[AnyUrl | None, Field(alias="@id")] = None
+    id: Annotated[AnyUrl, Field(alias="@id")]
 
     @classmethod
     def from_domain(cls, reference: CapitalSchemeReference, request: Request) -> Self:
