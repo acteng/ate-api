@@ -101,7 +101,10 @@ async def test_get_authority_bid_submitting_capital_schemes(
 
     assert response.status_code == 200
     assert response.json() == {
-        "items": [f"{client.base_url}/capital-schemes/ATE00001", f"{client.base_url}/capital-schemes/ATE00002"]
+        "items": [
+            {"@id": f"{client.base_url}/capital-schemes/ATE00001"},
+            {"@id": f"{client.base_url}/capital-schemes/ATE00002"},
+        ]
     }
 
 
@@ -152,7 +155,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [f"{client.base_url}/capital-schemes/ATE00001"]}
+    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
 
 
 @respx.mock
@@ -217,7 +220,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
 
     assert response.status_code == 200
     assert response.json() == {
-        "items": [f"{client.base_url}/capital-schemes/ATE00001", f"{client.base_url}/capital-schemes/ATE00002"]
+        "items": [
+            {"@id": f"{client.base_url}/capital-schemes/ATE00001"},
+            {"@id": f"{client.base_url}/capital-schemes/ATE00002"},
+        ]
     }
 
 
@@ -283,7 +289,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [f"{client.base_url}/capital-schemes/ATE00001"]}
+    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
 
 
 @respx.mock
@@ -370,7 +376,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [f"{client.base_url}/capital-schemes/ATE00001"]}
+    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
 
 
 @respx.mock
@@ -465,7 +471,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
 
     assert response.status_code == 200
     assert response.json() == {
-        "items": [f"{client.base_url}/capital-schemes/ATE00001", f"{client.base_url}/capital-schemes/ATE00002"]
+        "items": [
+            {"@id": f"{client.base_url}/capital-schemes/ATE00001"},
+            {"@id": f"{client.base_url}/capital-schemes/ATE00002"},
+        ]
     }
 
 
@@ -526,7 +535,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [f"{client.base_url}/capital-schemes/ATE00001"]}
+    assert response.json() == {"items": [{"@id": f"{client.base_url}/capital-schemes/ATE00001"}]}
 
 
 @respx.mock
