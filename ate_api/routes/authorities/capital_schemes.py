@@ -24,10 +24,13 @@ router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 
 class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
+    reference: str
 
     @classmethod
     def from_domain(cls, reference: CapitalSchemeReference, request: Request) -> Self:
-        return cls(id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))))
+        return cls(
+            id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))), reference=str(reference)
+        )
 
 
 class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
@@ -36,9 +39,18 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
             "examples": [
                 {
                     "items": [
-                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001"},
-                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002"},
-                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003"},
+                        {
+                            "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001",
+                            "reference": "ATE00001",
+                        },
+                        {
+                            "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002",
+                            "reference": "ATE00002",
+                        },
+                        {
+                            "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
+                            "reference": "ATE00003",
+                        },
                     ]
                 }
             ]

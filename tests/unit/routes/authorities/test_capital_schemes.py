@@ -11,4 +11,6 @@ class TestCapitalSchemeItemModel:
 
         capital_scheme_item_model = CapitalSchemeItemModel.from_domain(reference, http_request)
 
-        assert capital_scheme_item_model == CapitalSchemeItemModel(id=AnyUrl(f"{base_url}/capital-schemes/ATE00001"))
+        assert capital_scheme_item_model == CapitalSchemeItemModel(
+            id=AnyUrl(f"{base_url}/capital-schemes/ATE00001"), reference="ATE00001"
+        )

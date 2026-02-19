@@ -58,7 +58,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
     assert response.status_code == 200
     assert response.json() == {
         "items": [
-            {"@id": f"{client.base_url}/capital-schemes/ATE00001"},
-            {"@id": f"{client.base_url}/capital-schemes/ATE00002"},
+            {"@id": f"{client.base_url}/capital-schemes/ATE00001", "reference": "ATE00001"},
+            {"@id": f"{client.base_url}/capital-schemes/ATE00002", "reference": "ATE00002"},
         ]
     }
