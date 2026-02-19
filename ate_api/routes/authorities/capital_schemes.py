@@ -36,9 +36,9 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
             "examples": [
                 {
                     "items": [
-                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE000001"},
-                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE000002"},
-                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE000003"},
+                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001"},
+                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002"},
+                        {"@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003"},
                     ]
                 }
             ]
