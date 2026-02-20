@@ -25,6 +25,7 @@ class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
     name: str
+    funding_programme: AnyUrl
 
     @classmethod
     def from_domain(cls, capital_scheme_item: CapitalSchemeItem, request: Request) -> Self:
@@ -32,6 +33,9 @@ class CapitalSchemeItemModel(BaseModel):
             id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme_item.reference)))),
             reference=str(capital_scheme_item.reference),
             name=capital_scheme_item.name,
+            funding_programme=AnyUrl(
+                str(request.url_for("get_funding_programme", code=str(capital_scheme_item.funding_programme)))
+            ),
         )
 
 
@@ -45,16 +49,19 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001",
                             "reference": "ATE00001",
                             "name": "Wirral Package",
+                            "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002",
                             "reference": "ATE00002",
                             "name": "School Streets",
+                            "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
                             "reference": "ATE00003",
                             "name": "Hospital Fields Road",
+                            "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                         },
                     ]
                 }

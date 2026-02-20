@@ -149,7 +149,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
         statement = (
-            select(CapitalSchemeEntity.scheme_reference, CapitalSchemeOverviewEntity.scheme_name)
+            select(
+                CapitalSchemeEntity.scheme_reference,
+                CapitalSchemeOverviewEntity.scheme_name,
+                FundingProgrammeEntity.funding_programme_code,
+            )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
@@ -208,7 +212,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         result = await self._session.execute(statement)
         rows = result.all()
         return [
-            CapitalSchemeItem(reference=CapitalSchemeReference(row.scheme_reference), name=row.scheme_name)
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference(row.scheme_reference),
+                name=row.scheme_name,
+                funding_programme=FundingProgrammeCode(row.funding_programme_code),
+            )
             for row in rows
         ]
 

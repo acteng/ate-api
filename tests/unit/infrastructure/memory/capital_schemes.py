@@ -26,7 +26,11 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     ) -> list[CapitalSchemeItem]:
         return sorted(
             [
-                CapitalSchemeItem(reference=reference, name=capital_scheme.overview.name)
+                CapitalSchemeItem(
+                    reference=reference,
+                    name=capital_scheme.overview.name,
+                    funding_programme=capital_scheme.overview.funding_programme,
+                )
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
                 and (

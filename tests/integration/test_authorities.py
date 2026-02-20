@@ -102,8 +102,18 @@ async def test_get_authority_bid_submitting_capital_schemes(
     assert response.status_code == 200
     assert response.json() == {
         "items": [
-            {"@id": f"{client.base_url}/capital-schemes/ATE00001", "reference": "ATE00001", "name": "Wirral Package"},
-            {"@id": f"{client.base_url}/capital-schemes/ATE00002", "reference": "ATE00002", "name": "School Streets"},
+            {
+                "@id": f"{client.base_url}/capital-schemes/ATE00001",
+                "reference": "ATE00001",
+                "name": "Wirral Package",
+                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+            },
+            {
+                "@id": f"{client.base_url}/capital-schemes/ATE00002",
+                "reference": "ATE00002",
+                "name": "School Streets",
+                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+            },
         ]
     }
 

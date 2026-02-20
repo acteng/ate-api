@@ -11,6 +11,7 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 class CapitalSchemeItem:
     reference: CapitalSchemeReference
     name: str
+    funding_programme: FundingProgrammeCode
 
 
 class CapitalSchemeRepository:

@@ -624,8 +624,16 @@ class TestDatabaseCapitalSchemeRepository:
             )
 
         assert capital_scheme_items == [
-            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00001"), name="Wirral Package"),
-            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00002"), name="School Streets"),
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference("ATE00001"),
+                name="Wirral Package",
+                funding_programme=FundingProgrammeCode("ATF3"),
+            ),
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference("ATE00002"),
+                name="School Streets",
+                funding_programme=FundingProgrammeCode("ATF3"),
+            ),
         ]
 
     async def test_get_items_by_bid_submitting_authority_fetches_current_overview(self, engine: AsyncEngine) -> None:
