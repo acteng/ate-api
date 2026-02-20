@@ -11,6 +11,7 @@ from ate_api.domain.capital_scheme_milestones import (
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
@@ -90,9 +91,7 @@ class TestMemoryCapitalSchemeRepository:
 
         assert not capital_scheme
 
-    async def test_get_references_by_bid_submitting_authority(
-        self, capital_schemes: MemoryCapitalSchemeRepository
-    ) -> None:
+    async def test_get_items_by_bid_submitting_authority(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         await capital_schemes.add(
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
@@ -133,11 +132,14 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
 
-        references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert capital_scheme_items == [
+            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00001"), name="Wirral Package"),
+            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00002"), name="School Streets"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_funding_programme(
+    async def test_get_items_by_bid_submitting_authority_filters_by_funding_programme(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         await capital_schemes.add(
@@ -180,14 +182,17 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
 
-        references = await capital_schemes.get_references_by_bid_submitting_authority(
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
             AuthorityAbbreviation("LIV"),
             funding_programme_codes=[FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")],
         )
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_bid_status(
+    async def test_get_items_by_bid_submitting_authority_filters_by_bid_status(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         await capital_schemes.add(
@@ -221,13 +226,15 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
 
-        references = await capital_schemes.get_references_by_bid_submitting_authority(
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
             AuthorityAbbreviation("LIV"), bid_status=BidStatus.FUNDED
         )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_current_milestone(
+    async def test_get_items_by_bid_submitting_authority_filters_by_current_milestone(
         self,
         capital_schemes: MemoryCapitalSchemeRepository,
         capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
@@ -305,14 +312,17 @@ class TestMemoryCapitalSchemeRepository:
         )
         await capital_scheme_milestones.add(milestones3)
 
-        references = await capital_schemes.get_references_by_bid_submitting_authority(
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
             AuthorityAbbreviation("LIV"),
             current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
         )
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
+    async def test_get_items_by_bid_submitting_authority_filters_by_no_current_milestone(
         self,
         capital_schemes: MemoryCapitalSchemeRepository,
         capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
@@ -356,13 +366,15 @@ class TestMemoryCapitalSchemeRepository:
         )
         await capital_scheme_milestones.add(milestones2)
 
-        references = await capital_schemes.get_references_by_bid_submitting_authority(
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
             AuthorityAbbreviation("LIV"), current_milestones=[None]
         )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_orders_by_reference(
+    async def test_get_items_by_bid_submitting_authority_orders_by_reference(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         await capital_schemes.add(
@@ -392,16 +404,19 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
 
-        references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_when_none(
+    async def test_get_items_by_bid_submitting_authority_when_none(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
-        references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
-        assert not references
+        assert not capital_scheme_items
 
     async def test_update_updates_authority_review(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         capital_scheme = CapitalScheme(

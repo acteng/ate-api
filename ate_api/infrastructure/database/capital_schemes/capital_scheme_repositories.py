@@ -6,7 +6,7 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
@@ -141,15 +141,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         return row.to_domain()
 
-    async def get_references_by_bid_submitting_authority(
+    async def get_items_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone | None] | None = None,
-    ) -> list[CapitalSchemeReference]:
+    ) -> list[CapitalSchemeItem]:
         statement = (
-            select(CapitalSchemeEntity.scheme_reference)
+            select(CapitalSchemeEntity.scheme_reference, CapitalSchemeOverviewEntity.scheme_name)
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
@@ -205,8 +205,12 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 )
             )
 
-        result = await self._session.scalars(statement)
-        return [CapitalSchemeReference(reference) for reference in result.all()]
+        result = await self._session.execute(statement)
+        rows = result.all()
+        return [
+            CapitalSchemeItem(reference=CapitalSchemeReference(row.scheme_reference), name=row.scheme_name)
+            for row in rows
+        ]
 
     async def update(self, capital_scheme: CapitalScheme) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(capital_scheme)

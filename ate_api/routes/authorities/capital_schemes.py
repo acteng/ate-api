@@ -6,8 +6,7 @@ from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_CONTENT
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_scheme_milestones import Milestone
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.repositories import (
     get_authority_repository,
@@ -25,11 +24,14 @@ router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
+    name: str
 
     @classmethod
-    def from_domain(cls, reference: CapitalSchemeReference, request: Request) -> Self:
+    def from_domain(cls, capital_scheme_item: CapitalSchemeItem, request: Request) -> Self:
         return cls(
-            id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(reference)))), reference=str(reference)
+            id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme_item.reference)))),
+            reference=str(capital_scheme_item.reference),
+            name=capital_scheme_item.name,
         )
 
 
@@ -42,14 +44,17 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001",
                             "reference": "ATE00001",
+                            "name": "Wirral Package",
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002",
                             "reference": "ATE00002",
+                            "name": "School Streets",
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
                             "reference": "ATE00003",
+                            "name": "Hospital Fields Road",
                         },
                     ]
                 }
@@ -87,7 +92,7 @@ async def get_authority_bid_submitting_capital_schemes(
     ):
         raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_CONTENT)
 
-    references = await capital_schemes.get_references_by_bid_submitting_authority(
+    capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
         AuthorityAbbreviation(abbreviation),
         funding_programme_codes=(
             [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
@@ -95,7 +100,9 @@ async def get_authority_bid_submitting_capital_schemes(
         bid_status=bid_status.to_domain() if bid_status else None,
         current_milestones=[_to_domain(milestone) for milestone in current_milestones] if current_milestones else None,
     )
-    capital_scheme_models = [CapitalSchemeItemModel.from_domain(reference, request) for reference in references]
+    capital_scheme_models = [
+        CapitalSchemeItemModel.from_domain(capital_scheme_item, request) for capital_scheme_item in capital_scheme_items
+    ]
     return CapitalSchemeItemsModel(items=capital_scheme_models)
 
 

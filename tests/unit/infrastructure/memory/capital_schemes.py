@@ -1,7 +1,7 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
@@ -17,16 +17,16 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         return self._capital_schemes.get(reference)
 
-    async def get_references_by_bid_submitting_authority(
+    async def get_items_by_bid_submitting_authority(
         self,
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone | None] | None = None,
-    ) -> list[CapitalSchemeReference]:
+    ) -> list[CapitalSchemeItem]:
         return sorted(
             [
-                reference
+                CapitalSchemeItem(reference=reference, name=capital_scheme.overview.name)
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
                 and (
@@ -35,7 +35,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 and (not bid_status or capital_scheme.bid_status_details.bid_status == bid_status)
                 and (not current_milestones or (await self._get_current_milestone(reference)) in current_milestones)
             ],
-            key=lambda reference: str(reference),
+            key=lambda capital_scheme_item: str(capital_scheme_item.reference),
         )
 
     async def update(self, capital_scheme: CapitalScheme) -> None:

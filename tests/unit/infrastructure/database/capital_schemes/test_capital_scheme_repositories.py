@@ -9,6 +9,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -568,7 +569,7 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme
 
-    async def test_get_references_by_bid_submitting_authority(self, engine: AsyncEngine) -> None:
+    async def test_get_items_by_bid_submitting_authority(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -581,7 +582,10 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
+                                name="Wirral Package",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                type_=construction,
                             )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
@@ -590,7 +594,10 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_reference="ATE00002",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
+                                name="School Streets",
+                                bid_submitting_authority=liv,
+                                funding_programme=atf3,
+                                type_=construction,
                             )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
@@ -599,7 +606,10 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_reference="ATE00003",
                         capital_scheme_overviews=[
                             build_capital_scheme_overview_entity(
-                                bid_submitting_authority=wyo, funding_programme=atf3, type_=construction
+                                name="Hospital Fields Road",
+                                bid_submitting_authority=wyo,
+                                funding_programme=atf3,
+                                type_=construction,
                             )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
@@ -609,13 +619,16 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert capital_scheme_items == [
+            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00001"), name="Wirral Package"),
+            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00002"), name="School Streets"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_fetches_current_overview(
-        self, engine: AsyncEngine
-    ) -> None:
+    async def test_get_items_by_bid_submitting_authority_fetches_current_overview(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -649,11 +662,13 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert not references
+        assert not capital_scheme_items
 
-    async def test_get_references_by_bid_submitting_authority_filters_under_embargo(self, engine: AsyncEngine) -> None:
+    async def test_get_items_by_bid_submitting_authority_filters_under_embargo(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -685,11 +700,15 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_funding_programme(
+    async def test_get_items_by_bid_submitting_authority_filters_by_funding_programme(
         self, engine: AsyncEngine
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -733,14 +752,17 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"),
                 funding_programme_codes=[FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")],
             )
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_current_bid_status(
+    async def test_get_items_by_bid_submitting_authority_filters_by_current_bid_status(
         self, engine: AsyncEngine
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -785,13 +807,15 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"), bid_status=BidStatus.FUNDED
             )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_current_milestones(
+    async def test_get_items_by_bid_submitting_authority_filters_by_current_milestones(
         self, engine: AsyncEngine
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -865,14 +889,17 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"),
                 current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
             )
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_filters_by_no_current_milestone(
+    async def test_get_items_by_bid_submitting_authority_filters_by_no_current_milestone(
         self, engine: AsyncEngine
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -917,13 +944,15 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"), current_milestones=[None]
             )
 
-        assert references == [CapitalSchemeReference("ATE00001")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_selects_actual_observation_type(
+    async def test_get_items_by_bid_submitting_authority_selects_actual_observation_type(
         self, engine: AsyncEngine
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -958,15 +987,13 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"), current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED]
             )
 
-        assert not references
+        assert not capital_scheme_items
 
-    async def test_get_references_by_bid_submitting_authority_selects_latest_milestone(
-        self, engine: AsyncEngine
-    ) -> None:
+    async def test_get_items_by_bid_submitting_authority_selects_latest_milestone(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -1012,15 +1039,13 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"), current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED]
             )
 
-        assert not references
+        assert not capital_scheme_items
 
-    async def test_get_references_by_bid_submitting_authority_selects_current_milestone(
-        self, engine: AsyncEngine
-    ) -> None:
+    async def test_get_items_by_bid_submitting_authority_selects_current_milestone(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -1063,13 +1088,13 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV"), current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED]
             )
 
-        assert not references
+        assert not capital_scheme_items
 
-    async def test_get_references_by_bid_submitting_authority_orders_by_reference(self, engine: AsyncEngine) -> None:
+    async def test_get_items_by_bid_submitting_authority_orders_by_reference(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -1100,11 +1125,16 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert references == [CapitalSchemeReference("ATE00001"), CapitalSchemeReference("ATE00002")]
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
 
-    async def test_get_references_by_bid_submitting_authority_when_no_overview(self, engine: AsyncEngine) -> None:
+    async def test_get_items_by_bid_submitting_authority_when_no_overview(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -1118,11 +1148,13 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert not references
+        assert not capital_scheme_items
 
-    async def test_get_references_by_bid_submitting_authority_when_no_bid_status(self, engine: AsyncEngine) -> None:
+    async def test_get_items_by_bid_submitting_authority_when_no_bid_status(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -1142,19 +1174,23 @@ class TestDatabaseCapitalSchemeRepository:
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert not references
+        assert not capital_scheme_items
 
-    async def test_get_references_by_bid_submitting_authority_when_none(self, engine: AsyncEngine) -> None:
+    async def test_get_items_by_bid_submitting_authority_when_none(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(build_authority_entity(abbreviation="LIV"))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
-            references = await capital_schemes.get_references_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
 
-        assert not references
+        assert not capital_scheme_items
 
     async def test_update_updates_authority_review(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
