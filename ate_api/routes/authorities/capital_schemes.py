@@ -89,18 +89,18 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00002",
                             "overview": {
                                 "name": "School Streets",
-                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4",
                             },
-                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
+                            "authorityReview": {"reviewDate": "2020-02-02T00:00:00Z"},
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
                             "reference": "ATE00003",
                             "overview": {
                                 "name": "Hospital Fields Road",
-                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5",
                             },
-                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
+                            "authorityReview": {"reviewDate": "2020-02-03T00:00:00Z"},
                         },
                     ]
                 }
