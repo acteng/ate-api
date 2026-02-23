@@ -61,14 +61,18 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00001",
                 "reference": "ATE00001",
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                "overview": {
+                    "name": "Wirral Package",
+                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                },
             },
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00002",
                 "reference": "ATE00002",
-                "name": "School Streets",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                "overview": {
+                    "name": "School Streets",
+                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                },
             },
         ]
     }

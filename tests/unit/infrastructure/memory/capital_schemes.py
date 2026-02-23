@@ -1,7 +1,11 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import (
+    CapitalSchemeItem,
+    CapitalSchemeItemOverview,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
@@ -28,8 +32,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
             [
                 CapitalSchemeItem(
                     reference=reference,
-                    name=capital_scheme.overview.name,
-                    funding_programme=capital_scheme.overview.funding_programme,
+                    overview=CapitalSchemeItemOverview(
+                        name=capital_scheme.overview.name, funding_programme=capital_scheme.overview.funding_programme
+                    ),
                 )
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation

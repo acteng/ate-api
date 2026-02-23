@@ -11,7 +11,7 @@ from ate_api.domain.capital_scheme_milestones import (
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeItemOverview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
@@ -137,13 +137,15 @@ class TestMemoryCapitalSchemeRepository:
         assert capital_scheme_items == [
             CapitalSchemeItem(
                 reference=CapitalSchemeReference("ATE00001"),
-                name="Wirral Package",
-                funding_programme=FundingProgrammeCode("ATF3"),
+                overview=CapitalSchemeItemOverview(
+                    name="Wirral Package", funding_programme=FundingProgrammeCode("ATF3")
+                ),
             ),
             CapitalSchemeItem(
                 reference=CapitalSchemeReference("ATE00002"),
-                name="School Streets",
-                funding_programme=FundingProgrammeCode("ATF3"),
+                overview=CapitalSchemeItemOverview(
+                    name="School Streets", funding_programme=FundingProgrammeCode("ATF3")
+                ),
             ),
         ]
 

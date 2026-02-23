@@ -6,7 +6,11 @@ from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_CONTENT
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_scheme_milestones import Milestone
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import (
+    CapitalSchemeItem,
+    CapitalSchemeItemOverview,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.repositories import (
     get_authority_repository,
@@ -21,21 +25,31 @@ from ate_api.routes.collections import CollectionModel
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 
 
+class CapitalSchemeItemOverviewModel(BaseModel):
+    name: str
+    funding_programme: AnyUrl
+
+    @classmethod
+    def from_domain(cls, overview: CapitalSchemeItemOverview, request: Request) -> Self:
+        return cls(
+            name=overview.name,
+            funding_programme=AnyUrl(
+                str(request.url_for("get_funding_programme", code=str(overview.funding_programme)))
+            ),
+        )
+
+
 class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
-    name: str
-    funding_programme: AnyUrl
+    overview: CapitalSchemeItemOverviewModel
 
     @classmethod
     def from_domain(cls, capital_scheme_item: CapitalSchemeItem, request: Request) -> Self:
         return cls(
             id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme_item.reference)))),
             reference=str(capital_scheme_item.reference),
-            name=capital_scheme_item.name,
-            funding_programme=AnyUrl(
-                str(request.url_for("get_funding_programme", code=str(capital_scheme_item.funding_programme)))
-            ),
+            overview=CapitalSchemeItemOverviewModel.from_domain(capital_scheme_item.overview, request),
         )
 
 
@@ -48,20 +62,26 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00001",
                             "reference": "ATE00001",
-                            "name": "Wirral Package",
-                            "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            "overview": {
+                                "name": "Wirral Package",
+                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            },
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002",
                             "reference": "ATE00002",
-                            "name": "School Streets",
-                            "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            "overview": {
+                                "name": "School Streets",
+                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            },
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
                             "reference": "ATE00003",
-                            "name": "Hospital Fields Road",
-                            "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            "overview": {
+                                "name": "Hospital Fields Road",
+                                "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            },
                         },
                     ]
                 }

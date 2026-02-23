@@ -6,7 +6,11 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_scheme_repositories import (
+    CapitalSchemeItem,
+    CapitalSchemeItemOverview,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
@@ -214,8 +218,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return [
             CapitalSchemeItem(
                 reference=CapitalSchemeReference(row.scheme_reference),
-                name=row.scheme_name,
-                funding_programme=FundingProgrammeCode(row.funding_programme_code),
+                overview=CapitalSchemeItemOverview(
+                    name=row.scheme_name, funding_programme=FundingProgrammeCode(row.funding_programme_code)
+                ),
             )
             for row in rows
         ]

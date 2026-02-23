@@ -8,10 +8,15 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 
 @dataclass(frozen=True)
-class CapitalSchemeItem:
-    reference: CapitalSchemeReference
+class CapitalSchemeItemOverview:
     name: str
     funding_programme: FundingProgrammeCode
+
+
+@dataclass(frozen=True)
+class CapitalSchemeItem:
+    reference: CapitalSchemeReference
+    overview: CapitalSchemeItemOverview
 
 
 class CapitalSchemeRepository:
