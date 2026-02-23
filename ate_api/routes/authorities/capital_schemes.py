@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Literal, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
@@ -8,6 +9,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepositor
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.capital_scheme_repositories import (
     CapitalSchemeItem,
+    CapitalSchemeItemAuthorityReview,
     CapitalSchemeItemOverview,
     CapitalSchemeRepository,
 )
@@ -39,10 +41,19 @@ class CapitalSchemeItemOverviewModel(BaseModel):
         )
 
 
+class CapitalSchemeItemAuthorityReviewModel(BaseModel):
+    review_date: datetime
+
+    @classmethod
+    def from_domain(cls, authority_review: CapitalSchemeItemAuthorityReview) -> Self:
+        return cls(review_date=authority_review.review_date)
+
+
 class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
     overview: CapitalSchemeItemOverviewModel
+    authority_review: CapitalSchemeItemAuthorityReviewModel | None
 
     @classmethod
     def from_domain(cls, capital_scheme_item: CapitalSchemeItem, request: Request) -> Self:
@@ -50,6 +61,11 @@ class CapitalSchemeItemModel(BaseModel):
             id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme_item.reference)))),
             reference=str(capital_scheme_item.reference),
             overview=CapitalSchemeItemOverviewModel.from_domain(capital_scheme_item.overview, request),
+            authority_review=(
+                CapitalSchemeItemAuthorityReviewModel.from_domain(capital_scheme_item.authority_review)
+                if capital_scheme_item.authority_review
+                else None
+            ),
         )
 
 
@@ -66,6 +82,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "name": "Wirral Package",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                             },
+                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002",
@@ -74,6 +91,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "name": "School Streets",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                             },
+                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
@@ -82,6 +100,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "name": "Hospital Fields Road",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                             },
+                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
                         },
                     ]
                 }

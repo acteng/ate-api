@@ -8,6 +8,7 @@ from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import (
     CapitalSchemeItem,
+    CapitalSchemeItemAuthorityReview,
     CapitalSchemeItemOverview,
     CapitalSchemeRepository,
 )
@@ -44,6 +45,7 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from ate_api.infrastructure.database.dates import local_to_zoned
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
@@ -152,11 +154,17 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         bid_status: BidStatus | None = None,
         current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
+        ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
+        ranked_capital_scheme_authority_reviews_alias = aliased(
+            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
+        )
+
         statement = (
             select(
                 CapitalSchemeEntity.scheme_reference,
                 CapitalSchemeOverviewEntity.scheme_name,
                 FundingProgrammeEntity.funding_programme_code,
+                ranked_capital_scheme_authority_reviews_alias.review_date,
             )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
@@ -172,6 +180,14 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
             .join(FundingProgrammeEntity)
+            .outerjoin(
+                ranked_capital_scheme_authority_reviews_alias,
+                and_(
+                    CapitalSchemeEntity.capital_scheme_id
+                    == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
+                    ranked_capital_scheme_authority_reviews.c.rank == 1,
+                ),
+            )
             .where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
             .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
@@ -220,6 +236,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 reference=CapitalSchemeReference(row.scheme_reference),
                 overview=CapitalSchemeItemOverview(
                     name=row.scheme_name, funding_programme=FundingProgrammeCode(row.funding_programme_code)
+                ),
+                authority_review=(
+                    CapitalSchemeItemAuthorityReview(review_date=local_to_zoned(row.review_date))
+                    if row.review_date
+                    else None
                 ),
             )
             for row in rows

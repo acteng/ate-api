@@ -3,6 +3,7 @@ from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepo
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import (
     CapitalSchemeItem,
+    CapitalSchemeItemAuthorityReview,
     CapitalSchemeItemOverview,
     CapitalSchemeRepository,
 )
@@ -34,6 +35,11 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                     reference=reference,
                     overview=CapitalSchemeItemOverview(
                         name=capital_scheme.overview.name, funding_programme=capital_scheme.overview.funding_programme
+                    ),
+                    authority_review=(
+                        CapitalSchemeItemAuthorityReview(review_date=capital_scheme.authority_review.review_date)
+                        if capital_scheme.authority_review
+                        else None
                     ),
                 )
                 for reference, capital_scheme in self._capital_schemes.items()

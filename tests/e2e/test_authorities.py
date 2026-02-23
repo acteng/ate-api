@@ -18,6 +18,7 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
 
 
 def test_get_authority_bid_submitting_capital_schemes(client: Client, access_token: str, app_client: AppClient) -> None:
+    app_client.set_clock("2020-02-01T00:00:00Z")
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
@@ -35,6 +36,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
             "outputs": {"items": []},
         }
     )
+    app_client.create_capital_scheme_authority_review("ATE00001", {"source": "authority update"})
     app_client.create_capital_scheme(
         {
             "reference": "ATE00002",
@@ -65,6 +67,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                     "name": "Wirral Package",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 },
+                "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
             },
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00002",
@@ -73,6 +76,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                     "name": "School Streets",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 },
+                "authorityReview": None,
             },
         ]
     }

@@ -10,6 +10,7 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestonesRepository,
     Milestone,
 )
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -52,19 +53,23 @@ async def test_get_authority_bid_submitting_capital_schemes(
     await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=dummy_bid_status_details(),
+    capital_scheme = CapitalScheme(
+        reference=CapitalSchemeReference("ATE00001"),
+        overview=CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="Wirral Package",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        ),
+        bid_status_details=dummy_bid_status_details(),
+    )
+    capital_scheme.perform_authority_review(
+        CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
     )
+    await capital_schemes.add(capital_scheme)
     await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00002"),
@@ -109,6 +114,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "name": "Wirral Package",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 },
+                "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
             },
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00002",
@@ -117,6 +123,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "name": "School Streets",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 },
+                "authorityReview": None,
             },
         ]
     }
