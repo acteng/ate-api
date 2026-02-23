@@ -31,17 +31,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     ) -> list[CapitalSchemeItem]:
         return sorted(
             [
-                CapitalSchemeItem(
-                    reference=reference,
-                    overview=CapitalSchemeItemOverview(
-                        name=capital_scheme.overview.name, funding_programme=capital_scheme.overview.funding_programme
-                    ),
-                    authority_review=(
-                        CapitalSchemeItemAuthorityReview(review_date=capital_scheme.authority_review.review_date)
-                        if capital_scheme.authority_review
-                        else None
-                    ),
-                )
+                self._to_item(capital_scheme)
                 for reference, capital_scheme in self._capital_schemes.items()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
                 and (
@@ -55,6 +45,20 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
 
     async def update(self, capital_scheme: CapitalScheme) -> None:
         self._capital_schemes[capital_scheme.reference] = capital_scheme
+
+    @staticmethod
+    def _to_item(capital_scheme: CapitalScheme) -> CapitalSchemeItem:
+        return CapitalSchemeItem(
+            reference=capital_scheme.reference,
+            overview=CapitalSchemeItemOverview(
+                name=capital_scheme.overview.name, funding_programme=capital_scheme.overview.funding_programme
+            ),
+            authority_review=(
+                CapitalSchemeItemAuthorityReview(review_date=capital_scheme.authority_review.review_date)
+                if capital_scheme.authority_review
+                else None
+            ),
+        )
 
     async def _get_current_milestone(self, capital_scheme: CapitalSchemeReference) -> Milestone | None:
         milestones = await self._capital_scheme_milestones.get(capital_scheme)

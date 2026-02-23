@@ -1,4 +1,6 @@
-from sqlalchemy import ColumnElement, Select, and_, false, func, or_, select, tuple_
+from typing import Any
+
+from sqlalchemy import ColumnElement, Row, Select, and_, false, func, or_, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, contains_eager, joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
@@ -231,20 +233,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         result = await self._session.execute(statement)
         rows = result.all()
-        return [
-            CapitalSchemeItem(
-                reference=CapitalSchemeReference(row.scheme_reference),
-                overview=CapitalSchemeItemOverview(
-                    name=row.scheme_name, funding_programme=FundingProgrammeCode(row.funding_programme_code)
-                ),
-                authority_review=(
-                    CapitalSchemeItemAuthorityReview(review_date=local_to_zoned(row.review_date))
-                    if row.review_date
-                    else None
-                ),
-            )
-            for row in rows
-        ]
+        return [self._item_row_to_domain(row) for row in rows]
 
     async def update(self, capital_scheme: CapitalScheme) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(capital_scheme)
@@ -418,4 +407,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(ObservationTypeEntity)
             .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
             .where(ObservationTypeEntity.observation_type_name == ObservationTypeName.ACTUAL)
+        )
+
+    @staticmethod
+    def _item_row_to_domain(row: Row[Any]) -> CapitalSchemeItem:
+        return CapitalSchemeItem(
+            reference=CapitalSchemeReference(row.scheme_reference),
+            overview=CapitalSchemeItemOverview(
+                name=row.scheme_name, funding_programme=FundingProgrammeCode(row.funding_programme_code)
+            ),
+            authority_review=(
+                CapitalSchemeItemAuthorityReview(review_date=local_to_zoned(row.review_date))
+                if row.review_date
+                else None
+            ),
         )
