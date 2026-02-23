@@ -61,7 +61,7 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_authority_entity(id_=1, full_name="Liverpool", abbreviation="LIV"),
+                    build_authority_entity(id_=1, abbreviation="LIV"),
                     build_funding_programme_entity(id_=1, code="ATF3"),
                     build_scheme_type_entity(id_=1, name=SchemeTypeName.CONSTRUCTION),
                     build_bid_status_entity(id_=1, name=BidStatusName.FUNDED),
