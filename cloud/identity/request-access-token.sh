@@ -13,7 +13,9 @@ fi
 ENVIRONMENT=$1
 
 SERVER_METADATA_URL=$(terraform output -raw oidc_server_metadata_url)
-TOKEN_ENDPOINT=$(curl -s "${SERVER_METADATA_URL}" | jq -r .token_endpoint)
+SERVER_METADATA=$(curl -s "${SERVER_METADATA_URL}")
+ISSUER=$(echo "${SERVER_METADATA}" | jq -r .issuer)
+TOKEN_ENDPOINT=$(echo "${SERVER_METADATA}" | jq -r .token_endpoint)
 RESOURCE_SERVER_IDENTIFIER=$(terraform output -raw resource_server_identifier)
 CLIENT_ID=$(terraform output -raw example_client_id)
 
@@ -26,7 +28,7 @@ JWT_PAYLOAD=$((basenc --base64url --wrap=0 | tr -d '=') <<EOF
 {
 	"iss": "${CLIENT_ID}",
 	"sub": "${CLIENT_ID}",
-	"aud": "${TOKEN_ENDPOINT}",
+	"aud": "${ISSUER}",
 	"iat": ${ISSUED_AT},
 	"exp": $((${ISSUED_AT} + 60)),
 	"jti": "$(uuidgen)"
