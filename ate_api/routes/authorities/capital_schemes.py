@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated, Literal, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request
@@ -9,7 +8,6 @@ from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepositor
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.capital_scheme_repositories import (
     CapitalSchemeItem,
-    CapitalSchemeItemAuthorityReview,
     CapitalSchemeItemOverview,
     CapitalSchemeRepository,
 )
@@ -20,6 +18,7 @@ from ate_api.repositories import (
     get_funding_programme_repository,
 )
 from ate_api.routes.base import BaseModel
+from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.milestones import MilestoneModel
 from ate_api.routes.collections import CollectionModel
@@ -41,19 +40,11 @@ class CapitalSchemeItemOverviewModel(BaseModel):
         )
 
 
-class CapitalSchemeItemAuthorityReviewModel(BaseModel):
-    review_date: datetime
-
-    @classmethod
-    def from_domain(cls, authority_review: CapitalSchemeItemAuthorityReview) -> Self:
-        return cls(review_date=authority_review.review_date)
-
-
 class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
     overview: CapitalSchemeItemOverviewModel
-    authority_review: CapitalSchemeItemAuthorityReviewModel | None
+    authority_review: CapitalSchemeAuthorityReviewModel | None
 
     @classmethod
     def from_domain(cls, capital_scheme_item: CapitalSchemeItem, request: Request) -> Self:
@@ -62,7 +53,7 @@ class CapitalSchemeItemModel(BaseModel):
             reference=str(capital_scheme_item.reference),
             overview=CapitalSchemeItemOverviewModel.from_domain(capital_scheme_item.overview, request),
             authority_review=(
-                CapitalSchemeItemAuthorityReviewModel.from_domain(capital_scheme_item.authority_review)
+                CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme_item.authority_review)
                 if capital_scheme_item.authority_review
                 else None
             ),
@@ -82,7 +73,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "name": "Wirral Package",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                             },
-                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
+                            "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00002",
@@ -91,7 +82,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "name": "School Streets",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4",
                             },
-                            "authorityReview": {"reviewDate": "2020-02-02T00:00:00Z"},
+                            "authorityReview": {"reviewDate": "2020-02-02T00:00:00Z", "source": "authority update"},
                         },
                         {
                             "@id": "https://api.activetravelengland.gov.uk/capital-schemes/ATE00003",
@@ -100,7 +91,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "name": "Hospital Fields Road",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5",
                             },
-                            "authorityReview": {"reviewDate": "2020-02-03T00:00:00Z"},
+                            "authorityReview": {"reviewDate": "2020-02-03T00:00:00Z", "source": "authority update"},
                         },
                     ]
                 }

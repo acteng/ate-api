@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
+from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.dates import is_zoned
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 
@@ -16,19 +15,10 @@ class CapitalSchemeItemOverview:
 
 
 @dataclass(frozen=True)
-class CapitalSchemeItemAuthorityReview:
-    review_date: datetime
-
-    def __post_init__(self) -> None:
-        if self.review_date and not is_zoned(self.review_date):
-            raise ValueError(f"Review date and time must include a time zone: {self.review_date}")
-
-
-@dataclass(frozen=True)
 class CapitalSchemeItem:
     reference: CapitalSchemeReference
     overview: CapitalSchemeItemOverview
-    authority_review: CapitalSchemeItemAuthorityReview | None
+    authority_review: CapitalSchemeAuthorityReview | None
 
 
 class CapitalSchemeRepository:

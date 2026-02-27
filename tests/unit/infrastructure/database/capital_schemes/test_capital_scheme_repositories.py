@@ -9,11 +9,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_scheme_repositories import (
-    CapitalSchemeItem,
-    CapitalSchemeItemAuthorityReview,
-    CapitalSchemeItemOverview,
-)
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeItemOverview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -715,38 +711,9 @@ class TestDatabaseCapitalSchemeRepository:
             )
 
         assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeItemAuthorityReview(review_date=datetime(2020, 3, 1, tzinfo=UTC))
-        ]
-
-    async def test_get_items_by_bid_submitting_authority_converts_authority_review_from_local_europe_london(
-        self, engine: AsyncEngine
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity(bid_submitting_authority=liv)],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_authority_reviews=[
-                            CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 6, 1, 13), data_source=authority_review
-                            )
-                        ],
-                    ),
-                ]
+            CapitalSchemeAuthorityReview(
+                review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
             )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV")
-            )
-
-        assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeItemAuthorityReview(review_date=datetime(2020, 6, 1, 12, tzinfo=UTC))
         ]
 
     async def test_get_items_by_bid_submitting_authority_filters_under_embargo(self, engine: AsyncEngine) -> None:

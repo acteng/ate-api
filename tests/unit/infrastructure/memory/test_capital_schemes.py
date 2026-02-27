@@ -11,11 +11,7 @@ from ate_api.domain.capital_scheme_milestones import (
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_scheme_repositories import (
-    CapitalSchemeItem,
-    CapitalSchemeItemAuthorityReview,
-    CapitalSchemeItemOverview,
-)
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeItemOverview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
@@ -158,6 +154,9 @@ class TestMemoryCapitalSchemeRepository:
     async def test_get_items_by_bid_submitting_authority_fetches_authority_review(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
+        authority_review = CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
@@ -169,17 +168,13 @@ class TestMemoryCapitalSchemeRepository:
             ),
             bid_status_details=dummy_bid_status_details(),
         )
-        capital_scheme.perform_authority_review(
-            CapitalSchemeAuthorityReview(
-                review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
-            )
-        )
+        capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
 
         capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeItemAuthorityReview(review_date=datetime(2020, 2, 1, tzinfo=UTC))
+            authority_review
         ]
 
     async def test_get_items_by_bid_submitting_authority_filters_by_funding_programme(

@@ -10,7 +10,6 @@ from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import (
     CapitalSchemeItem,
-    CapitalSchemeItemAuthorityReview,
     CapitalSchemeItemOverview,
     CapitalSchemeRepository,
 )
@@ -47,7 +46,6 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from ate_api.infrastructure.database.dates import local_to_zoned
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
@@ -158,7 +156,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     ) -> list[CapitalSchemeItem]:
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
         ranked_capital_scheme_authority_reviews_alias = aliased(
-            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
+            CapitalSchemeAuthorityReviewEntity,
+            ranked_capital_scheme_authority_reviews,
+            name="CapitalSchemeAuthorityReviewEntity",
         )
 
         statement = (
@@ -166,8 +166,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 CapitalSchemeEntity.scheme_reference,
                 CapitalSchemeOverviewEntity.scheme_name,
                 FundingProgrammeEntity.funding_programme_code,
-                ranked_capital_scheme_authority_reviews_alias.review_date,
+                ranked_capital_scheme_authority_reviews_alias,
             )
+            .options(joinedload(ranked_capital_scheme_authority_reviews_alias.data_source))
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
@@ -417,8 +418,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 name=row.scheme_name, funding_programme=FundingProgrammeCode(row.funding_programme_code)
             ),
             authority_review=(
-                CapitalSchemeItemAuthorityReview(review_date=local_to_zoned(row.review_date))
-                if row.review_date
-                else None
+                row.CapitalSchemeAuthorityReviewEntity.to_domain() if row.CapitalSchemeAuthorityReviewEntity else None
             ),
         )

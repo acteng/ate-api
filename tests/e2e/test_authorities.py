@@ -67,7 +67,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                     "name": "Wirral Package",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 },
-                "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z"},
+                "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
             },
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00002",
