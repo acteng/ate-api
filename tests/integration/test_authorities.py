@@ -180,7 +180,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     )
 
     assert response.status_code == 200
-    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
 
 
 @respx.mock
@@ -244,10 +244,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     )
 
     assert response.status_code == 200
-    assert [item["@id"] for item in response.json()["items"]] == [
-        f"{client.base_url}/capital-schemes/ATE00001",
-        f"{client.base_url}/capital-schemes/ATE00002",
-    ]
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001", "ATE00002"]
 
 
 @respx.mock
@@ -312,7 +309,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
     )
 
     assert response.status_code == 200
-    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
 
 
 @respx.mock
@@ -399,7 +396,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
 
     assert response.status_code == 200
-    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
 
 
 @respx.mock
@@ -493,10 +490,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
 
     assert response.status_code == 200
-    assert [item["@id"] for item in response.json()["items"]] == [
-        f"{client.base_url}/capital-schemes/ATE00001",
-        f"{client.base_url}/capital-schemes/ATE00002",
-    ]
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001", "ATE00002"]
 
 
 @respx.mock
@@ -556,7 +550,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
     )
 
     assert response.status_code == 200
-    assert [item["@id"] for item in response.json()["items"]] == [f"{client.base_url}/capital-schemes/ATE00001"]
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
 
 
 @respx.mock
