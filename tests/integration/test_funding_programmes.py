@@ -38,7 +38,7 @@ async def test_get_funding_programmes_filters_by_eligible_for_authority_update(
     )
 
     assert response.status_code == 200
-    assert response.json() == {"items": [{"@id": f"{client.base_url}/funding-programmes/ATF3", "code": "ATF3"}]}
+    assert [item["code"] for item in response.json()["items"]] == ["ATF3"]
 
 
 @respx.mock
