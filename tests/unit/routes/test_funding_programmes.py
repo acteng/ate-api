@@ -2,7 +2,7 @@ from fastapi import Request
 from pydantic import AnyUrl
 
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode
-from ate_api.routes.funding_programmes import FundingProgrammeItemModel, FundingProgrammeModel
+from ate_api.routes.funding_programmes import FundingProgrammeModel
 
 
 class TestFundingProgrammeModel:
@@ -23,15 +23,4 @@ class TestFundingProgrammeModel:
         assert (
             funding_programme.code == FundingProgrammeCode("ATF3")
             and funding_programme.is_eligible_for_authority_update
-        )
-
-
-class TestFundingProgrammeItemModel:
-    def test_from_domain(self, http_request: Request, base_url: str) -> None:
-        funding_programme = FundingProgramme(code=FundingProgrammeCode("ATF3"), is_eligible_for_authority_update=True)
-
-        funding_programme_item_model = FundingProgrammeItemModel.from_domain(funding_programme, http_request)
-
-        assert funding_programme_item_model == FundingProgrammeItemModel(
-            id=AnyUrl(f"{base_url}/funding-programmes/ATF3"), code="ATF3"
         )

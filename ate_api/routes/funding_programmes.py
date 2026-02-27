@@ -41,27 +41,27 @@ class FundingProgrammeModel(BaseModel):
         )
 
 
-class FundingProgrammeItemModel(BaseModel):
-    id: Annotated[AnyUrl | None, Field(alias="@id")] = None
-    code: str
-
-    @classmethod
-    def from_domain(cls, funding_programme: FundingProgramme, request: Request) -> Self:
-        return cls(
-            id=AnyUrl(str(request.url_for("get_funding_programme", code=str(funding_programme.code)))),
-            code=str(funding_programme.code),
-        )
-
-
-class FundingProgrammeItemsModel(CollectionModel[FundingProgrammeItemModel]):
+class FundingProgrammesModel(CollectionModel[FundingProgrammeModel]):
     model_config = ConfigDict(
         json_schema_extra={
             "examples": [
                 {
                     "items": [
-                        {"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3", "code": "ATF3"},
-                        {"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4", "code": "ATF4"},
-                        {"@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5", "code": "ATF5"},
+                        {
+                            "@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                            "code": "ATF3",
+                            "eligibleForAuthorityUpdate": True,
+                        },
+                        {
+                            "@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4",
+                            "code": "ATF4",
+                            "eligibleForAuthorityUpdate": True,
+                        },
+                        {
+                            "@id": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5",
+                            "code": "ATF5",
+                            "eligibleForAuthorityUpdate": True,
+                        },
                     ]
                 }
             ]
@@ -79,7 +79,7 @@ async def get_funding_programmes(
     is_eligible_for_authority_update: Annotated[
         bool | None, Query(alias="eligible-for-authority-update", examples=[True])
     ] = None,
-) -> FundingProgrammeItemsModel:
+) -> FundingProgrammesModel:
     """
     Gets the funding programmes.
     """
@@ -87,10 +87,9 @@ async def get_funding_programmes(
         is_eligible_for_authority_update=is_eligible_for_authority_update
     )
     funding_programme_models = [
-        FundingProgrammeItemModel.from_domain(funding_programme, request)
-        for funding_programme in all_funding_programmes
+        FundingProgrammeModel.from_domain(funding_programme, request) for funding_programme in all_funding_programmes
     ]
-    return FundingProgrammeItemsModel(items=funding_programme_models)
+    return FundingProgrammesModel(items=funding_programme_models)
 
 
 @router.get("/{code}", summary="Get funding programme", responses={HTTP_404_NOT_FOUND: {}})
