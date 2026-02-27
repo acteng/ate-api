@@ -9,7 +9,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeItemOverview
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -581,11 +581,12 @@ class TestDatabaseCapitalSchemeRepository:
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
-                            build_capital_scheme_overview_entity(
-                                name="Wirral Package",
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
-                                type_=construction,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
                             )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
@@ -593,11 +594,12 @@ class TestDatabaseCapitalSchemeRepository:
                     CapitalSchemeEntity(
                         scheme_reference="ATE00002",
                         capital_scheme_overviews=[
-                            build_capital_scheme_overview_entity(
-                                name="School Streets",
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="School Streets",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
-                                type_=construction,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
                             )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
@@ -605,11 +607,12 @@ class TestDatabaseCapitalSchemeRepository:
                     CapitalSchemeEntity(
                         scheme_reference="ATE00003",
                         capital_scheme_overviews=[
-                            build_capital_scheme_overview_entity(
-                                name="Hospital Fields Road",
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Hospital Fields Road",
                                 bid_submitting_authority=wyo,
                                 funding_programme=atf3,
-                                type_=construction,
+                                scheme_type=construction,
+                                effective_date_from=datetime(2020, 1, 1),
                             )
                         ],
                         capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity(bid_status=funded)],
@@ -626,15 +629,23 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme_items == [
             CapitalSchemeItem(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeItemOverview(
-                    name="Wirral Package", funding_programme=FundingProgrammeCode("ATF3")
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="Wirral Package",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 authority_review=None,
             ),
             CapitalSchemeItem(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeItemOverview(
-                    name="School Streets", funding_programme=FundingProgrammeCode("ATF3")
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="School Streets",
+                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 authority_review=None,
             ),

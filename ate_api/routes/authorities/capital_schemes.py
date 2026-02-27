@@ -6,11 +6,7 @@ from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_CONTENT
 
 from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_scheme_milestones import Milestone
-from ate_api.domain.capital_schemes.capital_scheme_repositories import (
-    CapitalSchemeItem,
-    CapitalSchemeItemOverview,
-    CapitalSchemeRepository,
-)
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.repositories import (
     get_authority_repository,
@@ -21,29 +17,16 @@ from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.milestones import MilestoneModel
+from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 from ate_api.routes.collections import CollectionModel
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
 
 
-class CapitalSchemeItemOverviewModel(BaseModel):
-    name: str
-    funding_programme: AnyUrl
-
-    @classmethod
-    def from_domain(cls, overview: CapitalSchemeItemOverview, request: Request) -> Self:
-        return cls(
-            name=overview.name,
-            funding_programme=AnyUrl(
-                str(request.url_for("get_funding_programme", code=str(overview.funding_programme)))
-            ),
-        )
-
-
 class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
-    overview: CapitalSchemeItemOverviewModel
+    overview: CapitalSchemeOverviewModel
     authority_review: CapitalSchemeAuthorityReviewModel | None
 
     @classmethod
@@ -51,7 +34,7 @@ class CapitalSchemeItemModel(BaseModel):
         return cls(
             id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme_item.reference)))),
             reference=str(capital_scheme_item.reference),
-            overview=CapitalSchemeItemOverviewModel.from_domain(capital_scheme_item.overview, request),
+            overview=CapitalSchemeOverviewModel.from_domain(capital_scheme_item.overview, request),
             authority_review=(
                 CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme_item.authority_review)
                 if capital_scheme_item.authority_review
@@ -71,7 +54,9 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00001",
                             "overview": {
                                 "name": "Wirral Package",
+                                "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                                "type": "construction",
                             },
                             "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
                         },
@@ -80,7 +65,9 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00002",
                             "overview": {
                                 "name": "School Streets",
+                                "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4",
+                                "type": "construction",
                             },
                             "authorityReview": {"reviewDate": "2020-02-02T00:00:00Z", "source": "authority update"},
                         },
@@ -89,7 +76,9 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00003",
                             "overview": {
                                 "name": "Hospital Fields Road",
+                                "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5",
+                                "type": "construction",
                             },
                             "authorityReview": {"reviewDate": "2020-02-03T00:00:00Z", "source": "authority update"},
                         },

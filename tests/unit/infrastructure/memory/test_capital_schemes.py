@@ -11,7 +11,7 @@ from ate_api.domain.capital_scheme_milestones import (
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeItemOverview
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
@@ -92,29 +92,31 @@ class TestMemoryCapitalSchemeRepository:
         assert not capital_scheme
 
     async def test_get_items_by_bid_submitting_authority(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
+        overview1 = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="Wirral Package",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        )
         await capital_schemes.add(
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    type=CapitalSchemeType.CONSTRUCTION,
-                ),
+                overview=overview1,
                 bid_status_details=dummy_bid_status_details(),
             )
+        )
+        overview2 = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="School Streets",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            type=CapitalSchemeType.CONSTRUCTION,
         )
         await capital_schemes.add(
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="School Streets",
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    type=CapitalSchemeType.CONSTRUCTION,
-                ),
+                overview=overview2,
                 bid_status_details=dummy_bid_status_details(),
             )
         )
@@ -135,20 +137,8 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert capital_scheme_items == [
-            CapitalSchemeItem(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeItemOverview(
-                    name="Wirral Package", funding_programme=FundingProgrammeCode("ATF3")
-                ),
-                authority_review=None,
-            ),
-            CapitalSchemeItem(
-                reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeItemOverview(
-                    name="School Streets", funding_programme=FundingProgrammeCode("ATF3")
-                ),
-                authority_review=None,
-            ),
+            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00001"), overview=overview1, authority_review=None),
+            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00002"), overview=overview2, authority_review=None),
         ]
 
     async def test_get_items_by_bid_submitting_authority_fetches_authority_review(

@@ -8,11 +8,7 @@ from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.capital_scheme_repositories import (
-    CapitalSchemeItem,
-    CapitalSchemeItemOverview,
-    CapitalSchemeRepository,
-)
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
@@ -164,11 +160,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         statement = (
             select(
                 CapitalSchemeEntity.scheme_reference,
-                CapitalSchemeOverviewEntity.scheme_name,
-                FundingProgrammeEntity.funding_programme_code,
+                CapitalSchemeOverviewEntity,
                 ranked_capital_scheme_authority_reviews_alias,
             )
-            .options(joinedload(ranked_capital_scheme_authority_reviews_alias.data_source))
+            .options(
+                joinedload(CapitalSchemeOverviewEntity.bid_submitting_authority),
+                contains_eager(CapitalSchemeOverviewEntity.funding_programme),
+                joinedload(CapitalSchemeOverviewEntity.scheme_type),
+                joinedload(ranked_capital_scheme_authority_reviews_alias.data_source),
+            )
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
@@ -414,9 +414,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     def _item_row_to_domain(row: Row[Any]) -> CapitalSchemeItem:
         return CapitalSchemeItem(
             reference=CapitalSchemeReference(row.scheme_reference),
-            overview=CapitalSchemeItemOverview(
-                name=row.scheme_name, funding_programme=FundingProgrammeCode(row.funding_programme_code)
-            ),
+            overview=row.CapitalSchemeOverviewEntity.to_domain(),
             authority_review=(
                 row.CapitalSchemeAuthorityReviewEntity.to_domain() if row.CapitalSchemeAuthorityReviewEntity else None
             ),

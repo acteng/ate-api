@@ -1,11 +1,7 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
-from ate_api.domain.capital_schemes.capital_scheme_repositories import (
-    CapitalSchemeItem,
-    CapitalSchemeItemOverview,
-    CapitalSchemeRepository,
-)
+from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
@@ -49,9 +45,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     def _to_item(capital_scheme: CapitalScheme) -> CapitalSchemeItem:
         return CapitalSchemeItem(
             reference=capital_scheme.reference,
-            overview=CapitalSchemeItemOverview(
-                name=capital_scheme.overview.name, funding_programme=capital_scheme.overview.funding_programme
-            ),
+            overview=capital_scheme.overview,
             authority_review=capital_scheme.authority_review,
         )
 

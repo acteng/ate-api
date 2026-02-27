@@ -65,7 +65,9 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "reference": "ATE00001",
                 "overview": {
                     "name": "Wirral Package",
+                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "type": "construction",
                 },
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
             },
@@ -74,7 +76,9 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
                 "reference": "ATE00002",
                 "overview": {
                     "name": "School Streets",
+                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "type": "construction",
                 },
                 "authorityReview": None,
             },
