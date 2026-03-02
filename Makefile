@@ -1,6 +1,9 @@
 bin = .venv/bin
 packages = ate_api tests
 
+upgrade:
+	$(bin)/pip install --upgrade --upgrade-strategy=eager -e .[dev]
+
 black-check:
 	$(bin)/black --check $(packages)
 
