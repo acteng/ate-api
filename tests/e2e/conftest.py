@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generator
+from typing import Any, Generator
 
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
@@ -94,9 +94,9 @@ def client_fixture(server: Server) -> Client:
 
 @pytest.fixture(name="access_token")
 def access_token_fixture(
-    authorization_server: Server, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
+    authorization_server_configuration: Any, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
 ) -> str:
-    token_endpoint = authorization_server.url + authorization_server.app.url_path_for("token")
+    token_endpoint = authorization_server_configuration["token_endpoint"]
     token: OAuth2Token = authorization_client.fetch_token(
         token_endpoint, grant_type="client_credentials", audience=resource_server.identifier
     )
@@ -145,6 +145,14 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
 @pytest.fixture(name="authorization_server_configuration_url", scope="package")
 def authorization_server_configuration_url(authorization_server: Server) -> str:
     return authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
+
+
+@pytest.fixture(name="authorization_server_configuration", scope="package")
+def authorization_server_configuration(authorization_server_configuration_url: str) -> Any:
+    with Client() as client:
+        response = client.get(authorization_server_configuration_url)
+        response.raise_for_status()
+        return response.json()
 
 
 @pytest.fixture(name="tests_key_pair", scope="package")

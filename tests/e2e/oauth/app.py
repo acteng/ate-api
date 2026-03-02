@@ -36,7 +36,11 @@ def _get_authorization_server(
 
 @app.get("/.well-known/openid-configuration")
 async def openid_configuration(request: Request) -> dict[str, str]:
-    return {"issuer": _issuer, "jwks_uri": str(request.url_for("key_set"))}
+    return {
+        "issuer": _issuer,
+        "token_endpoint": str(request.url_for("token")),
+        "jwks_uri": str(request.url_for("key_set")),
+    }
 
 
 @app.get("/.well-known/jwks.json")
