@@ -60,12 +60,12 @@ def resource_server_fixture() -> OAuthResourceServer:
 
 @pytest.fixture(name="settings", scope="package")
 def settings_fixture(
-    database_url: str, authorization_server_configuration_url: str, resource_server: OAuthResourceServer
+    database_url: str, authorization_server_metadata_url: str, resource_server: OAuthResourceServer
 ) -> Settings:
     return Settings(
         database_url=database_url,
         create_database_schema=True,
-        oidc_server_metadata_url=authorization_server_configuration_url,
+        oidc_server_metadata_url=authorization_server_metadata_url,
         resource_server_identifier=resource_server.identifier,
     )
 
@@ -94,9 +94,9 @@ def client_fixture(server: Server) -> Client:
 
 @pytest.fixture(name="access_token")
 def access_token_fixture(
-    authorization_server_configuration: Any, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
+    authorization_server_metadata: Any, resource_server: OAuthResourceServer, authorization_client: OAuth2Client
 ) -> str:
-    token_endpoint = authorization_server_configuration["token_endpoint"]
+    token_endpoint = authorization_server_metadata["token_endpoint"]
     token: OAuth2Token = authorization_client.fetch_token(
         token_endpoint, grant_type="client_credentials", audience=resource_server.identifier
     )
@@ -142,15 +142,15 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
     server.stop()
 
 
-@pytest.fixture(name="authorization_server_configuration_url", scope="package")
-def authorization_server_configuration_url_fixture(authorization_server: Server) -> str:
+@pytest.fixture(name="authorization_server_metadata_url", scope="package")
+def authorization_server_metadata_url_fixture(authorization_server: Server) -> str:
     return authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
 
 
-@pytest.fixture(name="authorization_server_configuration", scope="package")
-def authorization_server_configuration_fixture(authorization_server_configuration_url: str) -> Any:
+@pytest.fixture(name="authorization_server_metadata", scope="package")
+def authorization_server_metadata_fixture(authorization_server_metadata_url: str) -> Any:
     with Client() as client:
-        response = client.get(authorization_server_configuration_url)
+        response = client.get(authorization_server_metadata_url)
         response.raise_for_status()
         return response.json()
 
@@ -177,9 +177,9 @@ def tests_oauth_client_fixture(tests_public_key: bytes) -> OAuthClient:
 
 @pytest.fixture(name="authorization_client")
 def authorization_client_fixture(
-    tests_oauth_client: OAuthClient, tests_private_key: bytes, authorization_server_configuration: Any
+    tests_oauth_client: OAuthClient, tests_private_key: bytes, authorization_server_metadata: Any
 ) -> OAuth2Client:
-    issuer = authorization_server_configuration["issuer"]
+    issuer = authorization_server_metadata["issuer"]
     return OAuth2Client(
         client_id=tests_oauth_client.client_id,
         client_secret=tests_private_key,
