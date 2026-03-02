@@ -176,11 +176,15 @@ def tests_oauth_client_fixture(tests_public_key: bytes) -> OAuthClient:
 
 
 @pytest.fixture(name="authorization_client")
-def authorization_client_fixture(tests_oauth_client: OAuthClient, tests_private_key: bytes) -> OAuth2Client:
+def authorization_client_fixture(
+    tests_oauth_client: OAuthClient, tests_private_key: bytes, authorization_server_configuration: Any
+) -> OAuth2Client:
+    issuer = authorization_server_configuration["issuer"]
     return OAuth2Client(
         client_id=tests_oauth_client.client_id,
         client_secret=tests_private_key,
-        token_endpoint_auth_method=PrivateKeyJWT(),
+        # Workaround: https://github.com/authlib/authlib/issues/730
+        token_endpoint_auth_method=PrivateKeyJWT(token_endpoint=issuer),
     )
 
 

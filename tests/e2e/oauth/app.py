@@ -28,7 +28,7 @@ def _get_authorization_server(
     )
     authorization_server.register_client_auth_method(
         PrivateKeyJwtClientAssertion.CLIENT_AUTH_METHOD,
-        PrivateKeyJwtClientAssertion(str(request.url_for("token")), settings.resource_server_identifier),
+        PrivateKeyJwtClientAssertion(str(request.url_for("token")), _issuer, settings.resource_server_identifier),
     )
     authorization_server.register_grant(PrivateKeyJwtClientCredentialsGrant)
     return authorization_server
