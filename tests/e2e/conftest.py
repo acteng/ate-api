@@ -59,12 +59,13 @@ def resource_server_fixture() -> OAuthResourceServer:
 
 
 @pytest.fixture(name="settings", scope="package")
-def settings_fixture(database_url: str, authorization_server: Server, resource_server: OAuthResourceServer) -> Settings:
-    oidc_server_metadata_url = authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
+def settings_fixture(
+    database_url: str, authorization_server_configuration_url: str, resource_server: OAuthResourceServer
+) -> Settings:
     return Settings(
         database_url=database_url,
         create_database_schema=True,
-        oidc_server_metadata_url=oidc_server_metadata_url,
+        oidc_server_metadata_url=authorization_server_configuration_url,
         resource_server_identifier=resource_server.identifier,
     )
 
@@ -139,6 +140,11 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
     server.start()
     yield server
     server.stop()
+
+
+@pytest.fixture(name="authorization_server_configuration_url", scope="package")
+def authorization_server_configuration_url(authorization_server: Server) -> str:
+    return authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
 
 
 @pytest.fixture(name="tests_key_pair", scope="package")
