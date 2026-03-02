@@ -143,12 +143,12 @@ def authorization_server_fixture(authorization_server_app: FastAPI) -> Generator
 
 
 @pytest.fixture(name="authorization_server_configuration_url", scope="package")
-def authorization_server_configuration_url(authorization_server: Server) -> str:
+def authorization_server_configuration_url_fixture(authorization_server: Server) -> str:
     return authorization_server.url + authorization_server.app.url_path_for("openid_configuration")
 
 
 @pytest.fixture(name="authorization_server_configuration", scope="package")
-def authorization_server_configuration(authorization_server_configuration_url: str) -> Any:
+def authorization_server_configuration_fixture(authorization_server_configuration_url: str) -> Any:
     with Client() as client:
         response = client.get(authorization_server_configuration_url)
         response.raise_for_status()
