@@ -43,11 +43,6 @@ async def openid_configuration(request: Request) -> dict[str, str]:
     }
 
 
-@app.get("/.well-known/jwks.json")
-async def key_set() -> Any:
-    return KeySet([_token_key]).as_dict()
-
-
 @app.post("/token")
 async def token(
     authorization_server: Annotated[AuthorizationServer, Depends(_get_authorization_server)], request: Request
@@ -58,3 +53,8 @@ async def token(
 
     response: Response = authorization_server.create_token_response(sync_request)
     return response
+
+
+@app.get("/.well-known/jwks.json")
+async def key_set() -> Any:
+    return KeySet([_token_key]).as_dict()
