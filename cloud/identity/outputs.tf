@@ -4,7 +4,7 @@ output "record" {
 }
 
 output "oidc_server_metadata_url" {
-  description = "OIDC configuration URL"
+  description = "Authorisation server configuration endpoint"
   value       = "https://${module.custom_domain.domain}/.well-known/openid-configuration"
 }
 

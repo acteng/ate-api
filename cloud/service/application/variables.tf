@@ -50,7 +50,7 @@ variable "database_password" {
 }
 
 variable "oidc_server_metadata_url" {
-  description = "OIDC configuration URL"
+  description = "Authorisation server configuration endpoint"
   type        = string
 }
 
