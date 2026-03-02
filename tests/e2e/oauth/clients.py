@@ -4,7 +4,7 @@ from authlib.oauth2.rfc6749 import ClientMixin
 
 
 @dataclass(frozen=True)
-class StubClient(ClientMixin):  # type: ignore
+class StubClient(ClientMixin):
     client_id: str
     public_key: bytes
 

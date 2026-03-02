@@ -35,7 +35,7 @@ class SyncStarletteHttpRequest:
         return self._form
 
 
-class StarletteOAuth2Request(OAuth2Request):  # type: ignore
+class StarletteOAuth2Request(OAuth2Request):
     def __init__(self, request: SyncStarletteHttpRequest):
         super().__init__(request.method, str(request.url), request.headers)
         self._form = request.form
@@ -47,7 +47,7 @@ class StarletteOAuth2Request(OAuth2Request):  # type: ignore
 
 
 # Workaround: https://github.com/authlib/authlib/pull/278
-class StarletteAuthorizationServer(AuthorizationServer):  # type: ignore
+class StarletteAuthorizationServer(AuthorizationServer):
     def __init__(self, query_client: Callable[[str], ClientMixin]):
         super().__init__()
         self._query_client = query_client
