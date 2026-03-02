@@ -13,9 +13,8 @@ fi
 ENVIRONMENT=$1
 
 SERVER_METADATA_URL=$(terraform output -raw oidc_server_metadata_url)
-SERVER_METADATA=$(curl -s "${SERVER_METADATA_URL}")
-ISSUER=$(echo "${SERVER_METADATA}" | jq -r .issuer)
-TOKEN_ENDPOINT=$(echo "${SERVER_METADATA}" | jq -r .token_endpoint)
+ISSUER=$(terraform output -raw issuer)
+TOKEN_ENDPOINT=$(curl -s "${SERVER_METADATA_URL}" | jq -r .token_endpoint)
 RESOURCE_SERVER_IDENTIFIER=$(terraform output -raw resource_server_identifier)
 CLIENT_ID=$(terraform output -raw example_client_id)
 

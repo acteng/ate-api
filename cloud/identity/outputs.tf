@@ -8,6 +8,11 @@ output "oidc_server_metadata_url" {
   value       = "https://${module.custom_domain.domain}/.well-known/openid-configuration"
 }
 
+output "issuer" {
+  description = "Authorisation server issuer"
+  value       = "https://${module.custom_domain.domain}/"
+}
+
 output "resource_server_identifier" {
   description = "Resource server identifier"
   value       = module.resource_server.identifier
