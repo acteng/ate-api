@@ -4,11 +4,10 @@ from typing import Annotated, Self
 from fastapi import APIRouter, Depends, HTTPException, Path
 from pydantic import ConfigDict, field_validator
 from pydantic_core import PydanticCustomError
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
 from ate_api.clock import get_clock
-from ate_api.database import get_session
+from ate_api.database import get_unit_of_work
 from ate_api.domain.capital_scheme_financials import (
     CapitalSchemeFinancial,
     CapitalSchemeFinancials,
@@ -23,6 +22,7 @@ from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
+from ate_api.unit_of_work import UnitOfWork
 
 
 class CapitalSchemeFinancialModel(BaseModel):
@@ -80,21 +80,22 @@ async def create_financial(
     capital_scheme_financials: Annotated[
         CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
     ],
-    session: Annotated[AsyncSession, Depends(get_session)],
+    unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
     reference: Annotated[str, Path(examples=["ATE00001"])],
     financial_model: CreateCapitalSchemeFinancialModel,
 ) -> CapitalSchemeFinancialModel:
     """
     Creates a financial for a capital scheme.
     """
-    financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
+    async with unit_of_work:
+        financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
 
-    if not financials:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+        if not financials:
+            raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    financial = financial_model.to_domain(clock.now)
-    financials.change_financial(financial)
-    await capital_scheme_financials.update(financials)
-    await session.commit()
+        financial = financial_model.to_domain(clock.now)
+        financials.change_financial(financial)
+        await capital_scheme_financials.update(financials)
+        await unit_of_work.commit()
 
     return CapitalSchemeFinancialModel.from_domain(financial)

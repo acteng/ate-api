@@ -4,11 +4,10 @@ from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from pydantic import ConfigDict
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
 from ate_api.clock import get_clock
-from ate_api.database import get_session
+from ate_api.database import get_unit_of_work
 from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestone,
     CapitalSchemeMilestones,
@@ -24,6 +23,7 @@ from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.observation_types import ObservationTypeModel
+from ate_api.unit_of_work import UnitOfWork
 
 
 class MilestoneModel(str, Enum):
@@ -148,24 +148,25 @@ async def create_milestones(
     capital_scheme_milestones: Annotated[
         CapitalSchemeMilestonesRepository, Depends(get_capital_scheme_milestones_repository)
     ],
-    session: Annotated[AsyncSession, Depends(get_session)],
+    unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
     reference: Annotated[str, Path(examples=["ATE00001"])],
     milestones_model: CollectionModel[CapitalSchemeMilestoneModel],
 ) -> CollectionModel[CapitalSchemeMilestoneModel]:
     """
     Creates milestones for a capital scheme.
     """
-    milestones = await capital_scheme_milestones.get(CapitalSchemeReference(reference))
+    async with unit_of_work:
+        milestones = await capital_scheme_milestones.get(CapitalSchemeReference(reference))
 
-    if not milestones:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+        if not milestones:
+            raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-    now = clock.now
-    new_milestones = [milestone_model.to_domain(now) for milestone_model in milestones_model.items]
-    for milestone in new_milestones:
-        milestones.change_milestone(milestone)
-    await capital_scheme_milestones.update(milestones)
-    await session.commit()
+        now = clock.now
+        new_milestones = [milestone_model.to_domain(now) for milestone_model in milestones_model.items]
+        for milestone in new_milestones:
+            milestones.change_milestone(milestone)
+        await capital_scheme_milestones.update(milestones)
+        await unit_of_work.commit()
 
     return CollectionModel[CapitalSchemeMilestoneModel](
         items=[CapitalSchemeMilestoneModel.from_domain(milestone) for milestone in new_milestones]

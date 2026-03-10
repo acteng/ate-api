@@ -33,7 +33,9 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from ate_api.infrastructure.database.unit_of_work import DatabaseUnitOfWork
 from ate_api.settings import Settings, get_settings
+from ate_api.unit_of_work import UnitOfWork
 
 
 @lru_cache
@@ -44,6 +46,10 @@ def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncEng
 async def get_session(engine: Annotated[AsyncEngine, Depends(get_engine)]) -> AsyncGenerator[AsyncSession]:
     async with AsyncSession(engine) as session:
         yield session
+
+
+def get_unit_of_work(session: Annotated[AsyncSession, Depends(get_session)]) -> UnitOfWork:
+    return DatabaseUnitOfWork(session)
 
 
 async def create_database_schema(engine: AsyncEngine) -> None:
