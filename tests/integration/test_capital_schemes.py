@@ -31,6 +31,7 @@ from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.clock import Clock
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.infrastructure.memory.unit_of_work import FakeUnitOfWork
 
 
 @respx.mock
@@ -236,7 +237,11 @@ def test_get_capital_scheme_when_not_found(client: TestClient, access_token: str
 
 @respx.mock
 async def test_create_financial_creates_financial(
-    clock: Clock, capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
+    clock: Clock,
+    unit_of_work: FakeUnitOfWork,
+    capital_scheme_financials: CapitalSchemeFinancialsRepository,
+    client: TestClient,
+    access_token: str,
 ) -> None:
     clock.now = datetime(2020, 1, 1, tzinfo=UTC)
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
@@ -256,6 +261,7 @@ async def test_create_financial_creates_financial(
             data_source=DataSource.ATF4_BID,
         )
     ]
+    assert unit_of_work.committed
 
 
 @respx.mock
@@ -338,7 +344,11 @@ def test_create_financial_when_capital_scheme_not_found(client: TestClient, acce
 
 @respx.mock
 async def test_create_milestones_creates_milestones(
-    clock: Clock, capital_scheme_milestones: CapitalSchemeMilestonesRepository, client: TestClient, access_token: str
+    clock: Clock,
+    unit_of_work: FakeUnitOfWork,
+    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
+    client: TestClient,
+    access_token: str,
 ) -> None:
     clock.now = datetime(2020, 1, 1, tzinfo=UTC)
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
@@ -381,6 +391,7 @@ async def test_create_milestones_creates_milestones(
             data_source=DataSource.ATF4_BID,
         ),
     ]
+    assert unit_of_work.committed
 
 
 @respx.mock
@@ -494,6 +505,7 @@ def test_create_milestones_when_capital_scheme_not_found(client: TestClient, acc
 @respx.mock
 async def test_create_authority_review_creates_authority_review(
     clock: Clock,
+    unit_of_work: FakeUnitOfWork,
     capital_schemes: CapitalSchemeRepository,
     client: TestClient,
     access_token: str,
@@ -517,6 +529,7 @@ async def test_create_authority_review_creates_authority_review(
     assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
         review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
     )
+    assert unit_of_work.committed
 
 
 @respx.mock

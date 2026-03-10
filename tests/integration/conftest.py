@@ -69,7 +69,7 @@ def settings_fixture(authorization_server: StubAuthorizationServer, resource_ser
 
 
 @pytest.fixture(name="unit_of_work")
-def unit_of_work_fixture() -> UnitOfWork:
+def unit_of_work_fixture() -> FakeUnitOfWork:
     return FakeUnitOfWork()
 
 
