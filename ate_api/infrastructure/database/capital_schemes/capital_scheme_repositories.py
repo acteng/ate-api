@@ -359,7 +359,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             func.rank()
             .over(
                 partition_by=CapitalSchemeAuthorityReviewEntity.capital_scheme_id,
-                order_by=CapitalSchemeAuthorityReviewEntity.review_date.desc(),
+                order_by=[
+                    CapitalSchemeAuthorityReviewEntity.review_date.desc(),
+                    CapitalSchemeAuthorityReviewEntity.capital_scheme_authority_review_id.desc(),
+                ],
             )
             .label("rank"),
         )

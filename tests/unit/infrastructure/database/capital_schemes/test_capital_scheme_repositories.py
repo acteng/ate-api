@@ -515,6 +515,35 @@ class TestDatabaseCapitalSchemeRepository:
             review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
 
+    async def test_get_fetches_latest_authority_review_when_tie(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_authority_reviews=[
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                            ),
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.authority_review == CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
+
     async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
@@ -724,6 +753,42 @@ class TestDatabaseCapitalSchemeRepository:
         assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
             CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            )
+        ]
+
+    async def test_get_items_by_bid_submitting_authority_fetches_latest_authority_review_when_tie(
+        self, engine: AsyncEngine
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    CapitalSchemeEntity(
+                        scheme_reference="ATE00001",
+                        capital_scheme_overviews=[build_capital_scheme_overview_entity(bid_submitting_authority=liv)],
+                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                        capital_scheme_authority_reviews=[
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                            ),
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
+                AuthorityAbbreviation("LIV")
+            )
+
+        assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeAuthorityReview(
+                review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
             )
         ]
 
