@@ -1,12 +1,12 @@
-from httpx import Client
+from httpx import AsyncClient
 
 from tests.e2e.app_client import AppClient
 
 
-def test_get_authority(client: Client, access_token: str, app_client: AppClient) -> None:
+async def test_get_authority(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
 
-    response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
+    response = await client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
     assert response.json() == {
@@ -17,7 +17,9 @@ def test_get_authority(client: Client, access_token: str, app_client: AppClient)
     }
 
 
-def test_get_authority_bid_submitting_capital_schemes(client: Client, access_token: str, app_client: AppClient) -> None:
+async def test_get_authority_bid_submitting_capital_schemes(
+    client: AsyncClient, access_token: str, app_client: AppClient
+) -> None:
     app_client.set_clock("2020-02-01T00:00:00Z")
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
@@ -53,7 +55,7 @@ def test_get_authority_bid_submitting_capital_schemes(client: Client, access_tok
         }
     )
 
-    response = client.get(
+    response = await client.get(
         "/authorities/LIV/capital-schemes/bid-submitting", headers={"Authorization": f"Bearer {access_token}"}
     )
 

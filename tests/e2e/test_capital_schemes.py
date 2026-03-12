@@ -1,9 +1,9 @@
-from httpx import Client
+from httpx import AsyncClient
 
 from tests.e2e.app_client import AppClient
 
 
-def test_get_capital_scheme(client: Client, access_token: str, app_client: AppClient) -> None:
+async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     app_client.set_clock("2020-02-01T00:00:00Z")
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
@@ -50,7 +50,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
     )
     app_client.create_capital_scheme_authority_review("ATE00001", {"source": "authority update"})
 
-    response = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+    response = await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
     assert response.json() == {
@@ -89,7 +89,7 @@ def test_get_capital_scheme(client: Client, access_token: str, app_client: AppCl
     }
 
 
-def test_create_financial(client: Client, access_token: str, app_client: AppClient) -> None:
+async def test_create_financial(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
@@ -112,7 +112,7 @@ def test_create_financial(client: Client, access_token: str, app_client: AppClie
         "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
     )
 
-    response = client.post(
+    response = await client.post(
         "/capital-schemes/ATE00001/financials",
         headers={"Authorization": f"Bearer {access_token}"},
         json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
@@ -120,13 +120,15 @@ def test_create_financial(client: Client, access_token: str, app_client: AppClie
 
     assert response.status_code == 201
     assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
-    capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
+    capital_scheme = (
+        await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+    ).json()
     assert capital_scheme["financials"] == {
         "items": [{"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}]
     }
 
 
-def test_create_milestones(client: Client, access_token: str, app_client: AppClient) -> None:
+async def test_create_milestones(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     app_client.create_capital_scheme(
@@ -165,7 +167,7 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
         },
     )
 
-    response = client.post(
+    response = await client.post(
         "/capital-schemes/ATE00001/milestones",
         headers={"Authorization": f"Bearer {access_token}"},
         json={
@@ -203,7 +205,9 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
             },
         ]
     }
-    capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
+    capital_scheme = (
+        await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+    ).json()
     assert capital_scheme["milestones"]["items"] == [
         {
             "milestone": "detailed design completed",
@@ -220,7 +224,7 @@ def test_create_milestones(client: Client, access_token: str, app_client: AppCli
     ]
 
 
-def test_create_authority_review(client: Client, access_token: str, app_client: AppClient) -> None:
+async def test_create_authority_review(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     app_client.set_clock("2020-02-01T00:00:00Z")
     app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
     app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
@@ -243,7 +247,7 @@ def test_create_authority_review(client: Client, access_token: str, app_client: 
     app_client.create_capital_scheme_authority_review("ATE00001", {"source": "ATF4 bid"})
     app_client.set_clock("2021-02-01T00:00:00Z")
 
-    response = client.post(
+    response = await client.post(
         "/capital-schemes/ATE00001/authority-reviews",
         headers={"Authorization": f"Bearer {access_token}"},
         json={"source": "authority update"},
@@ -251,12 +255,14 @@ def test_create_authority_review(client: Client, access_token: str, app_client: 
 
     assert response.status_code == 201
     assert response.json() == {"reviewDate": "2021-02-01T00:00:00Z", "source": "authority update"}
-    capital_scheme = client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"}).json()
+    capital_scheme = (
+        await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
+    ).json()
     assert capital_scheme["authorityReview"] == {"reviewDate": "2021-02-01T00:00:00Z", "source": "authority update"}
 
 
-def test_get_milestones(client: Client, access_token: str) -> None:
-    response = client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
+async def test_get_milestones(client: AsyncClient, access_token: str) -> None:
+    response = await client.get("/capital-schemes/milestones", headers={"Authorization": f"Bearer {access_token}"})
 
     assert response.status_code == 200
     assert response.json() == {

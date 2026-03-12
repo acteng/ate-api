@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
 from fastapi import FastAPI
-from httpx import Client
+from httpx import AsyncClient, Client
 from testcontainers.postgres import PostgresContainer
 
 from ate_api.clock import get_clock
@@ -88,8 +88,8 @@ def server_fixture(app: FastAPI) -> Generator[Server]:
 
 
 @pytest.fixture(name="client")
-def client_fixture(server: Server) -> Client:
-    return Client(base_url=server.url)
+def client_fixture(server: Server) -> AsyncClient:
+    return AsyncClient(base_url=server.url)
 
 
 @pytest.fixture(name="access_token")
