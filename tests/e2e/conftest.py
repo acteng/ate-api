@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Generator
+from typing import Any, AsyncGenerator, Generator
 
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
@@ -104,12 +104,12 @@ def access_token_fixture(
 
 
 @pytest.fixture(name="app_client")
-def app_client_fixture(server: Server, access_token: str) -> Generator[AppClient]:
+async def app_client_fixture(server: Server, access_token: str) -> AsyncGenerator[AppClient]:
     app_client = AppClient(server.url, access_token)
     yield app_client
-    app_client.delete_capital_schemes()
-    app_client.delete_authorities()
-    app_client.delete_funding_programmes()
+    await app_client.delete_capital_schemes()
+    await app_client.delete_authorities()
+    await app_client.delete_funding_programmes()
 
 
 # endregion

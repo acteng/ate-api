@@ -4,8 +4,8 @@ from tests.e2e.app_client import AppClient
 
 
 async def test_get_funding_programmes(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
-    app_client.create_funding_programme({"code": "ATF4", "eligibleForAuthorityUpdate": False})
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
+    await app_client.create_funding_programme({"code": "ATF4", "eligibleForAuthorityUpdate": False})
 
     response = await client.get("/funding-programmes", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -19,7 +19,7 @@ async def test_get_funding_programmes(client: AsyncClient, access_token: str, ap
 
 
 async def test_get_funding_programme(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
 
     response = await client.get("/funding-programmes/ATF3", headers={"Authorization": f"Bearer {access_token}"})
 

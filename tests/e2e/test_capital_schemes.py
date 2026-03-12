@@ -4,10 +4,10 @@ from tests.e2e.app_client import AppClient
 
 
 async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    app_client.set_clock("2020-02-01T00:00:00Z")
-    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
-    app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
-    app_client.create_capital_scheme(
+    await app_client.set_clock("2020-02-01T00:00:00Z")
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
+    await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
             "overview": {
@@ -32,10 +32,10 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "authorityReview": None,
         }
     )
-    app_client.create_capital_scheme_financial(
+    await app_client.create_capital_scheme_financial(
         "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
     )
-    app_client.create_capital_scheme_milestones(
+    await app_client.create_capital_scheme_milestones(
         "ATE00001",
         {
             "items": [
@@ -48,7 +48,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             ]
         },
     )
-    app_client.create_capital_scheme_authority_review("ATE00001", {"source": "authority update"})
+    await app_client.create_capital_scheme_authority_review("ATE00001", {"source": "authority update"})
 
     response = await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
 
@@ -90,9 +90,9 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
 
 
 async def test_create_financial(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
-    app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
-    app_client.create_capital_scheme(
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
+    await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
             "overview": {
@@ -108,7 +108,7 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
             "authorityReview": None,
         }
     )
-    app_client.create_capital_scheme_financial(
+    await app_client.create_capital_scheme_financial(
         "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
     )
 
@@ -129,9 +129,9 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
 
 
 async def test_create_milestones(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
-    app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
-    app_client.create_capital_scheme(
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
+    await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
             "overview": {
@@ -147,7 +147,7 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
             "authorityReview": None,
         }
     )
-    app_client.create_capital_scheme_milestones(
+    await app_client.create_capital_scheme_milestones(
         "ATE00001",
         {
             "items": [
@@ -225,10 +225,10 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
 
 
 async def test_create_authority_review(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    app_client.set_clock("2020-02-01T00:00:00Z")
-    app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
-    app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
-    app_client.create_capital_scheme(
+    await app_client.set_clock("2020-02-01T00:00:00Z")
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
+    await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
             "overview": {
@@ -244,8 +244,8 @@ async def test_create_authority_review(client: AsyncClient, access_token: str, a
             "authorityReview": None,
         }
     )
-    app_client.create_capital_scheme_authority_review("ATE00001", {"source": "ATF4 bid"})
-    app_client.set_clock("2021-02-01T00:00:00Z")
+    await app_client.create_capital_scheme_authority_review("ATE00001", {"source": "ATF4 bid"})
+    await app_client.set_clock("2021-02-01T00:00:00Z")
 
     response = await client.post(
         "/capital-schemes/ATE00001/authority-reviews",
