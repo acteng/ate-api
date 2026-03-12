@@ -20,6 +20,7 @@ from ate_api.infrastructure.clock import Clock
 from ate_api.repositories import get_capital_scheme_financials_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
+from ate_api.routes.concurrency import retry_on_serialization_failure
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.unit_of_work import UnitOfWork
@@ -75,6 +76,7 @@ router = APIRouter()
     summary="Create capital scheme financial",
     responses={HTTP_404_NOT_FOUND: {}},
 )
+@retry_on_serialization_failure(max_retries=5, jitter=0.1)
 async def create_financial(
     clock: Annotated[Clock, Depends(get_clock)],
     capital_scheme_financials: Annotated[
@@ -88,6 +90,8 @@ async def create_financial(
     Creates a financial for a capital scheme.
     """
     async with unit_of_work:
+        await unit_of_work.begin_serializable()
+
         financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
 
         if not financials:

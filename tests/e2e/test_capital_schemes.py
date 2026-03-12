@@ -128,6 +128,44 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
     }
 
 
+async def test_create_financial_concurrently(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
+    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
+    await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    await app_client.create_capital_scheme(
+        {
+            "reference": "ATE00001",
+            "overview": {
+                "name": "Wirral Package",
+                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
+                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                "type": "construction",
+            },
+            "bidStatusDetails": {"bidStatus": "funded"},
+            "financials": {"items": []},
+            "milestones": {"items": []},
+            "outputs": {"items": []},
+            "authorityReview": None,
+        }
+    )
+
+    responses = await asyncio.gather(
+        *[
+            client.post(
+                "/capital-schemes/ATE00001/financials",
+                headers={"Authorization": f"Bearer {access_token}"},
+                json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+            )
+            for _ in range(3)
+        ]
+    )
+
+    assert all(response.status_code == 201 for response in responses)
+    capital_scheme = await app_client.get_capital_scheme("ATE00001")
+    assert capital_scheme["financials"] == {
+        "items": [{"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}]
+    }
+
+
 async def test_create_milestones(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
