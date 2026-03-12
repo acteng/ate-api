@@ -120,9 +120,7 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
 
     assert response.status_code == 201
     assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
-    capital_scheme = (
-        await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
-    ).json()
+    capital_scheme = await app_client.get_capital_scheme("ATE00001")
     assert capital_scheme["financials"] == {
         "items": [{"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}]
     }
@@ -205,9 +203,7 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
             },
         ]
     }
-    capital_scheme = (
-        await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
-    ).json()
+    capital_scheme = await app_client.get_capital_scheme("ATE00001")
     assert capital_scheme["milestones"]["items"] == [
         {
             "milestone": "detailed design completed",
@@ -255,9 +251,7 @@ async def test_create_authority_review(client: AsyncClient, access_token: str, a
 
     assert response.status_code == 201
     assert response.json() == {"reviewDate": "2021-02-01T00:00:00Z", "source": "authority update"}
-    capital_scheme = (
-        await client.get("/capital-schemes/ATE00001", headers={"Authorization": f"Bearer {access_token}"})
-    ).json()
+    capital_scheme = await app_client.get_capital_scheme("ATE00001")
     assert capital_scheme["authorityReview"] == {"reviewDate": "2021-02-01T00:00:00Z", "source": "authority update"}
 
 

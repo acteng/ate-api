@@ -27,6 +27,11 @@ class AppClient:
         response = await self._client.delete("/test/authorities")
         response.raise_for_status()
 
+    async def get_capital_scheme(self, capital_scheme: str) -> Any:
+        response = await self._client.get(f"/capital-schemes/{capital_scheme}")
+        response.raise_for_status()
+        return response.json()
+
     async def create_capital_scheme(self, capital_scheme: Any) -> None:
         response = await self._client.post("/test/capital-schemes", json=capital_scheme)
         response.raise_for_status()
