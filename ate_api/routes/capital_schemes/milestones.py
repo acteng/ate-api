@@ -21,6 +21,7 @@ from ate_api.infrastructure.clock import Clock
 from ate_api.repositories import get_capital_scheme_milestones_repository, get_milestone_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
+from ate_api.routes.concurrency import retry_on_serialization_failure
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from ate_api.unit_of_work import UnitOfWork
@@ -143,6 +144,7 @@ async def get_milestones(
     summary="Create capital scheme milestones",
     responses={HTTP_404_NOT_FOUND: {}},
 )
+@retry_on_serialization_failure(max_retries=5, jitter=0.1)
 async def create_milestones(
     clock: Annotated[Clock, Depends(get_clock)],
     capital_scheme_milestones: Annotated[
@@ -156,6 +158,8 @@ async def create_milestones(
     Creates milestones for a capital scheme.
     """
     async with unit_of_work:
+        await unit_of_work.begin_serializable()
+
         milestones = await capital_scheme_milestones.get(CapitalSchemeReference(reference))
 
         if not milestones:

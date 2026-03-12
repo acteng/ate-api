@@ -391,7 +391,7 @@ async def test_create_milestones_creates_milestones(
             data_source=DataSource.ATF4_BID,
         ),
     ]
-    assert unit_of_work.committed
+    assert unit_of_work.serializable and unit_of_work.committed
 
 
 @respx.mock

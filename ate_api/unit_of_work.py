@@ -3,6 +3,9 @@ from typing import Self
 
 
 class UnitOfWork:
+    async def begin_serializable(self) -> None:
+        raise NotImplementedError()
+
     async def commit(self) -> None:
         raise NotImplementedError()
 
