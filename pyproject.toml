@@ -15,6 +15,7 @@ dependencies = [
 dev = [
     "aiosqlite~=0.22.0",
     "black~=26.3.0",
+    "httpx[http2]~=0.28.0",
     "isort~=8.0.0",
     "mypy~=1.19.0",
     "pytest~=9.0.0",

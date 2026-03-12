@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 class AppClient:
     def __init__(self, url: str, access_token: str):
-        self._client = AsyncClient(base_url=url, headers={"Authorization": f"Bearer {access_token}"})
+        self._client = AsyncClient(http2=True, base_url=url, headers={"Authorization": f"Bearer {access_token}"})
 
     async def set_clock(self, now: str) -> None:
         response = await self._client.put("/test/clock", json=now)

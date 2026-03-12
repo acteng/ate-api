@@ -89,7 +89,7 @@ def server_fixture(app: FastAPI) -> Generator[Server]:
 
 @pytest.fixture(name="client")
 def client_fixture(server: Server) -> AsyncClient:
-    return AsyncClient(base_url=server.url)
+    return AsyncClient(http2=True, base_url=server.url)
 
 
 @pytest.fixture(name="access_token")
