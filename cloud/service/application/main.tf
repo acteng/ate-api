@@ -110,3 +110,39 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_database_u
   role      = "roles/secretmanager.secretAccessor"
   secret_id = google_secret_manager_secret.database_url.id
 }
+
+# monitoring
+
+resource "google_monitoring_notification_channel" "email" {
+  display_name = "ATE API support email"
+  type         = "email"
+  labels = {
+    email_address = "api@activetravelengland.gov.uk"
+  }
+}
+
+resource "google_monitoring_alert_policy" "application_error" {
+  display_name = "Application error alert"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "Cloud Run error"
+
+    condition_matched_log {
+      filter = join("", [
+        "resource.type=\"cloud_run_revision\" ",
+        "AND severity>=ERROR"
+      ])
+    }
+  }
+
+  notification_channels = [google_monitoring_notification_channel.email.id]
+
+  alert_strategy {
+    notification_rate_limit {
+      period = "300s"
+    }
+  }
+
+  severity = "ERROR"
+}
