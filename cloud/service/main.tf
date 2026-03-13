@@ -92,6 +92,7 @@ module "application" {
   oidc_server_metadata_url   = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
   resource_server_identifier = data.terraform_remote_state.identity.outputs.resource_server_identifier
   keep_idle                  = local.config[local.env].keep_idle
+  domain                     = local.config[local.env].domain
 
   depends_on = [
     google_project_service.run,

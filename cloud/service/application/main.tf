@@ -113,12 +113,58 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_database_u
 
 # monitoring
 
+resource "google_monitoring_uptime_check_config" "application" {
+  display_name = "Application uptime check"
+  timeout      = "60s"
+  period       = "300s"
+
+  http_check {
+    use_ssl = true
+    path    = "/docs"
+  }
+
+  monitored_resource {
+    type = "uptime_url"
+    labels = {
+      project_id = var.project
+      host       = var.domain
+    }
+  }
+}
+
 resource "google_monitoring_notification_channel" "email" {
   display_name = "ATE API support email"
   type         = "email"
   labels = {
     email_address = "api@activetravelengland.gov.uk"
   }
+}
+
+resource "google_monitoring_alert_policy" "application_uptime" {
+  display_name = "Application uptime alert"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "Uptime check failed"
+
+    condition_threshold {
+      filter = join("", [
+        "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" ",
+        "AND metric.label.check_id=\"${google_monitoring_uptime_check_config.application.uptime_check_id}\" ",
+        "AND resource.type=\"uptime_url\""
+      ])
+      duration        = "300s"
+      comparison      = "COMPARISON_LT"
+      threshold_value = "1"
+
+      trigger {
+        count = 1
+      }
+    }
+  }
+
+  notification_channels = [google_monitoring_notification_channel.email.id]
+  severity              = "CRITICAL"
 }
 
 resource "google_monitoring_alert_policy" "application_error" {

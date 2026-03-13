@@ -63,3 +63,8 @@ variable "keep_idle" {
   description = "Whether to keep an instance idle to prevent cold starts"
   type        = bool
 }
+
+variable "domain" {
+  description = "Domain name to monitor"
+  type        = string
+}
