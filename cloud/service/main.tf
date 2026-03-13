@@ -18,18 +18,21 @@ locals {
     dev = {
       image_tag            = "latest"
       keep_idle            = false
+      monitoring           = false
       domain               = "dev.${local.domain}"
       github_action_deploy = true
     }
     test = {
       image_tag            = "0.16.0"
       keep_idle            = false
+      monitoring           = false
       domain               = "test.${local.domain}"
       github_action_deploy = false
     }
     prod = {
       image_tag            = "0.16.0"
       keep_idle            = true
+      monitoring           = true
       domain               = local.domain
       github_action_deploy = false
     }
@@ -92,6 +95,7 @@ module "application" {
   oidc_server_metadata_url   = data.terraform_remote_state.identity.outputs.oidc_server_metadata_url
   resource_server_identifier = data.terraform_remote_state.identity.outputs.resource_server_identifier
   keep_idle                  = local.config[local.env].keep_idle
+  monitoring                 = local.config[local.env].monitoring
   domain                     = local.config[local.env].domain
 
   depends_on = [

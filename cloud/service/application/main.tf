@@ -114,6 +114,8 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_database_u
 # monitoring
 
 resource "google_monitoring_uptime_check_config" "application" {
+  count = var.monitoring ? 1 : 0
+
   display_name = "Application uptime check"
   timeout      = "60s"
   period       = "300s"
@@ -133,6 +135,8 @@ resource "google_monitoring_uptime_check_config" "application" {
 }
 
 resource "google_monitoring_notification_channel" "email" {
+  count = var.monitoring ? 1 : 0
+
   display_name = "ATE API support email"
   type         = "email"
   labels = {
@@ -141,6 +145,8 @@ resource "google_monitoring_notification_channel" "email" {
 }
 
 resource "google_monitoring_alert_policy" "application_uptime" {
+  count = var.monitoring ? 1 : 0
+
   display_name = "Application uptime alert"
   combiner     = "OR"
 
@@ -150,7 +156,7 @@ resource "google_monitoring_alert_policy" "application_uptime" {
     condition_threshold {
       filter = join("", [
         "metric.type=\"monitoring.googleapis.com/uptime_check/check_passed\" ",
-        "AND metric.label.check_id=\"${google_monitoring_uptime_check_config.application.uptime_check_id}\" ",
+        "AND metric.label.check_id=\"${google_monitoring_uptime_check_config.application[0].uptime_check_id}\" ",
         "AND resource.type=\"uptime_url\""
       ])
       duration        = "300s"
@@ -163,11 +169,13 @@ resource "google_monitoring_alert_policy" "application_uptime" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email.id]
+  notification_channels = [google_monitoring_notification_channel.email[0].id]
   severity              = "CRITICAL"
 }
 
 resource "google_monitoring_alert_policy" "application_error" {
+  count = var.monitoring ? 1 : 0
+
   display_name = "Application error alert"
   combiner     = "OR"
 
@@ -182,7 +190,7 @@ resource "google_monitoring_alert_policy" "application_error" {
     }
   }
 
-  notification_channels = [google_monitoring_notification_channel.email.id]
+  notification_channels = [google_monitoring_notification_channel.email[0].id]
 
   alert_strategy {
     notification_rate_limit {
