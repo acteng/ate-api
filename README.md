@@ -133,6 +133,8 @@ The server can be configured with the following environment variables:
 | CREATE_DATABASE_SCHEMA     | `true` to create the database schema                                                    |
 | OIDC_SERVER_METADATA_URL   | Authorisation server configuration endpoint                                             |
 | RESOURCE_SERVER_IDENTIFIER | Resource server identifier (this must match the audience claim in the JWT access token) |
+| DOCS_USERNAME              | HTTP Basic Auth username for documentation (unset to disable)                           |
+| DOCS_PASSWORD              | HTTP Basic Auth password for documentation                                              |
 
 Environment variables can also be provided in a `.env` file.
 

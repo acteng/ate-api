@@ -10,6 +10,8 @@ class Settings(BaseSettings):
         "https://dev.identity.api.activetravelengland.gov.uk/.well-known/openid-configuration"
     )
     resource_server_identifier: str = "https://dev.api.activetravelengland.gov.uk"
+    docs_username: str | None = None
+    docs_password: str | None = None
 
     model_config = SettingsConfigDict(frozen=True, env_file=".env")
 
