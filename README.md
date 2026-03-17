@@ -166,3 +166,7 @@ Run the tests:
 * [Cloud infrastructure](cloud/README.md)
 * [Maintenance](docs/maintenance.md)
 * [Releasing](docs/releasing.md)
+
+## Licence
+
+[MIT License](LICENCE)
