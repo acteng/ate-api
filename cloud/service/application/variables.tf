@@ -64,6 +64,11 @@ variable "keep_idle" {
   type        = bool
 }
 
+variable "docs_auth" {
+  description = "Whether to protect documentation with HTTP Basic auth"
+  type        = bool
+}
+
 variable "monitoring" {
   description = "Whether to enable monitoring"
   type        = bool

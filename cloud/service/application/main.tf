@@ -39,6 +39,30 @@ resource "google_cloud_run_v2_service" "ate_api" {
         name  = "RESOURCE_SERVER_IDENTIFIER"
         value = var.resource_server_identifier
       }
+      dynamic "env" {
+        for_each = var.docs_auth ? [1] : []
+        content {
+          name = "DOCS_USERNAME"
+          value_source {
+            secret_key_ref {
+              secret  = data.google_secret_manager_secret.docs_username[0].secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
+      dynamic "env" {
+        for_each = var.docs_auth ? [1] : []
+        content {
+          name = "DOCS_PASSWORD"
+          value_source {
+            secret_key_ref {
+              secret  = data.google_secret_manager_secret.docs_password[0].secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
       ports {
         container_port = 8080
       }
@@ -58,6 +82,10 @@ resource "google_cloud_run_v2_service" "ate_api" {
     # database URL
     google_secret_manager_secret_version.database_url,
     google_secret_manager_secret_iam_member.cloud_run_ate_api_database_url,
+    # docs username
+    google_secret_manager_secret_iam_member.cloud_run_ate_api_docs_username,
+    # docs password
+    google_secret_manager_secret_iam_member.cloud_run_ate_api_docs_password,
   ]
 }
 
@@ -109,6 +137,38 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_database_u
   member    = "serviceAccount:${google_service_account.cloud_run_ate_api.email}"
   role      = "roles/secretmanager.secretAccessor"
   secret_id = google_secret_manager_secret.database_url.id
+}
+
+# docs username
+
+data "google_secret_manager_secret" "docs_username" {
+  count = var.docs_auth ? 1 : 0
+
+  secret_id = "docs-username"
+}
+
+resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_docs_username" {
+  count = var.docs_auth ? 1 : 0
+
+  member    = "serviceAccount:${google_service_account.cloud_run_ate_api.email}"
+  role      = "roles/secretmanager.secretAccessor"
+  secret_id = data.google_secret_manager_secret.docs_username[0].id
+}
+
+# docs password
+
+data "google_secret_manager_secret" "docs_password" {
+  count = var.docs_auth ? 1 : 0
+
+  secret_id = "docs-password"
+}
+
+resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_docs_password" {
+  count = var.docs_auth ? 1 : 0
+
+  member    = "serviceAccount:${google_service_account.cloud_run_ate_api.email}"
+  role      = "roles/secretmanager.secretAccessor"
+  secret_id = data.google_secret_manager_secret.docs_password[0].id
 }
 
 # monitoring

@@ -55,6 +55,20 @@ Then repeat the steps below for each environment as required.
 
 1. Update the DNS A record for the environment's domain to the IP address
 
+1. Provision the Secret Manager:
+
+   ```bash
+   terraform plan -target google_project_service.secret_manager -out plan.out
+   terraform apply plan.out
+   rm plan.out
+   ```
+
+1. Set the secrets for the environment:
+
+   ```bash
+   ./set-secrets.sh ${ENVIRONMENT}
+   ```
+
 1. Apply the changes:
 
    ```bash
