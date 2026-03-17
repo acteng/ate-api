@@ -49,6 +49,7 @@ Then repeat the steps below for each environment as required.
    ```bash
    terraform plan -target module.load_balancer.google_compute_global_address.ate_api -out plan.out
    terraform apply plan.out
+   rm plan.out
    terraform output -raw ip_address
    ```
 
