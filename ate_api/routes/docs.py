@@ -23,8 +23,8 @@ async def authorize(
         raise basic_auth.make_not_authenticated_error()
 
     if not (
-        compare_digest(credentials.username.encode(), settings.docs_username.encode())
-        and compare_digest(credentials.password.encode(), settings.docs_password.encode())
+        compare_digest(credentials.username, settings.docs_username)
+        and compare_digest(credentials.password, settings.docs_password)
     ):
         raise HTTPException(
             status_code=HTTP_401_UNAUTHORIZED,
