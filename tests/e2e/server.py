@@ -1,5 +1,5 @@
-import socket
 from multiprocessing import Process
+from socket import error, socket
 from time import time
 
 import pytest
@@ -32,7 +32,7 @@ class Server:
         return f"http://{self._host}:{self._port}"
 
     def _get_random_port(self) -> int:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket()
         sock.bind(("localhost", 0))
         port: int = sock.getsockname()[1]
         sock.close()
@@ -47,12 +47,12 @@ class Server:
                 pytest.fail("Failed to start server")
 
     def _can_connect(self) -> bool:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket()
 
         try:
             sock.connect((self._host, self._port))
             can_connect = True
-        except socket.error:
+        except error:
             can_connect = False
         finally:
             sock.close()
