@@ -173,6 +173,18 @@ resource "google_secret_manager_secret_iam_member" "cloud_run_ate_api_docs_passw
 
 # monitoring
 
+data "google_secret_manager_secret_version" "docs_username" {
+  count = var.monitoring && var.docs_auth ? 1 : 0
+
+  secret = data.google_secret_manager_secret.docs_username[0].id
+}
+
+data "google_secret_manager_secret_version" "docs_password" {
+  count = var.monitoring && var.docs_auth ? 1 : 0
+
+  secret = data.google_secret_manager_secret.docs_password[0].id
+}
+
 resource "google_monitoring_uptime_check_config" "application" {
   count = var.monitoring ? 1 : 0
 
@@ -183,6 +195,14 @@ resource "google_monitoring_uptime_check_config" "application" {
   http_check {
     use_ssl = true
     path    = "/docs"
+
+    dynamic "auth_info" {
+      for_each = var.docs_auth ? [1] : []
+      content {
+        username = data.google_secret_manager_secret_version.docs_username[0].secret_data
+        password = data.google_secret_manager_secret_version.docs_password[0].secret_data
+      }
+    }
   }
 
   monitored_resource {
