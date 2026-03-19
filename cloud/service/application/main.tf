@@ -231,6 +231,10 @@ resource "google_monitoring_alert_policy" "application_uptime" {
 
   notification_channels = [google_monitoring_notification_channel.email[0].id]
   severity              = "CRITICAL"
+
+  lifecycle {
+    replace_triggered_by = [google_monitoring_uptime_check_config.application[0].uptime_check_id]
+  }
 }
 
 resource "google_monitoring_alert_policy" "application_error" {
