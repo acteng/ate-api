@@ -28,7 +28,7 @@ As the state for this root module cannot be easily stored within itself, we stor
 1. Fetch the previous Terraform state from Bitwarden, if any:
 
    ```bash
-   bw get notes "API tf-backend State" > terraform.tfstate
+   bw get notes "ate-api-tf-backend-state" > terraform.tfstate
    ```
 
 1. Apply the changes:
@@ -37,7 +37,7 @@ As the state for this root module cannot be easily stored within itself, we stor
    terraform apply
    ```
 
-1. Store the new Terraform state in Bitwarden as "API tf-backend State"
+1. Store the new Terraform state in Bitwarden as "ate-api-tf-backend-state"
 
 ## Destroying
 
@@ -62,7 +62,7 @@ As the state for this root module cannot be easily stored within itself, we stor
 1. Fetch the previous Terraform state from Bitwarden, if any:
 
    ```bash
-   bw get notes "API tf-backend State" > terraform.tfstate
+   bw get notes "ate-api-tf-backend-state" > terraform.tfstate
    ```
 
 1. Force deletion of bucket objects by modifying `cloud/tf-backend/main.tf`:
@@ -92,4 +92,4 @@ As the state for this root module cannot be easily stored within itself, we stor
    terraform destroy
    ```
 
-1. Delete the Terraform state "API tf-backend State" from Bitwarden 
+1. Delete the Terraform state "ate-api-tf-backend-state" from Bitwarden 
