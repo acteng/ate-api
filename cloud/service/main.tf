@@ -24,7 +24,7 @@ locals {
       github_action_deploy = true
     }
     test = {
-      image_tag            = "0.18.0"
+      image_tag            = "0.18.1"
       keep_idle            = false
       docs_auth            = true
       monitoring           = false
@@ -32,7 +32,7 @@ locals {
       github_action_deploy = false
     }
     prod = {
-      image_tag            = "0.18.0"
+      image_tag            = "0.18.1"
       keep_idle            = true
       docs_auth            = true
       monitoring           = true
