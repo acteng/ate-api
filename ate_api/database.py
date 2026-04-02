@@ -40,7 +40,7 @@ from ate_api.unit_of_work import UnitOfWork
 
 @lru_cache
 def get_engine(settings: Annotated[Settings, Depends(get_settings)]) -> AsyncEngine:
-    return create_async_engine(settings.database_url)
+    return create_async_engine(settings.database_url, pool_pre_ping=True)
 
 
 async def get_session(engine: Annotated[AsyncEngine, Depends(get_engine)]) -> AsyncGenerator[AsyncSession]:
