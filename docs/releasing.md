@@ -10,6 +10,37 @@
    name = "ate-api"
    version = "<version>"
    ```
+1. Upgrade the Test image tag in the Terraform file `cloud/service/main.tf` to the release:
+   ```hcl
+   locals {
+     config = {
+       ...
+       test = {
+         image_tag = "<version>"
+         ...
+       }
+       ...
+     }
+   }
+   ```
+1. If this release is going to be deployed to Prod, upgrade the Prod image tag in the Terraform file
+   `cloud/service/main.tf` to the release:
+   ```hcl
+   locals {
+     config = {
+       ...
+       prod = {
+         image_tag = "<version>"
+         ...
+       }
+     }
+   }
+   ```
+1. Commit the changes with the message "Deploy \<version> to Test \[and Prod]"
+1. Push the commit:
+   ```bash
+   git push
+   ```
 1. Tag the repository for the release:
    ```bash
    git tag <version>
@@ -27,20 +58,10 @@
 
 ## Deploy to Test
 
-1. Upgrade the Test image tag in the Terraform file `cloud/service/main.tf` to the release:
-   ```hcl
-   locals {
-     config = {
-       ...
-       test = {
-         image_tag = "<version>"
-         ...
-       }
-       ...
-     }
-   }
+1. Check out the git tag for the release:
+   ```bash
+   git checkout <version>
    ```
-1. Commit the change with the message "Deploy \<version> to Test"
 1. Apply Terraform infrastructure changes to Test:
    ```bash
    cd cloud/service
@@ -51,19 +72,10 @@
 
 ## Deploy to Prod
 
-1. Upgrade the Prod image tag in the Terraform file `cloud/service/main.tf` to the release:
-   ```hcl
-   locals {
-     config = {
-       ...
-       prod = {
-         image_tag = "<version>"
-         ...
-       }
-     }
-   }
+1. Check out the git tag for the release:
+   ```bash
+   git checkout <version>
    ```
-1. Commit the change with the message "Deploy \<version> to Prod"
 1. Apply Terraform infrastructure changes to Prod:
    ```bash
    cd cloud/service
