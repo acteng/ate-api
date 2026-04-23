@@ -4,12 +4,6 @@
 
 1. Ensure all GitHub issues are closed for the milestone
 1. Close the GitHub milestone for the release
-1. Update the project version in [pyproject.toml](../pyproject.toml) for the release:
-   ```toml
-   [project]
-   name = "ate-api"
-   version = "<version>"
-   ```
 1. Upgrade the Test image tag in the Terraform file `cloud/service/main.tf` to the release:
    ```hcl
    locals {
@@ -55,6 +49,17 @@
    * Tag: `<version>`
    * Title: `<version>`
    * Description: `Completed stories: <link to milestone closed issues>`
+1. Update the project version in [pyproject.toml](../pyproject.toml) for the next release:
+   ```toml
+   [project]
+   name = "ate-api"
+   version = "<next-version>"
+   ```
+1. Commit the changes with the message "Upgrade project version to \<next-version>"
+1. Push the commit:
+   ```bash
+   git push
+   ```
 
 ## Deploy to Test
 
