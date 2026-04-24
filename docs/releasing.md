@@ -36,7 +36,11 @@
    }
    ```
 
-1. Commit the changes with the message "Deploy \<version> to Test \[and Prod]"
+1. Stage and commit the changes:
+
+   ```bash
+   git commit -m "Deploy <version> to Test [and Prod]"
+   ```
 
 1. Push the commit:
 
@@ -74,7 +78,11 @@
    version = "<next-version>"
    ```
 
-1. Commit the changes with the message "Upgrade project version to \<next-version>"
+1. Stage and commit the changes:
+
+   ```bash
+   git commit -m "Upgrade project version to <next-version>"
+   ```
 
 1. Push the commit:
 
