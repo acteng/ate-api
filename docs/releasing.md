@@ -36,7 +36,7 @@
    }
    ```
 
-1. Stage and commit the changes:
+1. Stage the changes and commit:
 
    ```bash
    git commit -m "Deploy <version> to Test [and Prod]"
@@ -78,7 +78,7 @@
    version = "<next-version>"
    ```
 
-1. Stage and commit the changes:
+1. Stage the changes and commit:
 
    ```bash
    git commit -m "Upgrade project version to <next-version>"
