@@ -7,7 +7,7 @@ Operational data API for Active Travel England.
 ## Prerequisites
 
 1. Install Python 3.13
-1. Install [Terraform](https://developer.hashicorp.com/terraform/install) 1.14
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install) 1.15
 
 ## Running locally using Compose
 
