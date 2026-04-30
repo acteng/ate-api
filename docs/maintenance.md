@@ -49,3 +49,16 @@ To upgrade Terraform the [latest minor version](https://developer.hashicorp.com/
    ```
 
 1. Update the Terraform version in the [README](../README.md) prerequisites
+
+## Upgrading Terraform providers
+
+To upgrade each Terraform root module in [cloud](../cloud):
+
+1. Update the providers in `versions.tf` to the latest minor or major version keeping the patch version zero,
+   e.g. `~> 1.2.0` to `~> 1.3.0`
+
+1. Install the upgraded providers:
+
+   ```bash
+   terraform init -upgrade
+   ```
