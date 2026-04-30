@@ -25,3 +25,27 @@ To upgrade packages to their latest minor or major version:
    ```bash
    pip install -e .[dev]
    ```
+
+## Upgrading Terraform
+
+To upgrade Terraform the [latest minor version](https://developer.hashicorp.com/terraform/install#release-information):
+
+1. For each Terraform root module in [cloud](../cloud), update the required version in `versions.tf` keeping the patch version zero:
+
+   ```hcl
+   terraform {
+     required_version = "~> <version>"
+     ...
+   }
+   ```
+
+1. Update the Terraform version in the [CI workflow](../.github/workflows/ci.yml):
+
+   ```yaml
+   - name: Setup Terraform
+     uses: hashicorp/setup-terraform@v4
+     with:
+       terraform_version: '~<version>'
+   ```
+
+1. Update the Terraform version in the [README](../README.md) prerequisites
