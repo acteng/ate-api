@@ -949,9 +949,15 @@ class TestDatabaseCapitalSchemeRepository:
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
-                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
-                    construction_completed := build_milestone_entity(name=MilestoneName.CONSTRUCTION_COMPLETED),
+                    detailed_design_completed := build_milestone_entity(
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0
+                    ),
+                    construction_started := build_milestone_entity(
+                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1
+                    ),
+                    construction_completed := build_milestone_entity(
+                        name=MilestoneName.CONSTRUCTION_COMPLETED, stage_order=2
+                    ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(
@@ -1176,8 +1182,12 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
+                    detailed_design_completed := build_milestone_entity(
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0
+                    ),
+                    construction_started := build_milestone_entity(
+                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1
+                    ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(

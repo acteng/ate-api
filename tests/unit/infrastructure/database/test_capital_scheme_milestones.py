@@ -185,8 +185,8 @@ class TestDatabaseMilestoneRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
+                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0),
+                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1),
                 ]
             )
 
@@ -206,8 +206,8 @@ class TestDatabaseMilestoneRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, is_active=True),
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, is_active=False),
+                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0, is_active=True),
+                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1, is_active=False),
                 ]
             )
 
@@ -227,8 +227,10 @@ class TestDatabaseMilestoneRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, is_complete=True),
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, is_complete=False),
+                    build_milestone_entity(
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0, is_complete=True
+                    ),
+                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1, is_complete=False),
                 ]
             )
 
@@ -261,8 +263,8 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED),
+                    build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0),
+                    build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1),
                     build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
                     build_data_source_entity(id_=1, name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(scheme_reference="ATE00001"),
@@ -334,8 +336,12 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
+                    detailed_design_completed := build_milestone_entity(
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0
+                    ),
+                    construction_started := build_milestone_entity(
+                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1
+                    ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(

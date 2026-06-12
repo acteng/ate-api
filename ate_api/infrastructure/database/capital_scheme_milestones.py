@@ -54,7 +54,7 @@ class MilestoneEntity(BaseEntity):
 
     milestone_id: Mapped[int] = mapped_column(primary_key=True)
     milestone_name: Mapped[MilestoneName] = mapped_column(unique=True)
-    stage_order: Mapped[int]
+    stage_order: Mapped[int] = mapped_column(unique=True)
     is_active: Mapped[bool]
     is_complete: Mapped[bool]
 
