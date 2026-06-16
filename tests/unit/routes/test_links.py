@@ -1,5 +1,5 @@
 import pytest
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 
 from ate_api.routes.links import path_parameter_for
 
@@ -12,11 +12,25 @@ def app_fixture() -> FastAPI:
     def foo(bar: str) -> None:
         pass
 
+    subrouter = APIRouter()
+
+    @subrouter.get("/subrouter/foo/{bar}")
+    def subrouter_foo(bar: str) -> None:
+        pass
+
+    app.include_router(subrouter)
+
+    app.host("subdomain.example.com", APIRouter(), "host")
+
     return app
 
 
 def test_path_parameter_for(http_request: Request, base_url: str) -> None:
     assert path_parameter_for(http_request, "foo", "bar", f"{base_url}/foo/xyz") == "xyz"
+
+
+def test_path_parameter_for_when_subrouter(http_request: Request, base_url: str) -> None:
+    assert path_parameter_for(http_request, "subrouter_foo", "bar", f"{base_url}/subrouter/foo/xyz") == "xyz"
 
 
 def test_path_parameter_for_when_unknown_route(http_request: Request, base_url: str) -> None:
@@ -38,6 +52,11 @@ def test_path_parameter_for_when_unmatched_base_url(
 ) -> None:
     with pytest.raises(ValueError, match=f"Unmatched base URL: {unmatched_base_url}"):
         path_parameter_for(http_request, "foo", "bar", f"{unmatched_base_url}foo/xyz")
+
+
+def test_path_parameter_for_when_missing_path(http_request: Request) -> None:
+    with pytest.raises(ValueError, match="Missing path for route: host"):
+        path_parameter_for(http_request, "host", "bar", "http://subdomain.example.com")
 
 
 def test_path_parameter_for_when_unmatched_path(http_request: Request, base_url: str) -> None:
