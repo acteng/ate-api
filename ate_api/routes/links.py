@@ -1,12 +1,20 @@
 from fastapi import Request
 from fastapi.datastructures import URL
-from starlette.routing import Route, compile_path
+from fastapi.routing import RouteContext, iter_route_contexts
+from starlette.routing import compile_path
 
 
 def path_parameter_for(request: Request, name: str, parameter: str, url: str) -> str:
-    route = next((route for route in request.app.routes if isinstance(route, Route) and route.name == name), None)
+    route_context = next(
+        (
+            route_context
+            for route_context in iter_route_contexts(request.app.routes)
+            if isinstance(route_context, RouteContext) and route_context.name == name
+        ),
+        None,
+    )
 
-    if not route:
+    if not route_context:
         raise ValueError(f"Unknown route: {name}")
 
     url_obj = URL(url)
@@ -16,7 +24,10 @@ def path_parameter_for(request: Request, name: str, parameter: str, url: str) ->
         raise ValueError(f"Unmatched base URL: {base_url}")
 
     path = url_obj.path
-    path_regex, _, _ = compile_path(route.path)
+    if not route_context.path:
+        raise ValueError(f"Route {name} has no valid path")
+
+    path_regex, _, _ = compile_path(route_context.path)
     match = path_regex.match(path)
 
     if not match:
