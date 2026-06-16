@@ -1,5 +1,5 @@
 import pytest
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 
 from ate_api.routes.links import path_parameter_for
 
@@ -12,11 +12,23 @@ def app_fixture() -> FastAPI:
     def foo(bar: str) -> None:
         pass
 
+    subrouter = APIRouter()
+
+    @subrouter.get("/subrouter/foo/{bar}")
+    def subrouter_foo(bar: str) -> None:
+        pass
+
+    app.include_router(subrouter)
+
     return app
 
 
 def test_path_parameter_for(http_request: Request, base_url: str) -> None:
     assert path_parameter_for(http_request, "foo", "bar", f"{base_url}/foo/xyz") == "xyz"
+
+
+def test_path_parameter_for_when_subrouter(http_request: Request, base_url: str) -> None:
+    assert path_parameter_for(http_request, "subrouter_foo", "bar", f"{base_url}/subrouter/foo/xyz") == "xyz"
 
 
 def test_path_parameter_for_when_unknown_route(http_request: Request, base_url: str) -> None:
