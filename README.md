@@ -106,7 +106,7 @@ To invoke the server running in an environment:
    ```bash
    cd cloud/identity
    terraform workspace select ${ENVIRONMENT}
-   ACCESS_TOKEN=$(./request-access-token.sh)
+   ACCESS_TOKEN=$(./request-access-token.sh ${ENVIRONMENT})
    ```
 
 1. Obtain the server details:
