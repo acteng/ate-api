@@ -17,7 +17,7 @@ def debug_fixture() -> bool:
 
 @pytest.fixture(name="database_url", scope="package")
 def database_url_fixture() -> Generator[str]:
-    with PostgresContainer("postgres:16") as postgres:
+    with PostgresContainer("postgres:18") as postgres:
         yield postgres.get_connection_url(driver="asyncpg")
 
 
