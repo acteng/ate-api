@@ -34,7 +34,7 @@ To run the server as a container:
 1. Run the database image:
 
    ```bash
-   docker run --rm -it -e POSTGRES_USER=ate -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16       
+   docker run --rm -it -e POSTGRES_USER=ate -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16
    ```
 
 1. Run the Docker image:
@@ -74,7 +74,7 @@ docker run --rm -it --network=host -e CREATE_DATABASE_SCHEMA=true -e PORT=8001 a
 1. Run the database image:
 
    ```bash
-   docker run --rm -it -e POSTGRES_USER=ate -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16       
+   docker run --rm -it -e POSTGRES_USER=ate -e POSTGRES_PASSWORD=password -p 5432:5432 postgres:16
    ```
    
    Or using Compose:
