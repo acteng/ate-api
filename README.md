@@ -56,7 +56,7 @@ docker run --rm -it --network=host -e CREATE_DATABASE_SCHEMA=true -e PORT=8001 a
 1. Create a virtual environment:
 
    ```bash
-   python3.13 -m venv --prompt . --upgrade-deps .venv
+   python3.14 -m venv --prompt . --upgrade-deps .venv
    ```
 
 1. Activate the virtual environment:
