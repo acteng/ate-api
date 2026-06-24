@@ -1,3 +1,5 @@
+import multiprocessing
+import sys
 from collections.abc import AsyncGenerator, Generator
 from dataclasses import dataclass
 from typing import Any
@@ -38,6 +40,18 @@ class OAuthClient:
 @dataclass(frozen=True)
 class OAuthResourceServer:
     identifier: str
+
+
+# region global fixtures
+
+
+@pytest.fixture(name="configure_live_server", scope="package", autouse=True)
+def configure_live_server_fixture() -> None:
+    if sys.platform in ["darwin", "linux"]:
+        multiprocessing.set_start_method("fork")
+
+
+# endregion
 
 
 # region app fixtures
