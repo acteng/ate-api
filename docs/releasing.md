@@ -6,7 +6,7 @@
 
 1. Close the GitHub milestone for the release
 
-1. Upgrade the Test image tag in the Terraform file `cloud/service/main.tf` to the release:
+1. Upgrade the Test image tag in the Terraform file [cloud/service/main.tf](../cloud/service/main.tf) to the release:
 
    ```hcl
    locals {
@@ -22,7 +22,7 @@
    ```
 
 1. If this release is going to be deployed to Prod, upgrade the Prod image tag in the Terraform file
-   `cloud/service/main.tf` to the release:
+   [cloud/service/main.tf](../cloud/service/main.tf) to the release:
 
    ```hcl
    locals {
