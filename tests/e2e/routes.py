@@ -12,6 +12,7 @@ from ate_api.database import get_session, get_unit_of_work
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.clock import Clock
 from ate_api.infrastructure.database import (
     AuthorityEntity,
@@ -24,14 +25,18 @@ from ate_api.infrastructure.database import (
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
 )
+from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity
+from ate_api.infrastructure.database.improvements.overviews import ImprovementOverviewEntity
 from ate_api.repositories import (
     get_authority_repository,
     get_capital_scheme_repository,
     get_funding_programme_repository,
+    get_improvement_repository,
 )
 from ate_api.routes.authorities.authorities import AuthorityModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
 from ate_api.routes.funding_programmes import FundingProgrammeModel
+from ate_api.routes.improvements.improvements import ImprovementModel
 from ate_api.unit_of_work import UnitOfWork
 
 router = APIRouter(prefix="/test")
@@ -82,6 +87,31 @@ async def delete_authorities(
 ) -> Response:
     async with unit_of_work:
         await session.execute(delete(AuthorityEntity))
+        await unit_of_work.commit()
+    return Response(status_code=HTTP_204_NO_CONTENT)
+
+
+@router.post("/improvements", status_code=HTTP_201_CREATED, response_class=Response)
+async def create_improvement(
+    clock: Annotated[Clock, Depends(get_clock)],
+    improvements: Annotated[ImprovementRepository, Depends(get_improvement_repository)],
+    unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
+    request: Request,
+    improvement: ImprovementModel,
+) -> None:
+    async with unit_of_work:
+        await improvements.add(improvement.to_domain(clock.now, request))
+        await unit_of_work.commit()
+
+
+@router.delete("/improvements", status_code=HTTP_204_NO_CONTENT)
+async def delete_improvements(
+    unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> Response:
+    async with unit_of_work:
+        await session.execute(delete(ImprovementOverviewEntity))
+        await session.execute(delete(ImprovementEntity))
         await unit_of_work.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
 

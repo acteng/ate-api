@@ -11,6 +11,7 @@ from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepo
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, MilestoneRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.clock import Clock
 from ate_api.main import app
 from ate_api.repositories import (
@@ -19,6 +20,7 @@ from ate_api.repositories import (
     get_capital_scheme_milestones_repository,
     get_capital_scheme_repository,
     get_funding_programme_repository,
+    get_improvement_repository,
     get_milestone_repository,
 )
 from ate_api.settings import Settings, get_settings
@@ -33,6 +35,7 @@ from tests.unit.infrastructure.memory.capital_scheme_milestones import (
 )
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 from tests.unit.infrastructure.memory.funding_programmes import MemoryFundingProgrammeRepository
+from tests.unit.infrastructure.memory.improvements import MemoryImprovementRepository
 from tests.unit.infrastructure.memory.unit_of_work import FakeUnitOfWork
 
 
@@ -83,6 +86,11 @@ def authorities_fixture() -> AuthorityRepository:
     return MemoryAuthorityRepository()
 
 
+@pytest.fixture(name="improvements")
+def improvements_fixture() -> ImprovementRepository:
+    return MemoryImprovementRepository()
+
+
 @pytest.fixture(name="milestones")
 def milestones_fixture() -> MilestoneRepository:
     return MemoryMilestoneRepository()
@@ -110,6 +118,7 @@ def app_fixture(
     unit_of_work: UnitOfWork,
     funding_programmes: FundingProgrammeRepository,
     authorities: AuthorityRepository,
+    improvements: ImprovementRepository,
     milestones: MilestoneRepository,
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
@@ -120,6 +129,7 @@ def app_fixture(
     app.dependency_overrides[get_unit_of_work] = lambda: unit_of_work
     app.dependency_overrides[get_funding_programme_repository] = lambda: funding_programmes
     app.dependency_overrides[get_authority_repository] = lambda: authorities
+    app.dependency_overrides[get_improvement_repository] = lambda: improvements
     app.dependency_overrides[get_milestone_repository] = lambda: milestones
     app.dependency_overrides[get_capital_scheme_repository] = lambda: capital_schemes
     app.dependency_overrides[get_capital_scheme_financials_repository] = lambda: capital_scheme_financials

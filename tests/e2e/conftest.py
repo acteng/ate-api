@@ -108,6 +108,7 @@ async def app_client_fixture(server: Server, access_token: str) -> AsyncGenerato
     app_client = AppClient(server.url, access_token)
     yield app_client
     await app_client.delete_capital_schemes()
+    await app_client.delete_improvements()
     await app_client.delete_authorities()
     await app_client.delete_funding_programmes()
 

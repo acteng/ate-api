@@ -74,6 +74,7 @@ async def _create_schema(engine: AsyncEngine) -> None:
         await connection.execute(CreateSchema("authority"))
         await connection.execute(CreateSchema("capital_scheme"))
         await connection.execute(CreateSchema("common"))
+        await connection.execute(CreateSchema("improvement"))
         await connection.run_sync(BaseEntity.metadata.create_all)
 
 

@@ -9,6 +9,7 @@ from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepo
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, MilestoneRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
+from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
 from ate_api.infrastructure.database.capital_scheme_milestones import (
@@ -17,6 +18,7 @@ from ate_api.infrastructure.database.capital_scheme_milestones import (
 )
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
+from ate_api.infrastructure.database.improvements.improvements import DatabaseImprovementRepository
 
 
 def get_funding_programme_repository(
@@ -27,6 +29,10 @@ def get_funding_programme_repository(
 
 def get_authority_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> AuthorityRepository:
     return DatabaseAuthorityRepository(session)
+
+
+def get_improvement_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> ImprovementRepository:
+    return DatabaseImprovementRepository(session)
 
 
 def get_capital_scheme_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> CapitalSchemeRepository:
