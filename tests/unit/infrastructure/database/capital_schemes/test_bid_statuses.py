@@ -28,7 +28,7 @@ class TestBidStatusName:
 class TestCapitalSchemeBidStatusEntity:
     def test_from_domain(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
@@ -37,17 +37,18 @@ class TestCapitalSchemeBidStatusEntity:
         assert (
             bid_status_entity.bid_status_id == 1
             and bid_status_entity.effective_date_from == datetime(2020, 1, 1)
-            and bid_status_entity.effective_date_to == datetime(2020, 2, 1)
+            and not bid_status_entity.effective_date_to
         )
 
-    def test_from_domain_when_current(self) -> None:
+    def test_from_domain_when_historic(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            bid_status=BidStatus.FUNDED,
         )
 
         bid_status_entity = CapitalSchemeBidStatusEntity.from_domain(bid_status_details, {BidStatus.FUNDED: 0})
 
-        assert not bid_status_entity.effective_date_to
+        assert bid_status_entity.effective_date_to == datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         bid_status_details = CapitalSchemeBidStatusDetails(
@@ -64,24 +65,25 @@ class TestCapitalSchemeBidStatusEntity:
         bid_status_entity = CapitalSchemeBidStatusEntity(
             bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
             effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
         )
 
         bid_status_details = bid_status_entity.to_domain()
 
         assert bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             bid_status=BidStatus.FUNDED,
         )
 
-    def test_to_domain_when_current(self) -> None:
+    def test_to_domain_when_historic(self) -> None:
         bid_status_entity = CapitalSchemeBidStatusEntity(
-            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED), effective_date_from=datetime(2020, 1, 1)
+            bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
+            effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
         )
 
         bid_status_details = bid_status_entity.to_domain()
 
-        assert not bid_status_details.effective_date.to
+        assert bid_status_details.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         bid_status_entity = CapitalSchemeBidStatusEntity(

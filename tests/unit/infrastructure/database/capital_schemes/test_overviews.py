@@ -33,7 +33,7 @@ class TestSchemeTypeName:
 class TestCapitalSchemeOverviewEntity:
     def test_from_domain(self) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
@@ -53,12 +53,12 @@ class TestCapitalSchemeOverviewEntity:
             and overview_entity.funding_programme_id == 2
             and overview_entity.scheme_type_id == 3
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
-            and overview_entity.effective_date_to == datetime(2020, 2, 1)
+            and not overview_entity.effective_date_to
         )
 
-    def test_from_domain_when_current(self) -> None:
+    def test_from_domain_when_historic(self) -> None:
         overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
@@ -72,7 +72,7 @@ class TestCapitalSchemeOverviewEntity:
             {CapitalSchemeType.CONSTRUCTION: 0},
         )
 
-        assert not overview_entity.effective_date_to
+        assert overview_entity.effective_date_to == datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         overview = CapitalSchemeOverview(
@@ -100,31 +100,31 @@ class TestCapitalSchemeOverviewEntity:
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
             effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
         )
 
         overview = overview_entity.to_domain()
 
         assert (
-            overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC))
+            overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC))
             and overview.name == "Wirral Package"
             and overview.bid_submitting_authority == AuthorityAbbreviation("LIV")
             and overview.funding_programme == FundingProgrammeCode("ATF3")
             and overview.type == CapitalSchemeType.CONSTRUCTION
         )
 
-    def test_to_domain_when_current(self) -> None:
+    def test_to_domain_when_historic(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
             scheme_name="Wirral Package",
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
             effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
         )
 
         overview = overview_entity.to_domain()
 
-        assert not overview.effective_date.to
+        assert overview.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(

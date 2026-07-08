@@ -90,7 +90,7 @@ class TestInterventionMeasureName:
 class TestCapitalSchemeInterventionEntity:
     def test_from_domain(self) -> None:
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -106,12 +106,12 @@ class TestCapitalSchemeInterventionEntity:
             and intervention_entity.intervention_value == Decimal(1.5)
             and intervention_entity.observation_type_id == 2
             and intervention_entity.effective_date_from == datetime(2020, 1, 1)
-            and intervention_entity.effective_date_to == datetime(2020, 2, 1)
+            and not intervention_entity.effective_date_to
         )
 
-    def test_from_domain_when_current(self) -> None:
+    def test_from_domain_when_historic(self) -> None:
         output = CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
@@ -122,7 +122,7 @@ class TestCapitalSchemeInterventionEntity:
             output, {(OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 0}, {ObservationType.ACTUAL: 0}
         )
 
-        assert not intervention_entity.effective_date_to
+        assert intervention_entity.effective_date_to == datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         output = CapitalSchemeOutput(
@@ -151,20 +151,19 @@ class TestCapitalSchemeInterventionEntity:
             intervention_value=Decimal("1.500000"),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
         )
 
         output = intervention_entity.to_domain()
 
         assert output == CapitalSchemeOutput(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
             value=Decimal(1.5),
         )
 
-    def test_to_domain_when_current(self) -> None:
+    def test_to_domain_when_historic(self) -> None:
         intervention_entity = CapitalSchemeInterventionEntity(
             intervention_type_measure=InterventionTypeMeasureEntity(
                 intervention_type=InterventionTypeEntity(
@@ -175,11 +174,12 @@ class TestCapitalSchemeInterventionEntity:
             intervention_value=Decimal("1.500000"),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
         )
 
         output = intervention_entity.to_domain()
 
-        assert not output.effective_date.to
+        assert output.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         intervention_entity = CapitalSchemeInterventionEntity(

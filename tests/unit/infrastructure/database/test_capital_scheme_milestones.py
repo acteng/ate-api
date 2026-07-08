@@ -60,7 +60,7 @@ class TestMilestoneName:
 class TestCapitalSchemeMilestoneEntity:
     def test_from_domain(self) -> None:
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
@@ -84,12 +84,12 @@ class TestCapitalSchemeMilestoneEntity:
             and milestone_entity.observation_type_id == 4
             and milestone_entity.data_source_id == 5
             and milestone_entity.effective_date_from == datetime(2020, 1, 1)
-            and milestone_entity.effective_date_to == datetime(2020, 2, 1)
+            and not milestone_entity.effective_date_to
         )
 
-    def test_from_domain_when_current(self) -> None:
+    def test_from_domain_when_historic(self) -> None:
         milestone = CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
@@ -104,7 +104,7 @@ class TestCapitalSchemeMilestoneEntity:
             {DataSource.ATF4_BID: 0},
         )
 
-        assert not milestone_entity.effective_date_to
+        assert milestone_entity.effective_date_to == datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         milestone = CapitalSchemeMilestone(
@@ -134,13 +134,12 @@ class TestCapitalSchemeMilestoneEntity:
             status_date=date(2020, 3, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
             effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
         )
 
         milestone = milestone_entity.to_domain()
 
         assert milestone == CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
@@ -148,18 +147,19 @@ class TestCapitalSchemeMilestoneEntity:
         )
         assert milestone.surrogate_id == 1
 
-    def test_to_domain_when_current(self) -> None:
+    def test_to_domain_when_historic(self) -> None:
         milestone_entity = CapitalSchemeMilestoneEntity(
             milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
             effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         milestone = milestone_entity.to_domain()
 
-        assert not milestone.effective_date.to
+        assert milestone.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         milestone_entity = CapitalSchemeMilestoneEntity(

@@ -30,7 +30,7 @@ from tests.unit.infrastructure.database.builders import (
 class TestCapitalSchemeFinancialEntity:
     def test_from_domain(self) -> None:
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
@@ -47,13 +47,13 @@ class TestCapitalSchemeFinancialEntity:
             and financial_entity.financial_type_id == 3
             and financial_entity.amount == 2_000_000
             and financial_entity.effective_date_from == datetime(2020, 1, 1)
-            and financial_entity.effective_date_to == datetime(2020, 2, 1)
+            and not financial_entity.effective_date_to
             and financial_entity.data_source_id == 4
         )
 
-    def test_from_domain_when_current(self) -> None:
+    def test_from_domain_when_historic(self) -> None:
         financial = CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
@@ -63,7 +63,7 @@ class TestCapitalSchemeFinancialEntity:
             financial, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
         )
 
-        assert not financial_entity.effective_date_to
+        assert financial_entity.effective_date_to == datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         financial = CapitalSchemeFinancial(
@@ -86,31 +86,31 @@ class TestCapitalSchemeFinancialEntity:
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
             effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         financial = financial_entity.to_domain()
 
         assert financial == CapitalSchemeFinancial(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
         assert financial.surrogate_id == 1
 
-    def test_to_domain_when_current(self) -> None:
+    def test_to_domain_when_historic(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
             effective_date_from=datetime(2020, 1, 1),
+            effective_date_to=datetime(2020, 2, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
         financial = financial_entity.to_domain()
 
-        assert not financial.effective_date.to
+        assert financial.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
