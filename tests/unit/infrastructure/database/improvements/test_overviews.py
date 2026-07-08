@@ -4,8 +4,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.improvements.overviews import ImprovementOverview
-from ate_api.infrastructure.database import AuthorityEntity, DataSourceEntity, DataSourceName
-from ate_api.infrastructure.database.improvements.overviews import ImprovementOverviewEntity
+from ate_api.infrastructure.database import AuthorityEntity, DataSourceEntity, DataSourceName, ImprovementOverviewEntity
 
 
 class TestImprovementOverviewEntity:

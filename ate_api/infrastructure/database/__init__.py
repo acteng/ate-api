@@ -43,5 +43,9 @@ from ate_api.infrastructure.database.data_sources import DataSourceName as DataS
 from ate_api.infrastructure.database.financial_types import FinancialTypeEntity as FinancialTypeEntity
 from ate_api.infrastructure.database.financial_types import FinancialTypeName as FinancialTypeName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity as FundingProgrammeEntity
+from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity as ImprovementEntity
+from ate_api.infrastructure.database.improvements.overviews import (
+    ImprovementOverviewEntity as ImprovementOverviewEntity,
+)
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity as ObservationTypeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeName as ObservationTypeName

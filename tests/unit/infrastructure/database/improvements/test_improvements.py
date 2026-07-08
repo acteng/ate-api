@@ -9,9 +9,14 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference
 from ate_api.domain.improvements.overviews import ImprovementOverview
-from ate_api.infrastructure.database import AuthorityEntity, DataSourceEntity, DataSourceName
-from ate_api.infrastructure.database.improvements.improvements import DatabaseImprovementRepository, ImprovementEntity
-from ate_api.infrastructure.database.improvements.overviews import ImprovementOverviewEntity
+from ate_api.infrastructure.database import (
+    AuthorityEntity,
+    DataSourceEntity,
+    DataSourceName,
+    ImprovementEntity,
+    ImprovementOverviewEntity,
+)
+from ate_api.infrastructure.database.improvements.improvements import DatabaseImprovementRepository
 from tests.unit.infrastructure.database.builders import build_authority_entity, build_data_source_entity
 
 

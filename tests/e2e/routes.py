@@ -24,9 +24,9 @@ from ate_api.infrastructure.database import (
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
+    ImprovementEntity,
+    ImprovementOverviewEntity,
 )
-from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity
-from ate_api.infrastructure.database.improvements.overviews import ImprovementOverviewEntity
 from ate_api.repositories import (
     get_authority_repository,
     get_capital_scheme_repository,
