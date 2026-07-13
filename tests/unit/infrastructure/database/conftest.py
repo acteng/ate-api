@@ -59,5 +59,6 @@ async def _delete_all(engine: AsyncEngine) -> None:
                 common.funding_programme,
                 common.observation_type,
                 improvement.improvement
+            RESTART IDENTITY
             CASCADE;
         """))
