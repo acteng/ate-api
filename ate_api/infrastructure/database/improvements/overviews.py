@@ -8,9 +8,9 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.improvements.overviews import ImprovementOverview
-from ate_api.infrastructure.database import DataSourceEntity
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.data_sources import DataSourceEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 
 
