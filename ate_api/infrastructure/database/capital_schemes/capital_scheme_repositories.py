@@ -15,7 +15,6 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.observation_types import ObservationType
-from ate_api.infrastructure.database import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_scheme_milestones import (
     CapitalSchemeMilestoneEntity,
@@ -42,6 +41,7 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
