@@ -16,6 +16,7 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
@@ -46,6 +47,7 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -64,6 +66,7 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+                improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
@@ -231,6 +234,7 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+                improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
@@ -250,6 +254,7 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             )
             and capital_scheme.bid_status_details

@@ -23,6 +23,17 @@ async def test_get_authority_bid_submitting_capital_schemes(
     await app_client.set_clock("2020-02-01T00:00:00Z")
     await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
+    await app_client.create_improvement(
+        {
+            "reference": "IMP00001",
+            "overview": {
+                "name": "Wirral Package",
+                "description": 'Improvement for the "Wirral Package" capital scheme created as part of funding devolution.',
+                "fundingManagedBy": f"{client.base_url}/authorities/LIV",
+                "source": "authority update",
+            },
+        }
+    )
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
@@ -30,6 +41,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 "name": "Wirral Package",
                 "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                "improvement": f"{client.base_url}/improvements/IMP00001",
                 "type": "construction",
             },
             "bidStatusDetails": {"bidStatus": "funded"},
@@ -46,6 +58,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 "name": "School Streets",
                 "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                "improvement": f"{client.base_url}/improvements/IMP00001",
                 "type": "construction",
             },
             "bidStatusDetails": {"bidStatus": "funded"},
@@ -69,6 +82,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "name": "Wirral Package",
                     "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
@@ -80,6 +94,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "name": "School Streets",
                     "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
                 "authorityReview": None,

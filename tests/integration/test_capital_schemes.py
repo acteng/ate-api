@@ -27,6 +27,8 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
+from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.clock import Clock
@@ -37,6 +39,7 @@ from tests.unit.infrastructure.memory.unit_of_work import FakeUnitOfWork
 @respx.mock
 async def test_get_capital_scheme(
     authorities: AuthorityRepository,
+    improvements: ImprovementRepository,
     capital_schemes: CapitalSchemeRepository,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
@@ -46,6 +49,18 @@ async def test_get_capital_scheme(
     await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00001"),
+            overview=ImprovementOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                name="Wirral Package",
+                funding_managed_by=AuthorityAbbreviation("LIV"),
+                description="Improvement for the 'Wirral Package' capital scheme created as part of funding devolution.",
+                data_source=DataSource.AUTHORITY_UPDATE,
+            ),
+        )
+    )
     await capital_schemes.add(
         CapitalScheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -54,6 +69,7 @@ async def test_get_capital_scheme(
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -74,6 +90,7 @@ async def test_get_capital_scheme(
             "name": "Wirral Package",
             "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+            "improvement": f"{client.base_url}/improvements/IMP00001",
             "type": "construction",
         },
         # Workaround: https://github.com/python/mypy/issues/19474

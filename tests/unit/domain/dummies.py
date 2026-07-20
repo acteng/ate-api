@@ -13,6 +13,7 @@ def dummy_overview() -> CapitalSchemeOverview:
         name="",
         bid_submitting_authority=AuthorityAbbreviation("dummy"),
         funding_programme=FundingProgrammeCode("dummy"),
+        improvement=None,
         type=CapitalSchemeType.DEVELOPMENT,
     )
 

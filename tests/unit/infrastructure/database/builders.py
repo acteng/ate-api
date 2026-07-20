@@ -11,6 +11,8 @@ from ate_api.infrastructure.database import (
     FinancialTypeEntity,
     FinancialTypeName,
     FundingProgrammeEntity,
+    ImprovementEntity,
+    ImprovementOverviewEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
     InterventionTypeEntity,
@@ -31,10 +33,27 @@ def build_authority_entity(
     return AuthorityEntity(authority_id=id_, authority_full_name=full_name, authority_abbreviation=abbreviation)
 
 
+def build_improvement_overview_entity(
+    name: str = "dummy",
+    description: str = "dummy",
+    funding_managed_by: AuthorityEntity | None = None,
+    data_source: DataSourceEntity | None = None,
+    effective_date_from: datetime = datetime.min,
+) -> ImprovementOverviewEntity:
+    return ImprovementOverviewEntity(
+        improvement_name=name,
+        improvement_description=description,
+        funding_managed_by=funding_managed_by or build_authority_entity(),
+        data_source=data_source or build_data_source_entity(),
+        effective_date_from=effective_date_from,
+    )
+
+
 def build_capital_scheme_overview_entity(
     name: str = "dummy",
     bid_submitting_authority: AuthorityEntity | None = None,
     funding_programme: FundingProgrammeEntity | None = None,
+    improvement: ImprovementEntity | None = None,
     type_: SchemeTypeEntity | None = None,
     effective_date_from: datetime = datetime.min,
 ) -> CapitalSchemeOverviewEntity:
@@ -42,6 +61,7 @@ def build_capital_scheme_overview_entity(
         scheme_name=name,
         bid_submitting_authority=bid_submitting_authority or build_authority_entity(),
         funding_programme=funding_programme or build_funding_programme_entity(),
+        improvement=improvement,
         scheme_type=type_ or build_scheme_type_entity(),
         effective_date_from=effective_date_from,
     )

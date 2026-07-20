@@ -14,6 +14,7 @@ from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_scheme_milestones import (
@@ -43,6 +44,7 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
 )
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
+from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
 
@@ -53,6 +55,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     async def add(self, capital_scheme: CapitalScheme) -> None:
         authority_ids = await self._get_authority_ids(capital_scheme)
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
+        improvement_ids = await self._get_improvement_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
@@ -64,6 +67,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 capital_scheme,
                 authority_ids,
                 funding_programme_ids,
+                improvement_ids,
                 scheme_type_ids,
                 bid_status_ids,
                 intervention_type_measure_ids,
@@ -85,6 +89,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 contains_eager(
                     CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
                 ),
+                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
                 joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
             )
             .join(
@@ -166,6 +171,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .options(
                 joinedload(CapitalSchemeOverviewEntity.bid_submitting_authority),
                 contains_eager(CapitalSchemeOverviewEntity.funding_programme),
+                joinedload(CapitalSchemeOverviewEntity.improvement),
                 joinedload(CapitalSchemeOverviewEntity.scheme_type),
                 joinedload(ranked_capital_scheme_authority_reviews_alias.data_source),
             )
@@ -281,6 +287,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {FundingProgrammeCode(row.funding_programme_code): row.funding_programme_id for row in rows}
+
+    async def _get_improvement_ids(self, capital_scheme: CapitalScheme) -> dict[ImprovementReference, int]:
+        improvement_reference = str(capital_scheme.overview.improvement)
+        rows = await self._session.execute(
+            select(ImprovementEntity.improvement_reference, ImprovementEntity.improvement_id).where(
+                ImprovementEntity.improvement_reference == improvement_reference
+            )
+        )
+        return {ImprovementReference(row.improvement_reference): row.improvement_id for row in rows}
 
     async def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeType, int]:
         scheme_type_name = SchemeTypeName.from_domain(capital_scheme.overview.type)

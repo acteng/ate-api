@@ -8,6 +8,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 
 
@@ -33,6 +34,7 @@ class TestCapitalSchemeOverviewModel:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -42,14 +44,30 @@ class TestCapitalSchemeOverviewModel:
             name="Wirral Package",
             bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+            improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
             type=CapitalSchemeTypeModel.CONSTRUCTION,
         )
+
+    def test_from_domain_without_improvement(self, http_request: Request, base_url: str) -> None:
+        overview = CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="Wirral Package",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=None,
+            type=CapitalSchemeType.CONSTRUCTION,
+        )
+
+        overview_model = CapitalSchemeOverviewModel.from_domain(overview, http_request)
+
+        assert not overview_model.improvement
 
     def test_to_domain(self, http_request: Request, base_url: str) -> None:
         overview_model = CapitalSchemeOverviewModel(
             name="Wirral Package",
             bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
             funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+            improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
             type=CapitalSchemeTypeModel.CONSTRUCTION,
         )
 
@@ -60,5 +78,19 @@ class TestCapitalSchemeOverviewModel:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
+
+    def test_to_domain_without_improvement(self, http_request: Request, base_url: str) -> None:
+        overview_model = CapitalSchemeOverviewModel(
+            name="Wirral Package",
+            bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
+            funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+            improvement=None,
+            type=CapitalSchemeTypeModel.CONSTRUCTION,
+        )
+
+        overview = overview_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC), http_request)
+
+        assert not overview.improvement

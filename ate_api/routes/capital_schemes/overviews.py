@@ -9,6 +9,7 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.base import BaseModel
 from ate_api.routes.links import path_parameter_for
 
@@ -29,6 +30,7 @@ class CapitalSchemeOverviewModel(BaseModel):
     name: str
     bid_submitting_authority: AnyUrl
     funding_programme: AnyUrl
+    improvement: AnyUrl | None
     type: CapitalSchemeTypeModel
 
     @classmethod
@@ -40,6 +42,11 @@ class CapitalSchemeOverviewModel(BaseModel):
             ),
             funding_programme=AnyUrl(
                 str(request.url_for("get_funding_programme", code=str(overview.funding_programme)))
+            ),
+            improvement=(
+                AnyUrl(str(request.url_for("get_improvement", reference=str(overview.improvement))))
+                if overview.improvement
+                else None
             ),
             type=CapitalSchemeTypeModel.from_domain(overview.type),
         )
@@ -53,6 +60,11 @@ class CapitalSchemeOverviewModel(BaseModel):
             ),
             funding_programme=FundingProgrammeCode(
                 path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme))
+            ),
+            improvement=(
+                ImprovementReference(path_parameter_for(request, "get_improvement", "reference", str(self.improvement)))
+                if self.improvement
+                else None
             ),
             type=self.type.to_domain(),
         )

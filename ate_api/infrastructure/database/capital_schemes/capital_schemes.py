@@ -9,6 +9,7 @@ from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
@@ -34,6 +35,7 @@ class CapitalSchemeEntity(BaseEntity):
         capital_scheme: CapitalScheme,
         authority_ids: dict[AuthorityAbbreviation, int],
         funding_programme_ids: dict[FundingProgrammeCode, int],
+        improvement_ids: dict[ImprovementReference, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
         bid_status_ids: dict[BidStatus, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
@@ -44,7 +46,7 @@ class CapitalSchemeEntity(BaseEntity):
             scheme_reference=str(capital_scheme.reference),
             capital_scheme_overviews=[
                 CapitalSchemeOverviewEntity.from_domain(
-                    capital_scheme.overview, authority_ids, funding_programme_ids, scheme_type_ids
+                    capital_scheme.overview, authority_ids, funding_programme_ids, improvement_ids, scheme_type_ids
                 )
             ],
             capital_scheme_bid_statuses=[

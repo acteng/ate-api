@@ -17,6 +17,7 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
@@ -40,6 +41,7 @@ class TestMemoryCapitalSchemeRepository:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
@@ -66,6 +68,7 @@ class TestMemoryCapitalSchemeRepository:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         bid_status_details = CapitalSchemeBidStatusDetails(
@@ -97,6 +100,7 @@ class TestMemoryCapitalSchemeRepository:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         await capital_schemes.add(
@@ -111,6 +115,7 @@ class TestMemoryCapitalSchemeRepository:
             name="School Streets",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         await capital_schemes.add(
@@ -128,6 +133,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("WYO"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=ImprovementReference("IMP00002"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -154,6 +160,7 @@ class TestMemoryCapitalSchemeRepository:
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -178,6 +185,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -191,6 +199,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF4"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -204,6 +213,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF5"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -231,6 +241,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
@@ -246,6 +257,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
@@ -275,6 +287,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -299,6 +312,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -323,6 +337,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -363,6 +378,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -377,6 +393,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -413,6 +430,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),
@@ -426,6 +444,7 @@ class TestMemoryCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=dummy_bid_status_details(),

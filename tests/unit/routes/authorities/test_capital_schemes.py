@@ -11,6 +11,7 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.authorities.capital_schemes import CapitalSchemeItemModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
@@ -27,6 +28,7 @@ class TestCapitalSchemeItemModel:
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             authority_review=None,
@@ -41,6 +43,7 @@ class TestCapitalSchemeItemModel:
                 name="Wirral Package",
                 bid_submitting_authority=AnyUrl(f"{base_url}/authorities/LIV"),
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+                improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             authority_review=None,

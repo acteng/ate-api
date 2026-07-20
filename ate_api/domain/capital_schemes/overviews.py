@@ -4,6 +4,7 @@ from enum import Enum, auto
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 
 
 class CapitalSchemeType(Enum):
@@ -17,4 +18,5 @@ class CapitalSchemeOverview:
     name: str
     bid_submitting_authority: AuthorityAbbreviation
     funding_programme: FundingProgrammeCode
+    improvement: ImprovementReference | None
     type: CapitalSchemeType

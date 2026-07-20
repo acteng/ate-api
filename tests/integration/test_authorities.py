@@ -18,6 +18,8 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
+from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
+from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.dummies import dummy_bid_status_details
 
@@ -48,10 +50,26 @@ def test_get_authority_when_not_found(client: TestClient, access_token: str) -> 
 
 @respx.mock
 async def test_get_authority_bid_submitting_capital_schemes(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+    authorities: AuthorityRepository,
+    improvements: ImprovementRepository,
+    capital_schemes: CapitalSchemeRepository,
+    client: TestClient,
+    access_token: str,
 ) -> None:
     await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
+    )
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00001"),
+            overview=ImprovementOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                name="Wirral Package",
+                funding_managed_by=AuthorityAbbreviation("LIV"),
+                description="Improvement for the 'Wirral Package' capital scheme created as part of funding devolution.",
+                data_source=DataSource.AUTHORITY_UPDATE,
+            ),
+        )
     )
     capital_scheme = CapitalScheme(
         reference=CapitalSchemeReference("ATE00001"),
@@ -60,6 +78,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         ),
         bid_status_details=dummy_bid_status_details(),
@@ -78,6 +97,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -85,6 +105,18 @@ async def test_get_authority_bid_submitting_capital_schemes(
     )
     await authorities.add(
         Authority(abbreviation=AuthorityAbbreviation("WYO"), full_name="West Yorkshire Combined Authority")
+    )
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00002"),
+            overview=ImprovementOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                name="Hospital Fields Road",
+                funding_managed_by=AuthorityAbbreviation("WYO"),
+                description="Improvement for the 'Hospital Fields Road' capital scheme created as part of funding devolution.",
+                data_source=DataSource.AUTHORITY_UPDATE,
+            ),
+        )
     )
     await capital_schemes.add(
         CapitalScheme(
@@ -94,6 +126,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("WYO"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00002"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -114,6 +147,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "name": "Wirral Package",
                     "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
@@ -125,6 +159,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "name": "School Streets",
                     "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
                 "authorityReview": None,
@@ -154,6 +189,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -167,6 +203,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF4"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -205,6 +242,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -218,6 +256,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF4"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -231,6 +270,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF5"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -279,6 +319,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -294,6 +335,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -348,6 +390,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -372,6 +415,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -418,6 +462,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -442,6 +487,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -466,6 +512,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -512,6 +559,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),
@@ -526,6 +574,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
                 name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=dummy_bid_status_details(),

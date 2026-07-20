@@ -10,6 +10,7 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     AuthorityEntity,
@@ -23,6 +24,7 @@ from ate_api.infrastructure.database import (
     DataSourceEntity,
     DataSourceName,
     FundingProgrammeEntity,
+    ImprovementEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
     InterventionTypeEntity,
@@ -37,6 +39,7 @@ from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
 from tests.unit.infrastructure.database.builders import (
     build_capital_scheme_bid_status_entity,
     build_capital_scheme_overview_entity,
+    build_improvement_overview_entity,
 )
 
 
@@ -49,6 +52,7 @@ class TestCapitalSchemeEntity:
                 name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
@@ -60,8 +64,9 @@ class TestCapitalSchemeEntity:
             capital_scheme,
             {AuthorityAbbreviation("LIV"): 1},
             {FundingProgrammeCode("ATF3"): 2},
-            {CapitalSchemeType.CONSTRUCTION: 3},
-            {BidStatus.FUNDED: 4},
+            {ImprovementReference("IMP00001"): 3},
+            {CapitalSchemeType.CONSTRUCTION: 4},
+            {BidStatus.FUNDED: 5},
             {},
             {},
             {},
@@ -73,13 +78,14 @@ class TestCapitalSchemeEntity:
             overview_entity.scheme_name == "Wirral Package"
             and overview_entity.bid_submitting_authority_id == 1
             and overview_entity.funding_programme_id == 2
-            and overview_entity.scheme_type_id == 3
+            and overview_entity.improvement_id == 3
+            and overview_entity.scheme_type_id == 4
             and overview_entity.effective_date_from == datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
         (bid_status_entity,) = capital_scheme_entity.capital_scheme_bid_statuses
         assert (
-            bid_status_entity.bid_status_id == 4
+            bid_status_entity.bid_status_id == 5
             and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_entity.effective_date_to
         )
@@ -114,6 +120,7 @@ class TestCapitalSchemeEntity:
             capital_scheme,
             {AuthorityAbbreviation("dummy"): 0},
             {FundingProgrammeCode("dummy"): 0},
+            {},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
             {
@@ -156,6 +163,7 @@ class TestCapitalSchemeEntity:
             capital_scheme,
             {AuthorityAbbreviation("dummy"): 0},
             {FundingProgrammeCode("dummy"): 0},
+            {},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
             {},
@@ -178,6 +186,9 @@ class TestCapitalSchemeEntity:
                     scheme_name="Wirral Package",
                     bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
                     funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
+                    improvement=ImprovementEntity(
+                        improvement_reference="IMP00001", improvement_overviews=[build_improvement_overview_entity()]
+                    ),
                     scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     effective_date_from=datetime(2020, 1, 1),
                 )
@@ -198,6 +209,7 @@ class TestCapitalSchemeEntity:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(

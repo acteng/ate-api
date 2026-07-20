@@ -16,6 +16,7 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     BidStatusName,
@@ -26,6 +27,7 @@ from ate_api.infrastructure.database import (
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
     DataSourceName,
+    ImprovementEntity,
     InterventionMeasureName,
     InterventionTypeName,
     MilestoneName,
@@ -41,6 +43,7 @@ from tests.unit.infrastructure.database.builders import (
     build_capital_scheme_overview_entity,
     build_data_source_entity,
     build_funding_programme_entity,
+    build_improvement_overview_entity,
     build_intervention_measure_entity,
     build_intervention_type_entity,
     build_intervention_type_measure_entity,
@@ -57,8 +60,13 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_authority_entity(id_=1, abbreviation="LIV"),
+                    liv := build_authority_entity(id_=1, abbreviation="LIV"),
                     build_funding_programme_entity(id_=1, code="ATF3"),
+                    ImprovementEntity(
+                        improvement_id=1,
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
+                    ),
                     build_scheme_type_entity(id_=1, name=SchemeTypeName.CONSTRUCTION),
                     build_bid_status_entity(id_=1, name=BidStatusName.FUNDED),
                 ]
@@ -74,6 +82,7 @@ class TestDatabaseCapitalSchemeRepository:
                         name="Wirral Package",
                         bid_submitting_authority=AuthorityAbbreviation("LIV"),
                         funding_programme=FundingProgrammeCode("ATF3"),
+                        improvement=ImprovementReference("IMP00001"),
                         type=CapitalSchemeType.CONSTRUCTION,
                     ),
                     bid_status_details=CapitalSchemeBidStatusDetails(
@@ -92,6 +101,7 @@ class TestDatabaseCapitalSchemeRepository:
             and overview_row.scheme_name == "Wirral Package"
             and overview_row.bid_submitting_authority_id == 1
             and overview_row.funding_programme_id == 1
+            and overview_row.improvement_id == 1
             and overview_row.scheme_type_id == 1
             and overview_row.effective_date_from == datetime(2020, 1, 1)
             and not overview_row.effective_date_to
@@ -212,6 +222,10 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
+                    imp := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
+                    ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
@@ -221,6 +235,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                             )
@@ -236,6 +251,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="School Streets",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                             )
@@ -257,6 +273,7 @@ class TestDatabaseCapitalSchemeRepository:
             name="Wirral Package",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
@@ -270,6 +287,10 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
+                    imp := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
+                    ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -278,6 +299,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                                 effective_date_to=datetime(2020, 2, 1),
@@ -286,6 +308,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="School Streets",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
@@ -304,6 +327,7 @@ class TestDatabaseCapitalSchemeRepository:
             name="School Streets",
             bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
 
@@ -605,6 +629,19 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
                     wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                        ],
+                    ),
+                    imp2 := ImprovementEntity(
+                        improvement_reference="IMP00002",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=wyo, data_source=authority_update)
+                        ],
+                    ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     CapitalSchemeEntity(
@@ -614,6 +651,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp1,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                             )
@@ -627,6 +665,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="School Streets",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp1,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                             )
@@ -640,6 +679,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="Hospital Fields Road",
                                 bid_submitting_authority=wyo,
                                 funding_programme=atf3,
+                                improvement=imp2,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                             )
@@ -663,6 +703,7 @@ class TestDatabaseCapitalSchemeRepository:
                     name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=ImprovementReference("IMP00001"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 authority_review=None,
@@ -674,6 +715,7 @@ class TestDatabaseCapitalSchemeRepository:
                     name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=ImprovementReference("IMP00001"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 authority_review=None,
@@ -687,6 +729,19 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
                     wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                        ],
+                    ),
+                    imp2 := ImprovementEntity(
+                        improvement_reference="IMP00002",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=wyo, data_source=authority_update)
+                        ],
+                    ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
@@ -695,6 +750,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
+                                improvement=imp1,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 1, 1),
                                 effective_date_to=datetime(2020, 2, 1),
@@ -703,6 +759,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="School Streets",
                                 bid_submitting_authority=wyo,
                                 funding_programme=atf3,
+                                improvement=imp2,
                                 scheme_type=construction,
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
