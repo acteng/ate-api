@@ -35,6 +35,7 @@ from ate_api.infrastructure.database import DataSourceName
         (DataSource.CATF_SCHEME_SUBMISSION, DataSourceName.CATF_SCHEME_SUBMISSION),
         (DataSource.IST_SCHEME_LIST, DataSourceName.IST_SCHEME_LIST),
         (DataSource.DESIGN_REVIEW_REQUEST, DataSourceName.DESIGN_REVIEW_REQUEST),
+        (DataSource.FUNDING_DEVOLUTION, DataSourceName.FUNDING_DEVOLUTION),
     ],
 )
 class TestDataSourceName:
