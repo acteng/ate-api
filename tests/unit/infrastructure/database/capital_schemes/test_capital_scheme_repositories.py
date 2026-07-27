@@ -61,14 +61,14 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(id_=1, abbreviation="LIV"),
-                    build_funding_programme_entity(id_=1, code="ATF3"),
+                    build_funding_programme_entity(id_=2, code="ATF3"),
                     ImprovementEntity(
-                        improvement_id=1,
+                        improvement_id=3,
                         improvement_reference="IMP00001",
                         improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
                     ),
-                    build_scheme_type_entity(id_=1, name=SchemeTypeName.CONSTRUCTION),
-                    build_bid_status_entity(id_=1, name=BidStatusName.FUNDED),
+                    build_scheme_type_entity(id_=4, name=SchemeTypeName.CONSTRUCTION),
+                    build_bid_status_entity(id_=5, name=BidStatusName.FUNDED),
                 ]
             )
 
@@ -100,15 +100,15 @@ class TestDatabaseCapitalSchemeRepository:
             overview_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and overview_row.scheme_name == "Wirral Package"
             and overview_row.bid_submitting_authority_id == 1
-            and overview_row.funding_programme_id == 1
-            and overview_row.improvement_id == 1
-            and overview_row.scheme_type_id == 1
+            and overview_row.funding_programme_id == 2
+            and overview_row.improvement_id == 3
+            and overview_row.scheme_type_id == 4
             and overview_row.effective_date_from == datetime(2020, 1, 1)
             and not overview_row.effective_date_to
         )
         assert (
             bid_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and bid_status_row.bid_status_id == 1
+            and bid_status_row.bid_status_id == 5
             and bid_status_row.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_row.effective_date_to
         )
@@ -130,7 +130,7 @@ class TestDatabaseCapitalSchemeRepository:
                     miles := build_intervention_measure_entity(name=InterventionMeasureName.MILES),
                     build_intervention_type_measure_entity(id_=1, type_=widening_existing_footway, measure=miles),
                     build_intervention_type_measure_entity(id_=2, type_=new_segregated_cycling_facility, measure=miles),
-                    build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
+                    build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
                 ]
             )
 
@@ -168,7 +168,7 @@ class TestDatabaseCapitalSchemeRepository:
             intervention_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and intervention_row1.intervention_type_measure_id == 1
             and intervention_row1.intervention_value == Decimal(1.5)
-            and intervention_row1.observation_type_id == 1
+            and intervention_row1.observation_type_id == 3
             and intervention_row1.effective_date_from == datetime(2020, 1, 1)
             and not intervention_row1.effective_date_to
         )
@@ -176,7 +176,7 @@ class TestDatabaseCapitalSchemeRepository:
             intervention_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and intervention_row2.intervention_type_measure_id == 2
             and intervention_row2.intervention_value == Decimal(2)
-            and intervention_row2.observation_type_id == 1
+            and intervention_row2.observation_type_id == 3
             and intervention_row2.effective_date_from == datetime(2020, 1, 1)
             and not intervention_row2.effective_date_to
         )

@@ -265,8 +265,8 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                 [
                     build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0),
                     build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1),
-                    build_observation_type_entity(id_=1, name=ObservationTypeName.ACTUAL),
-                    build_data_source_entity(id_=1, name=DataSourceName.ATF4_BID),
+                    build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
+                    build_data_source_entity(id_=4, name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(scheme_reference="ATE00001"),
                 ]
             )
@@ -301,8 +301,8 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             milestone_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and milestone_row1.milestone_id == 1
             and milestone_row1.status_date == date(2020, 2, 1)
-            and milestone_row1.observation_type_id == 1
-            and milestone_row1.data_source_id == 1
+            and milestone_row1.observation_type_id == 3
+            and milestone_row1.data_source_id == 4
             and milestone_row1.effective_date_from == datetime(2020, 1, 1)
             and not milestone_row1.effective_date_to
         )
@@ -310,8 +310,8 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             milestone_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and milestone_row2.milestone_id == 2
             and milestone_row2.status_date == date(2020, 3, 1)
-            and milestone_row2.observation_type_id == 1
-            and milestone_row2.data_source_id == 1
+            and milestone_row2.observation_type_id == 3
+            and milestone_row2.data_source_id == 4
             and milestone_row2.effective_date_from == datetime(2020, 1, 1)
             and not milestone_row2.effective_date_to
         )
