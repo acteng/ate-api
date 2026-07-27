@@ -18,11 +18,11 @@ from ate_api.infrastructure.database import BidStatusEntity, BidStatusName, Capi
     ],
 )
 class TestBidStatusName:
-    def test_to_domain(self, bid_status: BidStatus, bid_status_name: BidStatusName) -> None:
-        assert bid_status_name.to_domain() == bid_status
-
     def test_from_domain(self, bid_status: BidStatus, bid_status_name: BidStatusName) -> None:
         assert BidStatusName.from_domain(bid_status) == bid_status_name
+
+    def test_to_domain(self, bid_status: BidStatus, bid_status_name: BidStatusName) -> None:
+        assert bid_status_name.to_domain() == bid_status
 
 
 class TestCapitalSchemeBidStatusEntity:
