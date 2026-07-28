@@ -40,6 +40,7 @@ from tests.unit.infrastructure.database.builders import (
     build_authority_entity,
     build_bid_status_entity,
     build_capital_scheme_bid_status_entity,
+    build_capital_scheme_entity,
     build_capital_scheme_overview_entity,
     build_data_source_entity,
     build_funding_programme_entity,
@@ -581,11 +582,7 @@ class TestDatabaseCapitalSchemeRepository:
 
     async def test_get_when_no_overview(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(
-                CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()]
-                )
-            )
+            session.add(build_capital_scheme_entity(reference="ATE00001", overviews=[]))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
@@ -595,11 +592,7 @@ class TestDatabaseCapitalSchemeRepository:
 
     async def test_get_when_no_bid_status(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(
-                CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_overviews=[build_capital_scheme_overview_entity()]
-                )
-            )
+            session.add(build_capital_scheme_entity(reference="ATE00001", bid_statuses=[]))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
