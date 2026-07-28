@@ -21,7 +21,7 @@ from ate_api.domain.funding_programmes import FundingProgramme, FundingProgramme
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.dummies import dummy_bid_status_details
+from tests.unit.domain.builders import build_capital_scheme_bid_status_details
 
 
 @respx.mock
@@ -81,7 +81,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         ),
-        bid_status_details=dummy_bid_status_details(),
+        bid_status_details=build_capital_scheme_bid_status_details(),
     )
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(
@@ -100,7 +100,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await authorities.add(
@@ -129,7 +129,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 improvement=ImprovementReference("IMP00002"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
 
@@ -192,7 +192,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_schemes.add(
@@ -206,7 +206,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
 
@@ -245,7 +245,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_schemes.add(
@@ -259,7 +259,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_schemes.add(
@@ -273,7 +273,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
 
@@ -393,7 +393,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -418,7 +418,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -465,7 +465,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -490,7 +490,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -515,7 +515,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
@@ -562,7 +562,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
@@ -577,7 +577,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))

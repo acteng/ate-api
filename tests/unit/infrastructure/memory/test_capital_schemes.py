@@ -19,8 +19,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.builders import build_capital_scheme
-from tests.unit.domain.dummies import dummy_bid_status_details
+from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_bid_status_details
 from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
@@ -108,7 +107,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=overview1,
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         overview2 = CapitalSchemeOverview(
@@ -123,7 +122,7 @@ class TestMemoryCapitalSchemeRepository:
             CapitalScheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=overview2,
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
@@ -137,7 +136,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=ImprovementReference("IMP00002"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
 
@@ -164,7 +163,7 @@ class TestMemoryCapitalSchemeRepository:
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=dummy_bid_status_details(),
+            bid_status_details=build_capital_scheme_bid_status_details(),
         )
         capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
@@ -189,7 +188,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
@@ -203,7 +202,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
@@ -217,7 +216,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
 
@@ -291,7 +290,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -316,7 +315,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -341,7 +340,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
@@ -382,7 +381,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
@@ -397,7 +396,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -434,7 +433,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
@@ -448,7 +447,7 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=dummy_bid_status_details(),
+                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
 
