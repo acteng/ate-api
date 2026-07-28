@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -5,7 +7,8 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, Capi
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
-from tests.unit.domain.dummies import dummy_date_time_range
+
+_dummy_date_time = datetime.fromtimestamp(0, UTC)
 
 
 def build_authority_abbreviation(abbreviation: str = "dummy") -> AuthorityAbbreviation:
@@ -37,7 +40,7 @@ def build_capital_scheme_overview(
     type_: CapitalSchemeType = CapitalSchemeType.DEVELOPMENT,
 ) -> CapitalSchemeOverview:
     return CapitalSchemeOverview(
-        effective_date=effective_date or dummy_date_time_range(),
+        effective_date=effective_date or build_date_time_range(),
         name=name,
         bid_submitting_authority=bid_submitting_authority or build_authority_abbreviation(),
         funding_programme=funding_programme or build_funding_programme_code(),
@@ -50,9 +53,13 @@ def build_capital_scheme_bid_status_details(
     effective_date: DateTimeRange | None = None, bid_status: BidStatus = BidStatus.SUBMITTED
 ) -> CapitalSchemeBidStatusDetails:
     return CapitalSchemeBidStatusDetails(
-        effective_date=effective_date or dummy_date_time_range(), bid_status=bid_status
+        effective_date=effective_date or build_date_time_range(), bid_status=bid_status
     )
 
 
 def build_funding_programme_code(code: str = "dummy") -> FundingProgrammeCode:
     return FundingProgrammeCode(code)
+
+
+def build_date_time_range(from_: datetime = _dummy_date_time, to: datetime = _dummy_date_time) -> DateTimeRange:
+    return DateTimeRange(from_=from_, to=to)
