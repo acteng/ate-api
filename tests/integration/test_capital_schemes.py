@@ -32,7 +32,7 @@ from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.clock import Clock
-from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.memory.unit_of_work import FakeUnitOfWork
 
 
@@ -110,13 +110,7 @@ async def test_get_capital_scheme_with_financials(
     client: TestClient,
     access_token: str,
 ) -> None:
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-    )
+    await capital_schemes.add(build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
     financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
     financials.adjust_financial(
         CapitalSchemeFinancial(
@@ -145,13 +139,7 @@ async def test_get_capital_scheme_with_milestones(
     client: TestClient,
     access_token: str,
 ) -> None:
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-    )
+    await capital_schemes.add(build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
     milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
     milestones.change_milestone(
@@ -189,11 +177,7 @@ async def test_get_capital_scheme_with_outputs(
     client: TestClient,
     access_token: str,
 ) -> None:
-    capital_scheme = CapitalScheme(
-        reference=CapitalSchemeReference("ATE00001"),
-        overview=dummy_overview(),
-        bid_status_details=dummy_bid_status_details(),
-    )
+    capital_scheme = build_capital_scheme(reference=CapitalSchemeReference("ATE00001"))
     capital_scheme.change_output(
         CapitalSchemeOutput(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -225,11 +209,7 @@ async def test_get_capital_scheme_with_authority_review(
     client: TestClient,
     access_token: str,
 ) -> None:
-    capital_scheme = CapitalScheme(
-        reference=CapitalSchemeReference("ATE00001"),
-        overview=dummy_overview(),
-        bid_status_details=dummy_bid_status_details(),
-    )
+    capital_scheme = build_capital_scheme(reference=CapitalSchemeReference("ATE00001"))
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
@@ -528,13 +508,7 @@ async def test_create_authority_review_creates_authority_review(
     access_token: str,
 ) -> None:
     clock.now = datetime(2020, 2, 1, tzinfo=UTC)
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-    )
+    await capital_schemes.add(build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
 
     client.post(
         "/capital-schemes/ATE00001/authority-reviews",
@@ -557,13 +531,7 @@ async def test_create_authority_review_returns_created_authority_review(
     access_token: str,
 ) -> None:
     clock.now = datetime(2020, 2, 1, tzinfo=UTC)
-    await capital_schemes.add(
-        CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-    )
+    await capital_schemes.add(build_capital_scheme(reference=CapitalSchemeReference("ATE00001")))
 
     response = client.post(
         "/capital-schemes/ATE00001/authority-reviews",

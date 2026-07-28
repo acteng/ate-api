@@ -35,7 +35,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
-from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.database.builders import (
     build_capital_scheme_bid_status_entity,
     build_capital_scheme_overview_entity,
@@ -92,11 +92,7 @@ class TestCapitalSchemeEntity:
         assert not capital_scheme_entity.capital_scheme_authority_reviews
 
     def test_from_domain_sets_outputs(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         capital_scheme.change_output(
             CapitalSchemeOutput(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -148,11 +144,7 @@ class TestCapitalSchemeEntity:
         )
 
     def test_from_domain_sets_authority_review(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         capital_scheme.perform_authority_review(
             CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE

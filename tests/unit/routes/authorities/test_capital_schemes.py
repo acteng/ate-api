@@ -16,6 +16,7 @@ from ate_api.routes.authorities.capital_schemes import CapitalSchemeItemModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
 from ate_api.routes.data_sources import DataSourceModel
+from tests.unit.domain.builders import build_capital_scheme_reference
 from tests.unit.domain.dummies import dummy_overview
 
 
@@ -51,7 +52,7 @@ class TestCapitalSchemeItemModel:
 
     def test_from_domain_sets_authority_review(self, http_request: Request, base_url: str) -> None:
         capital_scheme_item = CapitalSchemeItem(
-            reference=CapitalSchemeReference("ATE00001"),
+            reference=build_capital_scheme_reference(),
             overview=dummy_overview(),
             authority_review=CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE

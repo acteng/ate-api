@@ -12,7 +12,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.domain.builders import build_capital_scheme
 
 
 class TestCapitalSchemeReference:
@@ -76,11 +76,7 @@ class TestCapitalScheme:
         )
 
     def test_outputs_is_copy(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         capital_scheme.change_output(
             CapitalSchemeOutput(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -96,11 +92,7 @@ class TestCapitalScheme:
         assert capital_scheme.outputs
 
     def test_change_output(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         output = CapitalSchemeOutput(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
@@ -114,11 +106,7 @@ class TestCapitalScheme:
         assert capital_scheme.outputs == [output]
 
     def test_perform_authority_review(self) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         authority_review = CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )

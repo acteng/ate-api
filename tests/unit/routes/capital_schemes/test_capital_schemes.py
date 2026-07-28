@@ -34,7 +34,7 @@ from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.routes.observation_types import ObservationTypeModel
-from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_reference
 from tests.unit.routes.dummies import dummy_bid_status_details_model, dummy_overview_model
 
 
@@ -77,12 +77,8 @@ class TestCapitalSchemeModel:
         )
 
     def test_from_domain_sets_financials(self, http_request: Request) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+        capital_scheme = build_capital_scheme()
+        financials = CapitalSchemeFinancials(capital_scheme=build_capital_scheme_reference())
         financials.adjust_financial(
             CapitalSchemeFinancial(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -99,7 +95,7 @@ class TestCapitalSchemeModel:
                 data_source=DataSource.ATF4_BID,
             )
         )
-        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        milestones = CapitalSchemeMilestones(capital_scheme=build_capital_scheme_reference())
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
@@ -115,13 +111,9 @@ class TestCapitalSchemeModel:
         )
 
     def test_from_domain_sets_milestones(self, http_request: Request) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
-        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        capital_scheme = build_capital_scheme()
+        financials = CapitalSchemeFinancials(capital_scheme=build_capital_scheme_reference())
+        milestones = CapitalSchemeMilestones(capital_scheme=build_capital_scheme_reference())
         milestones.change_milestone(
             CapitalSchemeMilestone(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -162,11 +154,7 @@ class TestCapitalSchemeModel:
         )
 
     def test_from_domain_sets_outputs(self, http_request: Request) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         capital_scheme.change_output(
             CapitalSchemeOutput(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -185,8 +173,8 @@ class TestCapitalSchemeModel:
                 value=Decimal(2),
             )
         )
-        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        financials = CapitalSchemeFinancials(capital_scheme=build_capital_scheme_reference())
+        milestones = CapitalSchemeMilestones(capital_scheme=build_capital_scheme_reference())
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
@@ -208,18 +196,14 @@ class TestCapitalSchemeModel:
         )
 
     def test_from_domain_sets_authority_review(self, http_request: Request) -> None:
-        capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=dummy_overview(),
-            bid_status_details=dummy_bid_status_details(),
-        )
+        capital_scheme = build_capital_scheme()
         capital_scheme.perform_authority_review(
             CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 1, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
             )
         )
-        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-        milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
+        financials = CapitalSchemeFinancials(capital_scheme=build_capital_scheme_reference())
+        milestones = CapitalSchemeMilestones(capital_scheme=build_capital_scheme_reference())
 
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 

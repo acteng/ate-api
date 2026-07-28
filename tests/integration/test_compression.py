@@ -13,11 +13,11 @@ from ate_api.domain.capital_scheme_milestones import (
     Milestone,
 )
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.dummies import dummy_bid_status_details, dummy_overview
+from tests.unit.domain.builders import build_capital_scheme
 
 
 @respx.mock
@@ -53,9 +53,7 @@ def add_large_capital_scheme(
     capital_scheme_milestones: CapitalSchemeMilestonesRepository,
 ) -> Callable[[CapitalSchemeReference], Awaitable[None]]:
     async def add(reference: CapitalSchemeReference) -> None:
-        await capital_schemes.add(
-            CapitalScheme(reference=reference, overview=dummy_overview(), bid_status_details=dummy_bid_status_details())
-        )
+        await capital_schemes.add(build_capital_scheme(reference=reference))
 
         await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=reference))
 
