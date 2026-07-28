@@ -36,11 +36,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeName,
 )
 from tests.unit.domain.builders import build_capital_scheme
-from tests.unit.infrastructure.database.builders import (
-    build_capital_scheme_bid_status_entity,
-    build_capital_scheme_overview_entity,
-    build_improvement_overview_entity,
-)
+from tests.unit.infrastructure.database.builders import build_capital_scheme_entity, build_improvement_overview_entity
 
 
 class TestCapitalSchemeEntity:
@@ -210,11 +206,9 @@ class TestCapitalSchemeEntity:
         assert not capital_scheme.authority_review
 
     def test_to_domain_sets_outputs(self) -> None:
-        capital_scheme_entity = CapitalSchemeEntity(
-            scheme_reference="ATE00001",
-            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-            capital_scheme_interventions=[
+        capital_scheme_entity = build_capital_scheme_entity(
+            reference="ATE00001",
+            interventions=[
                 CapitalSchemeInterventionEntity(
                     intervention_type_measure=InterventionTypeMeasureEntity(
                         intervention_type=InterventionTypeEntity(
@@ -264,11 +258,9 @@ class TestCapitalSchemeEntity:
         ]
 
     def test_to_domain_sets_authority_review(self) -> None:
-        capital_scheme_entity = CapitalSchemeEntity(
-            scheme_reference="ATE00001",
-            capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-            capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-            capital_scheme_authority_reviews=[
+        capital_scheme_entity = build_capital_scheme_entity(
+            reference="ATE00001",
+            authority_reviews=[
                 CapitalSchemeAuthorityReviewEntity(
                     review_date=datetime(2020, 1, 1),
                     data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
