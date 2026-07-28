@@ -285,9 +285,9 @@ class TestDatabaseCapitalSchemeRepository:
                         improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
@@ -306,7 +306,6 @@ class TestDatabaseCapitalSchemeRepository:
                                 effective_date_from=datetime(2020, 2, 1),
                             ),
                         ],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
                     ),
                 ]
             )
@@ -330,10 +329,9 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     not_funded := build_bid_status_entity(name=BidStatusName.NOT_FUNDED),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        bid_statuses=[
                             CapitalSchemeBidStatusEntity(
                                 bid_status=funded,
                                 effective_date_from=datetime(2020, 1, 1),
@@ -373,11 +371,9 @@ class TestDatabaseCapitalSchemeRepository:
                         type_=new_segregated_cycling_facility, measure=miles
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_interventions=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        interventions=[
                             CapitalSchemeInterventionEntity(
                                 intervention_type_measure=widening_existing_footway_miles,
                                 intervention_value=Decimal("1.000000"),
@@ -447,11 +443,9 @@ class TestDatabaseCapitalSchemeRepository:
                         type_=new_segregated_cycling_facility, measure=number_of_junctions
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_interventions=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        interventions=[
                             CapitalSchemeInterventionEntity(
                                 intervention_type_measure=new_segregated_cycling_facility_number_of_junctions,
                                 intervention_value=Decimal("3.000000"),
@@ -508,11 +502,9 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_authority_reviews=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
                                 review_date=datetime(2020, 2, 1), data_source=authority_review
                             ),
@@ -537,11 +529,9 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_authority_reviews=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
                                 review_date=datetime(2020, 2, 1), data_source=authority_review
                             ),
@@ -566,10 +556,8 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
+                    build_capital_scheme_entity(
+                        reference="ATE00001", overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)]
                     ),
                 ]
             )
@@ -1373,11 +1361,9 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     authority_update := build_data_source_entity(id_=1, name=DataSourceName.AUTHORITY_UPDATE),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                        capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                        capital_scheme_authority_reviews=[
+                    build_capital_scheme_entity(
+                        reference="ATE00001",
+                        authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
                                 review_date=datetime(2020, 2, 1), data_source=authority_update
                             )
@@ -1408,13 +1394,7 @@ class TestDatabaseCapitalSchemeRepository:
 
     async def test_update_when_no_authority_review(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(
-                CapitalSchemeEntity(
-                    scheme_reference="ATE00001",
-                    capital_scheme_overviews=[build_capital_scheme_overview_entity()],
-                    capital_scheme_bid_statuses=[build_capital_scheme_bid_status_entity()],
-                )
-            )
+            session.add(build_capital_scheme_entity(reference="ATE00001", authority_reviews=[]))
 
         async with AsyncSession(engine) as session, session.begin():
             capital_schemes = DatabaseCapitalSchemeRepository(session)
