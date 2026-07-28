@@ -35,7 +35,8 @@ from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_reference
-from tests.unit.routes.dummies import dummy_bid_status_details_model, dummy_overview_model
+from tests.unit.routes.builders import build_capital_scheme_overview_model
+from tests.unit.routes.dummies import dummy_bid_status_details_model
 
 
 class TestCapitalSchemeModel:
@@ -251,7 +252,7 @@ class TestCapitalSchemeModel:
     def test_to_domain_sets_outputs(self, http_request: Request, base_url: str) -> None:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
-            overview=dummy_overview_model(base_url),
+            overview=build_capital_scheme_overview_model(base_url),
             bid_status_details=dummy_bid_status_details_model(),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
