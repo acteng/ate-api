@@ -20,7 +20,7 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
 from tests.unit.infrastructure.database.builders import (
-    build_capital_scheme_overview_entity,
+    EntityBuilder,
     build_data_source_entity,
     build_financial_type_entity,
     build_funding_programme_entity,
@@ -183,11 +183,11 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             and financial_row2.data_source_id == 3
         )
 
-    async def test_get(self, engine: AsyncEngine) -> None:
+    async def test_get(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
                 CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_overviews=[build_capital_scheme_overview_entity()]
+                    scheme_reference="ATE00001", capital_scheme_overviews=[entities.build_capital_scheme_overview()]
                 )
             )
 
@@ -199,7 +199,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             financials and financials.capital_scheme == CapitalSchemeReference("ATE00001") and not financials.financials
         )
 
-    async def test_get_fetches_current_financials(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_financials(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -209,7 +209,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
@@ -256,7 +256,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         ]
 
     async def test_get_fetches_current_financials_ordered_by_financial_type_then_effective_date_from(
-        self, engine: AsyncEngine
+        self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
@@ -267,7 +267,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
@@ -318,14 +318,14 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             ),
         ]
 
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
+    async def test_get_filters_under_embargo(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview(funding_programme=atf3)],
                     ),
                 ]
             )
@@ -343,7 +343,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
 
         assert not financials
 
-    async def test_update(self, engine: AsyncEngine) -> None:
+    async def test_update(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -352,7 +352,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,

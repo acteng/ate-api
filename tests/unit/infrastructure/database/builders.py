@@ -43,12 +43,30 @@ class EntityBuilder:
         return CapitalSchemeEntity(
             capital_scheme_id=id_,
             scheme_reference=reference,
-            capital_scheme_overviews=overviews if overviews is not None else [build_capital_scheme_overview_entity()],
+            capital_scheme_overviews=overviews if overviews is not None else [self.build_capital_scheme_overview()],
             capital_scheme_bid_statuses=(
                 bid_statuses if bid_statuses is not None else [build_capital_scheme_bid_status_entity()]
             ),
             capital_scheme_interventions=interventions or [],
             capital_scheme_authority_reviews=authority_reviews or [],
+        )
+
+    def build_capital_scheme_overview(
+        self,
+        name: str = "dummy",
+        bid_submitting_authority: AuthorityEntity | None = None,
+        funding_programme: FundingProgrammeEntity | None = None,
+        improvement: ImprovementEntity | None = None,
+        type_: SchemeTypeEntity | None = None,
+        effective_date_from: datetime = datetime.min,
+    ) -> CapitalSchemeOverviewEntity:
+        return CapitalSchemeOverviewEntity(
+            scheme_name=name,
+            bid_submitting_authority=bid_submitting_authority or build_authority_entity(),
+            funding_programme=funding_programme or build_funding_programme_entity(),
+            improvement=improvement,
+            scheme_type=type_ or build_scheme_type_entity(),
+            effective_date_from=effective_date_from,
         )
 
 
@@ -70,24 +88,6 @@ def build_improvement_overview_entity(
         improvement_description=description,
         funding_managed_by=funding_managed_by or build_authority_entity(),
         data_source=data_source or build_data_source_entity(),
-        effective_date_from=effective_date_from,
-    )
-
-
-def build_capital_scheme_overview_entity(
-    name: str = "dummy",
-    bid_submitting_authority: AuthorityEntity | None = None,
-    funding_programme: FundingProgrammeEntity | None = None,
-    improvement: ImprovementEntity | None = None,
-    type_: SchemeTypeEntity | None = None,
-    effective_date_from: datetime = datetime.min,
-) -> CapitalSchemeOverviewEntity:
-    return CapitalSchemeOverviewEntity(
-        scheme_name=name,
-        bid_submitting_authority=bid_submitting_authority or build_authority_entity(),
-        funding_programme=funding_programme or build_funding_programme_entity(),
-        improvement=improvement,
-        scheme_type=type_ or build_scheme_type_entity(),
         effective_date_from=effective_date_from,
     )
 

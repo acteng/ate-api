@@ -24,7 +24,7 @@ from ate_api.infrastructure.database.capital_scheme_milestones import (
     DatabaseMilestoneRepository,
 )
 from tests.unit.infrastructure.database.builders import (
-    build_capital_scheme_overview_entity,
+    EntityBuilder,
     build_data_source_entity,
     build_funding_programme_entity,
     build_milestone_entity,
@@ -316,11 +316,11 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             and not milestone_row2.effective_date_to
         )
 
-    async def test_get(self, engine: AsyncEngine) -> None:
+    async def test_get(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(
                 CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_overviews=[build_capital_scheme_overview_entity()]
+                    scheme_reference="ATE00001", capital_scheme_overviews=[entities.build_capital_scheme_overview()]
                 )
             )
 
@@ -332,7 +332,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             milestones and milestones.capital_scheme == CapitalSchemeReference("ATE00001") and not milestones.milestones
         )
 
-    async def test_get_fetches_current_milestones(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_milestones(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -347,7 +347,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -399,7 +399,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
         ]
 
     async def test_get_fetches_current_milestones_ordered_by_milestone_stage_order_then_observation_type(
-        self, engine: AsyncEngine
+        self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
@@ -416,7 +416,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -473,14 +473,14 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             ),
         ]
 
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
+    async def test_get_filters_under_embargo(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview(funding_programme=atf3)],
                     ),
                 ]
             )
@@ -498,7 +498,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
 
         assert not milestones
 
-    async def test_update(self, engine: AsyncEngine) -> None:
+    async def test_update(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -510,7 +510,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     CapitalSchemeEntity(
                         capital_scheme_id=1,
                         scheme_reference="ATE00001",
-                        capital_scheme_overviews=[build_capital_scheme_overview_entity()],
+                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
