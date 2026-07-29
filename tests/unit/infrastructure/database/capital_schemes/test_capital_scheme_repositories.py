@@ -37,10 +37,10 @@ from ate_api.infrastructure.database import (
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.database.builders import (
+    EntityBuilder,
     build_authority_entity,
     build_bid_status_entity,
     build_capital_scheme_bid_status_entity,
-    build_capital_scheme_entity,
     build_capital_scheme_overview_entity,
     build_data_source_entity,
     build_funding_programme_entity,
@@ -274,7 +274,7 @@ class TestDatabaseCapitalSchemeRepository:
         )
         assert not capital_scheme.authority_review
 
-    async def test_get_fetches_current_overview(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_overview(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -285,7 +285,7 @@ class TestDatabaseCapitalSchemeRepository:
                         improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
                             CapitalSchemeOverviewEntity(
@@ -323,13 +323,13 @@ class TestDatabaseCapitalSchemeRepository:
             type=CapitalSchemeType.CONSTRUCTION,
         )
 
-    async def test_get_fetches_current_bid_status(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_bid_status(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     not_funded := build_bid_status_entity(name=BidStatusName.NOT_FUNDED),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         bid_statuses=[
                             CapitalSchemeBidStatusEntity(
@@ -353,7 +353,7 @@ class TestDatabaseCapitalSchemeRepository:
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
         )
 
-    async def test_get_fetches_current_outputs(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_outputs(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -371,7 +371,7 @@ class TestDatabaseCapitalSchemeRepository:
                         type_=new_segregated_cycling_facility, measure=miles
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         interventions=[
                             CapitalSchemeInterventionEntity(
@@ -419,7 +419,9 @@ class TestDatabaseCapitalSchemeRepository:
             ),
         ]
 
-    async def test_get_fetches_current_outputs_ordered_by_type_then_measure(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_outputs_ordered_by_type_then_measure(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -443,7 +445,7 @@ class TestDatabaseCapitalSchemeRepository:
                         type_=new_segregated_cycling_facility, measure=number_of_junctions
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         interventions=[
                             CapitalSchemeInterventionEntity(
@@ -497,12 +499,12 @@ class TestDatabaseCapitalSchemeRepository:
             ),
         ]
 
-    async def test_get_fetches_latest_authority_review(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_latest_authority_review(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
@@ -524,12 +526,14 @@ class TestDatabaseCapitalSchemeRepository:
             review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
 
-    async def test_get_fetches_latest_authority_review_when_tie(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_latest_authority_review_when_tie(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
@@ -551,12 +555,12 @@ class TestDatabaseCapitalSchemeRepository:
             review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
 
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
+    async def test_get_filters_under_embargo(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001", overviews=[build_capital_scheme_overview_entity(funding_programme=atf3)]
                     ),
                 ]
@@ -568,9 +572,9 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme
 
-    async def test_get_when_no_overview(self, engine: AsyncEngine) -> None:
+    async def test_get_when_no_overview(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(build_capital_scheme_entity(reference="ATE00001", overviews=[]))
+            session.add(entities.build_capital_scheme(reference="ATE00001", overviews=[]))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
@@ -578,9 +582,9 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme
 
-    async def test_get_when_no_bid_status(self, engine: AsyncEngine) -> None:
+    async def test_get_when_no_bid_status(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(build_capital_scheme_entity(reference="ATE00001", bid_statuses=[]))
+            session.add(entities.build_capital_scheme(reference="ATE00001", bid_statuses=[]))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)
@@ -1356,12 +1360,12 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme_items
 
-    async def test_update_updates_authority_review(self, engine: AsyncEngine) -> None:
+    async def test_update_updates_authority_review(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     authority_update := build_data_source_entity(id_=1, name=DataSourceName.AUTHORITY_UPDATE),
-                    build_capital_scheme_entity(
+                    entities.build_capital_scheme(
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
@@ -1392,9 +1396,9 @@ class TestDatabaseCapitalSchemeRepository:
             and authority_review_row2.data_source_id == 1
         )
 
-    async def test_update_when_no_authority_review(self, engine: AsyncEngine) -> None:
+    async def test_update_when_no_authority_review(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(build_capital_scheme_entity(reference="ATE00001", authority_reviews=[]))
+            session.add(entities.build_capital_scheme(reference="ATE00001", authority_reviews=[]))
 
         async with AsyncSession(engine) as session, session.begin():
             capital_schemes = DatabaseCapitalSchemeRepository(session)

@@ -36,7 +36,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeName,
 )
 from tests.unit.domain.builders import build_capital_scheme
-from tests.unit.infrastructure.database.builders import build_capital_scheme_entity, build_improvement_overview_entity
+from tests.unit.infrastructure.database.builders import EntityBuilder, build_improvement_overview_entity
 
 
 class TestCapitalSchemeEntity:
@@ -205,8 +205,8 @@ class TestCapitalSchemeEntity:
         )
         assert not capital_scheme.authority_review
 
-    def test_to_domain_sets_outputs(self) -> None:
-        capital_scheme_entity = build_capital_scheme_entity(
+    def test_to_domain_sets_outputs(self, entities: EntityBuilder) -> None:
+        capital_scheme_entity = entities.build_capital_scheme(
             reference="ATE00001",
             interventions=[
                 CapitalSchemeInterventionEntity(
@@ -257,8 +257,8 @@ class TestCapitalSchemeEntity:
             ),
         ]
 
-    def test_to_domain_sets_authority_review(self) -> None:
-        capital_scheme_entity = build_capital_scheme_entity(
+    def test_to_domain_sets_authority_review(self, entities: EntityBuilder) -> None:
+        capital_scheme_entity = entities.build_capital_scheme(
             reference="ATE00001",
             authority_reviews=[
                 CapitalSchemeAuthorityReviewEntity(

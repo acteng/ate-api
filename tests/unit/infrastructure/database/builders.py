@@ -30,6 +30,28 @@ from ate_api.infrastructure.database import (
 )
 
 
+class EntityBuilder:
+    def build_capital_scheme(
+        self,
+        id_: int | None = None,
+        reference: str = "dummy",
+        overviews: list[CapitalSchemeOverviewEntity] | None = None,
+        bid_statuses: list[CapitalSchemeBidStatusEntity] | None = None,
+        interventions: list[CapitalSchemeInterventionEntity] | None = None,
+        authority_reviews: list[CapitalSchemeAuthorityReviewEntity] | None = None,
+    ) -> CapitalSchemeEntity:
+        return CapitalSchemeEntity(
+            capital_scheme_id=id_,
+            scheme_reference=reference,
+            capital_scheme_overviews=overviews if overviews is not None else [build_capital_scheme_overview_entity()],
+            capital_scheme_bid_statuses=(
+                bid_statuses if bid_statuses is not None else [build_capital_scheme_bid_status_entity()]
+            ),
+            capital_scheme_interventions=interventions or [],
+            capital_scheme_authority_reviews=authority_reviews or [],
+        )
+
+
 def build_authority_entity(
     id_: int | None = None, full_name: str = "dummy", abbreviation: str = "dummy"
 ) -> AuthorityEntity:
@@ -49,26 +71,6 @@ def build_improvement_overview_entity(
         funding_managed_by=funding_managed_by or build_authority_entity(),
         data_source=data_source or build_data_source_entity(),
         effective_date_from=effective_date_from,
-    )
-
-
-def build_capital_scheme_entity(
-    id_: int | None = None,
-    reference: str = "dummy",
-    overviews: list[CapitalSchemeOverviewEntity] | None = None,
-    bid_statuses: list[CapitalSchemeBidStatusEntity] | None = None,
-    interventions: list[CapitalSchemeInterventionEntity] | None = None,
-    authority_reviews: list[CapitalSchemeAuthorityReviewEntity] | None = None,
-) -> CapitalSchemeEntity:
-    return CapitalSchemeEntity(
-        capital_scheme_id=id_,
-        scheme_reference=reference,
-        capital_scheme_overviews=overviews if overviews is not None else [build_capital_scheme_overview_entity()],
-        capital_scheme_bid_statuses=(
-            bid_statuses if bid_statuses is not None else [build_capital_scheme_bid_status_entity()]
-        ),
-        capital_scheme_interventions=interventions or [],
-        capital_scheme_authority_reviews=authority_reviews or [],
     )
 
 

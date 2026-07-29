@@ -8,6 +8,7 @@ from sqlalchemy.sql.ddl import CreateSchema
 from testcontainers.postgres import PostgresContainer
 
 from ate_api.infrastructure.database import BaseEntity
+from tests.unit.infrastructure.database.builders import EntityBuilder
 
 
 @pytest.fixture(name="debug", scope="package")
@@ -32,6 +33,11 @@ async def engine_fixture(database_url: str, debug: bool) -> AsyncEngine:
 async def data_fixture(engine: AsyncEngine) -> AsyncGenerator[None]:
     yield
     await _delete_all(engine)
+
+
+@pytest.fixture(name="entities")
+def entities_fixture() -> EntityBuilder:
+    return EntityBuilder()
 
 
 async def _create_schema(engine: AsyncEngine) -> None:
