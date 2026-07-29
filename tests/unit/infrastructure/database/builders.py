@@ -45,7 +45,7 @@ class EntityBuilder:
             scheme_reference=reference,
             capital_scheme_overviews=overviews if overviews is not None else [self.build_capital_scheme_overview()],
             capital_scheme_bid_statuses=(
-                bid_statuses if bid_statuses is not None else [build_capital_scheme_bid_status_entity()]
+                bid_statuses if bid_statuses is not None else [self.build_capital_scheme_bid_status()]
             ),
             capital_scheme_interventions=interventions or [],
             capital_scheme_authority_reviews=authority_reviews or [],
@@ -67,6 +67,13 @@ class EntityBuilder:
             improvement=improvement,
             scheme_type=type_ or build_scheme_type_entity(),
             effective_date_from=effective_date_from,
+        )
+
+    def build_capital_scheme_bid_status(
+        self, bid_status: BidStatusEntity | None = None, effective_date_from: datetime = datetime.min
+    ) -> CapitalSchemeBidStatusEntity:
+        return CapitalSchemeBidStatusEntity(
+            bid_status=bid_status or build_bid_status_entity(), effective_date_from=effective_date_from
         )
 
 
@@ -96,14 +103,6 @@ def build_scheme_type_entity(
     id_: int | None = None, name: SchemeTypeName = SchemeTypeName.DEVELOPMENT
 ) -> SchemeTypeEntity:
     return SchemeTypeEntity(scheme_type_id=id_, scheme_type_name=name)
-
-
-def build_capital_scheme_bid_status_entity(
-    bid_status: BidStatusEntity | None = None, effective_date_from: datetime = datetime.min
-) -> CapitalSchemeBidStatusEntity:
-    return CapitalSchemeBidStatusEntity(
-        bid_status=bid_status or build_bid_status_entity(), effective_date_from=effective_date_from
-    )
 
 
 def build_bid_status_entity(id_: int | None = None, name: BidStatusName = BidStatusName.SUBMITTED) -> BidStatusEntity:
