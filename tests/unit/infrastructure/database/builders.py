@@ -31,6 +31,9 @@ from ate_api.infrastructure.database import (
 
 
 class EntityBuilder:
+    def __init__(self) -> None:
+        self._dummy_funding_programme = build_funding_programme_entity()
+
     def build_capital_scheme(
         self,
         id_: int | None = None,
@@ -63,7 +66,7 @@ class EntityBuilder:
         return CapitalSchemeOverviewEntity(
             scheme_name=name,
             bid_submitting_authority=bid_submitting_authority or build_authority_entity(),
-            funding_programme=funding_programme or build_funding_programme_entity(),
+            funding_programme=funding_programme or self._dummy_funding_programme,
             improvement=improvement,
             scheme_type=type_ or build_scheme_type_entity(),
             effective_date_from=effective_date_from,

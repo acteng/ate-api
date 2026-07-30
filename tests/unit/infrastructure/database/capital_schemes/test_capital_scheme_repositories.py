@@ -926,16 +926,13 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     not_funded := build_bid_status_entity(name=BidStatusName.NOT_FUNDED),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[
                             CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
@@ -944,9 +941,7 @@ class TestDatabaseCapitalSchemeRepository:
                     entities.build_capital_scheme(
                         reference="ATE00002",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[
                             CapitalSchemeBidStatusEntity(
@@ -979,7 +974,6 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     detailed_design_completed := build_milestone_entity(
@@ -997,9 +991,7 @@ class TestDatabaseCapitalSchemeRepository:
                         id_=1,
                         reference="ATE00001",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
@@ -1015,9 +1007,7 @@ class TestDatabaseCapitalSchemeRepository:
                         id_=2,
                         reference="ATE00002",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
@@ -1033,9 +1023,7 @@ class TestDatabaseCapitalSchemeRepository:
                         id_=3,
                         reference="ATE00003",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
@@ -1069,7 +1057,6 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
@@ -1078,9 +1065,7 @@ class TestDatabaseCapitalSchemeRepository:
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
@@ -1088,9 +1073,7 @@ class TestDatabaseCapitalSchemeRepository:
                         id_=2,
                         reference="ATE00002",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
@@ -1260,24 +1243,19 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
                     entities.build_capital_scheme(
                         reference="ATE00002",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=liv, funding_programme=atf3, type_=construction
-                            )
+                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, type_=construction)
                         ],
                         bid_statuses=[entities.build_capital_scheme_bid_status(bid_status=funded)],
                     ),
