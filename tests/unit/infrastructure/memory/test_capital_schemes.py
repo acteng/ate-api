@@ -19,7 +19,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_bid_status_details
+from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
