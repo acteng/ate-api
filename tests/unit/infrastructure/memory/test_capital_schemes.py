@@ -118,7 +118,7 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(reference=CapitalSchemeReference("ATE00002"), overview=overview2)
         )
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -128,7 +128,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=ImprovementReference("IMP00002"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
 
