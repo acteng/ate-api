@@ -13,7 +13,7 @@ from ate_api.domain.capital_scheme_milestones import (
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -21,7 +21,7 @@ from ate_api.domain.funding_programmes import FundingProgramme, FundingProgramme
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.builders import build_capital_scheme_bid_status_details
+from tests.unit.domain.builders import build_capital_scheme
 
 
 @respx.mock
@@ -71,7 +71,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
             ),
         )
     )
-    capital_scheme = CapitalScheme(
+    capital_scheme = build_capital_scheme(
         reference=CapitalSchemeReference("ATE00001"),
         overview=CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -81,7 +81,6 @@ async def test_get_authority_bid_submitting_capital_schemes(
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         ),
-        bid_status_details=build_capital_scheme_bid_status_details(),
     )
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(
@@ -90,7 +89,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
     )
     await capital_schemes.add(capital_scheme)
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -100,7 +99,6 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await authorities.add(
@@ -119,7 +117,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
         )
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -129,7 +127,6 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 improvement=ImprovementReference("IMP00002"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
 
@@ -182,7 +179,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -192,11 +189,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -206,7 +202,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
 
@@ -235,7 +230,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF5")))
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -245,11 +240,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -259,11 +253,10 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -273,7 +266,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
 
@@ -312,7 +304,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -328,7 +320,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
         )
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -383,7 +375,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -393,7 +385,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -408,7 +399,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
     await capital_scheme_milestones.add(milestones1)
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -418,7 +409,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -455,7 +445,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -465,7 +455,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -480,7 +469,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
     await capital_scheme_milestones.add(milestones1)
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -490,7 +479,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -505,7 +493,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     )
     await capital_scheme_milestones.add(milestones2)
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -515,7 +503,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
@@ -552,7 +539,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
         Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
     )
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -562,12 +549,11 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
     await capital_schemes.add(
-        CapitalScheme(
+        build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -577,7 +563,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
     )
     milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
