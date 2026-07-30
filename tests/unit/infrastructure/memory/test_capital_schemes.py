@@ -104,11 +104,7 @@ class TestMemoryCapitalSchemeRepository:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         await capital_schemes.add(
-            CapitalScheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=overview1,
-                bid_status_details=build_capital_scheme_bid_status_details(),
-            )
+            build_capital_scheme(reference=CapitalSchemeReference("ATE00001"), overview=overview1)
         )
         overview2 = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -119,11 +115,7 @@ class TestMemoryCapitalSchemeRepository:
             type=CapitalSchemeType.CONSTRUCTION,
         )
         await capital_schemes.add(
-            CapitalScheme(
-                reference=CapitalSchemeReference("ATE00002"),
-                overview=overview2,
-                bid_status_details=build_capital_scheme_bid_status_details(),
-            )
+            build_capital_scheme(reference=CapitalSchemeReference("ATE00002"), overview=overview2)
         )
         await capital_schemes.add(
             CapitalScheme(
@@ -153,7 +145,7 @@ class TestMemoryCapitalSchemeRepository:
         authority_review = CapitalSchemeAuthorityReview(
             review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
-        capital_scheme = CapitalScheme(
+        capital_scheme = build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -163,7 +155,6 @@ class TestMemoryCapitalSchemeRepository:
                 improvement=None,
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=build_capital_scheme_bid_status_details(),
         )
         capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
@@ -178,7 +169,7 @@ class TestMemoryCapitalSchemeRepository:
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -188,11 +179,10 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -202,11 +192,10 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -216,7 +205,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
 
@@ -234,7 +222,7 @@ class TestMemoryCapitalSchemeRepository:
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -250,7 +238,7 @@ class TestMemoryCapitalSchemeRepository:
             )
         )
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -280,7 +268,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
     ) -> None:
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -290,7 +278,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -305,7 +292,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         await capital_scheme_milestones.add(milestones1)
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -315,7 +302,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -330,7 +316,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         await capital_scheme_milestones.add(milestones2)
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -340,7 +326,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
@@ -371,7 +356,7 @@ class TestMemoryCapitalSchemeRepository:
         capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
     ) -> None:
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -381,12 +366,11 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -396,7 +380,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
@@ -423,7 +406,7 @@ class TestMemoryCapitalSchemeRepository:
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -433,11 +416,10 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
         await capital_schemes.add(
-            CapitalScheme(
+            build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -447,7 +429,6 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=None,
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
-                bid_status_details=build_capital_scheme_bid_status_details(),
             )
         )
 
