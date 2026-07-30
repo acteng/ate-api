@@ -23,6 +23,7 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
@@ -75,6 +76,9 @@ async def test_get_capital_scheme(
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
         )
     )
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
@@ -95,6 +99,7 @@ async def test_get_capital_scheme(
         },
         # Workaround: https://github.com/python/mypy/issues/19474
         "bidStatusDetails": {"bidStatus": cast(Any, "funded")},
+        "status": {"status": "active"},
         "financials": {"items": []},
         "milestones": {"currentMilestone": None, "items": []},
         "outputs": {"items": []},

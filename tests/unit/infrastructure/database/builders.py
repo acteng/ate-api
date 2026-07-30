@@ -9,6 +9,7 @@ from ate_api.infrastructure.database import (
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
     CapitalSchemeOverviewEntity,
+    CapitalSchemeSchemeStatusEntity,
     DataSourceEntity,
     DataSourceName,
     FinancialTypeEntity,
@@ -25,6 +26,8 @@ from ate_api.infrastructure.database import (
     MilestoneName,
     ObservationTypeEntity,
     ObservationTypeName,
+    SchemeStatusEntity,
+    SchemeStatusName,
     SchemeTypeEntity,
     SchemeTypeName,
 )
@@ -35,6 +38,7 @@ class EntityBuilder:
         self._dummy_funding_programme = build_funding_programme_entity()
         self._dummy_scheme_type = build_scheme_type_entity()
         self._dummy_bid_status = build_bid_status_entity()
+        self._dummy_scheme_status = build_scheme_status_entity()
 
     def build_capital_scheme(
         self,
@@ -42,6 +46,7 @@ class EntityBuilder:
         reference: str = "dummy",
         overviews: list[CapitalSchemeOverviewEntity] | None = None,
         bid_statuses: list[CapitalSchemeBidStatusEntity] | None = None,
+        scheme_statuses: list[CapitalSchemeSchemeStatusEntity] | None = None,
         interventions: list[CapitalSchemeInterventionEntity] | None = None,
         authority_reviews: list[CapitalSchemeAuthorityReviewEntity] | None = None,
     ) -> CapitalSchemeEntity:
@@ -51,6 +56,9 @@ class EntityBuilder:
             capital_scheme_overviews=overviews if overviews is not None else [self.build_capital_scheme_overview()],
             capital_scheme_bid_statuses=(
                 bid_statuses if bid_statuses is not None else [self.build_capital_scheme_bid_status()]
+            ),
+            capital_scheme_scheme_statuses=(
+                scheme_statuses if scheme_statuses is not None else [self.build_capital_scheme_scheme_status_entity()]
             ),
             capital_scheme_interventions=interventions or [],
             capital_scheme_authority_reviews=authority_reviews or [],
@@ -79,6 +87,13 @@ class EntityBuilder:
     ) -> CapitalSchemeBidStatusEntity:
         return CapitalSchemeBidStatusEntity(
             bid_status=bid_status or self._dummy_bid_status, effective_date_from=effective_date_from
+        )
+
+    def build_capital_scheme_scheme_status_entity(
+        self, scheme_status: SchemeStatusEntity | None = None, effective_date_from: datetime = datetime.min
+    ) -> CapitalSchemeSchemeStatusEntity:
+        return CapitalSchemeSchemeStatusEntity(
+            scheme_status=scheme_status or self._dummy_scheme_status, effective_date_from=effective_date_from
         )
 
 
@@ -112,6 +127,12 @@ def build_scheme_type_entity(
 
 def build_bid_status_entity(id_: int | None = None, name: BidStatusName = BidStatusName.SUBMITTED) -> BidStatusEntity:
     return BidStatusEntity(bid_status_id=id_, bid_status_name=name)
+
+
+def build_scheme_status_entity(
+    id_: int | None = None, name: SchemeStatusName = SchemeStatusName.PIPELINE
+) -> SchemeStatusEntity:
+    return SchemeStatusEntity(scheme_status_id=id_, scheme_status_name=name)
 
 
 def build_financial_type_entity(

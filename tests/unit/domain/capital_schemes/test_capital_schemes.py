@@ -7,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -63,15 +64,22 @@ class TestCapitalScheme:
         bid_status_details = CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
+        status = CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
+        )
 
         capital_scheme = CapitalScheme(
-            reference=CapitalSchemeReference("ATE00001"), overview=overview, bid_status_details=bid_status_details
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=overview,
+            bid_status_details=bid_status_details,
+            status=status,
         )
 
         assert (
             capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
             and capital_scheme.bid_status_details == bid_status_details
+            and capital_scheme.status == status
             and not capital_scheme.authority_review
         )
 

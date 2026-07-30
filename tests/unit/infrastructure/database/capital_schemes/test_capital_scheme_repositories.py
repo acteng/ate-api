@@ -13,6 +13,7 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -26,12 +27,14 @@ from ate_api.infrastructure.database import (
     CapitalSchemeInterventionEntity,
     CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
+    CapitalSchemeSchemeStatusEntity,
     DataSourceName,
     ImprovementEntity,
     InterventionMeasureName,
     InterventionTypeName,
     MilestoneName,
     ObservationTypeName,
+    SchemeStatusName,
     SchemeTypeName,
 )
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
@@ -48,6 +51,7 @@ from tests.unit.infrastructure.database.builders import (
     build_intervention_type_measure_entity,
     build_milestone_entity,
     build_observation_type_entity,
+    build_scheme_status_entity,
     build_scheme_type_entity,
 )
 
@@ -68,6 +72,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     build_scheme_type_entity(id_=4, name=SchemeTypeName.CONSTRUCTION),
                     build_bid_status_entity(id_=5, name=BidStatusName.FUNDED),
+                    build_scheme_status_entity(id_=6, name=SchemeStatusName.ACTIVE),
                 ]
             )
 
@@ -87,6 +92,9 @@ class TestDatabaseCapitalSchemeRepository:
                     bid_status_details=CapitalSchemeBidStatusDetails(
                         effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
                     ),
+                    status=CapitalSchemeStatus(
+                        effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
+                    ),
                 )
             )
 
@@ -94,6 +102,7 @@ class TestDatabaseCapitalSchemeRepository:
             (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
             (overview_row,) = await session.scalars(select(CapitalSchemeOverviewEntity))
             (bid_status_row,) = await session.scalars(select(CapitalSchemeBidStatusEntity))
+            (scheme_status_row,) = await session.scalars(select(CapitalSchemeSchemeStatusEntity))
         assert capital_scheme_row.scheme_reference == "ATE00001"
         assert (
             overview_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
@@ -111,6 +120,12 @@ class TestDatabaseCapitalSchemeRepository:
             and bid_status_row.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_row.effective_date_to
         )
+        assert (
+            scheme_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and scheme_status_row.scheme_status_id == 6
+            and scheme_status_row.effective_date_from == datetime(2020, 3, 1)
+            and not scheme_status_row.effective_date_to
+        )
 
     async def test_add_stores_outputs(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
@@ -120,6 +135,7 @@ class TestDatabaseCapitalSchemeRepository:
                     build_funding_programme_entity(),
                     build_scheme_type_entity(),
                     build_bid_status_entity(),
+                    build_scheme_status_entity(),
                     widening_existing_footway := build_intervention_type_entity(
                         name=InterventionTypeName.WIDENING_EXISTING_FOOTWAY
                     ),
@@ -184,6 +200,7 @@ class TestDatabaseCapitalSchemeRepository:
                     build_funding_programme_entity(),
                     build_scheme_type_entity(),
                     build_bid_status_entity(),
+                    build_scheme_status_entity(),
                     build_data_source_entity(id_=1, name=DataSourceName.AUTHORITY_UPDATE),
                 ]
             )
@@ -219,6 +236,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     funded := build_bid_status_entity(name=BidStatusName.FUNDED),
+                    active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
                     CapitalSchemeEntity(
                         scheme_reference="ATE00001",
                         capital_scheme_overviews=[
@@ -233,6 +251,11 @@ class TestDatabaseCapitalSchemeRepository:
                         ],
                         capital_scheme_bid_statuses=[
                             CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
+                        ],
+                        capital_scheme_scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=datetime(2020, 1, 1)
+                            )
                         ],
                     ),
                     CapitalSchemeEntity(
@@ -249,6 +272,11 @@ class TestDatabaseCapitalSchemeRepository:
                         ],
                         capital_scheme_bid_statuses=[
                             CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
+                        ],
+                        capital_scheme_scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=datetime(2020, 1, 1)
+                            )
                         ],
                     ),
                 ]
@@ -269,6 +297,9 @@ class TestDatabaseCapitalSchemeRepository:
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
+        )
+        assert capital_scheme.status == CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
         )
         assert not capital_scheme.authority_review
 
@@ -349,6 +380,36 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert capital_scheme and capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
+        )
+
+    async def test_get_fetches_current_status(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    pipeline := build_scheme_status_entity(name=SchemeStatusName.PIPELINE),
+                    active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=pipeline,
+                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_to=datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=datetime(2020, 2, 1)
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert capital_scheme and capital_scheme.status == CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), status=Status.ACTIVE
         )
 
     async def test_get_fetches_current_outputs(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
@@ -583,6 +644,16 @@ class TestDatabaseCapitalSchemeRepository:
     async def test_get_when_no_bid_status(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(entities.build_capital_scheme(reference="ATE00001", bid_statuses=[]))
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
+
+        assert not capital_scheme
+
+    async def test_get_when_no_status(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(entities.build_capital_scheme(reference="ATE00001", scheme_statuses=[]))
 
         async with AsyncSession(engine) as session:
             capital_schemes = DatabaseCapitalSchemeRepository(session)

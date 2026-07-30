@@ -7,6 +7,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -21,6 +22,7 @@ from ate_api.infrastructure.database import (
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
     CapitalSchemeOverviewEntity,
+    CapitalSchemeSchemeStatusEntity,
     DataSourceEntity,
     DataSourceName,
     FundingProgrammeEntity,
@@ -32,6 +34,8 @@ from ate_api.infrastructure.database import (
     InterventionTypeName,
     ObservationTypeEntity,
     ObservationTypeName,
+    SchemeStatusEntity,
+    SchemeStatusName,
     SchemeTypeEntity,
     SchemeTypeName,
 )
@@ -54,6 +58,9 @@ class TestCapitalSchemeEntity:
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
         )
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
@@ -63,6 +70,7 @@ class TestCapitalSchemeEntity:
             {ImprovementReference("IMP00001"): 3},
             {CapitalSchemeType.CONSTRUCTION: 4},
             {BidStatus.FUNDED: 5},
+            {Status.ACTIVE: 6},
             {},
             {},
             {},
@@ -84,6 +92,12 @@ class TestCapitalSchemeEntity:
             bid_status_entity.bid_status_id == 5
             and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
             and not bid_status_entity.effective_date_to
+        )
+        (scheme_status_entity,) = capital_scheme_entity.capital_scheme_scheme_statuses
+        assert (
+            scheme_status_entity.scheme_status_id == 6
+            and scheme_status_entity.effective_date_from == datetime(2020, 3, 1)
+            and not scheme_status_entity.effective_date_to
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
 
@@ -115,6 +129,7 @@ class TestCapitalSchemeEntity:
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {Status.PIPELINE: 0},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
                 (OutputType.NEW_SEGREGATED_CYCLING_FACILITY, OutputMeasure.MILES): 2,
@@ -154,6 +169,7 @@ class TestCapitalSchemeEntity:
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
+            {Status.PIPELINE: 0},
             {},
             {},
             {DataSource.AUTHORITY_UPDATE: 1},
@@ -187,6 +203,12 @@ class TestCapitalSchemeEntity:
                     effective_date_from=datetime(2020, 2, 1),
                 )
             ],
+            capital_scheme_scheme_statuses=[
+                CapitalSchemeSchemeStatusEntity(
+                    scheme_status=SchemeStatusEntity(scheme_status_name=SchemeStatusName.ACTIVE),
+                    effective_date_from=datetime(2020, 3, 1),
+                )
+            ],
         )
 
         capital_scheme = capital_scheme_entity.to_domain()
@@ -202,6 +224,9 @@ class TestCapitalSchemeEntity:
         )
         assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
+        )
+        assert capital_scheme.status == CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
         )
         assert not capital_scheme.authority_review
 

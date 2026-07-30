@@ -12,10 +12,12 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
+from ate_api.infrastructure.database import CapitalSchemeSchemeStatusEntity, SchemeStatusEntity, SchemeStatusName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_scheme_milestones import (
     CapitalSchemeMilestoneEntity,
@@ -58,6 +60,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         improvement_ids = await self._get_improvement_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
         bid_status_ids = await self._get_bid_status_ids(capital_scheme)
+        scheme_status_ids = await self._get_scheme_status_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
         data_source_ids = await self._get_data_source_ids(capital_scheme)
@@ -70,6 +73,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 improvement_ids,
                 scheme_type_ids,
                 bid_status_ids,
+                scheme_status_ids,
                 intervention_type_measure_ids,
                 observation_type_ids,
                 data_source_ids,
@@ -108,6 +112,18 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         ).join(
             CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
                 CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
+            )
+        )
+
+        # fetch current scheme status
+        statement = statement.options(
+            contains_eager(CapitalSchemeEntity.capital_scheme_scheme_statuses),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
+            ),
+        ).join(
+            CapitalSchemeEntity.capital_scheme_scheme_statuses.and_(
+                CapitalSchemeSchemeStatusEntity.effective_date_to.is_(None)
             )
         )
 
@@ -314,6 +330,15 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
+
+    async def _get_scheme_status_ids(self, capital_scheme: CapitalScheme) -> dict[Status, int]:
+        scheme_status_name = SchemeStatusName.from_domain(capital_scheme.status.status)
+        rows = await self._session.execute(
+            select(SchemeStatusEntity.scheme_status_name, SchemeStatusEntity.scheme_status_id).where(
+                SchemeStatusEntity.scheme_status_name == scheme_status_name
+            )
+        )
+        return {row.scheme_status_name.to_domain(): row.scheme_status_id for row in rows}
 
     async def _get_intervention_type_measure_ids(
         self, capital_scheme: CapitalScheme

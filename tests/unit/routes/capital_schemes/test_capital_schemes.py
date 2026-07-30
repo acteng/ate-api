@@ -12,6 +12,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
@@ -30,6 +31,7 @@ from ate_api.routes.capital_schemes.milestones import (
 )
 from ate_api.routes.capital_schemes.outputs import CapitalSchemeOutputModel, OutputMeasureModel, OutputTypeModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
+from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
@@ -38,6 +40,7 @@ from tests.unit.domain.builders import build_capital_scheme, build_capital_schem
 from tests.unit.routes.builders import (
     build_capital_scheme_bid_status_details_model,
     build_capital_scheme_overview_model,
+    build_capital_scheme_status_model,
 )
 
 
@@ -56,6 +59,9 @@ class TestCapitalSchemeModel:
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
         )
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         milestones = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
@@ -73,6 +79,7 @@ class TestCapitalSchemeModel:
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
+            status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(current_milestone=None, items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
@@ -225,6 +232,7 @@ class TestCapitalSchemeModel:
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
+            status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
@@ -248,6 +256,8 @@ class TestCapitalSchemeModel:
             == CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             )
+            and capital_scheme.status
+            == CapitalSchemeStatus(effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE)
             and not capital_scheme.authority_review
         )
 
@@ -256,6 +266,7 @@ class TestCapitalSchemeModel:
             reference="ATE00001",
             overview=build_capital_scheme_overview_model(base_url),
             bid_status_details=build_capital_scheme_bid_status_details_model(),
+            status=build_capital_scheme_status_model(),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](

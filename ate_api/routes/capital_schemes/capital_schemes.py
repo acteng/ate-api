@@ -21,6 +21,7 @@ from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialsMod
 from ate_api.routes.capital_schemes.milestones import CapitalSchemeMilestonesModel
 from ate_api.routes.capital_schemes.outputs import CapitalSchemeOutputModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
+from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel
 from ate_api.routes.collections import CollectionModel
 
 
@@ -29,6 +30,7 @@ class CapitalSchemeModel(BaseModel):
     reference: str
     overview: CapitalSchemeOverviewModel
     bid_status_details: CapitalSchemeBidStatusDetailsModel
+    status: CapitalSchemeStatusModel
     financials: CapitalSchemeFinancialsModel
     milestones: CapitalSchemeMilestonesModel
     outputs: CollectionModel[CapitalSchemeOutputModel]
@@ -48,6 +50,7 @@ class CapitalSchemeModel(BaseModel):
                         "type": "construction",
                     },
                     "bidStatusDetails": {"bidStatus": "funded"},
+                    "status": {"status": "active"},
                     "financials": {"items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]},
                     "milestones": {
                         "currentMilestone": "detailed design completed",
@@ -89,6 +92,7 @@ class CapitalSchemeModel(BaseModel):
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             bid_status_details=CapitalSchemeBidStatusDetailsModel.from_domain(capital_scheme.bid_status_details),
+            status=CapitalSchemeStatusModel.from_domain(capital_scheme.status),
             financials=CapitalSchemeFinancialsModel.from_domain(financials),
             milestones=CapitalSchemeMilestonesModel.from_domain(milestones),
             outputs=CollectionModel[CapitalSchemeOutputModel](
@@ -106,6 +110,7 @@ class CapitalSchemeModel(BaseModel):
             reference=CapitalSchemeReference(self.reference),
             overview=self.overview.to_domain(now, request),
             bid_status_details=self.bid_status_details.to_domain(now),
+            status=self.status.to_domain(now),
         )
 
         for output in self.outputs.items:

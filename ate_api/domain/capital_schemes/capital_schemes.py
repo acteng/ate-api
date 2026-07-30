@@ -4,6 +4,7 @@ from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthor
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus
 
 
 class CapitalSchemeReference:
@@ -29,10 +30,12 @@ class CapitalScheme:
         reference: CapitalSchemeReference,
         overview: CapitalSchemeOverview,
         bid_status_details: CapitalSchemeBidStatusDetails,
+        status: CapitalSchemeStatus,
     ):
         self._reference = reference
         self._overview = overview
         self._bid_status_details = bid_status_details
+        self._status = status
         self._outputs: list[CapitalSchemeOutput] = []
         self._authority_review: CapitalSchemeAuthorityReview | None = None
 
@@ -47,6 +50,10 @@ class CapitalScheme:
     @property
     def bid_status_details(self) -> CapitalSchemeBidStatusDetails:
         return self._bid_status_details
+
+    @property
+    def status(self) -> CapitalSchemeStatus:
+        return self._status
 
     @property
     def outputs(self) -> list[CapitalSchemeOutput]:
