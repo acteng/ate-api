@@ -34,6 +34,7 @@ class EntityBuilder:
     def __init__(self) -> None:
         self._dummy_funding_programme = build_funding_programme_entity()
         self._dummy_scheme_type = build_scheme_type_entity()
+        self._dummy_bid_status = build_bid_status_entity()
 
     def build_capital_scheme(
         self,
@@ -77,7 +78,7 @@ class EntityBuilder:
         self, bid_status: BidStatusEntity | None = None, effective_date_from: datetime = datetime.min
     ) -> CapitalSchemeBidStatusEntity:
         return CapitalSchemeBidStatusEntity(
-            bid_status=bid_status or build_bid_status_entity(), effective_date_from=effective_date_from
+            bid_status=bid_status or self._dummy_bid_status, effective_date_from=effective_date_from
         )
 
 
