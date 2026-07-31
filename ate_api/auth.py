@@ -3,7 +3,14 @@ from typing import Annotated
 
 from authlib.integrations.starlette_client import OAuth
 from authlib.jose import jwt
-from authlib.jose.errors import ExpiredTokenError, InvalidClaimError, InvalidTokenError, MissingClaimError
+from authlib.jose.errors import (
+    BadSignatureError,
+    DecodeError,
+    ExpiredTokenError,
+    InvalidClaimError,
+    InvalidTokenError,
+    MissingClaimError,
+)
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -40,7 +47,7 @@ async def authorize(
                 "iat": {"essential": True},
             },
         )
-    except Exception as error:
+    except (DecodeError, BadSignatureError) as error:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, str(error), bearer_scheme.make_authenticate_headers())
 
     # validate claims
