@@ -72,7 +72,7 @@ class CapitalSchemeMilestones:
             for milestone in self._milestones
             if milestone.observation_type == ObservationType.ACTUAL
         ]
-        return sorted(actual_milestones)[-1] if actual_milestones else None
+        return max(actual_milestones) if actual_milestones else None
 
     def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
         self._milestones = list(
