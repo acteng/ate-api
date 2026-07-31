@@ -75,12 +75,10 @@ class CapitalSchemeMilestones:
         return max(actual_milestones) if actual_milestones else None
 
     def change_milestone(self, milestone: CapitalSchemeMilestone) -> None:
-        self._milestones = list(
-            map(
-                lambda m: m.close(milestone.effective_date.from_) if m.is_open and self._matches(m, milestone) else m,
-                self._milestones,
-            )
-        )
+        self._milestones = [
+            m.close(milestone.effective_date.from_) if m.is_open and self._matches(m, milestone) else m
+            for m in self._milestones
+        ]
         self._milestones.append(milestone)
 
     @staticmethod

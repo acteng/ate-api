@@ -49,12 +49,10 @@ class CapitalSchemeFinancials:
         if financial.type == FinancialType.FUNDING_ALLOCATION:
             raise ValueError("Funding allocation cannot be changed")
 
-        self._financials = list(
-            map(
-                lambda f: f.close(financial.effective_date.from_) if f.is_open and self._matches(f, financial) else f,
-                self._financials,
-            )
-        )
+        self._financials = [
+            f.close(financial.effective_date.from_) if f.is_open and self._matches(f, financial) else f
+            for f in self._financials
+        ]
         self._financials.append(financial)
 
     @staticmethod
