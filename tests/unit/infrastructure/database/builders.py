@@ -34,6 +34,12 @@ from ate_api.infrastructure.database import (
 
 
 class EntityBuilder:
+    """
+    Factory for database entities to be used by tests.
+
+    Built entities use shared reference data to avoid duplicate inserts.
+    """
+
     def __init__(self) -> None:
         self._dummy_funding_programme = build_funding_programme_entity()
         self._dummy_scheme_type = build_scheme_type_entity()
