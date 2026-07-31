@@ -94,7 +94,7 @@ class TestCapitalSchemeInterventionEntity:
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
         intervention_entity = CapitalSchemeInterventionEntity.from_domain(
@@ -103,7 +103,7 @@ class TestCapitalSchemeInterventionEntity:
 
         assert (
             intervention_entity.intervention_type_measure_id == 1
-            and intervention_entity.intervention_value == Decimal(1.5)
+            and intervention_entity.intervention_value == Decimal("1.5")
             and intervention_entity.observation_type_id == 2
             and intervention_entity.effective_date_from == datetime(2020, 1, 1)
             and not intervention_entity.effective_date_to
@@ -115,7 +115,7 @@ class TestCapitalSchemeInterventionEntity:
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
         intervention_entity = CapitalSchemeInterventionEntity.from_domain(
@@ -130,7 +130,7 @@ class TestCapitalSchemeInterventionEntity:
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
         intervention_entity = CapitalSchemeInterventionEntity.from_domain(
@@ -160,7 +160,7 @@ class TestCapitalSchemeInterventionEntity:
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
     def test_to_domain_when_historic(self) -> None:

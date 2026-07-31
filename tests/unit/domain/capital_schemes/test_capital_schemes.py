@@ -89,7 +89,7 @@ class TestCapitalScheme:
             CapitalSchemeOutput(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
-                value=Decimal(1.5),
+                value=Decimal("1.5"),
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
             )
@@ -104,7 +104,7 @@ class TestCapitalScheme:
         output = CapitalSchemeOutput(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
         )

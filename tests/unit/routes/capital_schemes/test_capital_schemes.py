@@ -171,7 +171,7 @@ class TestCapitalSchemeModel:
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
-                value=Decimal(1.5),
+                value=Decimal("1.5"),
             )
         )
         capital_scheme.change_output(
@@ -194,7 +194,7 @@ class TestCapitalSchemeModel:
                     type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
                     measure=OutputMeasureModel.MILES,
                     observation_type=ObservationTypeModel.ACTUAL,
-                    value=Decimal(1.5),
+                    value=Decimal("1.5"),
                 ),
                 CapitalSchemeOutputModel(
                     type=OutputTypeModel.NEW_SEGREGATED_CYCLING_FACILITY,
@@ -275,7 +275,7 @@ class TestCapitalSchemeModel:
                         type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
                         measure=OutputMeasureModel.MILES,
                         observation_type=ObservationTypeModel.ACTUAL,
-                        value=Decimal(1.5),
+                        value=Decimal("1.5"),
                     ),
                     CapitalSchemeOutputModel(
                         type=OutputTypeModel.NEW_SEGREGATED_CYCLING_FACILITY,
@@ -295,7 +295,7 @@ class TestCapitalSchemeModel:
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
-                value=Decimal(1.5),
+                value=Decimal("1.5"),
             ),
             CapitalSchemeOutput(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),

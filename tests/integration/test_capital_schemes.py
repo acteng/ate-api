@@ -189,7 +189,7 @@ async def test_get_capital_scheme_with_outputs(
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
     )
     await capital_schemes.add(capital_scheme)

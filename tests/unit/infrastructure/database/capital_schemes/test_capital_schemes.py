@@ -109,7 +109,7 @@ class TestCapitalSchemeEntity:
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
-                value=Decimal(1.5),
+                value=Decimal("1.5"),
             )
         )
         capital_scheme.change_output(
@@ -141,7 +141,7 @@ class TestCapitalSchemeEntity:
         intervention_entity1, intervention_entity2 = capital_scheme_entity.capital_scheme_interventions
         assert (
             intervention_entity1.intervention_type_measure_id == 1
-            and intervention_entity1.intervention_value == Decimal(1.5)
+            and intervention_entity1.intervention_value == Decimal("1.5")
             and intervention_entity1.observation_type_id == 3
             and intervention_entity1.effective_date_from == datetime(2020, 1, 1)
             and not intervention_entity1.effective_date_to
@@ -271,7 +271,7 @@ class TestCapitalSchemeEntity:
                 type=OutputType.WIDENING_EXISTING_FOOTWAY,
                 measure=OutputMeasure.MILES,
                 observation_type=ObservationType.ACTUAL,
-                value=Decimal(1.5),
+                value=Decimal("1.5"),
             ),
             CapitalSchemeOutput(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),

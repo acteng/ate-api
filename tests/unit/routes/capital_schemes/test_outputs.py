@@ -86,7 +86,7 @@ class TestCapitalSchemeOutputModel:
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
         output_model = CapitalSchemeOutputModel.from_domain(output)
@@ -95,7 +95,7 @@ class TestCapitalSchemeOutputModel:
             type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasureModel.MILES,
             observation_type=ObservationTypeModel.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
     def test_to_domain(self) -> None:
@@ -103,7 +103,7 @@ class TestCapitalSchemeOutputModel:
             type=OutputTypeModel.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasureModel.MILES,
             observation_type=ObservationTypeModel.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
 
         output = output_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
@@ -113,5 +113,5 @@ class TestCapitalSchemeOutputModel:
             type=OutputType.WIDENING_EXISTING_FOOTWAY,
             measure=OutputMeasure.MILES,
             observation_type=ObservationType.ACTUAL,
-            value=Decimal(1.5),
+            value=Decimal("1.5"),
         )
