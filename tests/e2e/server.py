@@ -1,5 +1,5 @@
 from multiprocessing import Process
-from socket import error, socket
+from socket import socket
 from time import time
 
 import pytest
@@ -52,7 +52,7 @@ class Server:
         try:
             sock.connect((self._host, self._port))
             can_connect = True
-        except error:
+        except OSError:
             can_connect = False
         finally:
             sock.close()
