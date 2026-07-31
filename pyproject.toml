@@ -21,7 +21,7 @@ dev = [
     "pytest-asyncio~=1.4.0",
     "respx~=0.23.0",
     "ruff~=0.16.0",
-    "testcontainers~=4.14.0"
+    "testcontainers~=4.15.0"
 ]
 
 [build-system]

@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
 from fastapi import FastAPI
 from httpx import AsyncClient, Client
-from testcontainers.postgres import PostgresContainer
+from testcontainers.community.postgres import PostgresContainer
 
 from ate_api.clock import get_clock
 from ate_api.infrastructure.clock import Clock

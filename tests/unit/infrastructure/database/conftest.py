@@ -5,7 +5,7 @@ import pytest_asyncio
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.sql.ddl import CreateSchema
-from testcontainers.postgres import PostgresContainer
+from testcontainers.community.postgres import PostgresContainer
 
 from ate_api.infrastructure.database import BaseEntity
 from tests.unit.infrastructure.database.builders import EntityBuilder
