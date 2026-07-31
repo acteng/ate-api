@@ -22,7 +22,7 @@ class TestSystemClock:
 
     @patch("ate_api.infrastructure.clock.datetime")
     def test_get_now_returns_utc(self, mock_datetime: Any, clock: SystemClock) -> None:
-        mock_datetime.now.return_value = datetime.min
+        mock_datetime.now.return_value = datetime.fromtimestamp(0, UTC)
 
         _ = clock.now
 
