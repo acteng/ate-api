@@ -35,7 +35,8 @@ def retry_on_serialization_failure[**P, T](
 
 
 def _is_serialization_failure(exception: DBAPIError) -> bool:
-    sqlstate: str = getattr(exception.orig, "sqlstate")
+    sqlstate = exception.orig.sqlstate if exception.orig and hasattr(exception.orig, "sqlstate") else None
+
     # See: https://www.postgresql.org/docs/current/mvcc-serialization-failure-handling.html
     serialization_failure = "40001"
 

@@ -61,9 +61,8 @@ async def raise_other_exception() -> None:
 
 
 def create_serialization_failure() -> DBAPIError:
-    # See: https://www.postgresql.org/docs/current/mvcc-serialization-failure-handling.html
-    serialization_failure = "40001"
+    class SerializationError(Exception):
+        # See: https://www.postgresql.org/docs/current/mvcc-serialization-failure-handling.html
+        sqlstate = "40001"
 
-    db_api_error = Exception()
-    setattr(db_api_error, "sqlstate", serialization_failure)
-    return DBAPIError(statement=None, params=None, orig=db_api_error)
+    return DBAPIError(statement=None, params=None, orig=SerializationError())
