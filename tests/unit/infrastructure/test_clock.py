@@ -15,9 +15,9 @@ class TestSystemClock:
 
     @patch("ate_api.infrastructure.clock.datetime")
     def test_get_now(self, mock_datetime: Any, clock: SystemClock) -> None:
-        mock_datetime.now.return_value = datetime(2020, 1, 2, 12)
+        mock_datetime.now.return_value = datetime(2020, 1, 2, 12, tzinfo=UTC)
 
-        assert clock.now == datetime(2020, 1, 2, 12)
+        assert clock.now == datetime(2020, 1, 2, 12, tzinfo=UTC)
 
     @patch("ate_api.infrastructure.clock.datetime")
     def test_get_now_returns_utc(self, mock_datetime: Any, clock: SystemClock) -> None:
@@ -29,7 +29,7 @@ class TestSystemClock:
 
     def test_set_now(self, clock: SystemClock) -> None:
         with pytest.raises(NotImplementedError):
-            clock.now = datetime(2020, 1, 2)
+            clock.now = datetime(2020, 1, 2, tzinfo=UTC)
 
 
 class TestFakeClock:
