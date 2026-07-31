@@ -21,6 +21,17 @@ async def test_can_access_with_valid_access_token(
 
 
 @respx.mock
+def test_cannot_access_with_invalid_access_token(
+    authorization_server: StubAuthorizationServer, client: TestClient
+) -> None:
+    response = client.get("/authorities/LIV", headers={"Authorization": "Bearer invalid"})
+
+    assert response.status_code == 401
+    assert response.headers["WWW-Authenticate"] == "Bearer"
+    assert response.json() == {"detail": "Invalid input segments length: "}
+
+
+@respx.mock
 def test_cannot_access_with_missing_signature(
     authorization_server: StubAuthorizationServer, client: TestClient
 ) -> None:
