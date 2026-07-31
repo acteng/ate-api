@@ -1,5 +1,3 @@
-from typing import Any
-
 from ate_api.domain.improvements.overviews import ImprovementOverview
 
 
@@ -7,7 +5,7 @@ class ImprovementReference:
     def __init__(self, reference: str):
         self._reference = reference
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, ImprovementReference) and self._reference == other._reference
 
     def __hash__(self) -> int:

@@ -1,5 +1,3 @@
-from typing import Any
-
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput
@@ -11,7 +9,7 @@ class CapitalSchemeReference:
     def __init__(self, reference: str):
         self._reference = reference
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, CapitalSchemeReference) and self._reference == other._reference
 
     def __hash__(self) -> int:

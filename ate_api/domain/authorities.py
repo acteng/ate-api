@@ -1,11 +1,8 @@
-from typing import Any
-
-
 class AuthorityAbbreviation:
     def __init__(self, abbreviation: str):
         self._abbreviation = abbreviation
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, AuthorityAbbreviation) and self._abbreviation == other._abbreviation
 
     def __hash__(self) -> int:

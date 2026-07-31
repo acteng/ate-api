@@ -1,11 +1,8 @@
-from typing import Any
-
-
 class FundingProgrammeCode:
     def __init__(self, code: str):
         self._code = code
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, FundingProgrammeCode) and self._code == other._code
 
     def __hash__(self) -> int:
