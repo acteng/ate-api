@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
@@ -8,8 +8,7 @@ from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
-
-_dummy_date_time = datetime.fromtimestamp(0, UTC)
+from tests.unit.dates import dummy_datetime
 
 
 def build_authority_abbreviation(abbreviation: str = "dummy") -> AuthorityAbbreviation:
@@ -70,5 +69,5 @@ def build_funding_programme_code(code: str = "dummy") -> FundingProgrammeCode:
     return FundingProgrammeCode(code)
 
 
-def build_date_time_range(from_: datetime = _dummy_date_time, to: datetime = _dummy_date_time) -> DateTimeRange:
+def build_date_time_range(from_: datetime = dummy_datetime, to: datetime = dummy_datetime) -> DateTimeRange:
     return DateTimeRange(from_=from_, to=to)

@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
+dummy_datetime = datetime.fromtimestamp(0, UTC)
 dummy_local_datetime = datetime.fromtimestamp(0)  # noqa: DTZ006
 
 
