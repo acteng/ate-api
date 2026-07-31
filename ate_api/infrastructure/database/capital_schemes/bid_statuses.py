@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import datetime
 from enum import Enum
 from typing import Self
@@ -28,7 +29,7 @@ class BidStatusName(Enum):
 
 class BidStatusEntity(BaseEntity):
     __tablename__ = "bid_status"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     bid_status_id: Mapped[int] = mapped_column(primary_key=True)
     bid_status_name: Mapped[BidStatusName] = mapped_column(unique=True)
@@ -36,7 +37,7 @@ class BidStatusEntity(BaseEntity):
 
 class CapitalSchemeBidStatusEntity(BaseEntity):
     __tablename__ = "capital_scheme_bid_status"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_bid_status_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)

@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import date, datetime
 from enum import Enum
 from typing import Self
@@ -50,7 +51,7 @@ class MilestoneName(Enum):
 
 class MilestoneEntity(BaseEntity):
     __tablename__ = "milestone"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     milestone_id: Mapped[int] = mapped_column(primary_key=True)
     milestone_name: Mapped[MilestoneName] = mapped_column(unique=True)
@@ -61,7 +62,7 @@ class MilestoneEntity(BaseEntity):
 
 class CapitalSchemeMilestoneEntity(BaseEntity):
     __tablename__ = "capital_scheme_milestone"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_milestone_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)

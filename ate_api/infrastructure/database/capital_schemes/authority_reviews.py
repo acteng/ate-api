@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Self
 
@@ -13,7 +14,7 @@ from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 
 class CapitalSchemeAuthorityReviewEntity(BaseEntity):
     __tablename__ = "capital_scheme_authority_review"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_authority_review_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)

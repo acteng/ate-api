@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Self
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -22,7 +23,7 @@ from ate_api.infrastructure.database.capital_schemes.statuses import CapitalSche
 
 class CapitalSchemeEntity(BaseEntity):
     __tablename__ = "capital_scheme"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_id: Mapped[int] = mapped_column(primary_key=True)
     scheme_reference: Mapped[str] = mapped_column(unique=True)

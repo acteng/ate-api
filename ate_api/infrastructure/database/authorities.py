@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Self
 
 from sqlalchemy import exists, select
@@ -10,7 +11,7 @@ from ate_api.infrastructure.database.base import BaseEntity
 
 class AuthorityEntity(BaseEntity):
     __tablename__ = "authority"
-    __table_args__ = {"schema": "authority"}
+    __table_args__: Mapping[str, str] = {"schema": "authority"}
 
     authority_id: Mapped[int] = mapped_column(primary_key=True)
     authority_full_name: Mapped[str] = mapped_column(unique=True)

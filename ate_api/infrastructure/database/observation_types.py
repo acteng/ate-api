@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from enum import Enum
 from typing import Self
 
@@ -21,7 +22,7 @@ class ObservationTypeName(Enum):
 
 class ObservationTypeEntity(BaseEntity):
     __tablename__ = "observation_type"
-    __table_args__ = {"schema": "common"}
+    __table_args__: Mapping[str, str] = {"schema": "common"}
 
     observation_type_id: Mapped[int] = mapped_column(primary_key=True)
     observation_type_name: Mapped[ObservationTypeName] = mapped_column(unique=True)

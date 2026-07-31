@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Self
 
@@ -16,7 +17,7 @@ from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 
 class ImprovementOverviewEntity(BaseEntity):
     __tablename__ = "improvement_overview"
-    __table_args__ = {"schema": "improvement"}
+    __table_args__: Mapping[str, str] = {"schema": "improvement"}
 
     improvement_overview_id: Mapped[int] = mapped_column(primary_key=True)
     improvement_id = mapped_column(ForeignKey("improvement.improvement.improvement_id"), nullable=False)

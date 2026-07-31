@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import datetime
 from enum import Enum
 from typing import Self
@@ -31,7 +32,7 @@ class SchemeTypeName(Enum):
 
 class SchemeTypeEntity(BaseEntity):
     __tablename__ = "scheme_type"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     scheme_type_id: Mapped[int] = mapped_column(primary_key=True)
     scheme_type_name: Mapped[SchemeTypeName] = mapped_column(unique=True)
@@ -39,7 +40,7 @@ class SchemeTypeEntity(BaseEntity):
 
 class CapitalSchemeOverviewEntity(BaseEntity):
     __tablename__ = "capital_scheme_overview"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_overview_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)

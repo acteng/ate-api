@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from enum import Enum
 from typing import Self
 
@@ -24,7 +25,7 @@ class FinancialTypeName(Enum):
 
 class FinancialTypeEntity(BaseEntity):
     __tablename__ = "financial_type"
-    __table_args__ = {"schema": "common"}
+    __table_args__: Mapping[str, str] = {"schema": "common"}
 
     financial_type_id: Mapped[int] = mapped_column(primary_key=True)
     financial_type_name: Mapped[FinancialTypeName] = mapped_column(unique=True)

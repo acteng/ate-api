@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Self
 
 from sqlalchemy import exists, false, select
@@ -11,7 +12,7 @@ from ate_api.infrastructure.database.base import BaseEntity
 
 class FundingProgrammeEntity(BaseEntity):
     __tablename__ = "funding_programme"
-    __table_args__ = {"schema": "common"}
+    __table_args__: Mapping[str, str] = {"schema": "common"}
 
     funding_programme_id: Mapped[int] = mapped_column(primary_key=True)
     funding_programme_code: Mapped[str] = mapped_column(unique=True)

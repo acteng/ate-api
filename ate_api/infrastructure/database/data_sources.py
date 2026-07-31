@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from enum import Enum
 from typing import Self
 
@@ -48,7 +49,7 @@ class DataSourceName(Enum):
 
 class DataSourceEntity(BaseEntity):
     __tablename__ = "data_source"
-    __table_args__ = {"schema": "common"}
+    __table_args__: Mapping[str, str] = {"schema": "common"}
 
     data_source_id: Mapped[int] = mapped_column(primary_key=True)
     data_source_name: Mapped[DataSourceName] = mapped_column(unique=True)

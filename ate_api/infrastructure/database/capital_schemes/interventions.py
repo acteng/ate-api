@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
@@ -46,7 +47,7 @@ class InterventionTypeName(Enum):
 
 class InterventionTypeEntity(BaseEntity):
     __tablename__ = "intervention_type"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     intervention_type_id: Mapped[int] = mapped_column(primary_key=True)
     intervention_type_name: Mapped[InterventionTypeName] = mapped_column(unique=True)
@@ -75,7 +76,7 @@ class InterventionMeasureName(Enum):
 
 class InterventionMeasureEntity(BaseEntity):
     __tablename__ = "intervention_measure"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     intervention_measure_id: Mapped[int] = mapped_column(primary_key=True)
     intervention_measure_name: Mapped[InterventionMeasureName] = mapped_column(unique=True)
@@ -83,7 +84,7 @@ class InterventionMeasureEntity(BaseEntity):
 
 class InterventionTypeMeasureEntity(BaseEntity):
     __tablename__ = "intervention_type_measure"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     intervention_type_measure_id: Mapped[int] = mapped_column(primary_key=True)
     intervention_type_id = mapped_column(ForeignKey(InterventionTypeEntity.intervention_type_id), nullable=False)
@@ -96,7 +97,7 @@ class InterventionTypeMeasureEntity(BaseEntity):
 
 class CapitalSchemeInterventionEntity(BaseEntity):
     __tablename__ = "capital_scheme_intervention"
-    __table_args__ = {"schema": "capital_scheme"}
+    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_intervention_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)

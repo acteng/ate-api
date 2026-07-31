@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from typing import Self
 
 from sqlalchemy import select
@@ -15,7 +16,7 @@ from ate_api.infrastructure.database.improvements.overviews import ImprovementOv
 
 class ImprovementEntity(BaseEntity):
     __tablename__ = "improvement"
-    __table_args__ = {"schema": "improvement"}
+    __table_args__: Mapping[str, str] = {"schema": "improvement"}
 
     improvement_id: Mapped[int] = mapped_column(primary_key=True)
     improvement_reference: Mapped[str] = mapped_column(unique=True)
