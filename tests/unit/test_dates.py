@@ -1,6 +1,10 @@
 from datetime import datetime
 
-from tests.unit.dates import local_datetime
+from tests.unit.dates import dummy_local_datetime, local_datetime
+
+
+def test_dummy_local_datetime() -> None:
+    assert not dummy_local_datetime.tzinfo
 
 
 def test_local_datetime() -> None:

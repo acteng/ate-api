@@ -1,5 +1,7 @@
 from datetime import datetime
 
+dummy_local_datetime = datetime.fromtimestamp(0)  # noqa: DTZ006
+
 
 def local_datetime(year: int, month: int, day: int, hour: int = 0) -> datetime:
     """

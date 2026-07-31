@@ -31,6 +31,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from tests.unit.dates import dummy_local_datetime
 
 
 class EntityBuilder:
@@ -77,7 +78,7 @@ class EntityBuilder:
         funding_programme: FundingProgrammeEntity | None = None,
         improvement: ImprovementEntity | None = None,
         type_: SchemeTypeEntity | None = None,
-        effective_date_from: datetime = datetime.min,
+        effective_date_from: datetime = dummy_local_datetime,
     ) -> CapitalSchemeOverviewEntity:
         return CapitalSchemeOverviewEntity(
             scheme_name=name,
@@ -89,14 +90,14 @@ class EntityBuilder:
         )
 
     def build_capital_scheme_bid_status(
-        self, bid_status: BidStatusEntity | None = None, effective_date_from: datetime = datetime.min
+        self, bid_status: BidStatusEntity | None = None, effective_date_from: datetime = dummy_local_datetime
     ) -> CapitalSchemeBidStatusEntity:
         return CapitalSchemeBidStatusEntity(
             bid_status=bid_status or self._dummy_bid_status, effective_date_from=effective_date_from
         )
 
     def build_capital_scheme_scheme_status_entity(
-        self, scheme_status: SchemeStatusEntity | None = None, effective_date_from: datetime = datetime.min
+        self, scheme_status: SchemeStatusEntity | None = None, effective_date_from: datetime = dummy_local_datetime
     ) -> CapitalSchemeSchemeStatusEntity:
         return CapitalSchemeSchemeStatusEntity(
             scheme_status=scheme_status or self._dummy_scheme_status, effective_date_from=effective_date_from
@@ -114,7 +115,7 @@ def build_improvement_overview_entity(
     description: str = "dummy",
     funding_managed_by: AuthorityEntity | None = None,
     data_source: DataSourceEntity | None = None,
-    effective_date_from: datetime = datetime.min,
+    effective_date_from: datetime = dummy_local_datetime,
 ) -> ImprovementOverviewEntity:
     return ImprovementOverviewEntity(
         improvement_name=name,
