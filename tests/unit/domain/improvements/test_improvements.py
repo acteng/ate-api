@@ -17,18 +17,24 @@ class TestImprovementReference:
         reference1 = ImprovementReference("IMP00001")
         reference2 = ImprovementReference("IMP00001")
 
-        assert reference1 == reference2
+        equal = reference1 == reference2
+
+        assert equal
 
     def test_equals_when_different_reference(self) -> None:
         reference1 = ImprovementReference("IMP00001")
         reference2 = ImprovementReference("IMP00002")
 
-        assert not reference1 == reference2
+        equal = reference1 == reference2
+
+        assert not equal
 
     def test_equals_when_different_class(self) -> None:
         reference = ImprovementReference("IMP00001")
 
-        assert not reference == "IMP00001"
+        equal = reference == "IMP00001"
+
+        assert not equal
 
     def test_hash(self) -> None:
         reference1 = ImprovementReference("IMP00001")

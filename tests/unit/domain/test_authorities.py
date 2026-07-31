@@ -11,18 +11,24 @@ class TestAuthorityAbbreviation:
         abbreviation1 = AuthorityAbbreviation("LIV")
         abbreviation2 = AuthorityAbbreviation("LIV")
 
-        assert abbreviation1 == abbreviation2
+        equal = abbreviation1 == abbreviation2
+
+        assert equal
 
     def test_equals_when_different_abbreviation(self) -> None:
         abbreviation1 = AuthorityAbbreviation("LIV")
         abbreviation2 = AuthorityAbbreviation("WYO")
 
-        assert not abbreviation1 == abbreviation2
+        equal = abbreviation1 == abbreviation2
+
+        assert not equal
 
     def test_equals_when_different_class(self) -> None:
         abbreviation = AuthorityAbbreviation("LIV")
 
-        assert not abbreviation == "LIV"
+        equal = abbreviation == "LIV"
+
+        assert not equal
 
     def test_hash(self) -> None:
         abbreviation1 = AuthorityAbbreviation("LIV")

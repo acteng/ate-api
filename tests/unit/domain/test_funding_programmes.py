@@ -11,18 +11,24 @@ class TestFundingProgrammeCode:
         code1 = FundingProgrammeCode("ATF3")
         code2 = FundingProgrammeCode("ATF3")
 
-        assert code1 == code2
+        equal = code1 == code2
+
+        assert equal
 
     def test_equals_when_different_code(self) -> None:
         code1 = FundingProgrammeCode("ATF3")
         code2 = FundingProgrammeCode("ATF4")
 
-        assert not code1 == code2
+        equal = code1 == code2
+
+        assert not equal
 
     def test_equals_when_different_class(self) -> None:
         code = FundingProgrammeCode("ATF3")
 
-        assert not code == "ATF3"
+        equal = code == "ATF3"
+
+        assert not equal
 
     def test_hash(self) -> None:
         code1 = FundingProgrammeCode("ATF3")
