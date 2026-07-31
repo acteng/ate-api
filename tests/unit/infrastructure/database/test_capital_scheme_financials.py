@@ -19,6 +19,7 @@ from ate_api.infrastructure.database import (
     FinancialTypeName,
 )
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
+from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_data_source_entity,
@@ -46,7 +47,7 @@ class TestCapitalSchemeFinancialEntity:
             and financial_entity.capital_scheme_id == 2
             and financial_entity.financial_type_id == 3
             and financial_entity.amount == 2_000_000
-            and financial_entity.effective_date_from == datetime(2020, 1, 1)
+            and financial_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not financial_entity.effective_date_to
             and financial_entity.data_source_id == 4
         )
@@ -63,7 +64,7 @@ class TestCapitalSchemeFinancialEntity:
             financial, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
         )
 
-        assert financial_entity.effective_date_to == datetime(2020, 2, 1)
+        assert financial_entity.effective_date_to == local_datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         financial = CapitalSchemeFinancial(
@@ -77,15 +78,15 @@ class TestCapitalSchemeFinancialEntity:
             financial, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
         )
 
-        assert financial_entity.effective_date_from == datetime(2020, 6, 1, 13)
-        assert financial_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert financial_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
+        assert financial_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
             capital_scheme_financial_id=1,
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
@@ -103,8 +104,8 @@ class TestCapitalSchemeFinancialEntity:
         financial_entity = CapitalSchemeFinancialEntity(
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
-            effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
+            effective_date_to=local_datetime(2020, 2, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
@@ -116,8 +117,8 @@ class TestCapitalSchemeFinancialEntity:
         financial_entity = CapitalSchemeFinancialEntity(
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
-            effective_date_from=datetime(2020, 6, 1, 13),
-            effective_date_to=datetime(2020, 7, 1, 13),
+            effective_date_from=local_datetime(2020, 6, 1, 13),
+            effective_date_to=local_datetime(2020, 7, 1, 13),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
@@ -170,7 +171,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             financial_row1.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and financial_row1.financial_type_id == 1
             and financial_row1.amount == 2_000_000
-            and financial_row1.effective_date_from == datetime(2020, 1, 1)
+            and financial_row1.effective_date_from == local_datetime(2020, 1, 1)
             and not financial_row1.effective_date_to
             and financial_row1.data_source_id == 3
         )
@@ -178,7 +179,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             financial_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and financial_row2.financial_type_id == 2
             and financial_row2.amount == 1_000_000
-            and financial_row2.effective_date_from == datetime(2020, 1, 1)
+            and financial_row2.effective_date_from == local_datetime(2020, 1, 1)
             and not financial_row2.effective_date_to
             and financial_row2.data_source_id == 3
         )
@@ -215,22 +216,22 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                         capital_scheme_id=1,
                         financial_type=funding_allocation,
                         amount=3_000_000,
-                        effective_date_from=datetime(2020, 1, 1),
-                        effective_date_to=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
+                        effective_date_to=local_datetime(2020, 2, 1),
                         data_source=atf4_bid,
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=funding_allocation,
                         amount=2_000_000,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                         data_source=atf4_bid,
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=spend_to_date,
                         amount=1_000_000,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                         data_source=atf4_bid,
                     ),
                 ]
@@ -273,21 +274,21 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                         capital_scheme_id=1,
                         financial_type=spend_to_date,
                         amount=1_000_000,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                         data_source=atf4_bid,
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=funding_allocation,
                         amount=3_000_000,
-                        effective_date_from=datetime(2020, 3, 1),
+                        effective_date_from=local_datetime(2020, 3, 1),
                         data_source=atf4_bid,
                     ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=funding_allocation,
                         amount=2_000_000,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                         data_source=atf4_bid,
                     ),
                 ]
@@ -358,7 +359,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                         capital_scheme_id=1,
                         financial_type=spend_to_date,
                         amount=3_000_000,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                         data_source=atf4_bid,
                     ),
                 ]
@@ -380,12 +381,12 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
 
         async with AsyncSession(engine) as session:
             financial_row1, financial_row2 = await session.scalars(select(CapitalSchemeFinancialEntity))
-        assert financial_row1.capital_scheme_id == 1 and financial_row1.effective_date_to == datetime(2020, 2, 1)
+        assert financial_row1.capital_scheme_id == 1 and financial_row1.effective_date_to == local_datetime(2020, 2, 1)
         assert (
             financial_row2.capital_scheme_id == 1
             and financial_row2.financial_type_id == 2
             and financial_row2.amount == 2_000_000
-            and financial_row2.effective_date_from == datetime(2020, 2, 1)
+            and financial_row2.effective_date_from == local_datetime(2020, 2, 1)
             and not financial_row2.effective_date_to
             and financial_row2.data_source_id == 3
         )

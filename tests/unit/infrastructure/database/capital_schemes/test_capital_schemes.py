@@ -39,6 +39,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from tests.unit.dates import local_datetime
 from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.database.builders import EntityBuilder, build_improvement_overview_entity
 
@@ -84,19 +85,19 @@ class TestCapitalSchemeEntity:
             and overview_entity.funding_programme_id == 2
             and overview_entity.improvement_id == 3
             and overview_entity.scheme_type_id == 4
-            and overview_entity.effective_date_from == datetime(2020, 1, 1)
+            and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
         (bid_status_entity,) = capital_scheme_entity.capital_scheme_bid_statuses
         assert (
             bid_status_entity.bid_status_id == 5
-            and bid_status_entity.effective_date_from == datetime(2020, 2, 1)
+            and bid_status_entity.effective_date_from == local_datetime(2020, 2, 1)
             and not bid_status_entity.effective_date_to
         )
         (scheme_status_entity,) = capital_scheme_entity.capital_scheme_scheme_statuses
         assert (
             scheme_status_entity.scheme_status_id == 6
-            and scheme_status_entity.effective_date_from == datetime(2020, 3, 1)
+            and scheme_status_entity.effective_date_from == local_datetime(2020, 3, 1)
             and not scheme_status_entity.effective_date_to
         )
         assert not capital_scheme_entity.capital_scheme_authority_reviews
@@ -143,14 +144,14 @@ class TestCapitalSchemeEntity:
             intervention_entity1.intervention_type_measure_id == 1
             and intervention_entity1.intervention_value == Decimal("1.5")
             and intervention_entity1.observation_type_id == 3
-            and intervention_entity1.effective_date_from == datetime(2020, 1, 1)
+            and intervention_entity1.effective_date_from == local_datetime(2020, 1, 1)
             and not intervention_entity1.effective_date_to
         )
         assert (
             intervention_entity2.intervention_type_measure_id == 2
             and intervention_entity2.intervention_value == Decimal(2)
             and intervention_entity2.observation_type_id == 3
-            and intervention_entity2.effective_date_from == datetime(2020, 1, 1)
+            and intervention_entity2.effective_date_from == local_datetime(2020, 1, 1)
             and not intervention_entity2.effective_date_to
         )
 
@@ -178,7 +179,7 @@ class TestCapitalSchemeEntity:
         (authority_review_entity,) = capital_scheme_entity.capital_scheme_authority_reviews
         assert (
             authority_review_entity.capital_scheme_id is None
-            and authority_review_entity.review_date == datetime(2020, 2, 1)
+            and authority_review_entity.review_date == local_datetime(2020, 2, 1)
             and authority_review_entity.data_source_id == 1
         )
 
@@ -194,19 +195,19 @@ class TestCapitalSchemeEntity:
                         improvement_reference="IMP00001", improvement_overviews=[build_improvement_overview_entity()]
                     ),
                     scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-                    effective_date_from=datetime(2020, 1, 1),
+                    effective_date_from=local_datetime(2020, 1, 1),
                 )
             ],
             capital_scheme_bid_statuses=[
                 CapitalSchemeBidStatusEntity(
                     bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-                    effective_date_from=datetime(2020, 2, 1),
+                    effective_date_from=local_datetime(2020, 2, 1),
                 )
             ],
             capital_scheme_scheme_statuses=[
                 CapitalSchemeSchemeStatusEntity(
                     scheme_status=SchemeStatusEntity(scheme_status_name=SchemeStatusName.ACTIVE),
-                    effective_date_from=datetime(2020, 3, 1),
+                    effective_date_from=local_datetime(2020, 3, 1),
                 )
             ],
         )
@@ -245,7 +246,7 @@ class TestCapitalSchemeEntity:
                     ),
                     intervention_value=Decimal("1.500000"),
                     observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-                    effective_date_from=datetime(2020, 1, 1),
+                    effective_date_from=local_datetime(2020, 1, 1),
                 ),
                 CapitalSchemeInterventionEntity(
                     intervention_type_measure=InterventionTypeMeasureEntity(
@@ -258,7 +259,7 @@ class TestCapitalSchemeEntity:
                     ),
                     intervention_value=Decimal("2.000000"),
                     observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-                    effective_date_from=datetime(2020, 1, 1),
+                    effective_date_from=local_datetime(2020, 1, 1),
                 ),
             ],
         )
@@ -287,7 +288,7 @@ class TestCapitalSchemeEntity:
             reference="ATE00001",
             authority_reviews=[
                 CapitalSchemeAuthorityReviewEntity(
-                    review_date=datetime(2020, 1, 1),
+                    review_date=local_datetime(2020, 1, 1),
                     data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
                 )
             ],

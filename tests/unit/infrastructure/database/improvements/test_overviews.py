@@ -5,6 +5,7 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.infrastructure.database import AuthorityEntity, DataSourceEntity, DataSourceName, ImprovementOverviewEntity
+from tests.unit.dates import local_datetime
 
 
 class TestImprovementOverviewEntity:
@@ -27,7 +28,7 @@ class TestImprovementOverviewEntity:
             and overview_entity.improvement_description is None
             and overview_entity.funding_managed_by_id == 1
             and overview_entity.data_source_id == 2
-            and overview_entity.effective_date_from == datetime(2020, 1, 1)
+            and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
 
@@ -65,7 +66,7 @@ class TestImprovementOverviewEntity:
             {DataSource.AUTHORITY_UPDATE: 0},
         )
 
-        assert overview_entity.effective_date_to == datetime(2020, 2, 1)
+        assert overview_entity.effective_date_to == local_datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         overview = ImprovementOverview(
@@ -81,15 +82,15 @@ class TestImprovementOverviewEntity:
             {DataSource.AUTHORITY_UPDATE: 0},
         )
 
-        assert overview_entity.effective_date_from == datetime(2020, 6, 1, 13)
-        assert overview_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert overview_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
+        assert overview_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         overview_entity = ImprovementOverviewEntity(
             improvement_name="Wirral Package",
             funding_managed_by=AuthorityEntity(authority_abbreviation="LIV"),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
         )
 
         overview = overview_entity.to_domain()
@@ -108,7 +109,7 @@ class TestImprovementOverviewEntity:
             improvement_description='Improvement for the "Wirral Package" capital scheme created as part of funding devolution.',
             funding_managed_by=AuthorityEntity(authority_abbreviation="LIV"),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
         )
 
         overview = overview_entity.to_domain()
@@ -123,8 +124,8 @@ class TestImprovementOverviewEntity:
             improvement_name="Wirral Package",
             funding_managed_by=AuthorityEntity(authority_abbreviation="LIV"),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
-            effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
+            effective_date_to=local_datetime(2020, 2, 1),
         )
 
         overview = overview_entity.to_domain()
@@ -136,8 +137,8 @@ class TestImprovementOverviewEntity:
             improvement_name="Wirral Package",
             funding_managed_by=AuthorityEntity(authority_abbreviation="LIV"),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
-            effective_date_from=datetime(2020, 6, 1, 13),
-            effective_date_to=datetime(2020, 7, 1, 13),
+            effective_date_from=local_datetime(2020, 6, 1, 13),
+            effective_date_to=local_datetime(2020, 7, 1, 13),
         )
 
         overview = overview_entity.to_domain()

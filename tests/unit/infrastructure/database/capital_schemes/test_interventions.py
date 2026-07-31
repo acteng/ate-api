@@ -16,6 +16,7 @@ from ate_api.infrastructure.database import (
     ObservationTypeEntity,
     ObservationTypeName,
 )
+from tests.unit.dates import local_datetime
 
 
 @pytest.mark.parametrize(
@@ -105,7 +106,7 @@ class TestCapitalSchemeInterventionEntity:
             intervention_entity.intervention_type_measure_id == 1
             and intervention_entity.intervention_value == Decimal("1.5")
             and intervention_entity.observation_type_id == 2
-            and intervention_entity.effective_date_from == datetime(2020, 1, 1)
+            and intervention_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not intervention_entity.effective_date_to
         )
 
@@ -122,7 +123,7 @@ class TestCapitalSchemeInterventionEntity:
             output, {(OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 0}, {ObservationType.ACTUAL: 0}
         )
 
-        assert intervention_entity.effective_date_to == datetime(2020, 2, 1)
+        assert intervention_entity.effective_date_to == local_datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         output = CapitalSchemeOutput(
@@ -137,8 +138,8 @@ class TestCapitalSchemeInterventionEntity:
             output, {(OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 0}, {ObservationType.ACTUAL: 0}
         )
 
-        assert intervention_entity.effective_date_from == datetime(2020, 6, 1, 13)
-        assert intervention_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert intervention_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
+        assert intervention_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         intervention_entity = CapitalSchemeInterventionEntity(
@@ -150,7 +151,7 @@ class TestCapitalSchemeInterventionEntity:
             ),
             intervention_value=Decimal("1.500000"),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
         )
 
         output = intervention_entity.to_domain()
@@ -173,8 +174,8 @@ class TestCapitalSchemeInterventionEntity:
             ),
             intervention_value=Decimal("1.500000"),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-            effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
+            effective_date_to=local_datetime(2020, 2, 1),
         )
 
         output = intervention_entity.to_domain()
@@ -191,8 +192,8 @@ class TestCapitalSchemeInterventionEntity:
             ),
             intervention_value=Decimal("1.500000"),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
-            effective_date_from=datetime(2020, 6, 1, 13),
-            effective_date_to=datetime(2020, 7, 1, 13),
+            effective_date_from=local_datetime(2020, 6, 1, 13),
+            effective_date_to=local_datetime(2020, 7, 1, 13),
         )
 
         output = intervention_entity.to_domain()

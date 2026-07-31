@@ -23,6 +23,7 @@ from ate_api.infrastructure.database.capital_scheme_milestones import (
     DatabaseCapitalSchemeMilestonesRepository,
     DatabaseMilestoneRepository,
 )
+from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_data_source_entity,
@@ -83,7 +84,7 @@ class TestCapitalSchemeMilestoneEntity:
             and milestone_entity.status_date == date(2020, 3, 1)
             and milestone_entity.observation_type_id == 4
             and milestone_entity.data_source_id == 5
-            and milestone_entity.effective_date_from == datetime(2020, 1, 1)
+            and milestone_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not milestone_entity.effective_date_to
         )
 
@@ -104,7 +105,7 @@ class TestCapitalSchemeMilestoneEntity:
             {DataSource.ATF4_BID: 0},
         )
 
-        assert milestone_entity.effective_date_to == datetime(2020, 2, 1)
+        assert milestone_entity.effective_date_to == local_datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         milestone = CapitalSchemeMilestone(
@@ -123,8 +124,8 @@ class TestCapitalSchemeMilestoneEntity:
             {DataSource.ATF4_BID: 0},
         )
 
-        assert milestone_entity.effective_date_from == datetime(2020, 6, 1, 13)
-        assert milestone_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert milestone_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
+        assert milestone_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         milestone_entity = CapitalSchemeMilestoneEntity(
@@ -133,7 +134,7 @@ class TestCapitalSchemeMilestoneEntity:
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
         )
 
         milestone = milestone_entity.to_domain()
@@ -152,8 +153,8 @@ class TestCapitalSchemeMilestoneEntity:
             milestone=MilestoneEntity(milestone_name=MilestoneName.DETAILED_DESIGN_COMPLETED),
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
-            effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
+            effective_date_to=local_datetime(2020, 2, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
@@ -167,8 +168,8 @@ class TestCapitalSchemeMilestoneEntity:
             observation_type=ObservationTypeEntity(observation_type_name=ObservationTypeName.ACTUAL),
             status_date=date(2020, 3, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
-            effective_date_from=datetime(2020, 6, 1, 13),
-            effective_date_to=datetime(2020, 7, 1, 13),
+            effective_date_from=local_datetime(2020, 6, 1, 13),
+            effective_date_to=local_datetime(2020, 7, 1, 13),
         )
 
         milestone = milestone_entity.to_domain()
@@ -303,7 +304,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             and milestone_row1.status_date == date(2020, 2, 1)
             and milestone_row1.observation_type_id == 3
             and milestone_row1.data_source_id == 4
-            and milestone_row1.effective_date_from == datetime(2020, 1, 1)
+            and milestone_row1.effective_date_from == local_datetime(2020, 1, 1)
             and not milestone_row1.effective_date_to
         )
         assert (
@@ -312,7 +313,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             and milestone_row2.status_date == date(2020, 3, 1)
             and milestone_row2.observation_type_id == 3
             and milestone_row2.data_source_id == 4
-            and milestone_row2.effective_date_from == datetime(2020, 1, 1)
+            and milestone_row2.effective_date_from == local_datetime(2020, 1, 1)
             and not milestone_row2.effective_date_to
         )
 
@@ -355,8 +356,8 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=actual,
                         status_date=date(2020, 3, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
-                        effective_date_to=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
+                        effective_date_to=local_datetime(2020, 2, 1),
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -364,7 +365,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=actual,
                         status_date=date(2020, 4, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -372,7 +373,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=actual,
                         status_date=date(2020, 5, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                     ),
                 ]
             )
@@ -424,7 +425,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=actual,
                         status_date=date(2020, 4, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -432,7 +433,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=actual,
                         status_date=date(2020, 3, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -440,7 +441,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=planned,
                         status_date=date(2020, 2, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -518,7 +519,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                         observation_type=actual,
                         status_date=date(2020, 2, 1),
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -540,13 +541,13 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
 
         async with AsyncSession(engine) as session:
             milestone_row1, milestone_row2 = await session.scalars(select(CapitalSchemeMilestoneEntity))
-        assert milestone_row1.capital_scheme_id == 1 and milestone_row1.effective_date_to == datetime(2020, 2, 1)
+        assert milestone_row1.capital_scheme_id == 1 and milestone_row1.effective_date_to == local_datetime(2020, 2, 1)
         assert (
             milestone_row2.capital_scheme_id == 1
             and milestone_row2.milestone_id == 2
             and milestone_row2.status_date == date(2020, 3, 1)
             and milestone_row2.observation_type_id == 3
             and milestone_row2.data_source_id == 4
-            and milestone_row2.effective_date_from == datetime(2020, 2, 1)
+            and milestone_row2.effective_date_from == local_datetime(2020, 2, 1)
             and not milestone_row2.effective_date_to
         )

@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.data_sources import DataSource
 from ate_api.infrastructure.database import CapitalSchemeAuthorityReviewEntity, DataSourceEntity, DataSourceName
+from tests.unit.dates import local_datetime
 
 
 class TestCapitalSchemeAuthorityReviewEntity:
@@ -18,7 +19,7 @@ class TestCapitalSchemeAuthorityReviewEntity:
         assert (
             authority_review_entity.capital_scheme_authority_review_id == 1
             and authority_review_entity.capital_scheme_id == 2
-            and authority_review_entity.review_date == datetime(2020, 1, 1)
+            and authority_review_entity.review_date == local_datetime(2020, 1, 1)
             and authority_review_entity.data_source_id == 3
         )
 
@@ -31,12 +32,12 @@ class TestCapitalSchemeAuthorityReviewEntity:
             authority_review, 0, {DataSource.AUTHORITY_UPDATE: 0}
         )
 
-        assert authority_review_entity.review_date == datetime(2020, 6, 1, 13)
+        assert authority_review_entity.review_date == local_datetime(2020, 6, 1, 13)
 
     def test_to_domain(self) -> None:
         authority_review_entity = CapitalSchemeAuthorityReviewEntity(
             capital_scheme_authority_review_id=1,
-            review_date=datetime(2020, 1, 1),
+            review_date=local_datetime(2020, 1, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
         )
 
@@ -49,7 +50,7 @@ class TestCapitalSchemeAuthorityReviewEntity:
 
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         authority_review_entity = CapitalSchemeAuthorityReviewEntity(
-            review_date=datetime(2020, 6, 1, 13),
+            review_date=local_datetime(2020, 6, 1, 13),
             data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
         )
 

@@ -38,6 +38,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeName,
 )
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
+from tests.unit.dates import local_datetime
 from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
@@ -111,19 +112,19 @@ class TestDatabaseCapitalSchemeRepository:
             and overview_row.funding_programme_id == 2
             and overview_row.improvement_id == 3
             and overview_row.scheme_type_id == 4
-            and overview_row.effective_date_from == datetime(2020, 1, 1)
+            and overview_row.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_row.effective_date_to
         )
         assert (
             bid_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and bid_status_row.bid_status_id == 5
-            and bid_status_row.effective_date_from == datetime(2020, 2, 1)
+            and bid_status_row.effective_date_from == local_datetime(2020, 2, 1)
             and not bid_status_row.effective_date_to
         )
         assert (
             scheme_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and scheme_status_row.scheme_status_id == 6
-            and scheme_status_row.effective_date_from == datetime(2020, 3, 1)
+            and scheme_status_row.effective_date_from == local_datetime(2020, 3, 1)
             and not scheme_status_row.effective_date_to
         )
 
@@ -180,7 +181,7 @@ class TestDatabaseCapitalSchemeRepository:
             and intervention_row1.intervention_type_measure_id == 1
             and intervention_row1.intervention_value == Decimal("1.5")
             and intervention_row1.observation_type_id == 3
-            and intervention_row1.effective_date_from == datetime(2020, 1, 1)
+            and intervention_row1.effective_date_from == local_datetime(2020, 1, 1)
             and not intervention_row1.effective_date_to
         )
         assert (
@@ -188,7 +189,7 @@ class TestDatabaseCapitalSchemeRepository:
             and intervention_row2.intervention_type_measure_id == 2
             and intervention_row2.intervention_value == Decimal(2)
             and intervention_row2.observation_type_id == 3
-            and intervention_row2.effective_date_from == datetime(2020, 1, 1)
+            and intervention_row2.effective_date_from == local_datetime(2020, 1, 1)
             and not intervention_row2.effective_date_to
         )
 
@@ -220,7 +221,7 @@ class TestDatabaseCapitalSchemeRepository:
             (authority_review_row,) = await session.scalars(select(CapitalSchemeAuthorityReviewEntity))
         assert (
             authority_review_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and authority_review_row.review_date == datetime(2020, 2, 1)
+            and authority_review_row.review_date == local_datetime(2020, 2, 1)
             and authority_review_row.data_source_id == 1
         )
 
@@ -246,15 +247,17 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                         capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
+                            CapitalSchemeBidStatusEntity(
+                                bid_status=funded, effective_date_from=local_datetime(2020, 1, 1)
+                            )
                         ],
                         capital_scheme_scheme_statuses=[
                             CapitalSchemeSchemeStatusEntity(
-                                scheme_status=active, effective_date_from=datetime(2020, 1, 1)
+                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
                             )
                         ],
                     ),
@@ -267,15 +270,17 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                         capital_scheme_bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
+                            CapitalSchemeBidStatusEntity(
+                                bid_status=funded, effective_date_from=local_datetime(2020, 1, 1)
+                            )
                         ],
                         capital_scheme_scheme_statuses=[
                             CapitalSchemeSchemeStatusEntity(
-                                scheme_status=active, effective_date_from=datetime(2020, 1, 1)
+                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
                             )
                         ],
                     ),
@@ -323,8 +328,8 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
@@ -332,7 +337,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 2, 1),
                             ),
                         ],
                     ),
@@ -363,11 +368,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_statuses=[
                             CapitalSchemeBidStatusEntity(
                                 bid_status=funded,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeBidStatusEntity(
-                                bid_status=not_funded, effective_date_from=datetime(2020, 2, 1)
+                                bid_status=not_funded, effective_date_from=local_datetime(2020, 2, 1)
                             ),
                         ],
                     ),
@@ -393,11 +398,11 @@ class TestDatabaseCapitalSchemeRepository:
                         scheme_statuses=[
                             CapitalSchemeSchemeStatusEntity(
                                 scheme_status=pipeline,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeSchemeStatusEntity(
-                                scheme_status=active, effective_date_from=datetime(2020, 2, 1)
+                                scheme_status=active, effective_date_from=local_datetime(2020, 2, 1)
                             ),
                         ],
                     ),
@@ -437,20 +442,20 @@ class TestDatabaseCapitalSchemeRepository:
                                 intervention_type_measure=widening_existing_footway_miles,
                                 intervention_value=Decimal("1.000000"),
                                 observation_type=actual,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeInterventionEntity(
                                 intervention_type_measure=widening_existing_footway_miles,
                                 intervention_value=Decimal("1.500000"),
                                 observation_type=actual,
-                                effective_date_from=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeInterventionEntity(
                                 intervention_type_measure=new_segregated_cycling_facility_miles,
                                 intervention_value=Decimal("2.000000"),
                                 observation_type=actual,
-                                effective_date_from=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 2, 1),
                             ),
                         ],
                     ),
@@ -511,19 +516,19 @@ class TestDatabaseCapitalSchemeRepository:
                                 intervention_type_measure=new_segregated_cycling_facility_number_of_junctions,
                                 intervention_value=Decimal("3.000000"),
                                 observation_type=actual,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             ),
                             CapitalSchemeInterventionEntity(
                                 intervention_type_measure=new_segregated_cycling_facility_miles,
                                 intervention_value=Decimal("2.000000"),
                                 observation_type=actual,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             ),
                             CapitalSchemeInterventionEntity(
                                 intervention_type_measure=widening_existing_footway_miles,
                                 intervention_value=Decimal("1.500000"),
                                 observation_type=actual,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             ),
                         ],
                     ),
@@ -567,10 +572,10 @@ class TestDatabaseCapitalSchemeRepository:
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 3, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 3, 1), data_source=authority_review
                             ),
                         ],
                     ),
@@ -596,10 +601,10 @@ class TestDatabaseCapitalSchemeRepository:
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
                             ),
                         ],
                     ),
@@ -698,7 +703,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                     ),
@@ -711,7 +716,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                     ),
@@ -724,7 +729,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp2,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                     ),
@@ -796,8 +801,8 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
@@ -805,7 +810,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 funding_programme=atf3,
                                 improvement=imp2,
                                 scheme_type=construction,
-                                effective_date_from=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 2, 1),
                             ),
                         ],
                     ),
@@ -833,10 +838,10 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 3, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 3, 1), data_source=authority_review
                             ),
                         ],
                     ),
@@ -868,10 +873,10 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
                             ),
                         ],
                     ),
@@ -980,7 +985,9 @@ class TestDatabaseCapitalSchemeRepository:
                         reference="ATE00001",
                         overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
                         bid_statuses=[
-                            CapitalSchemeBidStatusEntity(bid_status=funded, effective_date_from=datetime(2020, 1, 1))
+                            CapitalSchemeBidStatusEntity(
+                                bid_status=funded, effective_date_from=local_datetime(2020, 1, 1)
+                            )
                         ],
                     ),
                     entities.build_capital_scheme(
@@ -989,11 +996,11 @@ class TestDatabaseCapitalSchemeRepository:
                         bid_statuses=[
                             CapitalSchemeBidStatusEntity(
                                 bid_status=funded,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             CapitalSchemeBidStatusEntity(
-                                bid_status=not_funded, effective_date_from=datetime(2020, 2, 1)
+                                bid_status=not_funded, effective_date_from=local_datetime(2020, 2, 1)
                             ),
                         ],
                     ),
@@ -1039,7 +1046,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 2, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                     entities.build_capital_scheme(
                         id_=2,
@@ -1052,7 +1059,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 3, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                     entities.build_capital_scheme(
                         id_=3,
@@ -1065,7 +1072,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 4, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1107,7 +1114,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 3, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1143,7 +1150,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 2, 1),
                         observation_type=planned,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1182,7 +1189,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 2, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -1190,7 +1197,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 2, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
             )
@@ -1229,8 +1236,8 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 2, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 1, 1),
-                        effective_date_to=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 1, 1),
+                        effective_date_to=local_datetime(2020, 2, 1),
                     ),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
@@ -1238,7 +1245,7 @@ class TestDatabaseCapitalSchemeRepository:
                         status_date=date(2020, 3, 1),
                         observation_type=actual,
                         data_source=atf4_bid,
-                        effective_date_from=datetime(2020, 2, 1),
+                        effective_date_from=local_datetime(2020, 2, 1),
                     ),
                 ]
             )
@@ -1343,7 +1350,7 @@ class TestDatabaseCapitalSchemeRepository:
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=datetime(2020, 2, 1), data_source=authority_update
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             )
                         ],
                     ),
@@ -1366,7 +1373,7 @@ class TestDatabaseCapitalSchemeRepository:
             _, authority_review_row2 = await session.scalars(select(CapitalSchemeAuthorityReviewEntity))
         assert (
             authority_review_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and authority_review_row2.review_date == datetime(2020, 3, 1)
+            and authority_review_row2.review_date == local_datetime(2020, 3, 1)
             and authority_review_row2.data_source_id == 1
         )
 

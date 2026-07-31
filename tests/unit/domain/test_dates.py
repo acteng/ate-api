@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta, tzinfo
 import pytest
 
 from ate_api.domain.dates import DateTimeRange, is_zoned
+from tests.unit.dates import local_datetime
 
 
 class TestDateTimeRange:
@@ -42,14 +43,14 @@ class TestDateTimeRange:
         "from_, to, expected_message",
         [
             pytest.param(
-                datetime(2020, 1, 1),
+                local_datetime(2020, 1, 1),
                 datetime(2020, 2, 1, tzinfo=UTC),
                 "From date and time must include a time zone: 2020-01-01 00:00:00",
                 id="local from",
             ),
             pytest.param(
                 datetime(2020, 1, 1, tzinfo=UTC),
-                datetime(2020, 2, 1),
+                local_datetime(2020, 2, 1),
                 "To date and time must include a time zone: 2020-02-01 00:00:00",
                 id="local to",
             ),
@@ -103,7 +104,7 @@ class _UnknownUtcOffsetTimezone(tzinfo):
     "date, expected_is_zoned",
     [
         pytest.param(datetime(2000, 1, 1, tzinfo=UTC), True, id="zoned"),
-        pytest.param(datetime(2000, 1, 1), False, id="local"),
+        pytest.param(local_datetime(2000, 1, 1), False, id="local"),
         pytest.param(
             datetime(2000, 1, 1, tzinfo=_UnknownUtcOffsetTimezone()), False, id="zoned with unknown UTC offset"
         ),

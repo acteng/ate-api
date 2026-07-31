@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from ate_api.infrastructure.clock import SystemClock
+from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.clock import FakeClock
 
 
@@ -47,4 +48,4 @@ class TestFakeClock:
 
     def test_cannot_set_now_with_local_date(self, clock: FakeClock) -> None:
         with pytest.raises(ValueError, match="Now date and time must include a time zone: 2020-01-02 12:00:00"):
-            clock.now = datetime(2020, 1, 2, 12)
+            clock.now = local_datetime(2020, 1, 2, 12)

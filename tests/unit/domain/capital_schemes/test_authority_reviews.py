@@ -4,6 +4,7 @@ import pytest
 
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.data_sources import DataSource
+from tests.unit.dates import local_datetime
 
 
 class TestCapitalSchemeAuthorityReview:
@@ -20,4 +21,6 @@ class TestCapitalSchemeAuthorityReview:
 
     def test_cannot_create_with_local_review_date(self) -> None:
         with pytest.raises(ValueError, match="Review date and time must include a time zone: 2020-01-01 00:00:00"):
-            CapitalSchemeAuthorityReview(review_date=datetime(2020, 1, 1), data_source=DataSource.AUTHORITY_UPDATE)
+            CapitalSchemeAuthorityReview(
+                review_date=local_datetime(2020, 1, 1), data_source=DataSource.AUTHORITY_UPDATE
+            )

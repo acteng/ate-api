@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 import pytest
 
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
+from tests.unit.dates import local_datetime
 
 
 def test_zoned_to_local() -> None:
@@ -11,18 +12,18 @@ def test_zoned_to_local() -> None:
 
     local = zoned_to_local(zoned)
 
-    assert local == datetime(2020, 6, 1, 13)
+    assert local == local_datetime(2020, 6, 1, 13)
 
 
 def test_zoned_to_local_with_local_date() -> None:
-    local = datetime(2020, 6, 1, 13)
+    local = local_datetime(2020, 6, 1, 13)
 
     with pytest.raises(ValueError, match="Date and time must include a time zone: 2020-06-01 13:00:00"):
         zoned_to_local(local)
 
 
 def test_local_to_zoned() -> None:
-    local = datetime(2020, 6, 1, 13)
+    local = local_datetime(2020, 6, 1, 13)
 
     zoned = local_to_zoned(local)
 

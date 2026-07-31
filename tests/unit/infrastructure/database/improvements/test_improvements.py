@@ -17,6 +17,7 @@ from ate_api.infrastructure.database import (
     ImprovementOverviewEntity,
 )
 from ate_api.infrastructure.database.improvements.improvements import DatabaseImprovementRepository
+from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.database.builders import build_authority_entity, build_data_source_entity
 
 
@@ -43,7 +44,7 @@ class TestImprovementEntity:
             and overview_entity.improvement_description is None
             and overview_entity.funding_managed_by_id == 1
             and overview_entity.data_source_id == 2
-            and overview_entity.effective_date_from == datetime(2020, 1, 1)
+            and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
 
@@ -55,7 +56,7 @@ class TestImprovementEntity:
                     improvement_name="Wirral Package",
                     funding_managed_by=AuthorityEntity(authority_abbreviation="LIV"),
                     data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
-                    effective_date_from=datetime(2020, 1, 1),
+                    effective_date_from=local_datetime(2020, 1, 1),
                 )
             ],
         )
@@ -109,7 +110,7 @@ class TestDatabaseImprovementRepository:
             == 'Improvement for the "Wirral Package" capital scheme created as part of funding devolution.'
             and overview_row.funding_managed_by_id == 1
             and overview_row.data_source_id == 2
-            and overview_row.effective_date_from == datetime(2020, 1, 1)
+            and overview_row.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_row.effective_date_to
         )
 
@@ -127,7 +128,7 @@ class TestDatabaseImprovementRepository:
                                 improvement_description='Improvement for the "Wirral Package" capital scheme created as part of funding devolution.',
                                 funding_managed_by=liv,
                                 data_source=authority_update,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                     ),
@@ -138,7 +139,7 @@ class TestDatabaseImprovementRepository:
                                 improvement_name="School Streets",
                                 funding_managed_by=liv,
                                 data_source=authority_update,
-                                effective_date_from=datetime(2020, 1, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
                             )
                         ],
                     ),
@@ -171,14 +172,14 @@ class TestDatabaseImprovementRepository:
                                 improvement_name="Wirral Package",
                                 funding_managed_by=liv,
                                 data_source=authority_update,
-                                effective_date_from=datetime(2020, 1, 1),
-                                effective_date_to=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
                             ),
                             ImprovementOverviewEntity(
                                 improvement_name="School Streets",
                                 funding_managed_by=liv,
                                 data_source=authority_update,
-                                effective_date_from=datetime(2020, 2, 1),
+                                effective_date_from=local_datetime(2020, 2, 1),
                             ),
                         ],
                     ),

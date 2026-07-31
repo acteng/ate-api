@@ -15,6 +15,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeEntity,
     SchemeTypeName,
 )
+from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.database.builders import build_improvement_overview_entity
 
 
@@ -58,7 +59,7 @@ class TestCapitalSchemeOverviewEntity:
             and overview_entity.funding_programme_id == 2
             and overview_entity.improvement_id == 3
             and overview_entity.scheme_type_id == 4
-            and overview_entity.effective_date_from == datetime(2020, 1, 1)
+            and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
 
@@ -100,7 +101,7 @@ class TestCapitalSchemeOverviewEntity:
             {CapitalSchemeType.CONSTRUCTION: 0},
         )
 
-        assert overview_entity.effective_date_to == datetime(2020, 2, 1)
+        assert overview_entity.effective_date_to == local_datetime(2020, 2, 1)
 
     def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
         overview = CapitalSchemeOverview(
@@ -120,8 +121,8 @@ class TestCapitalSchemeOverviewEntity:
             {CapitalSchemeType.CONSTRUCTION: 0},
         )
 
-        assert overview_entity.effective_date_from == datetime(2020, 6, 1, 13)
-        assert overview_entity.effective_date_to == datetime(2020, 7, 1, 13)
+        assert overview_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
+        assert overview_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
     def test_to_domain(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
@@ -132,7 +133,7 @@ class TestCapitalSchemeOverviewEntity:
                 improvement_reference="IMP00001", improvement_overviews=[build_improvement_overview_entity()]
             ),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
         )
 
         overview = overview_entity.to_domain()
@@ -152,7 +153,7 @@ class TestCapitalSchemeOverviewEntity:
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-            effective_date_from=datetime(2020, 1, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
         )
 
         overview = overview_entity.to_domain()
@@ -165,8 +166,8 @@ class TestCapitalSchemeOverviewEntity:
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-            effective_date_from=datetime(2020, 1, 1),
-            effective_date_to=datetime(2020, 2, 1),
+            effective_date_from=local_datetime(2020, 1, 1),
+            effective_date_to=local_datetime(2020, 2, 1),
         )
 
         overview = overview_entity.to_domain()
@@ -179,8 +180,8 @@ class TestCapitalSchemeOverviewEntity:
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
-            effective_date_from=datetime(2020, 6, 1, 13),
-            effective_date_to=datetime(2020, 7, 1, 13),
+            effective_date_from=local_datetime(2020, 6, 1, 13),
+            effective_date_to=local_datetime(2020, 7, 1, 13),
         )
 
         overview = overview_entity.to_domain()
