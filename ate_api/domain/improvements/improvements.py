@@ -15,7 +15,7 @@ class ImprovementReference:
         return self._reference
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(self._reference)})"
+        return f"{self.__class__.__name__}({self._reference!r})"
 
 
 class Improvement:

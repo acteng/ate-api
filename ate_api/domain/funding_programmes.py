@@ -12,7 +12,7 @@ class FundingProgrammeCode:
         return self._code
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(self._code)})"
+        return f"{self.__class__.__name__}({self._code!r})"
 
 
 class FundingProgramme:

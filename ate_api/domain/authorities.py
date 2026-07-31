@@ -12,7 +12,7 @@ class AuthorityAbbreviation:
         return self._abbreviation
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(self._abbreviation)})"
+        return f"{self.__class__.__name__}({self._abbreviation!r})"
 
 
 class Authority:
