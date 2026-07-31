@@ -1,4 +1,5 @@
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from authlib.oauth2 import AuthorizationServer, OAuth2Request
 from authlib.oauth2.rfc6749 import ClientMixin

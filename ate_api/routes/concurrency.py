@@ -1,7 +1,7 @@
 import asyncio
+from collections.abc import Awaitable, Callable
 from functools import wraps
 from random import random
-from typing import Awaitable, Callable
 
 from sqlalchemy.exc import DBAPIError
 

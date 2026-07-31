@@ -1,5 +1,5 @@
+from collections.abc import Awaitable, Callable
 from datetime import UTC, date, datetime
-from typing import Awaitable, Callable
 
 import pytest
 import respx

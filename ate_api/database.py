@@ -1,5 +1,6 @@
+from collections.abc import AsyncGenerator
 from functools import lru_cache
-from typing import Annotated, AsyncGenerator
+from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy import text

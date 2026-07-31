@@ -1,6 +1,6 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from importlib.metadata import version
-from typing import AsyncGenerator
 
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware import Middleware

@@ -1,5 +1,6 @@
+from collections.abc import AsyncGenerator, Generator
 from dataclasses import dataclass
-from typing import Any, AsyncGenerator, Generator
+from typing import Any
 
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
