@@ -24,7 +24,7 @@ locals {
       github_action_deploy = true
     }
     test = {
-      image_tag            = "1.2.0"
+      image_tag            = "1.3.0-rc.1"
       keep_idle            = false
       docs_auth            = true
       monitoring           = false
