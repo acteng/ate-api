@@ -1,6 +1,7 @@
 import pytest
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
+from tests.unit.domain.builders import build_authority
 from tests.unit.infrastructure.memory.authorities import MemoryAuthorityRepository
 
 
@@ -40,9 +41,7 @@ class TestMemoryAuthorityRepository:
         assert not authority
 
     async def test_exists(self, authorities: MemoryAuthorityRepository) -> None:
-        await authorities.add(
-            Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-        )
+        await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
 
         exists = await authorities.exists(AuthorityAbbreviation("LIV"))
 

@@ -3,11 +3,12 @@ from datetime import UTC, datetime
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from ate_api.domain.improvements.overviews import ImprovementOverview
+from tests.unit.domain.builders import build_authority
 
 
 @respx.mock
@@ -17,9 +18,7 @@ async def test_get_improvement(
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00001"),

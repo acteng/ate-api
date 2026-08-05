@@ -5,7 +5,7 @@ from typing import Any, cast
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_scheme_financials import (
     CapitalSchemeFinancial,
     CapitalSchemeFinancials,
@@ -33,7 +33,7 @@ from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.clock import Clock
-from tests.unit.domain.builders import build_capital_scheme
+from tests.unit.domain.builders import build_authority, build_capital_scheme
 from tests.unit.infrastructure.memory.unit_of_work import FakeUnitOfWork
 
 
@@ -47,9 +47,7 @@ async def test_get_capital_scheme(
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00001"),

@@ -21,7 +21,7 @@ from ate_api.domain.funding_programmes import FundingProgramme, FundingProgramme
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.builders import build_capital_scheme
+from tests.unit.domain.builders import build_authority, build_capital_scheme
 
 
 @respx.mock
@@ -56,9 +56,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00001"),
@@ -101,9 +99,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
             ),
         )
     )
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("WYO"), full_name="West Yorkshire Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("WYO")))
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00002"),
@@ -173,9 +169,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
     await capital_schemes.add(
@@ -223,9 +217,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
     await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF5")))
@@ -283,9 +275,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
 async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_funding_programme(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
 
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
@@ -300,9 +290,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_fu
 async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -350,9 +338,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
 async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_bid_status(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
 
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
@@ -371,9 +357,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -441,9 +425,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -535,9 +517,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
     client: TestClient,
     access_token: str,
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
@@ -591,9 +571,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
 async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_current_milestone(
     authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
 
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
@@ -608,9 +586,7 @@ async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_cu
 async def test_get_authority_bid_submitting_capital_schemes_when_none(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
 
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting", headers={"Authorization": f"Bearer {access_token}"}

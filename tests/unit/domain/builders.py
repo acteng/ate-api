@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -9,6 +9,10 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from tests.unit.dates import dummy_datetime
+
+
+def build_authority(abbreviation: AuthorityAbbreviation | None = None, full_name: str = "dummy") -> Authority:
+    return Authority(abbreviation=abbreviation or build_authority_abbreviation(), full_name=full_name)
 
 
 def build_authority_abbreviation(abbreviation: str = "dummy") -> AuthorityAbbreviation:

@@ -3,17 +3,16 @@ from datetime import UTC, datetime
 import respx
 from fastapi.testclient import TestClient
 
-from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.authorities import AuthorityAbbreviation, AuthorityRepository
 from tests.integration.oauth import StubAuthorizationServer
+from tests.unit.domain.builders import build_authority
 
 
 @respx.mock
 async def test_can_access_with_valid_access_token(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
-    await authorities.add(
-        Authority(abbreviation=AuthorityAbbreviation("LIV"), full_name="Liverpool City Region Combined Authority")
-    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
 
     response = client.get("/authorities/LIV", headers={"Authorization": f"Bearer {access_token}"})
 
