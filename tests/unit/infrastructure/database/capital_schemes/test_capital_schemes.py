@@ -40,7 +40,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeName,
 )
 from tests.unit.dates import local_datetime
-from tests.unit.domain.builders import build_capital_scheme
+from tests.unit.domain.builders import build_authority_abbreviation, build_capital_scheme, build_funding_programme_code
 from tests.unit.infrastructure.database.builders import EntityBuilder, build_improvement_overview_entity
 
 
@@ -125,8 +125,8 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {AuthorityAbbreviation("dummy"): 0},
-            {FundingProgrammeCode("dummy"): 0},
+            {build_authority_abbreviation(): 0},
+            {build_funding_programme_code(): 0},
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
@@ -165,8 +165,8 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {AuthorityAbbreviation("dummy"): 0},
-            {FundingProgrammeCode("dummy"): 0},
+            {build_authority_abbreviation(): 0},
+            {build_funding_programme_code(): 0},
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
             {BidStatus.SUBMITTED: 0},
