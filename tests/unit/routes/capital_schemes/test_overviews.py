@@ -10,6 +10,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
+from tests.unit.domain.builders import build_capital_scheme_overview
 
 
 @pytest.mark.parametrize(
@@ -49,13 +50,8 @@ class TestCapitalSchemeOverviewModel:
         )
 
     def test_from_domain_without_improvement(self, http_request: Request, base_url: str) -> None:
-        overview = CapitalSchemeOverview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            name="Wirral Package",
-            bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            funding_programme=FundingProgrammeCode("ATF3"),
-            improvement=None,
-            type=CapitalSchemeType.CONSTRUCTION,
+        overview = build_capital_scheme_overview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), improvement=None
         )
 
         overview_model = CapitalSchemeOverviewModel.from_domain(overview, http_request)

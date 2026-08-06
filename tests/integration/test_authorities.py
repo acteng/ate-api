@@ -21,7 +21,7 @@ from ate_api.domain.funding_programmes import FundingProgramme, FundingProgramme
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.builders import build_authority, build_capital_scheme
+from tests.unit.domain.builders import build_authority, build_capital_scheme, build_capital_scheme_overview
 
 
 @respx.mock
@@ -175,26 +175,20 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF4"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -224,39 +218,30 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_funding_p
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF4"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF5"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -294,13 +279,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
@@ -310,13 +291,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_statu
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
             bid_status_details=CapitalSchemeBidStatusDetails(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
@@ -361,13 +338,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -385,13 +358,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -429,13 +398,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -453,13 +418,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -477,13 +438,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_m
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Hospital Fields Road",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -521,13 +478,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )
@@ -535,13 +488,9 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_curren
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="School Streets",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
     )

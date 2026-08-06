@@ -10,6 +10,8 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from tests.unit.dates import dummy_datetime
 
+_dummy_capital_scheme_type = CapitalSchemeType.DEVELOPMENT
+
 
 def build_authority(abbreviation: AuthorityAbbreviation | None = None, full_name: str = "dummy") -> Authority:
     return Authority(abbreviation=abbreviation or build_authority_abbreviation(), full_name=full_name)
@@ -43,7 +45,7 @@ def build_capital_scheme_overview(
     bid_submitting_authority: AuthorityAbbreviation | None = None,
     funding_programme: FundingProgrammeCode | None = None,
     improvement: ImprovementReference | None = None,
-    type_: CapitalSchemeType = CapitalSchemeType.DEVELOPMENT,
+    type_: CapitalSchemeType = _dummy_capital_scheme_type,
 ) -> CapitalSchemeOverview:
     return CapitalSchemeOverview(
         effective_date=effective_date or build_date_time_range(),
@@ -71,6 +73,10 @@ def build_capital_scheme_status(
 
 def build_funding_programme_code(code: str = "dummy") -> FundingProgrammeCode:
     return FundingProgrammeCode(code)
+
+
+def build_capital_scheme_type() -> CapitalSchemeType:
+    return _dummy_capital_scheme_type
 
 
 def build_date_time_range(from_: datetime = dummy_datetime, to: datetime = dummy_datetime) -> DateTimeRange:

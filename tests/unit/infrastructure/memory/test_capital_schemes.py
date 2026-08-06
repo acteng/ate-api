@@ -20,7 +20,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.domain.builders import build_capital_scheme
+from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_overview
 from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
@@ -161,13 +161,9 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme = build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=CapitalSchemeOverview(
+            overview=build_capital_scheme_overview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
                 bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=None,
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
         )
         capital_scheme.perform_authority_review(authority_review)
@@ -185,39 +181,30 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF4"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF5"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
@@ -238,13 +225,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
@@ -254,13 +237,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
                 bid_status_details=CapitalSchemeBidStatusDetails(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
@@ -284,13 +263,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
@@ -308,13 +283,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
@@ -332,13 +303,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Hospital Fields Road",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
@@ -372,13 +339,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
@@ -386,13 +349,9 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="School Streets",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
@@ -422,26 +381,18 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=CapitalSchemeOverview(
+                overview=build_capital_scheme_overview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Wirral Package",
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=None,
-                    type=CapitalSchemeType.CONSTRUCTION,
                 ),
             )
         )
