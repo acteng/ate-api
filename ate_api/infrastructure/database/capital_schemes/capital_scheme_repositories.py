@@ -169,6 +169,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
+        status: Status | None = None,
         current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
@@ -202,6 +203,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 )
             )
             .join(
+                CapitalSchemeEntity.capital_scheme_scheme_statuses.and_(
+                    CapitalSchemeSchemeStatusEntity.effective_date_to.is_(None)
+                )
+            )
+            .join(
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
             .join(FundingProgrammeEntity)
@@ -226,6 +232,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         if bid_status:
             statement = statement.join(BidStatusEntity).where(
                 BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status)
+            )
+
+        if status:
+            statement = statement.join(SchemeStatusEntity).where(
+                SchemeStatusEntity.scheme_status_name == SchemeStatusName.from_domain(status)
             )
 
         if current_milestones:

@@ -3,6 +3,7 @@ from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepo
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 
@@ -22,6 +23,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         bid_status: BidStatus | None = None,
+        status: Status | None = None,
         current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
         return sorted(
@@ -33,6 +35,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                     not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
                 )
                 and (not bid_status or capital_scheme.bid_status_details.bid_status == bid_status)
+                and (not status or capital_scheme.status.status == status)
                 and (not current_milestones or (await self._get_current_milestone(reference)) in current_milestones)
             ],
             key=lambda capital_scheme_item: str(capital_scheme_item.reference),

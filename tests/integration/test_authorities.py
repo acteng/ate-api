@@ -15,6 +15,7 @@ from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalScheme
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
@@ -320,6 +321,61 @@ async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_bi
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
         params={"bid-status": "foo"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 422
+
+
+@respx.mock
+async def test_get_authority_bid_submitting_capital_schemes_filters_by_status(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
+            ),
+        )
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"status": "active"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
+
+
+@respx.mock
+async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_status(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/bid-submitting",
+        params={"status": "foo"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
 

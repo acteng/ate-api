@@ -18,6 +18,7 @@ from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthor
 from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel
 from ate_api.routes.capital_schemes.milestones import MilestoneModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
+from ate_api.routes.capital_schemes.statuses import StatusModel
 from ate_api.routes.collections import CollectionModel
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
@@ -105,6 +106,7 @@ async def get_authority_bid_submitting_capital_schemes(
         list[str] | None, Query(alias="funding-programme-code", examples=["ATF3"])
     ] = None,
     bid_status: Annotated[BidStatusModel | None, Query(alias="bid-status", examples=["funded"])] = None,
+    status: Annotated[StatusModel | None, Query(examples=["active"])] = None,
     current_milestones: Annotated[
         list[MilestoneModel | Literal[""]] | None,
         Query(alias="current-milestone", examples=["detailed design completed"]),
@@ -127,6 +129,7 @@ async def get_authority_bid_submitting_capital_schemes(
             [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
         ),
         bid_status=bid_status.to_domain() if bid_status else None,
+        status=status.to_domain() if status else None,
         current_milestones=[_to_domain(milestone) for milestone in current_milestones] if current_milestones else None,
     )
     capital_scheme_models = [
