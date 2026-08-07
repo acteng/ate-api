@@ -192,16 +192,19 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 joinedload(CapitalSchemeOverviewEntity.scheme_type),
                 joinedload(ranked_capital_scheme_authority_reviews_alias.data_source),
             )
+            # require current overview
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
                 )
             )
+            # require current bid status
             .join(
                 CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
                     CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
                 )
             )
+            # require current scheme status
             .join(
                 CapitalSchemeEntity.capital_scheme_scheme_statuses.and_(
                     CapitalSchemeSchemeStatusEntity.effective_date_to.is_(None)
