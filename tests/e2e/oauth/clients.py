@@ -17,6 +17,9 @@ class StubClient(ClientMixin):  # type: ignore
     def check_grant_type(self, grant_type: str) -> bool:
         return grant_type == "client_credentials"
 
+    def get_allowed_scope(self, scope: str) -> str:
+        return ""
+
 
 class ClientRepository:
     def __init__(self) -> None:

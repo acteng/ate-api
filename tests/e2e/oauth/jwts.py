@@ -1,5 +1,3 @@
-from typing import Any
-
 from authlib.oauth2 import OAuth2Error, OAuth2Request
 from authlib.oauth2.rfc7523 import JWTBearerClientAssertion
 
@@ -34,11 +32,8 @@ class PrivateKeyJwtClientAssertion(JWTBearerClientAssertion):  # type: ignore
         self._validate_audience(request.payload.data.get("audience"))
         return client
 
-    # Workaround: https://github.com/authlib/authlib/issues/730
-    def create_claims_options(self) -> dict[str, Any]:
-        options: dict[str, Any] = super().create_claims_options()
-        options["aud"]["value"] = self._issuer
-        return options
+    def get_audiences(self) -> list[str]:
+        return [self._issuer]
 
     def _validate_audience(self, audience: str) -> None:
         if self._audience:

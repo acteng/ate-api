@@ -1,8 +1,8 @@
 from typing import Any
 
-from authlib.jose import KeySet
 from authlib.oauth2.rfc6749 import ClientMixin
 from authlib.oauth2.rfc9068 import JWTBearerTokenGenerator
+from joserfc.jwk import KeySet
 
 
 class StubJWTBearerTokenGenerator(JWTBearerTokenGenerator):  # type: ignore

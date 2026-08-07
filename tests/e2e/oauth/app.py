@@ -1,9 +1,9 @@
 from functools import lru_cache
 from typing import Annotated, Any
 
-from authlib.jose import KeySet, RSAKey
 from authlib.oauth2 import AuthorizationServer
 from fastapi import Depends, FastAPI, Request, Response
+from joserfc.jwk import KeySet, RSAKey
 
 from tests.e2e.oauth.clients import ClientRepository
 from tests.e2e.oauth.grants import PrivateKeyJwtClientCredentialsGrant
@@ -15,7 +15,7 @@ from tests.e2e.oauth.tokens import StubJWTBearerTokenGenerator
 app = FastAPI()
 clients = ClientRepository()
 _issuer = "https://stub.example"
-_token_key = RSAKey.generate_key(is_private=True)
+_token_key = RSAKey.generate_key(private=True)
 
 
 @lru_cache
