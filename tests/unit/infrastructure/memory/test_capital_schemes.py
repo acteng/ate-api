@@ -219,42 +219,6 @@ class TestMemoryCapitalSchemeRepository:
             CapitalSchemeReference("ATE00002"),
         ]
 
-    async def test_get_items_by_bid_submitting_authority_filters_by_bid_status(
-        self, capital_schemes: MemoryCapitalSchemeRepository
-    ) -> None:
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-                bid_status_details=CapitalSchemeBidStatusDetails(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
-                ),
-            )
-        )
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-                bid_status_details=CapitalSchemeBidStatusDetails(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
-                ),
-            )
-        )
-
-        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"), bid_status=BidStatus.FUNDED
-        )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001")
-        ]
-
     async def test_get_items_by_bid_submitting_authority_filters_by_status(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:

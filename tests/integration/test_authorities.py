@@ -11,7 +11,6 @@ from ate_api.domain.capital_scheme_milestones import (
     Milestone,
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -266,61 +265,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_fu
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
         params={"funding-programme-code": "foo"},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 422
-
-
-@respx.mock
-async def test_get_authority_bid_submitting_capital_schemes_filters_by_bid_status(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
-) -> None:
-    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-            bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
-            ),
-        )
-    )
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00002"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-            bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.NOT_FUNDED
-            ),
-        )
-    )
-
-    response = client.get(
-        "/authorities/LIV/capital-schemes/bid-submitting",
-        params={"bid-status": "funded"},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 200
-    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
-
-
-@respx.mock
-async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_bid_status(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
-) -> None:
-    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
-
-    response = client.get(
-        "/authorities/LIV/capital-schemes/bid-submitting",
-        params={"bid-status": "foo"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
 

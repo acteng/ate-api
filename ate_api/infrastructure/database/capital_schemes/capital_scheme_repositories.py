@@ -168,7 +168,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self,
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
-        bid_status: BidStatus | None = None,
         status: Status | None = None,
         current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
@@ -230,11 +229,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         if funding_programme_codes:
             statement = statement.where(
                 FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
-            )
-
-        if bid_status:
-            statement = statement.join(BidStatusEntity).where(
-                BidStatusEntity.bid_status_name == BidStatusName.from_domain(bid_status)
             )
 
         if status:

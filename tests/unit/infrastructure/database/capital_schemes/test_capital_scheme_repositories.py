@@ -972,51 +972,6 @@ class TestDatabaseCapitalSchemeRepository:
             CapitalSchemeReference("ATE00002"),
         ]
 
-    async def test_get_items_by_bid_submitting_authority_filters_by_current_bid_status(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    funded := build_bid_status_entity(name=BidStatusName.FUNDED),
-                    not_funded := build_bid_status_entity(name=BidStatusName.NOT_FUNDED),
-                    entities.build_capital_scheme(
-                        reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                        bid_statuses=[
-                            CapitalSchemeBidStatusEntity(
-                                bid_status=funded, effective_date_from=local_datetime(2020, 1, 1)
-                            )
-                        ],
-                    ),
-                    entities.build_capital_scheme(
-                        reference="ATE00002",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                        bid_statuses=[
-                            CapitalSchemeBidStatusEntity(
-                                bid_status=funded,
-                                effective_date_from=local_datetime(2020, 1, 1),
-                                effective_date_to=local_datetime(2020, 2, 1),
-                            ),
-                            CapitalSchemeBidStatusEntity(
-                                bid_status=not_funded, effective_date_from=local_datetime(2020, 2, 1)
-                            ),
-                        ],
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), bid_status=BidStatus.FUNDED
-            )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001")
-        ]
-
     async def test_get_items_by_bid_submitting_authority_filters_by_current_status(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
