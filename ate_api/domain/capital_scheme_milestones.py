@@ -23,14 +23,6 @@ class Milestone(IntEnum):
     SUPERSEDED = auto()
     REMOVED = auto()
 
-    @property
-    def is_active(self) -> bool:
-        return self not in {Milestone.NOT_PROGRESSED, Milestone.SUPERSEDED, Milestone.REMOVED}
-
-    @property
-    def is_complete(self) -> bool:
-        return self == Milestone.FUNDING_COMPLETED
-
 
 @dataclass(frozen=True)
 class CapitalSchemeMilestone:
@@ -86,11 +78,6 @@ class CapitalSchemeMilestones:
         return (
             milestone1.milestone == milestone2.milestone and milestone1.observation_type == milestone2.observation_type
         )
-
-
-class MilestoneRepository:
-    async def get_all(self, is_active: bool | None = None, is_complete: bool | None = None) -> list[Milestone]:
-        raise NotImplementedError()
 
 
 class CapitalSchemeMilestonesRepository:

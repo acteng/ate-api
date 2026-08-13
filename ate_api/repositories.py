@@ -6,16 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ate_api.database import get_session
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
-from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, MilestoneRepository
+from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
 from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
-from ate_api.infrastructure.database.capital_scheme_milestones import (
-    DatabaseCapitalSchemeMilestonesRepository,
-    DatabaseMilestoneRepository,
-)
+from ate_api.infrastructure.database.capital_scheme_milestones import DatabaseCapitalSchemeMilestonesRepository
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
 from ate_api.infrastructure.database.improvements.improvements import DatabaseImprovementRepository
@@ -49,7 +46,3 @@ def get_capital_scheme_milestones_repository(
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> CapitalSchemeMilestonesRepository:
     return DatabaseCapitalSchemeMilestonesRepository(session)
-
-
-def get_milestone_repository(session: Annotated[AsyncSession, Depends(get_session)]) -> MilestoneRepository:
-    return DatabaseMilestoneRepository(session)

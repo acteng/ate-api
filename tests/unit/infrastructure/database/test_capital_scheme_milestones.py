@@ -19,10 +19,7 @@ from ate_api.infrastructure.database import (
     ObservationTypeEntity,
     ObservationTypeName,
 )
-from ate_api.infrastructure.database.capital_scheme_milestones import (
-    DatabaseCapitalSchemeMilestonesRepository,
-    DatabaseMilestoneRepository,
-)
+from ate_api.infrastructure.database.capital_scheme_milestones import DatabaseCapitalSchemeMilestonesRepository
 from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
@@ -177,84 +174,6 @@ class TestCapitalSchemeMilestoneEntity:
         assert milestone.effective_date == DateTimeRange(
             datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )
-
-
-@pytest.mark.usefixtures("data")
-@pytest.mark.asyncio(loop_scope="package")
-class TestDatabaseMilestoneRepository:
-    async def test_get_all(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0),
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            milestones = DatabaseMilestoneRepository(session)
-            all_milestones = await milestones.get_all()
-
-        assert all_milestones == [Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED]
-
-    @pytest.mark.parametrize(
-        "is_active, expected_milestone",
-        [(True, Milestone.DETAILED_DESIGN_COMPLETED), (False, Milestone.CONSTRUCTION_STARTED)],
-    )
-    async def test_get_all_filters_by_is_active(
-        self, engine: AsyncEngine, is_active: bool, expected_milestone: Milestone
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0, is_active=True),
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1, is_active=False),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            milestones = DatabaseMilestoneRepository(session)
-            all_milestones = await milestones.get_all(is_active=is_active)
-
-        assert all_milestones == [expected_milestone]
-
-    @pytest.mark.parametrize(
-        "is_complete, expected_milestone",
-        [(True, Milestone.DETAILED_DESIGN_COMPLETED), (False, Milestone.CONSTRUCTION_STARTED)],
-    )
-    async def test_get_all_filters_by_is_complete(
-        self, engine: AsyncEngine, is_complete: bool, expected_milestone: Milestone
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0, is_complete=True
-                    ),
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1, is_complete=False),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            milestones = DatabaseMilestoneRepository(session)
-            all_milestones = await milestones.get_all(is_complete=is_complete)
-
-        assert all_milestones == [expected_milestone]
-
-    async def test_get_all_orders_by_stage_order(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2),
-                    build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            milestones = DatabaseMilestoneRepository(session)
-            all_milestones = await milestones.get_all()
-
-        assert all_milestones == [Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED]
 
 
 @pytest.mark.usefixtures("data")

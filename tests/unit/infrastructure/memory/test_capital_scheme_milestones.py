@@ -7,76 +7,7 @@ from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReferenc
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType
-from tests.unit.infrastructure.memory.capital_scheme_milestones import (
-    MemoryCapitalSchemeMilestonesRepository,
-    MemoryMilestoneRepository,
-)
-
-
-class TestMemoryMilestoneRepository:
-    @pytest.fixture(name="milestones")
-    def milestones_fixture(self) -> MemoryMilestoneRepository:
-        return MemoryMilestoneRepository()
-
-    async def test_get_all(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all()
-
-        assert all_milestones == [
-            Milestone.PUBLIC_CONSULTATION_COMPLETED,
-            Milestone.FEASIBILITY_DESIGN_STARTED,
-            Milestone.FEASIBILITY_DESIGN_COMPLETED,
-            Milestone.PRELIMINARY_DESIGN_COMPLETED,
-            Milestone.OUTLINE_DESIGN_COMPLETED,
-            Milestone.DETAILED_DESIGN_COMPLETED,
-            Milestone.CONSTRUCTION_STARTED,
-            Milestone.CONSTRUCTION_COMPLETED,
-            Milestone.FUNDING_COMPLETED,
-            Milestone.NOT_PROGRESSED,
-            Milestone.SUPERSEDED,
-            Milestone.REMOVED,
-        ]
-
-    async def test_get_all_filters_by_is_active(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_active=True)
-
-        assert all_milestones == [
-            Milestone.PUBLIC_CONSULTATION_COMPLETED,
-            Milestone.FEASIBILITY_DESIGN_STARTED,
-            Milestone.FEASIBILITY_DESIGN_COMPLETED,
-            Milestone.PRELIMINARY_DESIGN_COMPLETED,
-            Milestone.OUTLINE_DESIGN_COMPLETED,
-            Milestone.DETAILED_DESIGN_COMPLETED,
-            Milestone.CONSTRUCTION_STARTED,
-            Milestone.CONSTRUCTION_COMPLETED,
-            Milestone.FUNDING_COMPLETED,
-        ]
-
-    async def test_get_all_filters_by_is_inactive(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_active=False)
-
-        assert all_milestones == [Milestone.NOT_PROGRESSED, Milestone.SUPERSEDED, Milestone.REMOVED]
-
-    async def test_get_all_filters_by_is_complete(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_complete=True)
-
-        assert all_milestones == [Milestone.FUNDING_COMPLETED]
-
-    async def test_get_all_filters_by_is_incomplete(self, milestones: MemoryMilestoneRepository) -> None:
-        all_milestones = await milestones.get_all(is_complete=False)
-
-        assert all_milestones == [
-            Milestone.PUBLIC_CONSULTATION_COMPLETED,
-            Milestone.FEASIBILITY_DESIGN_STARTED,
-            Milestone.FEASIBILITY_DESIGN_COMPLETED,
-            Milestone.PRELIMINARY_DESIGN_COMPLETED,
-            Milestone.OUTLINE_DESIGN_COMPLETED,
-            Milestone.DETAILED_DESIGN_COMPLETED,
-            Milestone.CONSTRUCTION_STARTED,
-            Milestone.CONSTRUCTION_COMPLETED,
-            Milestone.NOT_PROGRESSED,
-            Milestone.SUPERSEDED,
-            Milestone.REMOVED,
-        ]
+from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 
 
 class TestMemoryCapitalSchemeMilestonesRepository:

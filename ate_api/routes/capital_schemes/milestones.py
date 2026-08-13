@@ -2,7 +2,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Annotated, Self
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Path
 from pydantic import ConfigDict
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
@@ -13,12 +13,11 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestones,
     CapitalSchemeMilestonesRepository,
     Milestone,
-    MilestoneRepository,
 )
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.dates import DateTimeRange
 from ate_api.infrastructure.clock import Clock
-from ate_api.repositories import get_capital_scheme_milestones_repository, get_milestone_repository
+from ate_api.repositories import get_capital_scheme_milestones_repository
 from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.concurrency import retry_on_serialization_failure
@@ -47,27 +46,6 @@ class MilestoneModel(str, Enum):
 
     def to_domain(self) -> Milestone:
         return Milestone[self.name]
-
-
-class MilestonesModel(CollectionModel[MilestoneModel]):
-    model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [
-                {
-                    "items": [
-                        "public consultation completed",
-                        "feasibility design started",
-                        "feasibility design completed",
-                        "preliminary design completed",
-                        "outline design completed",
-                        "detailed design completed",
-                        "construction started",
-                        "construction completed",
-                    ]
-                }
-            ]
-        }
-    )
 
 
 class CapitalSchemeMilestoneModel(BaseModel):
@@ -122,20 +100,6 @@ class CapitalSchemeMilestonesModel(CollectionModel[CapitalSchemeMilestoneModel])
 
 
 router = APIRouter()
-
-
-@router.get("/milestones", summary="Get capital scheme milestones")
-async def get_milestones(
-    milestones: Annotated[MilestoneRepository, Depends(get_milestone_repository)],
-    is_active: Annotated[bool | None, Query(alias="active", examples=[True])] = None,
-    is_complete: Annotated[bool | None, Query(alias="complete", examples=[False])] = None,
-) -> MilestonesModel:
-    """
-    Gets the capital scheme milestones.
-    """
-    all_milestones = await milestones.get_all(is_active=is_active, is_complete=is_complete)
-
-    return MilestonesModel(items=[MilestoneModel.from_domain(milestone) for milestone in all_milestones])
 
 
 @router.post(

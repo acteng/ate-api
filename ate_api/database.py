@@ -187,12 +187,7 @@ def _get_output_type_measures() -> list[tuple[OutputType, OutputMeasure]]:
 
 def _create_milestones() -> list[MilestoneEntity]:
     return [
-        MilestoneEntity(
-            milestone_name=MilestoneName.from_domain(milestone),
-            stage_order=index,
-            is_active=milestone.is_active,
-            is_complete=milestone.is_complete,
-        )
+        MilestoneEntity(milestone_name=MilestoneName.from_domain(milestone), stage_order=index)
         for index, milestone in enumerate(Milestone)
     ]
 

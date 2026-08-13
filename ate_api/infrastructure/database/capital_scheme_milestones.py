@@ -12,7 +12,6 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestones,
     CapitalSchemeMilestonesRepository,
     Milestone,
-    MilestoneRepository,
 )
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
@@ -56,8 +55,6 @@ class MilestoneEntity(BaseEntity):
     milestone_id: Mapped[int] = mapped_column(primary_key=True)
     milestone_name: Mapped[MilestoneName] = mapped_column(unique=True)
     stage_order: Mapped[int] = mapped_column(unique=True)
-    is_active: Mapped[bool]
-    is_complete: Mapped[bool]
 
 
 class CapitalSchemeMilestoneEntity(BaseEntity):
@@ -108,24 +105,6 @@ class CapitalSchemeMilestoneEntity(BaseEntity):
             data_source=self.data_source.data_source_name.to_domain(),
             surrogate_id=self.capital_scheme_milestone_id,
         )
-
-
-class DatabaseMilestoneRepository(MilestoneRepository):
-    def __init__(self, session: AsyncSession):
-        self._session = session
-
-    async def get_all(self, is_active: bool | None = None, is_complete: bool | None = None) -> list[Milestone]:
-        statement = select(MilestoneEntity).order_by(MilestoneEntity.stage_order)
-
-        if is_active is not None:
-            statement = statement.where(MilestoneEntity.is_active == is_active)
-
-        if is_complete is not None:
-            statement = statement.where(MilestoneEntity.is_complete == is_complete)
-
-        result = await self._session.scalars(statement)
-        rows = result.all()
-        return [row.milestone_name.to_domain() for row in rows]
 
 
 class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepository):
