@@ -105,10 +105,6 @@ async def get_authority_bid_submitting_capital_schemes(
         list[str] | None, Query(alias="funding-programme-code", examples=["ATF3"])
     ] = None,
     status: Annotated[StatusModel | None, Query(examples=["active"])] = None,
-    current_milestones: Annotated[
-        list[MilestoneModel | Literal[""]] | None,
-        Query(alias="current-milestone", examples=["detailed design completed"]),
-    ] = None,
 ) -> CapitalSchemeItemsModel:
     """
     Gets the capital schemes submitted by an authority.
@@ -127,7 +123,6 @@ async def get_authority_bid_submitting_capital_schemes(
             [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
         ),
         status=status.to_domain() if status else None,
-        current_milestones=[_to_domain(milestone) for milestone in current_milestones] if current_milestones else None,
     )
     capital_scheme_models = [
         CapitalSchemeItemModel.from_domain(capital_scheme_item, request) for capital_scheme_item in capital_scheme_items

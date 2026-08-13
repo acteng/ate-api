@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -6,7 +6,6 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
@@ -25,14 +24,12 @@ from ate_api.infrastructure.database import (
     CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
-    CapitalSchemeMilestoneEntity,
     CapitalSchemeOverviewEntity,
     CapitalSchemeSchemeStatusEntity,
     DataSourceName,
     ImprovementEntity,
     InterventionMeasureName,
     InterventionTypeName,
-    MilestoneName,
     ObservationTypeName,
     SchemeStatusName,
     SchemeTypeName,
@@ -50,7 +47,6 @@ from tests.unit.infrastructure.database.builders import (
     build_intervention_measure_entity,
     build_intervention_type_entity,
     build_intervention_type_measure_entity,
-    build_milestone_entity,
     build_observation_type_entity,
     build_scheme_status_entity,
     build_scheme_type_entity,
@@ -1016,247 +1012,6 @@ class TestDatabaseCapitalSchemeRepository:
         assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
             CapitalSchemeReference("ATE00001")
         ]
-
-    async def test_get_items_by_bid_submitting_authority_filters_by_current_milestones(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    detailed_design_completed := build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0
-                    ),
-                    construction_started := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1
-                    ),
-                    construction_completed := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_COMPLETED, stage_order=2
-                    ),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    entities.build_capital_scheme(
-                        id_=1,
-                        reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=detailed_design_completed,
-                        status_date=date(2020, 2, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                    entities.build_capital_scheme(
-                        id_=2,
-                        reference="ATE00002",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=2,
-                        milestone=construction_started,
-                        status_date=date(2020, 3, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                    entities.build_capital_scheme(
-                        id_=3,
-                        reference="ATE00003",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=3,
-                        milestone=construction_completed,
-                        status_date=date(2020, 4, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"),
-                current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
-            )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001"),
-            CapitalSchemeReference("ATE00002"),
-        ]
-
-    async def test_get_items_by_bid_submitting_authority_filters_by_no_current_milestone(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    construction_started := build_milestone_entity(name=MilestoneName.CONSTRUCTION_STARTED),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    entities.build_capital_scheme(
-                        reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    entities.build_capital_scheme(
-                        id_=2,
-                        reference="ATE00002",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=2,
-                        milestone=construction_started,
-                        status_date=date(2020, 3, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), current_milestones=[None]
-            )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001")
-        ]
-
-    async def test_get_items_by_bid_submitting_authority_selects_actual_observation_type(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    detailed_design_completed := build_milestone_entity(name=MilestoneName.DETAILED_DESIGN_COMPLETED),
-                    planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    entities.build_capital_scheme(
-                        id_=1,
-                        reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=detailed_design_completed,
-                        status_date=date(2020, 2, 1),
-                        observation_type=planned,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED]
-            )
-
-        assert not capital_scheme_items
-
-    async def test_get_items_by_bid_submitting_authority_selects_latest_milestone(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    detailed_design_completed := build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
-                    ),
-                    construction_started := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
-                    ),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    entities.build_capital_scheme(
-                        id_=1,
-                        reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=detailed_design_completed,
-                        status_date=date(2020, 2, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=construction_started,
-                        status_date=date(2020, 2, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED]
-            )
-
-        assert not capital_scheme_items
-
-    async def test_get_items_by_bid_submitting_authority_selects_current_milestone(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    detailed_design_completed := build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0
-                    ),
-                    construction_started := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1
-                    ),
-                    actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    entities.build_capital_scheme(
-                        id_=1,
-                        reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=detailed_design_completed,
-                        status_date=date(2020, 2, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 1, 1),
-                        effective_date_to=local_datetime(2020, 2, 1),
-                    ),
-                    CapitalSchemeMilestoneEntity(
-                        capital_scheme_id=1,
-                        milestone=construction_started,
-                        status_date=date(2020, 3, 1),
-                        observation_type=actual,
-                        data_source=atf4_bid,
-                        effective_date_from=local_datetime(2020, 2, 1),
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV"), current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED]
-            )
-
-        assert not capital_scheme_items
 
     async def test_get_items_by_bid_submitting_authority_orders_by_reference(
         self, engine: AsyncEngine, entities: EntityBuilder

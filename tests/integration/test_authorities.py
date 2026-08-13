@@ -1,15 +1,9 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 
 import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
-from ate_api.domain.capital_scheme_milestones import (
-    CapitalSchemeMilestone,
-    CapitalSchemeMilestones,
-    CapitalSchemeMilestonesRepository,
-    Milestone,
-)
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
@@ -20,7 +14,6 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from ate_api.domain.improvements.overviews import ImprovementOverview
-from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.builders import build_authority, build_capital_scheme, build_capital_scheme_overview
 
 
@@ -320,211 +313,6 @@ async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_st
     response = client.get(
         "/authorities/LIV/capital-schemes/bid-submitting",
         params={"status": "foo"},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 422
-
-
-@respx.mock
-async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestone(
-    authorities: AuthorityRepository,
-    capital_schemes: CapitalSchemeRepository,
-    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
-    client: TestClient,
-    access_token: str,
-) -> None:
-    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-    milestones1.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
-        )
-    )
-    await capital_scheme_milestones.add(milestones1)
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00002"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
-    milestones2.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.CONSTRUCTION_STARTED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
-        )
-    )
-    await capital_scheme_milestones.add(milestones2)
-
-    response = client.get(
-        "/authorities/LIV/capital-schemes/bid-submitting",
-        params={"current-milestone": "detailed design completed"},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 200
-    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
-
-
-@respx.mock
-async def test_get_authority_bid_submitting_capital_schemes_filters_by_current_milestones(
-    authorities: AuthorityRepository,
-    capital_schemes: CapitalSchemeRepository,
-    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
-    client: TestClient,
-    access_token: str,
-) -> None:
-    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-    milestones1.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
-        )
-    )
-    await capital_scheme_milestones.add(milestones1)
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00002"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
-    milestones2.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.CONSTRUCTION_STARTED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
-        )
-    )
-    await capital_scheme_milestones.add(milestones2)
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00003"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
-    milestones3.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.CONSTRUCTION_COMPLETED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 4, 1),
-            data_source=DataSource.ATF4_BID,
-        )
-    )
-    await capital_scheme_milestones.add(milestones3)
-
-    response = client.get(
-        "/authorities/LIV/capital-schemes/bid-submitting",
-        params={"current-milestone": ["detailed design completed", "construction started"]},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 200
-    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001", "ATE00002"]
-
-
-@respx.mock
-async def test_get_authority_bid_submitting_capital_schemes_filters_by_no_current_milestone(
-    authorities: AuthorityRepository,
-    capital_schemes: CapitalSchemeRepository,
-    capital_scheme_milestones: CapitalSchemeMilestonesRepository,
-    client: TestClient,
-    access_token: str,
-) -> None:
-    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
-    await capital_schemes.add(
-        build_capital_scheme(
-            reference=CapitalSchemeReference("ATE00002"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
-        )
-    )
-    milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
-    milestones2.change_milestone(
-        CapitalSchemeMilestone(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            milestone=Milestone.CONSTRUCTION_STARTED,
-            observation_type=ObservationType.ACTUAL,
-            status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
-        )
-    )
-    await capital_scheme_milestones.add(milestones2)
-
-    response = client.get(
-        "/authorities/LIV/capital-schemes/bid-submitting",
-        params={"current-milestone": ""},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-
-    assert response.status_code == 200
-    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
-
-
-@respx.mock
-async def test_get_authority_bid_submitting_capital_schemes_filter_by_unknown_current_milestone(
-    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
-) -> None:
-    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
-
-    response = client.get(
-        "/authorities/LIV/capital-schemes/bid-submitting",
-        params={"current-milestone": "foo"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
 

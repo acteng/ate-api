@@ -1,5 +1,5 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository, Milestone
+from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.statuses import Status
@@ -22,7 +22,6 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         status: Status | None = None,
-        current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
         return sorted(
             [
@@ -33,7 +32,6 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                     not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
                 )
                 and (not status or capital_scheme.status.status == status)
-                and (not current_milestones or (await self._get_current_milestone(reference)) in current_milestones)
             ],
             key=lambda capital_scheme_item: str(capital_scheme_item.reference),
         )
@@ -48,8 +46,3 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
             overview=capital_scheme.overview,
             authority_review=capital_scheme.authority_review,
         )
-
-    async def _get_current_milestone(self, capital_scheme: CapitalSchemeReference) -> Milestone | None:
-        milestones = await self._capital_scheme_milestones.get(capital_scheme)
-        assert milestones
-        return milestones.current_milestone

@@ -6,7 +6,6 @@ from sqlalchemy.orm import aliased, contains_eager, joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -19,11 +18,6 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import CapitalSchemeSchemeStatusEntity, SchemeStatusEntity, SchemeStatusName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
-from ate_api.infrastructure.database.capital_scheme_milestones import (
-    CapitalSchemeMilestoneEntity,
-    MilestoneEntity,
-    MilestoneName,
-)
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
     BidStatusEntity,
@@ -169,7 +163,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         status: Status | None = None,
-        current_milestones: list[Milestone | None] | None = None,
     ) -> list[CapitalSchemeItem]:
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
         ranked_capital_scheme_authority_reviews_alias = aliased(
@@ -234,32 +227,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         if status:
             statement = statement.join(SchemeStatusEntity).where(
                 SchemeStatusEntity.scheme_status_name == SchemeStatusName.from_domain(status)
-            )
-
-        if current_milestones:
-            ranked_actual_capital_scheme_milestones = self._select_ranked_actual_capital_scheme_milestones().cte()
-            ranked_actual_capital_scheme_milestones_alias = aliased(
-                CapitalSchemeMilestoneEntity, ranked_actual_capital_scheme_milestones
-            )
-            statement = (
-                statement.outerjoin(
-                    ranked_actual_capital_scheme_milestones_alias,
-                    and_(
-                        CapitalSchemeEntity.capital_scheme_id
-                        == ranked_actual_capital_scheme_milestones_alias.capital_scheme_id,
-                        ranked_actual_capital_scheme_milestones.c.rank == 1,
-                    ),
-                )
-                .outerjoin(MilestoneEntity)
-                .where(
-                    self._optional_in(
-                        MilestoneEntity.milestone_name,
-                        [
-                            None if milestone is None else MilestoneName.from_domain(milestone)
-                            for milestone in current_milestones
-                        ],
-                    )
-                )
             )
 
         result = await self._session.execute(statement)
@@ -441,24 +408,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .where(CapitalSchemeInterventionEntity.effective_date_to.is_(None))
             .order_by(InterventionTypeEntity.intervention_type_id)
             .order_by(InterventionMeasureEntity.intervention_measure_id)
-        )
-
-    @staticmethod
-    def _select_ranked_actual_capital_scheme_milestones() -> Select[tuple[CapitalSchemeMilestoneEntity, int]]:
-        return (
-            select(
-                CapitalSchemeMilestoneEntity,
-                func.rank()
-                .over(
-                    partition_by=CapitalSchemeMilestoneEntity.capital_scheme_id,
-                    order_by=MilestoneEntity.stage_order.desc(),
-                )
-                .label("rank"),
-            )
-            .join(MilestoneEntity)
-            .join(ObservationTypeEntity)
-            .where(CapitalSchemeMilestoneEntity.effective_date_to.is_(None))
-            .where(ObservationTypeEntity.observation_type_name == ObservationTypeName.ACTUAL)
         )
 
     @staticmethod

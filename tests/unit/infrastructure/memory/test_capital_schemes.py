@@ -1,13 +1,10 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 
 import pytest
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_milestones import (
-    CapitalSchemeMilestone,
-    CapitalSchemeMilestones,
     CapitalSchemeMilestonesRepository,
-    Milestone,
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
@@ -19,7 +16,6 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
-from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_overview
 from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
@@ -249,126 +245,6 @@ class TestMemoryCapitalSchemeRepository:
 
         capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
             AuthorityAbbreviation("LIV"), status=Status.ACTIVE
-        )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001")
-        ]
-
-    async def test_get_items_by_bid_submitting_authority_filters_by_current_milestone(
-        self,
-        capital_schemes: MemoryCapitalSchemeRepository,
-        capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
-    ) -> None:
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-            )
-        )
-        milestones1 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001"))
-        milestones1.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.DETAILED_DESIGN_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_scheme_milestones.add(milestones1)
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-            )
-        )
-        milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
-        milestones2.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_scheme_milestones.add(milestones2)
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00003"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-            )
-        )
-        milestones3 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00003"))
-        milestones3.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_COMPLETED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 4, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_scheme_milestones.add(milestones3)
-
-        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"),
-            current_milestones=[Milestone.DETAILED_DESIGN_COMPLETED, Milestone.CONSTRUCTION_STARTED],
-        )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001"),
-            CapitalSchemeReference("ATE00002"),
-        ]
-
-    async def test_get_items_by_bid_submitting_authority_filters_by_no_current_milestone(
-        self,
-        capital_schemes: MemoryCapitalSchemeRepository,
-        capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository,
-    ) -> None:
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-            )
-        )
-        await capital_scheme_milestones.add(CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00001")))
-        await capital_schemes.add(
-            build_capital_scheme(
-                reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
-            )
-        )
-        milestones2 = CapitalSchemeMilestones(capital_scheme=CapitalSchemeReference("ATE00002"))
-        milestones2.change_milestone(
-            CapitalSchemeMilestone(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                milestone=Milestone.CONSTRUCTION_STARTED,
-                observation_type=ObservationType.ACTUAL,
-                status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
-            )
-        )
-        await capital_scheme_milestones.add(milestones2)
-
-        capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-            AuthorityAbbreviation("LIV"), current_milestones=[None]
         )
 
         assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
