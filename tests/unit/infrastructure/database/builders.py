@@ -116,6 +116,7 @@ def build_improvement_overview_entity(
     funding_managed_by: AuthorityEntity | None = None,
     data_source: DataSourceEntity | None = None,
     effective_date_from: datetime = dummy_local_datetime,
+    is_deleted: bool = False,
 ) -> ImprovementOverviewEntity:
     return ImprovementOverviewEntity(
         improvement_name=name,
@@ -123,6 +124,7 @@ def build_improvement_overview_entity(
         funding_managed_by=funding_managed_by or build_authority_entity(),
         data_source=data_source or build_data_source_entity(),
         effective_date_from=effective_date_from,
+        is_deleted=is_deleted,
     )
 
 

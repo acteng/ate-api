@@ -1,5 +1,7 @@
 from datetime import UTC, datetime
 
+import pytest
+
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -30,6 +32,7 @@ class TestImprovementOverviewEntity:
             and overview_entity.data_source_id == 2
             and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
+            and overview_entity.is_deleted is False
         )
 
     def test_from_domain_sets_description(self) -> None:
@@ -146,3 +149,15 @@ class TestImprovementOverviewEntity:
         assert overview.effective_date == DateTimeRange(
             datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )
+
+    def test_to_domain_when_deleted(self) -> None:
+        overview_entity = ImprovementOverviewEntity(
+            improvement_name="Wirral Package",
+            funding_managed_by=AuthorityEntity(authority_abbreviation="LIV"),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.AUTHORITY_UPDATE),
+            effective_date_from=local_datetime(2020, 1, 1),
+            is_deleted=True,
+        )
+
+        with pytest.raises(ValueError, match="Improvement overview is deleted"):
+            overview_entity.to_domain()

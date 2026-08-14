@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from typing import Self
 
-from sqlalchemy import select
+from sqlalchemy import false, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, joinedload, mapped_column, relationship
 
@@ -63,7 +63,11 @@ class DatabaseImprovementRepository(ImprovementRepository):
             contains_eager(ImprovementEntity.improvement_overviews),
             joinedload(ImprovementEntity.improvement_overviews, ImprovementOverviewEntity.funding_managed_by),
             joinedload(ImprovementEntity.improvement_overviews, ImprovementOverviewEntity.data_source),
-        ).join(ImprovementEntity.improvement_overviews.and_(ImprovementOverviewEntity.effective_date_to.is_(None)))
+        ).join(
+            ImprovementEntity.improvement_overviews.and_(ImprovementOverviewEntity.effective_date_to.is_(None)).and_(
+                ImprovementOverviewEntity.is_deleted == false()
+            )
+        )
 
         result = await self._session.scalars(statement)
         row = result.unique().one_or_none()

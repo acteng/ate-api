@@ -129,6 +129,7 @@ class TestDatabaseImprovementRepository:
                                 funding_managed_by=liv,
                                 data_source=authority_update,
                                 effective_date_from=local_datetime(2020, 1, 1),
+                                is_deleted=False,
                             )
                         ],
                     ),
@@ -140,6 +141,7 @@ class TestDatabaseImprovementRepository:
                                 funding_managed_by=liv,
                                 data_source=authority_update,
                                 effective_date_from=local_datetime(2020, 1, 1),
+                                is_deleted=False,
                             )
                         ],
                     ),
@@ -174,12 +176,14 @@ class TestDatabaseImprovementRepository:
                                 data_source=authority_update,
                                 effective_date_from=local_datetime(2020, 1, 1),
                                 effective_date_to=local_datetime(2020, 2, 1),
+                                is_deleted=False,
                             ),
                             ImprovementOverviewEntity(
                                 improvement_name="School Streets",
                                 funding_managed_by=liv,
                                 data_source=authority_update,
                                 effective_date_from=local_datetime(2020, 2, 1),
+                                is_deleted=False,
                             ),
                         ],
                     ),
@@ -200,6 +204,34 @@ class TestDatabaseImprovementRepository:
     async def test_get_when_no_overview(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(ImprovementEntity(improvement_reference="IMP00001"))
+
+        async with AsyncSession(engine) as session:
+            improvements = DatabaseImprovementRepository(session)
+            improvement = await improvements.get(ImprovementReference("IMP00001"))
+
+        assert not improvement
+
+    async def test_get_when_deleted(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            ImprovementOverviewEntity(
+                                improvement_name="Wirral Package",
+                                improvement_description='Improvement for the "Wirral Package" capital scheme created as part of funding devolution.',
+                                funding_managed_by=liv,
+                                data_source=authority_update,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                is_deleted=True,
+                            )
+                        ],
+                    ),
+                ]
+            )
 
         async with AsyncSession(engine) as session:
             improvements = DatabaseImprovementRepository(session)

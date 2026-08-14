@@ -29,6 +29,7 @@ class ImprovementOverviewEntity(BaseEntity):
     data_source: Mapped[DataSourceEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
     effective_date_to: Mapped[datetime | None]
+    is_deleted: Mapped[bool]
 
     @classmethod
     def from_domain(
@@ -44,9 +45,13 @@ class ImprovementOverviewEntity(BaseEntity):
             data_source_id=data_source_ids[overview.data_source],
             effective_date_from=zoned_to_local(overview.effective_date.from_),
             effective_date_to=zoned_to_local(overview.effective_date.to) if overview.effective_date.to else None,
+            is_deleted=False,
         )
 
     def to_domain(self) -> ImprovementOverview:
+        if self.is_deleted:
+            raise ValueError("Improvement overview is deleted")
+
         return ImprovementOverview(
             effective_date=DateTimeRange(
                 local_to_zoned(self.effective_date_from),
