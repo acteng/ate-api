@@ -183,8 +183,8 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0),
-                    build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1),
+                    build_milestone_entity(id_=1, name=MilestoneName.DETAILED_DESIGN_COMPLETED, milestone_order=0),
+                    build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED, milestone_order=1),
                     build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
                     build_data_source_entity(id_=4, name=DataSourceName.ATF4_BID),
                     CapitalSchemeEntity(scheme_reference="ATE00001"),
@@ -257,10 +257,10 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             session.add_all(
                 [
                     detailed_design_completed := build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=0
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, milestone_order=0
                     ),
                     construction_started := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=1
+                        name=MilestoneName.CONSTRUCTION_STARTED, milestone_order=1
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
@@ -318,17 +318,17 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
             ),
         ]
 
-    async def test_get_fetches_current_milestones_ordered_by_milestone_stage_order_then_observation_type(
+    async def test_get_fetches_current_milestones_ordered_by_milestone_milestone_order_then_observation_type(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     detailed_design_completed := build_milestone_entity(
-                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, stage_order=1
+                        name=MilestoneName.DETAILED_DESIGN_COMPLETED, milestone_order=1
                     ),
                     construction_started := build_milestone_entity(
-                        name=MilestoneName.CONSTRUCTION_STARTED, stage_order=2
+                        name=MilestoneName.CONSTRUCTION_STARTED, milestone_order=2
                     ),
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),

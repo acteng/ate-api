@@ -54,7 +54,7 @@ class MilestoneEntity(BaseEntity):
 
     milestone_id: Mapped[int] = mapped_column(primary_key=True)
     milestone_name: Mapped[MilestoneName] = mapped_column(unique=True)
-    stage_order: Mapped[int] = mapped_column(unique=True)
+    milestone_order: Mapped[int] = mapped_column(unique=True)
 
 
 class CapitalSchemeMilestoneEntity(BaseEntity):
@@ -149,7 +149,7 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
             .outerjoin(ObservationTypeEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
             .where(FundingProgrammeEntity.is_under_embargo == false())
-            .order_by(MilestoneEntity.stage_order)
+            .order_by(MilestoneEntity.milestone_order)
             .order_by(ObservationTypeEntity.observation_type_id)
         )
         rows = result.all()

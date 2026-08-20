@@ -157,9 +157,9 @@ def build_data_source_entity(id_: int | None = None, name: DataSourceName = Data
 def build_milestone_entity(
     id_: int | None = None,
     name: MilestoneName = MilestoneName.PUBLIC_CONSULTATION_COMPLETED,
-    stage_order: int = 0,
+    milestone_order: int = 0,
 ) -> MilestoneEntity:
-    return MilestoneEntity(milestone_id=id_, milestone_name=name, stage_order=stage_order)
+    return MilestoneEntity(milestone_id=id_, milestone_name=name, milestone_order=milestone_order)
 
 
 def build_intervention_type_measure_entity(
