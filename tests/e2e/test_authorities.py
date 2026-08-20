@@ -85,6 +85,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
+                "status": {"status": "active"},
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
             },
             {
@@ -97,6 +98,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
+                "status": {"status": "active"},
                 "authorityReview": None,
             },
         ]

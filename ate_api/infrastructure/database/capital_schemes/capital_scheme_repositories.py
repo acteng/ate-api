@@ -157,6 +157,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             select(
                 CapitalSchemeEntity.scheme_reference,
                 CapitalSchemeOverviewEntity,
+                CapitalSchemeSchemeStatusEntity,
                 ranked_capital_scheme_authority_reviews_alias,
             )
             .options(
@@ -164,6 +165,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 contains_eager(CapitalSchemeOverviewEntity.funding_programme),
                 joinedload(CapitalSchemeOverviewEntity.improvement),
                 joinedload(CapitalSchemeOverviewEntity.scheme_type),
+                joinedload(CapitalSchemeSchemeStatusEntity.scheme_status),
                 joinedload(ranked_capital_scheme_authority_reviews_alias.data_source),
             )
             # require current overview
@@ -382,6 +384,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return CapitalSchemeItem(
             reference=CapitalSchemeReference(row.scheme_reference),
             overview=row.CapitalSchemeOverviewEntity.to_domain(),
+            status=row.CapitalSchemeSchemeStatusEntity.to_domain(),
             authority_review=(
                 row.CapitalSchemeAuthorityReviewEntity.to_domain() if row.CapitalSchemeAuthorityReviewEntity else None
             ),

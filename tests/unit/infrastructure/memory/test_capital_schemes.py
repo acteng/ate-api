@@ -95,8 +95,11 @@ class TestMemoryCapitalSchemeRepository:
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
+        status1 = CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+        )
         await capital_schemes.add(
-            build_capital_scheme(reference=CapitalSchemeReference("ATE00001"), overview=overview1)
+            build_capital_scheme(reference=CapitalSchemeReference("ATE00001"), overview=overview1, status=status1)
         )
         overview2 = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
@@ -106,8 +109,11 @@ class TestMemoryCapitalSchemeRepository:
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
+        status2 = CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+        )
         await capital_schemes.add(
-            build_capital_scheme(reference=CapitalSchemeReference("ATE00002"), overview=overview2)
+            build_capital_scheme(reference=CapitalSchemeReference("ATE00002"), overview=overview2, status=status2)
         )
         await capital_schemes.add(
             build_capital_scheme(
@@ -120,14 +126,21 @@ class TestMemoryCapitalSchemeRepository:
                     improvement=ImprovementReference("IMP00002"),
                     type=CapitalSchemeType.CONSTRUCTION,
                 ),
+                status=CapitalSchemeStatus(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+                ),
             )
         )
 
         capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(AuthorityAbbreviation("LIV"))
 
         assert capital_scheme_items == [
-            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00001"), overview=overview1, authority_review=None),
-            CapitalSchemeItem(reference=CapitalSchemeReference("ATE00002"), overview=overview2, authority_review=None),
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference("ATE00001"), overview=overview1, status=status1, authority_review=None
+            ),
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference("ATE00002"), overview=overview2, status=status2, authority_review=None
+            ),
         ]
 
     async def test_get_items_by_bid_submitting_authority_fetches_authority_review(

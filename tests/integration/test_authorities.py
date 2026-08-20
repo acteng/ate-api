@@ -72,6 +72,9 @@ async def test_get_authority_bid_submitting_capital_schemes(
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         ),
+        status=CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+        ),
     )
     capital_scheme.perform_authority_review(
         CapitalSchemeAuthorityReview(
@@ -89,6 +92,9 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
             ),
         )
     )
@@ -116,6 +122,9 @@ async def test_get_authority_bid_submitting_capital_schemes(
                 improvement=ImprovementReference("IMP00002"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
         )
     )
 
@@ -136,6 +145,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
+                "status": {"status": "active"},
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
             },
             {
@@ -148,6 +158,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
                 },
+                "status": {"status": "active"},
                 "authorityReview": None,
             },
         ]

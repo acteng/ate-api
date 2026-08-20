@@ -17,7 +17,7 @@ from ate_api.routes.base import BaseModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.milestones import MilestoneModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
-from ate_api.routes.capital_schemes.statuses import StatusModel
+from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 from ate_api.routes.collections import CollectionModel
 
 router = APIRouter(prefix="/{abbreviation}/capital-schemes")
@@ -27,6 +27,7 @@ class CapitalSchemeItemModel(BaseModel):
     id: Annotated[AnyUrl, Field(alias="@id")]
     reference: str
     overview: CapitalSchemeOverviewModel
+    status: CapitalSchemeStatusModel
     authority_review: CapitalSchemeAuthorityReviewModel | None
 
     @classmethod
@@ -35,6 +36,7 @@ class CapitalSchemeItemModel(BaseModel):
             id=AnyUrl(str(request.url_for("get_capital_scheme", reference=str(capital_scheme_item.reference)))),
             reference=str(capital_scheme_item.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme_item.overview, request),
+            status=CapitalSchemeStatusModel.from_domain(capital_scheme_item.status),
             authority_review=(
                 CapitalSchemeAuthorityReviewModel.from_domain(capital_scheme_item.authority_review)
                 if capital_scheme_item.authority_review
@@ -59,6 +61,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                                 "type": "construction",
                             },
+                            "status": {"status": "active"},
                             "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
                         },
                         {
@@ -71,6 +74,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                                 "type": "construction",
                             },
+                            "status": {"status": "active"},
                             "authorityReview": {"reviewDate": "2020-02-02T00:00:00Z", "source": "authority update"},
                         },
                         {
@@ -83,6 +87,7 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                                 "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                                 "type": "construction",
                             },
+                            "status": {"status": "active"},
                             "authorityReview": {"reviewDate": "2020-02-03T00:00:00Z", "source": "authority update"},
                         },
                     ]

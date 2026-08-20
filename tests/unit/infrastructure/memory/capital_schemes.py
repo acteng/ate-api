@@ -44,5 +44,6 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         return CapitalSchemeItem(
             reference=capital_scheme.reference,
             overview=capital_scheme.overview,
+            status=capital_scheme.status,
             authority_review=capital_scheme.authority_review,
         )

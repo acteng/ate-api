@@ -8,6 +8,7 @@ from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthor
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -15,8 +16,13 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.authorities.capital_schemes import CapitalSchemeItemModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
+from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 from ate_api.routes.data_sources import DataSourceModel
-from tests.unit.domain.builders import build_capital_scheme_overview, build_capital_scheme_reference
+from tests.unit.domain.builders import (
+    build_capital_scheme_overview,
+    build_capital_scheme_reference,
+    build_capital_scheme_status,
+)
 
 
 class TestCapitalSchemeItemModel:
@@ -30,6 +36,9 @@ class TestCapitalSchemeItemModel:
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
             ),
             authority_review=None,
         )
@@ -46,6 +55,7 @@ class TestCapitalSchemeItemModel:
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
+            status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             authority_review=None,
         )
 
@@ -53,6 +63,7 @@ class TestCapitalSchemeItemModel:
         capital_scheme_item = CapitalSchemeItem(
             reference=build_capital_scheme_reference(),
             overview=build_capital_scheme_overview(),
+            status=build_capital_scheme_status(),
             authority_review=CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
             ),
