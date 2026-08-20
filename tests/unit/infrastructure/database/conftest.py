@@ -54,7 +54,6 @@ async def _delete_all(engine: AsyncEngine) -> None:
         await connection.execute(text("""
             TRUNCATE
                 authority.authority,
-                capital_scheme.bid_status,
                 capital_scheme.capital_scheme,
                 capital_scheme.intervention_measure,
                 capital_scheme.intervention_type,

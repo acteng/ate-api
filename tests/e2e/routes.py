@@ -17,7 +17,6 @@ from ate_api.infrastructure.clock import Clock
 from ate_api.infrastructure.database import (
     AuthorityEntity,
     CapitalSchemeAuthorityReviewEntity,
-    CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeFinancialEntity,
     CapitalSchemeInterventionEntity,
@@ -137,7 +136,6 @@ async def delete_capital_schemes(
 ) -> Response:
     async with unit_of_work:
         await session.execute(delete(CapitalSchemeOverviewEntity))
-        await session.execute(delete(CapitalSchemeBidStatusEntity))
         await session.execute(delete(CapitalSchemeSchemeStatusEntity))
         await session.execute(delete(CapitalSchemeFinancialEntity))
         await session.execute(delete(CapitalSchemeMilestoneEntity))

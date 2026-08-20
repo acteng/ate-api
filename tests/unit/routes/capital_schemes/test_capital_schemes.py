@@ -8,7 +8,6 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancial, CapitalSchemeFinancials
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestone, CapitalSchemeMilestones, Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -21,7 +20,6 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
-from ate_api.routes.capital_schemes.bid_statuses import BidStatusModel, CapitalSchemeBidStatusDetailsModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
 from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialModel, CapitalSchemeFinancialsModel
 from ate_api.routes.capital_schemes.milestones import (
@@ -38,7 +36,6 @@ from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_reference
 from tests.unit.routes.builders import (
-    build_capital_scheme_bid_status_details_model,
     build_capital_scheme_overview_model,
     build_capital_scheme_status_model,
 )
@@ -55,9 +52,6 @@ class TestCapitalSchemeModel:
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
             ),
             status=CapitalSchemeStatus(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
@@ -78,7 +72,6 @@ class TestCapitalSchemeModel:
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(current_milestone=None, items=[]),
@@ -231,7 +224,6 @@ class TestCapitalSchemeModel:
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
                 type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetailsModel(bid_status=BidStatusModel.FUNDED),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),
@@ -252,10 +244,6 @@ class TestCapitalSchemeModel:
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             )
-            and capital_scheme.bid_status_details
-            == CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
-            )
             and capital_scheme.status
             == CapitalSchemeStatus(effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE)
             and not capital_scheme.authority_review
@@ -265,7 +253,6 @@ class TestCapitalSchemeModel:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
             overview=build_capital_scheme_overview_model(base_url),
-            bid_status_details=build_capital_scheme_bid_status_details_model(),
             status=build_capital_scheme_status_model(),
             financials=CapitalSchemeFinancialsModel(items=[]),
             milestones=CapitalSchemeMilestonesModel(items=[]),

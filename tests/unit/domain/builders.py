@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
@@ -24,13 +23,11 @@ def build_authority_abbreviation(abbreviation: str = "dummy") -> AuthorityAbbrev
 def build_capital_scheme(
     reference: CapitalSchemeReference | None = None,
     overview: CapitalSchemeOverview | None = None,
-    bid_status_details: CapitalSchemeBidStatusDetails | None = None,
     status: CapitalSchemeStatus | None = None,
 ) -> CapitalScheme:
     return CapitalScheme(
         reference=reference or build_capital_scheme_reference(),
         overview=overview or build_capital_scheme_overview(),
-        bid_status_details=bid_status_details or build_capital_scheme_bid_status_details(),
         status=status or build_capital_scheme_status(),
     )
 
@@ -54,14 +51,6 @@ def build_capital_scheme_overview(
         funding_programme=funding_programme or build_funding_programme_code(),
         improvement=improvement,
         type=type_,
-    )
-
-
-def build_capital_scheme_bid_status_details(
-    effective_date: DateTimeRange | None = None, bid_status: BidStatus = BidStatus.SUBMITTED
-) -> CapitalSchemeBidStatusDetails:
-    return CapitalSchemeBidStatusDetails(
-        effective_date=effective_date or build_date_time_range(), bid_status=bid_status
     )
 
 

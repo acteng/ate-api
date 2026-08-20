@@ -4,7 +4,6 @@ from typing import Self
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
@@ -15,7 +14,6 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
-from ate_api.infrastructure.database.capital_schemes.bid_statuses import CapitalSchemeBidStatusEntity
 from ate_api.infrastructure.database.capital_schemes.interventions import CapitalSchemeInterventionEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.capital_schemes.statuses import CapitalSchemeSchemeStatusEntity
@@ -28,7 +26,6 @@ class CapitalSchemeEntity(BaseEntity):
     capital_scheme_id: Mapped[int] = mapped_column(primary_key=True)
     scheme_reference: Mapped[str] = mapped_column(unique=True)
     capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
-    capital_scheme_bid_statuses: Mapped[list[CapitalSchemeBidStatusEntity]] = relationship(lazy="raise")
     capital_scheme_scheme_statuses: Mapped[list[CapitalSchemeSchemeStatusEntity]] = relationship(lazy="raise")
     capital_scheme_interventions: Mapped[list[CapitalSchemeInterventionEntity]] = relationship(lazy="raise")
     capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
@@ -41,7 +38,6 @@ class CapitalSchemeEntity(BaseEntity):
         funding_programme_ids: dict[FundingProgrammeCode, int],
         improvement_ids: dict[ImprovementReference, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
-        bid_status_ids: dict[BidStatus, int],
         scheme_status_ids: dict[Status, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
         observation_type_ids: dict[ObservationType, int],
@@ -53,9 +49,6 @@ class CapitalSchemeEntity(BaseEntity):
                 CapitalSchemeOverviewEntity.from_domain(
                     capital_scheme.overview, authority_ids, funding_programme_ids, improvement_ids, scheme_type_ids
                 )
-            ],
-            capital_scheme_bid_statuses=[
-                CapitalSchemeBidStatusEntity.from_domain(capital_scheme.bid_status_details, bid_status_ids)
             ],
             capital_scheme_scheme_statuses=[
                 CapitalSchemeSchemeStatusEntity.from_domain(capital_scheme.status, scheme_status_ids)
@@ -73,12 +66,10 @@ class CapitalSchemeEntity(BaseEntity):
 
     def to_domain(self) -> CapitalScheme:
         (capital_scheme_overview,) = self.capital_scheme_overviews
-        (capital_scheme_bid_status,) = self.capital_scheme_bid_statuses
         (capital_scheme_scheme_status,) = self.capital_scheme_scheme_statuses
         capital_scheme = CapitalScheme(
             reference=CapitalSchemeReference(self.scheme_reference),
             overview=capital_scheme_overview.to_domain(),
-            bid_status_details=capital_scheme_bid_status.to_domain(),
             status=capital_scheme_scheme_status.to_domain(),
         )
 

@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engin
 from sqlalchemy.sql.ddl import CreateSchema
 
 from ate_api.domain.capital_scheme_milestones import Milestone
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.capital_schemes.statuses import Status
@@ -17,8 +16,6 @@ from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     BaseEntity,
-    BidStatusEntity,
-    BidStatusName,
     DataSourceEntity,
     DataSourceName,
     FinancialTypeEntity,
@@ -89,7 +86,6 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
         session.add_all(_create_financial_types())
         session.add_all(_create_observation_types())
         # capital_scheme
-        session.add_all(_create_bid_statuses())
         session.add_all(_create_scheme_statuses())
         intervention_types = _create_intervention_types()
         session.add_all(intervention_types.values())
@@ -117,10 +113,6 @@ def _create_observation_types() -> list[ObservationTypeEntity]:
         ObservationTypeEntity(observation_type_name=ObservationTypeName.from_domain(observation_type))
         for observation_type in ObservationType
     ]
-
-
-def _create_bid_statuses() -> list[BidStatusEntity]:
-    return [BidStatusEntity(bid_status_name=BidStatusName.from_domain(bid_status)) for bid_status in BidStatus]
 
 
 def _create_scheme_statuses() -> list[SchemeStatusEntity]:

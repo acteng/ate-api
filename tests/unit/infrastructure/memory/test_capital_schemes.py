@@ -7,7 +7,6 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestonesRepository,
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -41,20 +40,12 @@ class TestMemoryCapitalSchemeRepository:
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
-        bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
-        )
         status = CapitalSchemeStatus(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
         )
 
         await capital_schemes.add(
-            CapitalScheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=overview,
-                bid_status_details=bid_status_details,
-                status=status,
-            )
+            CapitalScheme(reference=CapitalSchemeReference("ATE00001"), overview=overview, status=status)
         )
 
         capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
@@ -62,7 +53,6 @@ class TestMemoryCapitalSchemeRepository:
             capital_scheme
             and capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
-            and capital_scheme.bid_status_details == bid_status_details
             and capital_scheme.status == status
         )
 
@@ -75,19 +65,11 @@ class TestMemoryCapitalSchemeRepository:
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
         )
-        bid_status_details = CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
-        )
         status = CapitalSchemeStatus(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
         )
         await capital_schemes.add(
-            CapitalScheme(
-                reference=CapitalSchemeReference("ATE00001"),
-                overview=overview,
-                bid_status_details=bid_status_details,
-                status=status,
-            )
+            CapitalScheme(reference=CapitalSchemeReference("ATE00001"), overview=overview, status=status)
         )
 
         capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
@@ -96,7 +78,6 @@ class TestMemoryCapitalSchemeRepository:
             capital_scheme
             and capital_scheme.reference == CapitalSchemeReference("ATE00001")
             and capital_scheme.overview == overview
-            and capital_scheme.bid_status_details == bid_status_details
             and capital_scheme.status == status
         )
 

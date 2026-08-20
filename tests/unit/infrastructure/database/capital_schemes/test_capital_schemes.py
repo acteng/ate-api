@@ -3,7 +3,6 @@ from decimal import Decimal
 
 from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus, CapitalSchemeBidStatusDetails
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
@@ -15,10 +14,7 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
     AuthorityEntity,
-    BidStatusEntity,
-    BidStatusName,
     CapitalSchemeAuthorityReviewEntity,
-    CapitalSchemeBidStatusEntity,
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
     CapitalSchemeOverviewEntity,
@@ -56,9 +52,6 @@ class TestCapitalSchemeEntity:
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
             ),
-            bid_status_details=CapitalSchemeBidStatusDetails(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
-            ),
             status=CapitalSchemeStatus(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
             ),
@@ -70,8 +63,7 @@ class TestCapitalSchemeEntity:
             {FundingProgrammeCode("ATF3"): 2},
             {ImprovementReference("IMP00001"): 3},
             {CapitalSchemeType.CONSTRUCTION: 4},
-            {BidStatus.FUNDED: 5},
-            {Status.ACTIVE: 6},
+            {Status.ACTIVE: 5},
             {},
             {},
             {},
@@ -88,15 +80,9 @@ class TestCapitalSchemeEntity:
             and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
-        (bid_status_entity,) = capital_scheme_entity.capital_scheme_bid_statuses
-        assert (
-            bid_status_entity.bid_status_id == 5
-            and bid_status_entity.effective_date_from == local_datetime(2020, 2, 1)
-            and not bid_status_entity.effective_date_to
-        )
         (scheme_status_entity,) = capital_scheme_entity.capital_scheme_scheme_statuses
         assert (
-            scheme_status_entity.scheme_status_id == 6
+            scheme_status_entity.scheme_status_id == 5
             and scheme_status_entity.effective_date_from == local_datetime(2020, 3, 1)
             and not scheme_status_entity.effective_date_to
         )
@@ -129,7 +115,6 @@ class TestCapitalSchemeEntity:
             {build_funding_programme_code(): 0},
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
-            {BidStatus.SUBMITTED: 0},
             {Status.PIPELINE: 0},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
@@ -169,7 +154,6 @@ class TestCapitalSchemeEntity:
             {build_funding_programme_code(): 0},
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
-            {BidStatus.SUBMITTED: 0},
             {Status.PIPELINE: 0},
             {},
             {},
@@ -198,12 +182,6 @@ class TestCapitalSchemeEntity:
                     effective_date_from=local_datetime(2020, 1, 1),
                 )
             ],
-            capital_scheme_bid_statuses=[
-                CapitalSchemeBidStatusEntity(
-                    bid_status=BidStatusEntity(bid_status_name=BidStatusName.FUNDED),
-                    effective_date_from=local_datetime(2020, 2, 1),
-                )
-            ],
             capital_scheme_scheme_statuses=[
                 CapitalSchemeSchemeStatusEntity(
                     scheme_status=SchemeStatusEntity(scheme_status_name=SchemeStatusName.ACTIVE),
@@ -222,9 +200,6 @@ class TestCapitalSchemeEntity:
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
-        )
-        assert capital_scheme.bid_status_details == CapitalSchemeBidStatusDetails(
-            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), bid_status=BidStatus.FUNDED
         )
         assert capital_scheme.status == CapitalSchemeStatus(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE

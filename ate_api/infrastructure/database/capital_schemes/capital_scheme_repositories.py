@@ -6,7 +6,6 @@ from sqlalchemy.orm import aliased, contains_eager, joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_schemes.bid_statuses import BidStatus
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
@@ -19,11 +18,6 @@ from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import CapitalSchemeSchemeStatusEntity, SchemeStatusEntity, SchemeStatusName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
-from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
-    BidStatusEntity,
-    BidStatusName,
-    CapitalSchemeBidStatusEntity,
-)
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
 from ate_api.infrastructure.database.capital_schemes.interventions import (
     CapitalSchemeInterventionEntity,
@@ -53,7 +47,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         improvement_ids = await self._get_improvement_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
-        bid_status_ids = await self._get_bid_status_ids(capital_scheme)
         scheme_status_ids = await self._get_scheme_status_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
@@ -66,7 +59,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 funding_programme_ids,
                 improvement_ids,
                 scheme_type_ids,
-                bid_status_ids,
                 scheme_status_ids,
                 intervention_type_measure_ids,
                 observation_type_ids,
@@ -97,16 +89,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
             .join(FundingProgrammeEntity)
             .where(FundingProgrammeEntity.is_under_embargo == false())
-        )
-
-        # fetch current bid status
-        statement = statement.options(
-            contains_eager(CapitalSchemeEntity.capital_scheme_bid_statuses),
-            joinedload(CapitalSchemeEntity.capital_scheme_bid_statuses, CapitalSchemeBidStatusEntity.bid_status),
-        ).join(
-            CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
-                CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
-            )
         )
 
         # fetch current scheme status
@@ -188,12 +170,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(
                 CapitalSchemeEntity.capital_scheme_overviews.and_(
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
-                )
-            )
-            # require current bid status
-            .join(
-                CapitalSchemeEntity.capital_scheme_bid_statuses.and_(
-                    CapitalSchemeBidStatusEntity.effective_date_to.is_(None)
                 )
             )
             # require current scheme status
@@ -296,15 +272,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {row.scheme_type_name.to_domain(): row.scheme_type_id for row in rows}
-
-    async def _get_bid_status_ids(self, capital_scheme: CapitalScheme) -> dict[BidStatus, int]:
-        bid_status_name = BidStatusName.from_domain(capital_scheme.bid_status_details.bid_status)
-        rows = await self._session.execute(
-            select(BidStatusEntity.bid_status_name, BidStatusEntity.bid_status_id).where(
-                BidStatusEntity.bid_status_name == bid_status_name
-            )
-        )
-        return {row.bid_status_name.to_domain(): row.bid_status_id for row in rows}
 
     async def _get_scheme_status_ids(self, capital_scheme: CapitalScheme) -> dict[Status, int]:
         scheme_status_name = SchemeStatusName.from_domain(capital_scheme.status.status)

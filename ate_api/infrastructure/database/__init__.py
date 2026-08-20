@@ -11,11 +11,6 @@ from ate_api.infrastructure.database.capital_scheme_milestones import MilestoneN
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import (
     CapitalSchemeAuthorityReviewEntity as CapitalSchemeAuthorityReviewEntity,
 )
-from ate_api.infrastructure.database.capital_schemes.bid_statuses import BidStatusEntity as BidStatusEntity
-from ate_api.infrastructure.database.capital_schemes.bid_statuses import BidStatusName as BidStatusName
-from ate_api.infrastructure.database.capital_schemes.bid_statuses import (
-    CapitalSchemeBidStatusEntity as CapitalSchemeBidStatusEntity,
-)
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity as CapitalSchemeEntity
 from ate_api.infrastructure.database.capital_schemes.interventions import (
     CapitalSchemeInterventionEntity as CapitalSchemeInterventionEntity,
