@@ -70,25 +70,16 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         statement = select(CapitalSchemeEntity).where(CapitalSchemeEntity.scheme_reference == str(reference))
 
         # fetch current overview
-        statement = (
-            statement.options(
-                contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-                joinedload(
-                    CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
-                ),
-                contains_eager(
-                    CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
-                ),
-                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
-                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
-            )
-            .join(
-                CapitalSchemeEntity.capital_scheme_overviews.and_(
-                    CapitalSchemeOverviewEntity.effective_date_to.is_(None)
-                )
-            )
-            .join(FundingProgrammeEntity)
-            .where(FundingProgrammeEntity.is_under_embargo == false())
+        statement = statement.options(
+            contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
+            ),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
+        ).join(
+            CapitalSchemeEntity.capital_scheme_overviews.and_(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
         )
 
         # fetch current scheme status
@@ -162,7 +153,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
             .options(
                 joinedload(CapitalSchemeOverviewEntity.bid_submitting_authority),
-                contains_eager(CapitalSchemeOverviewEntity.funding_programme),
+                joinedload(CapitalSchemeOverviewEntity.funding_programme),
                 joinedload(CapitalSchemeOverviewEntity.improvement),
                 joinedload(CapitalSchemeOverviewEntity.scheme_type),
                 joinedload(CapitalSchemeSchemeStatusEntity.scheme_status),
@@ -183,7 +174,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             .join(
                 AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
             )
-            .join(FundingProgrammeEntity)
             .outerjoin(
                 ranked_capital_scheme_authority_reviews_alias,
                 and_(
@@ -193,12 +183,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 ),
             )
             .where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
-            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(CapitalSchemeEntity.scheme_reference)
         )
 
         if funding_programme_codes:
-            statement = statement.where(
+            statement = statement.join(FundingProgrammeEntity).where(
                 FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
             )
 

@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Self
 
-from sqlalchemy import ForeignKey, and_, false, select
+from sqlalchemy import ForeignKey, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, joinedload, mapped_column, relationship
 
@@ -22,7 +22,6 @@ from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSch
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.financial_types import FinancialTypeEntity, FinancialTypeName
-from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 
 
 class CapitalSchemeFinancialEntity(BaseEntity):
@@ -96,7 +95,6 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
                 )
             )
-            .join(FundingProgrammeEntity)
             .outerjoin(
                 CapitalSchemeFinancialEntity,
                 and_(
@@ -106,7 +104,6 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
             )
             .outerjoin(FinancialTypeEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
-            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(FinancialTypeEntity.financial_type_id)
             .order_by(CapitalSchemeFinancialEntity.effective_date_from)
         )

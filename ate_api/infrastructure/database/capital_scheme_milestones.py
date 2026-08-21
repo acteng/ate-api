@@ -3,7 +3,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Self
 
-from sqlalchemy import ForeignKey, and_, false, select
+from sqlalchemy import ForeignKey, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, contains_eager, joinedload, mapped_column, relationship
 
@@ -22,7 +22,6 @@ from ate_api.infrastructure.database.capital_schemes.capital_schemes import Capi
 from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
-from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
 
@@ -137,7 +136,6 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
                     CapitalSchemeOverviewEntity.effective_date_to.is_(None)
                 )
             )
-            .join(FundingProgrammeEntity)
             .outerjoin(
                 CapitalSchemeMilestoneEntity,
                 and_(
@@ -148,7 +146,6 @@ class DatabaseCapitalSchemeMilestonesRepository(CapitalSchemeMilestonesRepositor
             .outerjoin(MilestoneEntity)
             .outerjoin(ObservationTypeEntity)
             .where(CapitalSchemeEntity.scheme_reference == str(capital_scheme))
-            .where(FundingProgrammeEntity.is_under_embargo == false())
             .order_by(MilestoneEntity.milestone_order)
             .order_by(ObservationTypeEntity.observation_type_id)
         )

@@ -24,7 +24,6 @@ from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_data_source_entity,
     build_financial_type_entity,
-    build_funding_programme_entity,
 )
 
 
@@ -318,24 +317,6 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 data_source=DataSource.ATF4_BID,
             ),
         ]
-
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[entities.build_capital_scheme_overview(funding_programme=atf3)],
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
-            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
-
-        assert not financials
 
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:

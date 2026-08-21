@@ -554,23 +554,6 @@ class TestDatabaseCapitalSchemeRepository:
             review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
 
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    entities.build_capital_scheme(
-                        reference="ATE00001", overviews=[entities.build_capital_scheme_overview(funding_programme=atf3)]
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme = await capital_schemes.get(CapitalSchemeReference("ATE00001"))
-
-        assert not capital_scheme
-
     async def test_get_when_no_overview(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add(entities.build_capital_scheme(reference="ATE00001", overviews=[]))
@@ -876,40 +859,6 @@ class TestDatabaseCapitalSchemeRepository:
             CapitalSchemeAuthorityReview(
                 review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
             )
-        ]
-
-    async def test_get_items_by_bid_submitting_authority_filters_under_embargo(
-        self, engine: AsyncEngine, entities: EntityBuilder
-    ) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=False),
-                    atf4 := build_funding_programme_entity(code="ATF4", is_under_embargo=True),
-                    entities.build_capital_scheme(
-                        reference="ATE00001",
-                        overviews=[
-                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, funding_programme=atf3)
-                        ],
-                    ),
-                    entities.build_capital_scheme(
-                        reference="ATE00002",
-                        overviews=[
-                            entities.build_capital_scheme_overview(bid_submitting_authority=liv, funding_programme=atf4)
-                        ],
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_schemes = DatabaseCapitalSchemeRepository(session)
-            capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-                AuthorityAbbreviation("LIV")
-            )
-
-        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
-            CapitalSchemeReference("ATE00001")
         ]
 
     async def test_get_items_by_bid_submitting_authority_filters_by_funding_programme(

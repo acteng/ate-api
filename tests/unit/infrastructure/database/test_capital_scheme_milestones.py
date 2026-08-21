@@ -24,7 +24,6 @@ from tests.unit.dates import local_datetime
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_data_source_entity,
-    build_funding_programme_entity,
     build_milestone_entity,
     build_observation_type_entity,
 )
@@ -392,24 +391,6 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                 data_source=DataSource.ATF4_BID,
             ),
         ]
-
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    atf3 := build_funding_programme_entity(code="ATF3", is_under_embargo=True),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[entities.build_capital_scheme_overview(funding_programme=atf3)],
-                    ),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
-            milestones = await capital_scheme_milestones.get(CapitalSchemeReference("ATE00001"))
-
-        assert not milestones
 
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:

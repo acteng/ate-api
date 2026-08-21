@@ -16,13 +16,12 @@ class TestFundingProgrammeEntity:
 
         assert (
             funding_programme_entity.funding_programme_code == "ATF3"
-            and not funding_programme_entity.is_under_embargo
             and funding_programme_entity.is_eligible_for_authority_update
         )
 
     def test_to_domain(self) -> None:
         funding_programme_entity = FundingProgrammeEntity(
-            funding_programme_code="ATF3", is_under_embargo=False, is_eligible_for_authority_update=True
+            funding_programme_code="ATF3", is_eligible_for_authority_update=True
         )
 
         funding_programme = funding_programme_entity.to_domain()
@@ -66,16 +65,6 @@ class TestDatabaseFundingProgrammeRepository:
             and funding_programme.is_eligible_for_authority_update
         )
 
-    async def test_get_filters_under_embargo(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add(build_funding_programme_entity(code="ATF3", is_under_embargo=True))
-
-        async with AsyncSession(engine) as session:
-            funding_programmes = DatabaseFundingProgrammeRepository(session)
-            funding_programme = await funding_programmes.get(FundingProgrammeCode("ATF3"))
-
-        assert not funding_programme
-
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -104,21 +93,6 @@ class TestDatabaseFundingProgrammeRepository:
             funding_programme2.code == FundingProgrammeCode("ATF4")
             and funding_programme2.is_eligible_for_authority_update
         )
-
-    async def test_get_all_filters_under_embargo(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    build_funding_programme_entity(code="ATF3", is_under_embargo=False),
-                    build_funding_programme_entity(code="ATF4", is_under_embargo=True),
-                ]
-            )
-
-        async with AsyncSession(engine) as session:
-            funding_programmes = DatabaseFundingProgrammeRepository(session)
-            (funding_programme1,) = await funding_programmes.get_all()
-
-        assert funding_programme1.code == FundingProgrammeCode("ATF3")
 
     @pytest.mark.parametrize("is_eligible_for_authority_update, expected_code", [(True, "ATF3"), (False, "ATF4")])
     async def test_get_all_filters_by_is_eligible_for_authority_update(
@@ -168,16 +142,6 @@ class TestDatabaseFundingProgrammeRepository:
 
         assert exists
 
-    async def test_exists_filters_under_embargo(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add(build_funding_programme_entity(code="ATF3", is_under_embargo=True))
-
-        async with AsyncSession(engine) as session:
-            funding_programmes = DatabaseFundingProgrammeRepository(session)
-            exists = await funding_programmes.exists(FundingProgrammeCode("ATF3"))
-
-        assert not exists
-
     async def test_exists_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:
             funding_programmes = DatabaseFundingProgrammeRepository(session)
@@ -194,16 +158,6 @@ class TestDatabaseFundingProgrammeRepository:
             exists = await funding_programmes.exists_all([FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")])
 
         assert exists
-
-    async def test_exists_all_filters_under_embargo(self, engine: AsyncEngine) -> None:
-        async with AsyncSession(engine) as session, session.begin():
-            session.add(build_funding_programme_entity(code="ATF3", is_under_embargo=True))
-
-        async with AsyncSession(engine) as session:
-            funding_programmes = DatabaseFundingProgrammeRepository(session)
-            exists = await funding_programmes.exists_all([FundingProgrammeCode("ATF3")])
-
-        assert not exists
 
     async def test_exists_all_when_some_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session, session.begin():
