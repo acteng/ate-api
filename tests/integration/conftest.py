@@ -88,8 +88,8 @@ def improvements_fixture() -> ImprovementRepository:
 
 
 @pytest.fixture(name="capital_schemes")
-def capital_schemes_fixture(capital_scheme_milestones: CapitalSchemeMilestonesRepository) -> CapitalSchemeRepository:
-    return MemoryCapitalSchemeRepository(capital_scheme_milestones)
+def capital_schemes_fixture() -> CapitalSchemeRepository:
+    return MemoryCapitalSchemeRepository()
 
 
 @pytest.fixture(name="capital_scheme_financials")

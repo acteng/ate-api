@@ -1,5 +1,4 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.statuses import Status
@@ -7,8 +6,7 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 
 
 class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
-    def __init__(self, capital_scheme_milestones: CapitalSchemeMilestonesRepository) -> None:
-        self._capital_scheme_milestones = capital_scheme_milestones
+    def __init__(self) -> None:
         self._capital_schemes: dict[CapitalSchemeReference, CapitalScheme] = {}
 
     async def add(self, capital_scheme: CapitalScheme) -> None:
@@ -26,7 +24,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         return sorted(
             [
                 self._to_item(capital_scheme)
-                for reference, capital_scheme in self._capital_schemes.items()
+                for capital_scheme in self._capital_schemes.values()
                 if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
                 and (
                     not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes

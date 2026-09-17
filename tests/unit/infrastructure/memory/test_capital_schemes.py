@@ -3,9 +3,6 @@ from datetime import UTC, datetime
 import pytest
 
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_scheme_milestones import (
-    CapitalSchemeMilestonesRepository,
-)
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -16,20 +13,13 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_overview
-from tests.unit.infrastructure.memory.capital_scheme_milestones import MemoryCapitalSchemeMilestonesRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 
 
 class TestMemoryCapitalSchemeRepository:
-    @pytest.fixture(name="capital_scheme_milestones")
-    def capital_scheme_milestones_fixture(self) -> CapitalSchemeMilestonesRepository:
-        return MemoryCapitalSchemeMilestonesRepository()
-
     @pytest.fixture(name="capital_schemes")
-    def capital_schemes_fixture(
-        self, capital_scheme_milestones: MemoryCapitalSchemeMilestonesRepository
-    ) -> MemoryCapitalSchemeRepository:
-        return MemoryCapitalSchemeRepository(capital_scheme_milestones)
+    def capital_schemes_fixture(self) -> MemoryCapitalSchemeRepository:
+        return MemoryCapitalSchemeRepository()
 
     async def test_add(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         overview = CapitalSchemeOverview(
