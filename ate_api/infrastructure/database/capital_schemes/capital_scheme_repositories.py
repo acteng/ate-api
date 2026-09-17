@@ -37,6 +37,7 @@ from ate_api.infrastructure.database.capital_schemes.statuses import (
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity
+from ate_api.infrastructure.database.improvements.overviews import ImprovementOverviewEntity
 from ate_api.infrastructure.database.observation_types import ObservationTypeEntity, ObservationTypeName
 
 
@@ -210,6 +211,60 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         result = await self._session.execute(statement)
         rows = result.unique().all()
         return [self._to_item(row.CapitalSchemeEntity) for row in rows]
+
+    async def get_items_by_funding_managed_by(
+        self, authority_abbreviation: AuthorityAbbreviation
+    ) -> list[CapitalSchemeItem]:
+        statement = select(CapitalSchemeEntity)
+
+        # fetch current overview
+        statement = statement.options(
+            contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
+            ),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
+            # forward reference to authority filter join
+            contains_eager(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
+        ).join(
+            CapitalSchemeEntity.capital_scheme_overviews.and_(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
+        )
+
+        # filter by authority
+        statement = (
+            statement.join(ImprovementEntity)
+            .join(ImprovementOverviewEntity)
+            .join(AuthorityEntity)
+            .where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
+        )
+
+        # fetch scheme status
+        # TODO: fetch current
+        statement = statement.options(
+            joinedload(CapitalSchemeEntity.capital_scheme_scheme_statuses),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
+            ),
+        )
+
+        # TODO: fetch latest authority review
+
+        # TODO: replace with _to_item when latest authority review fetched
+        def to_item(capital_scheme: CapitalSchemeEntity) -> CapitalSchemeItem:
+            (capital_scheme_overview,) = capital_scheme.capital_scheme_overviews
+            (capital_scheme_scheme_status,) = capital_scheme.capital_scheme_scheme_statuses
+
+            return CapitalSchemeItem(
+                reference=CapitalSchemeReference(capital_scheme.scheme_reference),
+                overview=capital_scheme_overview.to_domain(),
+                status=capital_scheme_scheme_status.to_domain(),
+                authority_review=None,
+            )
+
+        result = await self._session.execute(statement)
+        rows = result.unique().all()
+        return [to_item(row.CapitalSchemeEntity) for row in rows]
 
     async def update(self, capital_scheme: CapitalScheme) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(capital_scheme)

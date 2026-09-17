@@ -3,10 +3,12 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.funding_programmes import FundingProgrammeCode
+from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 
 
 class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
-    def __init__(self) -> None:
+    def __init__(self, improvements: ImprovementRepository) -> None:
+        self._improvements = improvements
         self._capital_schemes: dict[CapitalSchemeReference, CapitalScheme] = {}
 
     async def add(self, capital_scheme: CapitalScheme) -> None:
@@ -34,6 +36,19 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
             key=lambda capital_scheme_item: str(capital_scheme_item.reference),
         )
 
+    async def get_items_by_funding_managed_by(
+        self, authority_abbreviation: AuthorityAbbreviation
+    ) -> list[CapitalSchemeItem]:
+        return sorted(
+            [
+                self._to_item(capital_scheme)
+                for capital_scheme in self._capital_schemes.values()
+                if (await self._get_improvement(capital_scheme.overview.improvement)).overview.funding_managed_by
+                == authority_abbreviation
+            ],
+            key=lambda capital_scheme_item: str(capital_scheme_item.reference),
+        )
+
     async def update(self, capital_scheme: CapitalScheme) -> None:
         self._capital_schemes[capital_scheme.reference] = capital_scheme
 
@@ -45,3 +60,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
             status=capital_scheme.status,
             authority_review=capital_scheme.authority_review,
         )
+
+    async def _get_improvement(self, improvement_reference: ImprovementReference | None) -> Improvement:
+        assert improvement_reference
+        improvement = await self._improvements.get(improvement_reference)
+        assert improvement
+        return improvement
