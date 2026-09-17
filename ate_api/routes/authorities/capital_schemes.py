@@ -135,6 +135,30 @@ async def get_authority_bid_submitting_capital_schemes(
     return CapitalSchemeItemsModel(items=capital_scheme_models)
 
 
+@router.get(
+    "/funding-managed-by",
+    summary="Get authority funding managed by capital schemes",
+    responses={HTTP_404_NOT_FOUND: {}},
+)
+async def get_authority_funding_managed_by_capital_schemes(
+    authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
+    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
+    request: Request,
+    abbreviation: Annotated[str, Path(examples=["LIV"])],
+) -> CapitalSchemeItemsModel:
+    """
+    Gets the capital schemes whose funding is managed by an authority.
+    """
+    if not await authorities.exists(AuthorityAbbreviation(abbreviation)):
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
+
+    capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation(abbreviation))
+    capital_scheme_models = [
+        CapitalSchemeItemModel.from_domain(capital_scheme_item, request) for capital_scheme_item in capital_scheme_items
+    ]
+    return CapitalSchemeItemsModel(items=capital_scheme_models)
+
+
 def _to_domain(milestone: MilestoneModel | Literal[""]) -> Milestone | None:
     match milestone:
         case MilestoneModel():

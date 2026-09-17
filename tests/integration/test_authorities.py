@@ -343,3 +343,138 @@ def test_get_authority_bid_submitting_capital_schemes_when_not_found(client: Tes
     )
 
     assert response.status_code == 404
+
+
+@respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes(
+    authorities: AuthorityRepository,
+    improvements: ImprovementRepository,
+    capital_schemes: CapitalSchemeRepository,
+    client: TestClient,
+    access_token: str,
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00001"),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
+        )
+    )
+    capital_scheme = build_capital_scheme(
+        reference=CapitalSchemeReference("ATE00001"),
+        overview=CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="Wirral Package",
+            bid_submitting_authority=AuthorityAbbreviation("LIV"),
+            funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
+            type=CapitalSchemeType.CONSTRUCTION,
+        ),
+        status=CapitalSchemeStatus(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+        ),
+    )
+    capital_scheme.perform_authority_review(
+        CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+        )
+    )
+    await capital_schemes.add(capital_scheme)
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                name="School Streets",
+                bid_submitting_authority=AuthorityAbbreviation("LIV"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
+        )
+    )
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("WYO")))
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00002"),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("WYO")),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00003"),
+            overview=CapitalSchemeOverview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                name="Hospital Fields Road",
+                bid_submitting_authority=AuthorityAbbreviation("WYO"),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00002"),
+                type=CapitalSchemeType.CONSTRUCTION,
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
+        )
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by", headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "items": [
+            {
+                "@id": f"{client.base_url}/capital-schemes/ATE00001",
+                "reference": "ATE00001",
+                "overview": {
+                    "name": "Wirral Package",
+                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
+                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "improvement": f"{client.base_url}/improvements/IMP00001",
+                    "type": "construction",
+                },
+                "status": {"status": "active"},
+                "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
+            },
+            {
+                "@id": f"{client.base_url}/capital-schemes/ATE00002",
+                "reference": "ATE00002",
+                "overview": {
+                    "name": "School Streets",
+                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
+                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "improvement": f"{client.base_url}/improvements/IMP00001",
+                    "type": "construction",
+                },
+                "status": {"status": "active"},
+                "authorityReview": None,
+            },
+        ]
+    }
+
+
+@respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes_when_none(
+    authorities: AuthorityRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by", headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["items"] == []
+
+
+@respx.mock
+def test_get_authority_funding_managed_by_capital_schemes_when_not_found(client: TestClient, access_token: str) -> None:
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by", headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 404

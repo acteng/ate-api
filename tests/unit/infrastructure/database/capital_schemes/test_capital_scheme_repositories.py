@@ -33,7 +33,7 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from tests.unit.dates import local_datetime
-from tests.unit.domain.builders import build_capital_scheme
+from tests.unit.domain.builders import build_authority_abbreviation, build_capital_scheme
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_authority_entity,
@@ -1039,6 +1039,386 @@ class TestDatabaseCapitalSchemeRepository:
             capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
                 AuthorityAbbreviation("LIV")
             )
+
+        assert not capital_scheme_items
+
+    async def test_get_items_by_funding_managed_by(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    wyo := build_authority_entity(abbreviation="WYO"),
+                    dummy_authority := build_authority_entity(),
+                    atf3 := build_funding_programme_entity(code="ATF3"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                        ],
+                    ),
+                    imp2 := ImprovementEntity(
+                        improvement_reference="IMP00002",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=wyo, data_source=authority_update)
+                        ],
+                    ),
+                    construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
+                    active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
+                                bid_submitting_authority=dummy_authority,
+                                funding_programme=atf3,
+                                improvement=imp1,
+                                scheme_type=construction,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                            )
+                        ],
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
+                            )
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00002",
+                        overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="School Streets",
+                                bid_submitting_authority=dummy_authority,
+                                funding_programme=atf3,
+                                improvement=imp1,
+                                scheme_type=construction,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                            )
+                        ],
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
+                            )
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00003",
+                        overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Hospital Fields Road",
+                                bid_submitting_authority=dummy_authority,
+                                funding_programme=atf3,
+                                improvement=imp2,
+                                scheme_type=construction,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                            )
+                        ],
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
+                            )
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert capital_scheme_items == [
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="Wirral Package",
+                    bid_submitting_authority=build_authority_abbreviation(),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=ImprovementReference("IMP00001"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                status=CapitalSchemeStatus(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+                ),
+                authority_review=None,
+            ),
+            CapitalSchemeItem(
+                reference=CapitalSchemeReference("ATE00002"),
+                overview=CapitalSchemeOverview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    name="School Streets",
+                    bid_submitting_authority=build_authority_abbreviation(),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=ImprovementReference("IMP00001"),
+                    type=CapitalSchemeType.CONSTRUCTION,
+                ),
+                status=CapitalSchemeStatus(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+                ),
+                authority_review=None,
+            ),
+        ]
+
+    async def test_get_items_by_funding_managed_by_fetches_current_overview(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    wyo := build_authority_entity(abbreviation="WYO"),
+                    dummy_authority := build_authority_entity(),
+                    atf3 := build_funding_programme_entity(code="ATF3"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                        ],
+                    ),
+                    imp2 := ImprovementEntity(
+                        improvement_reference="IMP00002",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=wyo, data_source=authority_update)
+                        ],
+                    ),
+                    construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="Wirral Package",
+                                bid_submitting_authority=dummy_authority,
+                                funding_programme=atf3,
+                                improvement=imp1,
+                                scheme_type=construction,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeOverviewEntity(
+                                scheme_name="School Streets",
+                                bid_submitting_authority=dummy_authority,
+                                funding_programme=atf3,
+                                improvement=imp2,
+                                scheme_type=construction,
+                                effective_date_from=local_datetime(2020, 2, 1),
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert not capital_scheme_items
+
+    async def test_get_items_by_funding_managed_by_fetches_current_status(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
+                    ),
+                    pipeline := build_scheme_status_entity(name=SchemeStatusName.PIPELINE),
+                    active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=pipeline,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=local_datetime(2020, 2, 1)
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert [capital_scheme_item.status for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeStatus(effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)), status=Status.ACTIVE)
+        ]
+
+    async def test_get_items_by_funding_managed_by_fetches_latest_authority_review(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        authority_reviews=[
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
+                            ),
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=local_datetime(2020, 3, 1), data_source=authority_update
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeAuthorityReview(
+                review_date=datetime(2020, 3, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            )
+        ]
+
+    async def test_get_items_by_funding_managed_by_fetches_latest_authority_review_when_tie(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[
+                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        authority_reviews=[
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
+                            ),
+                            CapitalSchemeAuthorityReviewEntity(
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert [capital_scheme_item.authority_review for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeAuthorityReview(
+                review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
+            )
+        ]
+
+    async def test_get_items_by_funding_managed_by_orders_by_reference(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    dummy_authority := build_authority_entity(),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00002",
+                        overviews=[
+                            entities.build_capital_scheme_overview(
+                                bid_submitting_authority=dummy_authority, improvement=imp1
+                            )
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[
+                            entities.build_capital_scheme_overview(
+                                bid_submitting_authority=dummy_authority, improvement=imp1
+                            )
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
+
+    async def test_get_items_by_funding_managed_by_when_no_overview(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_authority_entity(abbreviation="LIV"),
+                    entities.build_capital_scheme(reference="ATE00001", overviews=[]),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert not capital_scheme_items
+
+    async def test_get_items_by_funding_managed_by_when_no_status(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    imp1 := ImprovementEntity(
+                        improvement_reference="IMP00001",
+                        improvement_overviews=[build_improvement_overview_entity(funding_managed_by=liv)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        scheme_statuses=[],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert not capital_scheme_items
+
+    async def test_get_items_by_funding_managed_by_when_none(self, engine: AsyncEngine) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(build_authority_entity(abbreviation="LIV"))
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
 
         assert not capital_scheme_items
 
