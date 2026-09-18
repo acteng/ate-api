@@ -139,66 +139,69 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
         status: Status | None = None,
     ) -> list[CapitalSchemeItem]:
+        statement = select(CapitalSchemeEntity).order_by(CapitalSchemeEntity.scheme_reference)
+
+        # fetch current overview
+        statement = statement.options(
+            contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
+            # forward reference to authority filter join
+            contains_eager(
+                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
+            ),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
+        ).join(
+            CapitalSchemeEntity.capital_scheme_overviews.and_(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
+        )
+
+        # filter by authority
+        statement = statement.join(
+            AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
+        ).where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
+
+        # fetch current scheme status
+        statement = statement.options(
+            contains_eager(CapitalSchemeEntity.capital_scheme_scheme_statuses),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
+            ),
+        ).join(
+            CapitalSchemeEntity.capital_scheme_scheme_statuses.and_(
+                CapitalSchemeSchemeStatusEntity.effective_date_to.is_(None)
+            )
+        )
+
+        # fetch latest authority review
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
         ranked_capital_scheme_authority_reviews_alias = aliased(
             CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
         )
-
-        statement = (
-            select(CapitalSchemeEntity)
-            .options(
-                contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-                contains_eager(
-                    CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
-                ),
-                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
-                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
-                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
-                contains_eager(CapitalSchemeEntity.capital_scheme_scheme_statuses),
-                joinedload(
-                    CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
-                ),
-                contains_eager(
-                    CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
-                        ranked_capital_scheme_authority_reviews_alias
-                    )
-                ),
-                joinedload(
-                    CapitalSchemeEntity.capital_scheme_authority_reviews, CapitalSchemeAuthorityReviewEntity.data_source
-                ),
-            )
-            # require current overview
-            .join(
-                CapitalSchemeEntity.capital_scheme_overviews.and_(
-                    CapitalSchemeOverviewEntity.effective_date_to.is_(None)
+        statement = statement.options(
+            contains_eager(
+                CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
+                    ranked_capital_scheme_authority_reviews_alias
                 )
-            )
-            # require current scheme status
-            .join(
-                CapitalSchemeEntity.capital_scheme_scheme_statuses.and_(
-                    CapitalSchemeSchemeStatusEntity.effective_date_to.is_(None)
-                )
-            )
-            .join(
-                AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
-            )
-            .outerjoin(
-                ranked_capital_scheme_authority_reviews_alias,
-                and_(
-                    CapitalSchemeEntity.capital_scheme_id
-                    == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
-                    ranked_capital_scheme_authority_reviews.c.rank == 1,
-                ),
-            )
-            .where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
-            .order_by(CapitalSchemeEntity.scheme_reference)
+            ),
+            joinedload(
+                CapitalSchemeEntity.capital_scheme_authority_reviews, CapitalSchemeAuthorityReviewEntity.data_source
+            ),
+        ).outerjoin(
+            ranked_capital_scheme_authority_reviews_alias,
+            and_(
+                CapitalSchemeEntity.capital_scheme_id
+                == ranked_capital_scheme_authority_reviews_alias.capital_scheme_id,
+                ranked_capital_scheme_authority_reviews.c.rank == 1,
+            ),
         )
 
+        # filter by funding programme
         if funding_programme_codes:
             statement = statement.join(FundingProgrammeEntity).where(
                 FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
             )
 
+        # filter by scheme status
         if status:
             statement = statement.join(SchemeStatusEntity).where(
                 SchemeStatusEntity.scheme_status_name == SchemeStatusName.from_domain(status)
