@@ -148,7 +148,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             select(CapitalSchemeEntity)
             .options(
                 contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-                joinedload(
+                contains_eager(
                     CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
                 ),
                 joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
