@@ -381,7 +381,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         (capital_scheme_overview,) = capital_scheme.capital_scheme_overviews
         (capital_scheme_scheme_status,) = capital_scheme.capital_scheme_scheme_statuses
         capital_scheme_authority_review = next(iter(capital_scheme.capital_scheme_authority_reviews), None)
-        
+
         return CapitalSchemeItem(
             reference=CapitalSchemeReference(capital_scheme.scheme_reference),
             overview=capital_scheme_overview.to_domain(),
