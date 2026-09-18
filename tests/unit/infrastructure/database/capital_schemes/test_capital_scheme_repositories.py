@@ -587,18 +587,23 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
                     wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
+                    dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
                     imp1 := ImprovementEntity(
                         improvement_reference="IMP00001",
                         improvement_overviews=[
-                            build_improvement_overview_entity(funding_managed_by=liv, data_source=authority_update)
+                            build_improvement_overview_entity(
+                                funding_managed_by=dummy_authority, data_source=authority_update
+                            )
                         ],
                     ),
                     imp2 := ImprovementEntity(
                         improvement_reference="IMP00002",
                         improvement_overviews=[
-                            build_improvement_overview_entity(funding_managed_by=wyo, data_source=authority_update)
+                            build_improvement_overview_entity(
+                                funding_managed_by=dummy_authority, data_source=authority_update
+                            )
                         ],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
