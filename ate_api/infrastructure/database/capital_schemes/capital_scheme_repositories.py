@@ -1,6 +1,4 @@
-from typing import Any
-
-from sqlalchemy import ColumnElement, Row, Select, and_, false, func, or_, select, tuple_
+from sqlalchemy import ColumnElement, Select, and_, false, func, or_, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, contains_eager, joinedload
 from sqlalchemy.orm.attributes import InstrumentedAttribute, set_committed_value
@@ -143,25 +141,31 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     ) -> list[CapitalSchemeItem]:
         ranked_capital_scheme_authority_reviews = self._select_ranked_capital_scheme_authority_reviews().cte()
         ranked_capital_scheme_authority_reviews_alias = aliased(
-            CapitalSchemeAuthorityReviewEntity,
-            ranked_capital_scheme_authority_reviews,
-            name="CapitalSchemeAuthorityReviewEntity",
+            CapitalSchemeAuthorityReviewEntity, ranked_capital_scheme_authority_reviews
         )
 
         statement = (
-            select(
-                CapitalSchemeEntity.scheme_reference,
-                CapitalSchemeOverviewEntity,
-                CapitalSchemeSchemeStatusEntity,
-                ranked_capital_scheme_authority_reviews_alias,
-            )
+            select(CapitalSchemeEntity)
             .options(
-                joinedload(CapitalSchemeOverviewEntity.bid_submitting_authority),
-                joinedload(CapitalSchemeOverviewEntity.funding_programme),
-                joinedload(CapitalSchemeOverviewEntity.improvement),
-                joinedload(CapitalSchemeOverviewEntity.scheme_type),
-                joinedload(CapitalSchemeSchemeStatusEntity.scheme_status),
-                joinedload(ranked_capital_scheme_authority_reviews_alias.data_source),
+                contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
+                joinedload(
+                    CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
+                ),
+                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
+                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
+                joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
+                contains_eager(CapitalSchemeEntity.capital_scheme_scheme_statuses),
+                joinedload(
+                    CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
+                ),
+                contains_eager(
+                    CapitalSchemeEntity.capital_scheme_authority_reviews.of_type(
+                        ranked_capital_scheme_authority_reviews_alias
+                    )
+                ),
+                joinedload(
+                    CapitalSchemeEntity.capital_scheme_authority_reviews, CapitalSchemeAuthorityReviewEntity.data_source
+                ),
             )
             # require current overview
             .join(
@@ -201,8 +205,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
 
         result = await self._session.execute(statement)
-        rows = result.all()
-        return [self._item_row_to_domain(row) for row in rows]
+        rows = result.unique().all()
+        return [self._to_item(row.CapitalSchemeEntity) for row in rows]
 
     async def update(self, capital_scheme: CapitalScheme) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(capital_scheme)
@@ -373,12 +377,14 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
     @staticmethod
-    def _item_row_to_domain(row: Row[Any]) -> CapitalSchemeItem:
+    def _to_item(capital_scheme: CapitalSchemeEntity) -> CapitalSchemeItem:
+        (capital_scheme_overview,) = capital_scheme.capital_scheme_overviews
+        (capital_scheme_scheme_status,) = capital_scheme.capital_scheme_scheme_statuses
+        capital_scheme_authority_review = next(iter(capital_scheme.capital_scheme_authority_reviews), None)
+        
         return CapitalSchemeItem(
-            reference=CapitalSchemeReference(row.scheme_reference),
-            overview=row.CapitalSchemeOverviewEntity.to_domain(),
-            status=row.CapitalSchemeSchemeStatusEntity.to_domain(),
-            authority_review=(
-                row.CapitalSchemeAuthorityReviewEntity.to_domain() if row.CapitalSchemeAuthorityReviewEntity else None
-            ),
+            reference=CapitalSchemeReference(capital_scheme.scheme_reference),
+            overview=capital_scheme_overview.to_domain(),
+            status=capital_scheme_scheme_status.to_domain(),
+            authority_review=capital_scheme_authority_review.to_domain() if capital_scheme_authority_review else None,
         )
