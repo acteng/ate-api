@@ -156,9 +156,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
         # filter by authority
-        statement = statement.join(
-            AuthorityEntity, AuthorityEntity.authority_id == CapitalSchemeOverviewEntity.bid_submitting_authority_id
-        ).where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
+        statement = statement.join(AuthorityEntity).where(
+            AuthorityEntity.authority_abbreviation == str(authority_abbreviation)
+        )
 
         # fetch current scheme status
         statement = statement.options(
