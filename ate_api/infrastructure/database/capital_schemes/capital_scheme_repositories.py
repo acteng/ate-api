@@ -15,7 +15,6 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
-from ate_api.infrastructure.database import CapitalSchemeSchemeStatusEntity, SchemeStatusEntity, SchemeStatusName
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
@@ -31,6 +30,11 @@ from ate_api.infrastructure.database.capital_schemes.overviews import (
     CapitalSchemeOverviewEntity,
     SchemeTypeEntity,
     SchemeTypeName,
+)
+from ate_api.infrastructure.database.capital_schemes.statuses import (
+    CapitalSchemeSchemeStatusEntity,
+    SchemeStatusEntity,
+    SchemeStatusName,
 )
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
