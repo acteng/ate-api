@@ -13,8 +13,12 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgramme, FundingProgrammeCode, FundingProgrammeRepository
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
-from ate_api.domain.improvements.overviews import ImprovementOverview
-from tests.unit.domain.builders import build_authority, build_capital_scheme, build_capital_scheme_overview
+from tests.unit.domain.builders import (
+    build_authority,
+    build_capital_scheme,
+    build_capital_scheme_overview,
+    build_improvement_overview,
+)
 
 
 @respx.mock
@@ -53,13 +57,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00001"),
-            overview=ImprovementOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
-                funding_managed_by=AuthorityAbbreviation("LIV"),
-                description="Improvement for the 'Wirral Package' capital scheme created as part of funding devolution.",
-                data_source=DataSource.AUTHORITY_UPDATE,
-            ),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
         )
     )
     capital_scheme = build_capital_scheme(
@@ -102,13 +100,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00002"),
-            overview=ImprovementOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Hospital Fields Road",
-                funding_managed_by=AuthorityAbbreviation("WYO"),
-                description="Improvement for the 'Hospital Fields Road' capital scheme created as part of funding devolution.",
-                data_source=DataSource.AUTHORITY_UPDATE,
-            ),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("WYO")),
         )
     )
     await capital_schemes.add(

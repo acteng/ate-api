@@ -4,12 +4,15 @@ from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
+from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
+from ate_api.domain.improvements.overviews import ImprovementOverview
 from tests.unit.dates import dummy_datetime
 
 _dummy_capital_scheme_type = CapitalSchemeType.DEVELOPMENT
+_dummy_data_source = DataSource.PULSE_5
 
 
 def build_authority(abbreviation: AuthorityAbbreviation | None = None, full_name: str = "dummy") -> Authority:
@@ -18,6 +21,22 @@ def build_authority(abbreviation: AuthorityAbbreviation | None = None, full_name
 
 def build_authority_abbreviation(abbreviation: str = "dummy") -> AuthorityAbbreviation:
     return AuthorityAbbreviation(abbreviation)
+
+
+def build_improvement_overview(
+    effective_date: DateTimeRange | None = None,
+    name: str = "dummy",
+    description: str | None = None,
+    funding_managed_by: AuthorityAbbreviation | None = None,
+    data_source: DataSource = _dummy_data_source,
+) -> ImprovementOverview:
+    return ImprovementOverview(
+        effective_date=effective_date or build_date_time_range(),
+        name=name,
+        description=description,
+        funding_managed_by=funding_managed_by or build_authority_abbreviation(),
+        data_source=data_source,
+    )
 
 
 def build_capital_scheme(

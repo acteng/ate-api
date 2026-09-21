@@ -28,11 +28,10 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
-from ate_api.domain.improvements.overviews import ImprovementOverview
 from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.clock import Clock
-from tests.unit.domain.builders import build_authority, build_capital_scheme
+from tests.unit.domain.builders import build_authority, build_capital_scheme, build_improvement_overview
 from tests.unit.infrastructure.memory.unit_of_work import FakeUnitOfWork
 
 
@@ -50,13 +49,7 @@ async def test_get_capital_scheme(
     await improvements.add(
         Improvement(
             reference=ImprovementReference("IMP00001"),
-            overview=ImprovementOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Wirral Package",
-                funding_managed_by=AuthorityAbbreviation("LIV"),
-                description="Improvement for the 'Wirral Package' capital scheme created as part of funding devolution.",
-                data_source=DataSource.AUTHORITY_UPDATE,
-            ),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
         )
     )
     await capital_schemes.add(
