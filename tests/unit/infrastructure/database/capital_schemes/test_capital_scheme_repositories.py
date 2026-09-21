@@ -24,7 +24,6 @@ from ate_api.infrastructure.database import (
     CapitalSchemeOverviewEntity,
     CapitalSchemeSchemeStatusEntity,
     DataSourceName,
-    ImprovementEntity,
     InterventionMeasureName,
     InterventionTypeName,
     ObservationTypeName,
@@ -57,10 +56,10 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(id_=1, abbreviation="LIV"),
                     build_funding_programme_entity(id_=2, code="ATF3"),
-                    ImprovementEntity(
-                        improvement_id=3,
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    entities.build_improvement(
+                        id_=3,
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     build_scheme_type_entity(id_=4, name=SchemeTypeName.CONSTRUCTION),
                     build_scheme_status_entity(id_=5, name=SchemeStatusName.ACTIVE),
@@ -209,9 +208,9 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
@@ -278,9 +277,9 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(
@@ -587,14 +586,8 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview()],
-                    ),
-                    imp2 := ImprovementEntity(
-                        improvement_reference="IMP00002",
-                        improvement_overviews=[entities.build_improvement_overview()],
-                    ),
+                    imp1 := entities.build_improvement(reference="IMP00001"),
+                    imp2 := entities.build_improvement(reference="IMP00002"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
                     entities.build_capital_scheme(
@@ -702,14 +695,8 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview()],
-                    ),
-                    imp2 := ImprovementEntity(
-                        improvement_reference="IMP00002",
-                        improvement_overviews=[entities.build_improvement_overview()],
-                    ),
+                    imp1 := entities.build_improvement(reference="IMP00001"),
+                    imp2 := entities.build_improvement(reference="IMP00002"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(
                         reference="ATE00001",
@@ -1029,13 +1016,13 @@ class TestDatabaseCapitalSchemeRepository:
                     wyo := build_authority_entity(abbreviation="WYO"),
                     dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
-                    imp2 := ImprovementEntity(
-                        improvement_reference="IMP00002",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=wyo)],
+                    imp2 := entities.build_improvement(
+                        reference="IMP00002",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=wyo)],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
@@ -1143,13 +1130,13 @@ class TestDatabaseCapitalSchemeRepository:
                     wyo := build_authority_entity(abbreviation="WYO"),
                     dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
-                    imp2 := ImprovementEntity(
-                        improvement_reference="IMP00002",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=wyo)],
+                    imp2 := entities.build_improvement(
+                        reference="IMP00002",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=wyo)],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(
@@ -1190,9 +1177,9 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     pipeline := build_scheme_status_entity(name=SchemeStatusName.PIPELINE),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
@@ -1229,9 +1216,9 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
@@ -1266,9 +1253,9 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
@@ -1303,9 +1290,9 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     dummy_authority := build_authority_entity(),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00002",
@@ -1359,9 +1346,9 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    imp1 := ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    imp1 := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",

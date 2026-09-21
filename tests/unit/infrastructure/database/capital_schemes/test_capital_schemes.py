@@ -22,7 +22,6 @@ from ate_api.infrastructure.database import (
     DataSourceEntity,
     DataSourceName,
     FundingProgrammeEntity,
-    ImprovementEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
     InterventionTypeEntity,
@@ -175,10 +174,7 @@ class TestCapitalSchemeEntity:
                     scheme_name="Wirral Package",
                     bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
                     funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
-                    improvement=ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview()],
-                    ),
+                    improvement=entities.build_improvement(reference="IMP00001"),
                     scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     effective_date_from=local_datetime(2020, 1, 1),
                 )

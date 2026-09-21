@@ -45,6 +45,15 @@ class EntityBuilder:
         self._dummy_scheme_type = build_scheme_type_entity()
         self._dummy_scheme_status = build_scheme_status_entity()
 
+    def build_improvement(
+        self, id_: int | None = None, reference: str = "dummy", overviews: list[ImprovementOverviewEntity] | None = None
+    ) -> ImprovementEntity:
+        return ImprovementEntity(
+            improvement_id=id_,
+            improvement_reference=reference,
+            improvement_overviews=overviews if overviews is not None else [self.build_improvement_overview()],
+        )
+
     def build_improvement_overview(
         self,
         name: str = "dummy",
