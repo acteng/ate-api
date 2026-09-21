@@ -39,9 +39,28 @@ class EntityBuilder:
     """
 
     def __init__(self) -> None:
+        self._dummy_data_source = build_data_source_entity()
         self._dummy_funding_programme = build_funding_programme_entity()
         self._dummy_scheme_type = build_scheme_type_entity()
         self._dummy_scheme_status = build_scheme_status_entity()
+
+    def build_improvement_overview(
+        self,
+        name: str = "dummy",
+        description: str = "dummy",
+        funding_managed_by: AuthorityEntity | None = None,
+        data_source: DataSourceEntity | None = None,
+        effective_date_from: datetime = dummy_local_datetime,
+        is_deleted: bool = False,
+    ) -> ImprovementOverviewEntity:
+        return ImprovementOverviewEntity(
+            improvement_name=name,
+            improvement_description=description,
+            funding_managed_by=funding_managed_by or build_authority_entity(),
+            data_source=data_source or self._dummy_data_source,
+            effective_date_from=effective_date_from,
+            is_deleted=is_deleted,
+        )
 
     def build_capital_scheme(
         self,
@@ -94,24 +113,6 @@ def build_authority_entity(
 ) -> AuthorityEntity:
     return AuthorityEntity(
         authority_id=id_, authority_full_name=full_name or abbreviation, authority_abbreviation=abbreviation
-    )
-
-
-def build_improvement_overview_entity(
-    name: str = "dummy",
-    description: str = "dummy",
-    funding_managed_by: AuthorityEntity | None = None,
-    data_source: DataSourceEntity | None = None,
-    effective_date_from: datetime = dummy_local_datetime,
-    is_deleted: bool = False,
-) -> ImprovementOverviewEntity:
-    return ImprovementOverviewEntity(
-        improvement_name=name,
-        improvement_description=description,
-        funding_managed_by=funding_managed_by or build_authority_entity(),
-        data_source=data_source or build_data_source_entity(),
-        effective_date_from=effective_date_from,
-        is_deleted=is_deleted,
     )
 
 

@@ -22,7 +22,7 @@ from tests.unit.domain.builders import (
     build_capital_scheme_type,
     build_funding_programme_code,
 )
-from tests.unit.infrastructure.database.builders import build_improvement_overview_entity
+from tests.unit.infrastructure.database.builders import EntityBuilder
 
 
 @pytest.mark.parametrize(
@@ -115,13 +115,13 @@ class TestCapitalSchemeOverviewEntity:
         assert overview_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
         assert overview_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
-    def test_to_domain(self) -> None:
+    def test_to_domain(self, entities: EntityBuilder) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
             scheme_name="Wirral Package",
             bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             improvement=ImprovementEntity(
-                improvement_reference="IMP00001", improvement_overviews=[build_improvement_overview_entity()]
+                improvement_reference="IMP00001", improvement_overviews=[entities.build_improvement_overview()]
             ),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
             effective_date_from=local_datetime(2020, 1, 1),
