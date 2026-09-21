@@ -57,7 +57,7 @@ class EntityBuilder:
             scheme_reference=reference,
             capital_scheme_overviews=overviews if overviews is not None else [self.build_capital_scheme_overview()],
             capital_scheme_scheme_statuses=(
-                scheme_statuses if scheme_statuses is not None else [self.build_capital_scheme_scheme_status_entity()]
+                scheme_statuses if scheme_statuses is not None else [self.build_capital_scheme_scheme_status()]
             ),
             capital_scheme_interventions=interventions or [],
             capital_scheme_authority_reviews=authority_reviews or [],
@@ -81,7 +81,7 @@ class EntityBuilder:
             effective_date_from=effective_date_from,
         )
 
-    def build_capital_scheme_scheme_status_entity(
+    def build_capital_scheme_scheme_status(
         self, scheme_status: SchemeStatusEntity | None = None, effective_date_from: datetime = dummy_local_datetime
     ) -> CapitalSchemeSchemeStatusEntity:
         return CapitalSchemeSchemeStatusEntity(
