@@ -586,15 +586,14 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := ImprovementEntity(
                         improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=dummy_authority)],
+                        improvement_overviews=[entities.build_improvement_overview()],
                     ),
                     imp2 := ImprovementEntity(
                         improvement_reference="IMP00002",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=dummy_authority)],
+                        improvement_overviews=[entities.build_improvement_overview()],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
@@ -702,15 +701,14 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := ImprovementEntity(
                         improvement_reference="IMP00001",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=dummy_authority)],
+                        improvement_overviews=[entities.build_improvement_overview()],
                     ),
                     imp2 := ImprovementEntity(
                         improvement_reference="IMP00002",
-                        improvement_overviews=[entities.build_improvement_overview(funding_managed_by=dummy_authority)],
+                        improvement_overviews=[entities.build_improvement_overview()],
                     ),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(

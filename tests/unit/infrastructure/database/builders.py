@@ -41,6 +41,7 @@ class EntityBuilder:
     def __init__(self) -> None:
         self._dummy_data_source = build_data_source_entity()
         self._dummy_funding_programme = build_funding_programme_entity()
+        self._dummy_authority = build_authority_entity()
         self._dummy_scheme_type = build_scheme_type_entity()
         self._dummy_scheme_status = build_scheme_status_entity()
 
@@ -56,7 +57,7 @@ class EntityBuilder:
         return ImprovementOverviewEntity(
             improvement_name=name,
             improvement_description=description,
-            funding_managed_by=funding_managed_by or build_authority_entity(),
+            funding_managed_by=funding_managed_by or self._dummy_authority,
             data_source=data_source or self._dummy_data_source,
             effective_date_from=effective_date_from,
             is_deleted=is_deleted,
