@@ -502,15 +502,15 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 3, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 3, 1), data_source=authority_update
                             ),
                         ],
                     ),
@@ -531,15 +531,15 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             ),
                         ],
                     ),
@@ -808,16 +808,16 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 3, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 3, 1), data_source=authority_update
                             ),
                         ],
                     ),
@@ -843,16 +843,16 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    authority_review := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
+                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=liv)],
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             ),
                             CapitalSchemeAuthorityReviewEntity(
-                                review_date=local_datetime(2020, 2, 1), data_source=authority_review
+                                review_date=local_datetime(2020, 2, 1), data_source=authority_update
                             ),
                         ],
                     ),
