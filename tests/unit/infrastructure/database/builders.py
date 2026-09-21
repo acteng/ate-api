@@ -90,9 +90,11 @@ class EntityBuilder:
 
 
 def build_authority_entity(
-    id_: int | None = None, full_name: str = "dummy", abbreviation: str = "dummy"
+    id_: int | None = None, full_name: str | None = None, abbreviation: str = "dummy"
 ) -> AuthorityEntity:
-    return AuthorityEntity(authority_id=id_, authority_full_name=full_name, authority_abbreviation=abbreviation)
+    return AuthorityEntity(
+        authority_id=id_, authority_full_name=full_name or abbreviation, authority_abbreviation=abbreviation
+    )
 
 
 def build_improvement_overview_entity(

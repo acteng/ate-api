@@ -585,8 +585,8 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
-                    wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    wyo := build_authority_entity(abbreviation="WYO"),
                     dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
@@ -710,8 +710,8 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
-                    wyo := build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    wyo := build_authority_entity(abbreviation="WYO"),
                     dummy_authority := build_authority_entity(),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
