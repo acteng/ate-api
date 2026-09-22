@@ -213,7 +213,9 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return [self._to_item(row.CapitalSchemeEntity) for row in rows]
 
     async def get_items_by_funding_managed_by(
-        self, authority_abbreviation: AuthorityAbbreviation
+        self,
+        authority_abbreviation: AuthorityAbbreviation,
+        funding_programme_codes: list[FundingProgrammeCode] | None = None,
     ) -> list[CapitalSchemeItem]:
         statement = select(CapitalSchemeEntity).order_by(CapitalSchemeEntity.scheme_reference)
 
@@ -223,7 +225,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             joinedload(
                 CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
             ),
-            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
+            # possible forward reference to funding programme filter join
+            (contains_eager if funding_programme_codes else joinedload)(
+                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
+            ),
             # forward reference to authority filter join
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
@@ -273,6 +278,12 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 ranked_capital_scheme_authority_reviews.c.rank == 1,
             ),
         )
+
+        # filter by funding programme
+        if funding_programme_codes:
+            statement = statement.join(FundingProgrammeEntity).where(
+                FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
+            )
 
         result = await self._session.execute(statement)
         rows = result.unique().all()

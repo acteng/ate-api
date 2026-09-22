@@ -1196,6 +1196,47 @@ class TestDatabaseCapitalSchemeRepository:
             )
         ]
 
+    async def test_get_items_by_funding_managed_by_filters_by_funding_programme(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    atf3 := build_funding_programme_entity(code="ATF3"),
+                    atf4 := build_funding_programme_entity(code="ATF4"),
+                    atf5 := build_funding_programme_entity(code="ATF5"),
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf3, improvement=imp)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00002",
+                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf4, improvement=imp)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00003",
+                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf5, improvement=imp)],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
+                AuthorityAbbreviation("LIV"),
+                funding_programme_codes=[FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")],
+            )
+
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
+
     async def test_get_items_by_funding_managed_by_orders_by_reference(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:

@@ -458,6 +458,130 @@ async def test_get_authority_funding_managed_by_capital_schemes(
 
 
 @respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes_filters_by_funding_programme(
+    authorities: AuthorityRepository,
+    funding_programmes: FundingProgrammeRepository,
+    improvements: ImprovementRepository,
+    capital_schemes: CapitalSchemeRepository,
+    client: TestClient,
+    access_token: str,
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00001"),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF4"),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+        )
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by",
+        params={"funding-programme-code": "ATF3"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
+
+
+@respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes_filters_by_funding_programmes(
+    authorities: AuthorityRepository,
+    funding_programmes: FundingProgrammeRepository,
+    improvements: ImprovementRepository,
+    capital_schemes: CapitalSchemeRepository,
+    client: TestClient,
+    access_token: str,
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF3")))
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF4")))
+    await funding_programmes.add(FundingProgramme(code=FundingProgrammeCode("ATF5")))
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00001"),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF3"),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF4"),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00003"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF5"),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+        )
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by",
+        params={"funding-programme-code": ["ATF3", "ATF4"]},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001", "ATE00002"]
+
+
+@respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes_filter_by_unknown_funding_programme(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by",
+        params={"funding-programme-code": "foo"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 422
+
+
+@respx.mock
 async def test_get_authority_funding_managed_by_capital_schemes_when_none(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:

@@ -37,7 +37,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
     async def get_items_by_funding_managed_by(
-        self, authority_abbreviation: AuthorityAbbreviation
+        self,
+        authority_abbreviation: AuthorityAbbreviation,
+        funding_programme_codes: list[FundingProgrammeCode] | None = None,
     ) -> list[CapitalSchemeItem]:
         return sorted(
             [
@@ -45,6 +47,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 for capital_scheme in self._capital_schemes.values()
                 if (await self._get_improvement(capital_scheme.overview.improvement)).overview.funding_managed_by
                 == authority_abbreviation
+                and (
+                    not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
+                )
             ],
             key=lambda capital_scheme_item: str(capital_scheme_item.reference),
         )

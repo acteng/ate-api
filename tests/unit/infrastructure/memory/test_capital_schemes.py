@@ -377,6 +377,56 @@ class TestMemoryCapitalSchemeRepository:
             authority_review
         ]
 
+    async def test_get_items_by_funding_managed_by_filters_by_funding_programme(
+        self, capital_schemes: MemoryCapitalSchemeRepository, improvements: MemoryImprovementRepository
+    ) -> None:
+        await improvements.add(
+            Improvement(
+                reference=ImprovementReference("IMP00001"),
+                overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
+            )
+        )
+        await capital_schemes.add(
+            build_capital_scheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=build_capital_scheme_overview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    funding_programme=FundingProgrammeCode("ATF3"),
+                    improvement=ImprovementReference("IMP00001"),
+                ),
+            )
+        )
+        await capital_schemes.add(
+            build_capital_scheme(
+                reference=CapitalSchemeReference("ATE00002"),
+                overview=build_capital_scheme_overview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    funding_programme=FundingProgrammeCode("ATF4"),
+                    improvement=ImprovementReference("IMP00001"),
+                ),
+            )
+        )
+        await capital_schemes.add(
+            build_capital_scheme(
+                reference=CapitalSchemeReference("ATE00003"),
+                overview=build_capital_scheme_overview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    funding_programme=FundingProgrammeCode("ATF5"),
+                    improvement=ImprovementReference("IMP00001"),
+                ),
+            )
+        )
+
+        capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
+            AuthorityAbbreviation("LIV"),
+            funding_programme_codes=[FundingProgrammeCode("ATF3"), FundingProgrammeCode("ATF4")],
+        )
+
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001"),
+            CapitalSchemeReference("ATE00002"),
+        ]
+
     async def test_get_items_by_funding_managed_by_orders_by_reference(
         self, capital_schemes: MemoryCapitalSchemeRepository, improvements: ImprovementRepository
     ) -> None:

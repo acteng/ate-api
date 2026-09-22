@@ -32,7 +32,9 @@ class CapitalSchemeRepository:
         raise NotImplementedError()
 
     async def get_items_by_funding_managed_by(
-        self, authority_abbreviation: AuthorityAbbreviation
+        self,
+        authority_abbreviation: AuthorityAbbreviation,
+        funding_programme_codes: list[FundingProgrammeCode] | None = None,
     ) -> list[CapitalSchemeItem]:
         raise NotImplementedError()
 
