@@ -167,7 +167,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current scheme status
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_scheme_statuses),
-            joinedload(
+            # possible forward reference to scheme status filter join
+            (contains_eager if status else joinedload)(
                 CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
             ),
         ).join(
