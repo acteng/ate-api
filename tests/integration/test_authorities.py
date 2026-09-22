@@ -17,6 +17,7 @@ from tests.unit.domain.builders import (
     build_authority,
     build_capital_scheme,
     build_capital_scheme_overview,
+    build_capital_scheme_status,
     build_improvement_overview,
 )
 
@@ -106,17 +107,7 @@ async def test_get_authority_bid_submitting_capital_schemes(
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Hospital Fields Road",
-                bid_submitting_authority=AuthorityAbbreviation("WYO"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=ImprovementReference("IMP00002"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            status=CapitalSchemeStatus(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-            ),
+            overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("WYO")),
         )
     )
 
@@ -271,18 +262,14 @@ async def test_get_authority_bid_submitting_capital_schemes_filters_by_status(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
-            status=CapitalSchemeStatus(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-            ),
+            status=build_capital_scheme_status(status=Status.ACTIVE),
         )
     )
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
-            status=CapitalSchemeStatus(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
-            ),
+            status=build_capital_scheme_status(status=Status.PIPELINE),
         )
     )
 
@@ -395,17 +382,7 @@ async def test_get_authority_funding_managed_by_capital_schemes(
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
-            overview=CapitalSchemeOverview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                name="Hospital Fields Road",
-                bid_submitting_authority=AuthorityAbbreviation("WYO"),
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=ImprovementReference("IMP00002"),
-                type=CapitalSchemeType.CONSTRUCTION,
-            ),
-            status=CapitalSchemeStatus(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00002")),
         )
     )
 
@@ -584,18 +561,14 @@ async def test_get_authority_funding_managed_by_capital_schemes_filters_by_statu
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
-            status=CapitalSchemeStatus(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-            ),
+            status=build_capital_scheme_status(status=Status.ACTIVE),
         )
     )
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
             overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
-            status=CapitalSchemeStatus(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
-            ),
+            status=build_capital_scheme_status(status=Status.PIPELINE),
         )
     )
 
