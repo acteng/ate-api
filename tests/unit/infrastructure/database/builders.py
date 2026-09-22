@@ -105,7 +105,7 @@ class EntityBuilder:
     ) -> CapitalSchemeOverviewEntity:
         return CapitalSchemeOverviewEntity(
             scheme_name=name,
-            bid_submitting_authority=bid_submitting_authority or build_authority_entity(),
+            bid_submitting_authority=bid_submitting_authority or self._dummy_authority,
             funding_programme=funding_programme or self._dummy_funding_programme,
             improvement=improvement,
             scheme_type=type_ or self._dummy_scheme_type,

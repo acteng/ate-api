@@ -1279,26 +1279,17 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    dummy_authority := build_authority_entity(),
                     imp1 := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00002",
-                        overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=dummy_authority, improvement=imp1
-                            )
-                        ],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[
-                            entities.build_capital_scheme_overview(
-                                bid_submitting_authority=dummy_authority, improvement=imp1
-                            )
-                        ],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
                     ),
                 ]
             )
