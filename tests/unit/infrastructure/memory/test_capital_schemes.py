@@ -12,7 +12,12 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
-from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_overview, build_improvement_overview
+from tests.unit.domain.builders import (
+    build_capital_scheme,
+    build_capital_scheme_overview,
+    build_capital_scheme_status,
+    build_improvement_overview,
+)
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 from tests.unit.infrastructure.memory.improvements import MemoryImprovementRepository
 
@@ -113,17 +118,7 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
-                overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Hospital Fields Road",
-                    bid_submitting_authority=AuthorityAbbreviation("WYO"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=ImprovementReference("IMP00002"),
-                    type=CapitalSchemeType.CONSTRUCTION,
-                ),
-                status=CapitalSchemeStatus(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-                ),
+                overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("WYO")),
             )
         )
 
@@ -304,17 +299,7 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
-                overview=CapitalSchemeOverview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    name="Hospital Fields Road",
-                    bid_submitting_authority=AuthorityAbbreviation("WYO"),
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=ImprovementReference("IMP00002"),
-                    type=CapitalSchemeType.CONSTRUCTION,
-                ),
-                status=CapitalSchemeStatus(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00002")),
             )
         )
 
@@ -416,18 +401,14 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
-                status=CapitalSchemeStatus(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
-                ),
+                status=build_capital_scheme_status(status=Status.ACTIVE),
             )
         )
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
-                status=CapitalSchemeStatus(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
-                ),
+                status=build_capital_scheme_status(status=Status.PIPELINE),
             )
         )
 
