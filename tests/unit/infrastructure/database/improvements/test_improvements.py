@@ -18,7 +18,7 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.improvements.improvements import DatabaseImprovementRepository
 from tests.unit.dates import local_datetime
-from tests.unit.infrastructure.database.builders import build_authority_entity, build_data_source_entity
+from tests.unit.infrastructure.database.builders import EntityBuilder, build_authority_entity, build_data_source_entity
 
 
 class TestImprovementEntity:
@@ -114,7 +114,7 @@ class TestDatabaseImprovementRepository:
             and not overview_row.effective_date_to
         )
 
-    async def test_get(self, engine: AsyncEngine) -> None:
+    async def test_get(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -133,18 +133,7 @@ class TestDatabaseImprovementRepository:
                             )
                         ],
                     ),
-                    ImprovementEntity(
-                        improvement_reference="IMP00002",
-                        improvement_overviews=[
-                            ImprovementOverviewEntity(
-                                improvement_name="School Streets",
-                                funding_managed_by=liv,
-                                data_source=authority_update,
-                                effective_date_from=local_datetime(2020, 1, 1),
-                                is_deleted=False,
-                            )
-                        ],
-                    ),
+                    entities.build_improvement(reference="IMP00002"),
                 ]
             )
 
@@ -161,22 +150,18 @@ class TestDatabaseImprovementRepository:
             data_source=DataSource.AUTHORITY_UPDATE,
         )
 
-    async def test_get_fetches_current_overview(self, engine: AsyncEngine) -> None:
+    async def test_get_fetches_current_overview(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[
-                            ImprovementOverviewEntity(
-                                improvement_name="Wirral Package",
-                                funding_managed_by=liv,
-                                data_source=authority_update,
+                    entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[
+                            entities.build_improvement_overview(
                                 effective_date_from=local_datetime(2020, 1, 1),
                                 effective_date_to=local_datetime(2020, 2, 1),
-                                is_deleted=False,
                             ),
                             ImprovementOverviewEntity(
                                 improvement_name="School Streets",
@@ -201,9 +186,9 @@ class TestDatabaseImprovementRepository:
             data_source=DataSource.AUTHORITY_UPDATE,
         )
 
-    async def test_get_when_no_overview(self, engine: AsyncEngine) -> None:
+    async def test_get_when_no_overview(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(ImprovementEntity(improvement_reference="IMP00001"))
+            session.add(entities.build_improvement(reference="IMP00001", overviews=[]))
 
         async with AsyncSession(engine) as session:
             improvements = DatabaseImprovementRepository(session)
@@ -211,26 +196,12 @@ class TestDatabaseImprovementRepository:
 
         assert not improvement
 
-    async def test_get_when_deleted(self, engine: AsyncEngine) -> None:
+    async def test_get_when_deleted(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add_all(
-                [
-                    liv := build_authority_entity(abbreviation="LIV"),
-                    authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    ImprovementEntity(
-                        improvement_reference="IMP00001",
-                        improvement_overviews=[
-                            ImprovementOverviewEntity(
-                                improvement_name="Wirral Package",
-                                improvement_description='Improvement for the "Wirral Package" capital scheme created as part of funding devolution.',
-                                funding_managed_by=liv,
-                                data_source=authority_update,
-                                effective_date_from=local_datetime(2020, 1, 1),
-                                is_deleted=True,
-                            )
-                        ],
-                    ),
-                ]
+            session.add(
+                entities.build_improvement(
+                    reference="IMP00001", overviews=[entities.build_improvement_overview(is_deleted=True)]
+                )
             )
 
         async with AsyncSession(engine) as session:

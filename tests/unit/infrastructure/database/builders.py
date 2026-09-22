@@ -61,6 +61,7 @@ class EntityBuilder:
         funding_managed_by: AuthorityEntity | None = None,
         data_source: DataSourceEntity | None = None,
         effective_date_from: datetime = dummy_local_datetime,
+        effective_date_to: datetime | None = None,
         is_deleted: bool = False,
     ) -> ImprovementOverviewEntity:
         return ImprovementOverviewEntity(
@@ -69,6 +70,7 @@ class EntityBuilder:
             funding_managed_by=funding_managed_by or self._dummy_authority,
             data_source=data_source or self._dummy_data_source,
             effective_date_from=effective_date_from,
+            effective_date_to=effective_date_to,
             is_deleted=is_deleted,
         )
 
