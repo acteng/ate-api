@@ -40,6 +40,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         self,
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
+        status: Status | None = None,
     ) -> list[CapitalSchemeItem]:
         return sorted(
             [
@@ -50,6 +51,7 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 and (
                     not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
                 )
+                and (not status or capital_scheme.status.status == status)
             ],
             key=lambda capital_scheme_item: str(capital_scheme_item.reference),
         )

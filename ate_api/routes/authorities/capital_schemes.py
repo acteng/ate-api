@@ -149,6 +149,7 @@ async def get_authority_funding_managed_by_capital_schemes(
     funding_programme_codes: Annotated[
         list[str] | None, Query(alias="funding-programme-code", examples=["ATF3"])
     ] = None,
+    status: Annotated[StatusModel | None, Query(examples=["active"])] = None,
 ) -> CapitalSchemeItemsModel:
     """
     Gets the capital schemes whose funding is managed by an authority.
@@ -166,6 +167,7 @@ async def get_authority_funding_managed_by_capital_schemes(
         funding_programme_codes=(
             [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
         ),
+        status=status.to_domain() if status else None,
     )
     capital_scheme_models = [
         CapitalSchemeItemModel.from_domain(capital_scheme_item, request) for capital_scheme_item in capital_scheme_items

@@ -220,6 +220,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self,
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
+        status: Status | None = None,
     ) -> list[CapitalSchemeItem]:
         statement = select(CapitalSchemeEntity).order_by(CapitalSchemeEntity.scheme_reference)
 
@@ -251,7 +252,8 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current scheme status
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_scheme_statuses),
-            joinedload(
+            # possible forward reference to scheme status filter join
+            (contains_eager if status else joinedload)(
                 CapitalSchemeEntity.capital_scheme_scheme_statuses, CapitalSchemeSchemeStatusEntity.scheme_status
             ),
         ).join(
@@ -287,6 +289,12 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         if funding_programme_codes:
             statement = statement.join(FundingProgrammeEntity).where(
                 FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
+            )
+
+        # filter by scheme status
+        if status:
+            statement = statement.join(SchemeStatusEntity).where(
+                SchemeStatusEntity.scheme_status_name == SchemeStatusName.from_domain(status)
             )
 
         result = await self._session.execute(statement)

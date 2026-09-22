@@ -1237,6 +1237,55 @@ class TestDatabaseCapitalSchemeRepository:
             CapitalSchemeReference("ATE00002"),
         ]
 
+    async def test_get_items_by_funding_managed_by_filters_by_current_status(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    ),
+                    active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
+                    pipeline := build_scheme_status_entity(name=SchemeStatusName.PIPELINE),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
+                            )
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00002",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        scheme_statuses=[
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=active,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
+                            ),
+                            CapitalSchemeSchemeStatusEntity(
+                                scheme_status=pipeline, effective_date_from=local_datetime(2020, 2, 1)
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
+                AuthorityAbbreviation("LIV"), status=Status.ACTIVE
+            )
+
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
+
     async def test_get_items_by_funding_managed_by_orders_by_reference(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:

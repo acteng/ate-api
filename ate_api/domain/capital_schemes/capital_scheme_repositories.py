@@ -35,6 +35,7 @@ class CapitalSchemeRepository:
         self,
         authority_abbreviation: AuthorityAbbreviation,
         funding_programme_codes: list[FundingProgrammeCode] | None = None,
+        status: Status | None = None,
     ) -> list[CapitalSchemeItem]:
         raise NotImplementedError()
 

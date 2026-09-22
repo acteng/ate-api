@@ -427,6 +427,48 @@ class TestMemoryCapitalSchemeRepository:
             CapitalSchemeReference("ATE00002"),
         ]
 
+    async def test_get_items_by_funding_managed_by_filters_by_status(
+        self, improvements: ImprovementRepository, capital_schemes: MemoryCapitalSchemeRepository
+    ) -> None:
+        await improvements.add(
+            Improvement(
+                reference=ImprovementReference("IMP00001"),
+                overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
+            )
+        )
+        await capital_schemes.add(
+            build_capital_scheme(
+                reference=CapitalSchemeReference("ATE00001"),
+                overview=build_capital_scheme_overview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    improvement=ImprovementReference("IMP00001"),
+                ),
+                status=CapitalSchemeStatus(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+                ),
+            )
+        )
+        await capital_schemes.add(
+            build_capital_scheme(
+                reference=CapitalSchemeReference("ATE00002"),
+                overview=build_capital_scheme_overview(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    improvement=ImprovementReference("IMP00001"),
+                ),
+                status=CapitalSchemeStatus(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
+                ),
+            )
+        )
+
+        capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
+            AuthorityAbbreviation("LIV"), status=Status.ACTIVE
+        )
+
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
+        ]
+
     async def test_get_items_by_funding_managed_by_orders_by_reference(
         self, capital_schemes: MemoryCapitalSchemeRepository, improvements: ImprovementRepository
     ) -> None:

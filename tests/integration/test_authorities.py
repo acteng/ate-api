@@ -582,6 +582,71 @@ async def test_get_authority_funding_managed_by_capital_schemes_filter_by_unknow
 
 
 @respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes_filters_by_status(
+    authorities: AuthorityRepository,
+    improvements: ImprovementRepository,
+    capital_schemes: CapitalSchemeRepository,
+    client: TestClient,
+    access_token: str,
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+    await improvements.add(
+        Improvement(
+            reference=ImprovementReference("IMP00001"),
+            overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00001"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
+            ),
+        )
+    )
+    await capital_schemes.add(
+        build_capital_scheme(
+            reference=CapitalSchemeReference("ATE00002"),
+            overview=build_capital_scheme_overview(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                improvement=ImprovementReference("IMP00001"),
+            ),
+            status=CapitalSchemeStatus(
+                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
+            ),
+        )
+    )
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by",
+        params={"status": "active"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 200
+    assert [item["reference"] for item in response.json()["items"]] == ["ATE00001"]
+
+
+@respx.mock
+async def test_get_authority_funding_managed_by_capital_schemes_filter_by_unknown_status(
+    authorities: AuthorityRepository, capital_schemes: CapitalSchemeRepository, client: TestClient, access_token: str
+) -> None:
+    await authorities.add(build_authority(abbreviation=AuthorityAbbreviation("LIV")))
+
+    response = client.get(
+        "/authorities/LIV/capital-schemes/funding-managed-by",
+        params={"status": "foo"},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    assert response.status_code == 422
+
+
+@respx.mock
 async def test_get_authority_funding_managed_by_capital_schemes_when_none(
     authorities: AuthorityRepository, client: TestClient, access_token: str
 ) -> None:
