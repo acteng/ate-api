@@ -32,7 +32,7 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from tests.unit.dates import local_datetime
-from tests.unit.domain.builders import build_authority_abbreviation, build_capital_scheme
+from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_authority_entity,
@@ -1004,7 +1004,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    dummy_authority := build_authority_entity(),
+                    yny := build_authority_entity(abbreviation="YNY"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := entities.build_improvement(
                         reference="IMP00001",
@@ -1021,7 +1021,7 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                bid_submitting_authority=dummy_authority,
+                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
@@ -1039,7 +1039,7 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
-                                bid_submitting_authority=dummy_authority,
+                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
@@ -1057,7 +1057,7 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Hospital Fields Road",
-                                bid_submitting_authority=dummy_authority,
+                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp2,
                                 scheme_type=construction,
@@ -1083,7 +1083,7 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
-                    bid_submitting_authority=build_authority_abbreviation(),
+                    bid_submitting_authority=AuthorityAbbreviation("YNY"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                     type=CapitalSchemeType.CONSTRUCTION,
@@ -1098,7 +1098,7 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="School Streets",
-                    bid_submitting_authority=build_authority_abbreviation(),
+                    bid_submitting_authority=AuthorityAbbreviation("YNY"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                     type=CapitalSchemeType.CONSTRUCTION,
@@ -1118,7 +1118,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    dummy_authority := build_authority_entity(),
+                    yny := build_authority_entity(abbreviation="YNY"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := entities.build_improvement(
                         reference="IMP00001",
@@ -1134,7 +1134,7 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                bid_submitting_authority=dummy_authority,
+                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
@@ -1143,7 +1143,7 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
-                                bid_submitting_authority=dummy_authority,
+                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp2,
                                 scheme_type=construction,
