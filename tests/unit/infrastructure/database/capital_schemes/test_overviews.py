@@ -69,9 +69,7 @@ class TestCapitalSchemeOverviewEntity:
         )
 
     def test_from_domain_without_improvement(self) -> None:
-        overview = build_capital_scheme_overview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), improvement=None
-        )
+        overview = build_capital_scheme_overview(improvement=None)
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,

@@ -50,9 +50,7 @@ class TestCapitalSchemeOverviewModel:
         )
 
     def test_from_domain_without_improvement(self, http_request: Request, base_url: str) -> None:
-        overview = build_capital_scheme_overview(
-            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), improvement=None
-        )
+        overview = build_capital_scheme_overview(improvement=None)
 
         overview_model = CapitalSchemeOverviewModel.from_domain(overview, http_request)
 

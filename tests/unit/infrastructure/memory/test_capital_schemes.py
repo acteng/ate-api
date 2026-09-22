@@ -146,10 +146,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme = build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
-            ),
+            overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
         )
         capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
@@ -167,7 +164,6 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                 ),
@@ -177,7 +173,6 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF4"),
                 ),
@@ -187,7 +182,6 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     bid_submitting_authority=AuthorityAbbreviation("LIV"),
                     funding_programme=FundingProgrammeCode("ATF5"),
                 ),
@@ -210,10 +204,7 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
+                overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
                 status=CapitalSchemeStatus(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
                 ),
@@ -222,10 +213,7 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
+                overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
                 status=CapitalSchemeStatus(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
                 ),
@@ -246,19 +234,13 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
+                overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
             )
         )
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    bid_submitting_authority=AuthorityAbbreviation("LIV"),
-                ),
+                overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
             )
         )
 
@@ -363,10 +345,7 @@ class TestMemoryCapitalSchemeRepository:
         )
         capital_scheme = build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                improvement=ImprovementReference("IMP00001"),
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
         )
         capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
@@ -390,7 +369,6 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
                 overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                 ),
@@ -400,7 +378,6 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
                 overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     funding_programme=FundingProgrammeCode("ATF4"),
                     improvement=ImprovementReference("IMP00001"),
                 ),
@@ -410,7 +387,6 @@ class TestMemoryCapitalSchemeRepository:
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
                 overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     funding_programme=FundingProgrammeCode("ATF5"),
                     improvement=ImprovementReference("IMP00001"),
                 ),
@@ -439,10 +415,7 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
                 status=CapitalSchemeStatus(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
                 ),
@@ -451,10 +424,7 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
                 status=CapitalSchemeStatus(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.PIPELINE
                 ),
@@ -481,19 +451,13 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
             )
         )
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
             )
         )
 

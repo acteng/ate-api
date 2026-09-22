@@ -87,5 +87,5 @@ def build_capital_scheme_type() -> CapitalSchemeType:
     return _dummy_capital_scheme_type
 
 
-def build_date_time_range(from_: datetime = dummy_datetime, to: datetime = dummy_datetime) -> DateTimeRange:
+def build_date_time_range(from_: datetime = dummy_datetime, to: datetime | None = None) -> DateTimeRange:
     return DateTimeRange(from_=from_, to=to)
