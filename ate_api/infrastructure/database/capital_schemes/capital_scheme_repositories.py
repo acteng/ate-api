@@ -149,7 +149,10 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             contains_eager(
                 CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
             ),
-            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
+            # possible forward reference to funding programme filter join
+            (contains_eager if funding_programme_codes else joinedload)(
+                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
+            ),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
         ).join(
