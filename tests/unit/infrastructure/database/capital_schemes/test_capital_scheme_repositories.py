@@ -54,13 +54,9 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := build_authority_entity(id_=1, abbreviation="LIV"),
+                    build_authority_entity(id_=1, abbreviation="LIV"),
                     build_funding_programme_entity(id_=2, code="ATF3"),
-                    entities.build_improvement(
-                        id_=3,
-                        reference="IMP00001",
-                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
-                    ),
+                    entities.build_improvement(id_=3, reference="IMP00001"),
                     build_scheme_type_entity(id_=4, name=SchemeTypeName.CONSTRUCTION),
                     build_scheme_status_entity(id_=5, name=SchemeStatusName.ACTIVE),
                 ]
@@ -208,10 +204,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp := entities.build_improvement(
-                        reference="IMP00001",
-                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
-                    ),
+                    imp := entities.build_improvement(reference="IMP00001"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
                     CapitalSchemeEntity(
@@ -277,10 +270,7 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp := entities.build_improvement(
-                        reference="IMP00001",
-                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
-                    ),
+                    imp := entities.build_improvement(reference="IMP00001"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(
                         reference="ATE00001",
