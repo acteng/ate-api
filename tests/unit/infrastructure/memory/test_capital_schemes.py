@@ -136,12 +136,12 @@ class TestMemoryCapitalSchemeRepository:
     async def test_get_items_by_bid_submitting_authority_fetches_authority_review(
         self, capital_schemes: MemoryCapitalSchemeRepository
     ) -> None:
-        authority_review = CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
-        )
         capital_scheme = build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=build_capital_scheme_overview(bid_submitting_authority=AuthorityAbbreviation("LIV")),
+        )
+        authority_review = CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
         capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
@@ -325,12 +325,12 @@ class TestMemoryCapitalSchemeRepository:
                 overview=build_improvement_overview(funding_managed_by=AuthorityAbbreviation("LIV")),
             )
         )
-        authority_review = CapitalSchemeAuthorityReview(
-            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
-        )
         capital_scheme = build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
             overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
+        )
+        authority_review = CapitalSchemeAuthorityReview(
+            review_date=datetime(2020, 2, 1, tzinfo=UTC), data_source=DataSource.AUTHORITY_UPDATE
         )
         capital_scheme.perform_authority_review(authority_review)
         await capital_schemes.add(capital_scheme)
