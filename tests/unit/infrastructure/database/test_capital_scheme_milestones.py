@@ -178,7 +178,7 @@ class TestCapitalSchemeMilestoneEntity:
 @pytest.mark.usefixtures("data")
 @pytest.mark.asyncio(loop_scope="package")
 class TestDatabaseCapitalSchemeMilestonesRepository:
-    async def test_add_stores_milestones(self, engine: AsyncEngine) -> None:
+    async def test_add_stores_milestones(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -186,7 +186,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     build_milestone_entity(id_=2, name=MilestoneName.CONSTRUCTION_STARTED, milestone_order=1),
                     build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
                     build_data_source_entity(id_=4, name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(scheme_reference="ATE00001"),
+                    entities.build_capital_scheme(reference="ATE00001"),
                 ]
             )
 
@@ -237,11 +237,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
 
     async def test_get(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
-            session.add(
-                CapitalSchemeEntity(
-                    scheme_reference="ATE00001", capital_scheme_overviews=[entities.build_capital_scheme_overview()]
-                )
-            )
+            session.add(entities.build_capital_scheme(reference="ATE00001"))
 
         async with AsyncSession(engine) as session:
             capital_scheme_milestones = DatabaseCapitalSchemeMilestonesRepository(session)
@@ -263,11 +259,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     ),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(
-                        capital_scheme_id=1,
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
-                    ),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=detailed_design_completed,
@@ -332,11 +324,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     planned := build_observation_type_entity(name=ObservationTypeName.PLANNED),
                     actual := build_observation_type_entity(name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(
-                        capital_scheme_id=1,
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
-                    ),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=construction_started,
@@ -408,11 +396,7 @@ class TestDatabaseCapitalSchemeMilestonesRepository:
                     ),
                     actual := build_observation_type_entity(id_=3, name=ObservationTypeName.ACTUAL),
                     atf4_bid := build_data_source_entity(id_=4, name=DataSourceName.ATF4_BID),
-                    CapitalSchemeEntity(
-                        capital_scheme_id=1,
-                        scheme_reference="ATE00001",
-                        capital_scheme_overviews=[entities.build_capital_scheme_overview()],
-                    ),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeMilestoneEntity(
                         capital_scheme_id=1,
                         milestone=detailed_design_completed,
