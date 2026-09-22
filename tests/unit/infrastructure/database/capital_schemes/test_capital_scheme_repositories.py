@@ -1091,7 +1091,7 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    imp1 := entities.build_improvement(
+                    imp := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
@@ -1099,7 +1099,7 @@ class TestDatabaseCapitalSchemeRepository:
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
                         scheme_statuses=[
                             CapitalSchemeSchemeStatusEntity(
                                 scheme_status=pipeline,
@@ -1130,13 +1130,13 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    imp1 := entities.build_improvement(
+                    imp := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
                                 review_date=local_datetime(2020, 2, 1), data_source=authority_update
@@ -1167,13 +1167,13 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     authority_update := build_data_source_entity(name=DataSourceName.AUTHORITY_UPDATE),
-                    imp1 := entities.build_improvement(
+                    imp := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
                         authority_reviews=[
                             CapitalSchemeAuthorityReviewEntity(
                                 review_date=local_datetime(2020, 2, 1), data_source=authority_update
@@ -1203,17 +1203,17 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    imp1 := entities.build_improvement(
+                    imp := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00002",
-                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
                     ),
                 ]
             )
@@ -1251,13 +1251,13 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
-                    imp1 := entities.build_improvement(
+                    imp := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(improvement=imp1)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
                         scheme_statuses=[],
                     ),
                 ]
