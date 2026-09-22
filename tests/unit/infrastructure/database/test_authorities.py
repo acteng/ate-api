@@ -40,7 +40,7 @@ class TestDatabaseAuthorityRepository:
             session.add_all(
                 [
                     build_authority_entity(full_name="Liverpool", abbreviation="LIV"),
-                    build_authority_entity(full_name="West Yorkshire", abbreviation="WYO"),
+                    build_authority_entity(abbreviation="WYO"),
                 ]
             )
 
