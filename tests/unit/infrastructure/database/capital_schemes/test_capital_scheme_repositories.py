@@ -225,24 +225,7 @@ class TestDatabaseCapitalSchemeRepository:
                             )
                         ],
                     ),
-                    CapitalSchemeEntity(
-                        scheme_reference="ATE00002",
-                        capital_scheme_overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="School Streets",
-                                bid_submitting_authority=liv,
-                                funding_programme=atf3,
-                                improvement=imp,
-                                scheme_type=construction,
-                                effective_date_from=local_datetime(2020, 1, 1),
-                            )
-                        ],
-                        capital_scheme_scheme_statuses=[
-                            CapitalSchemeSchemeStatusEntity(
-                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
-                            )
-                        ],
-                    ),
+                    entities.build_capital_scheme(reference="ATE00002"),
                 ]
             )
 
@@ -275,12 +258,7 @@ class TestDatabaseCapitalSchemeRepository:
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Wirral Package",
-                                bid_submitting_authority=liv,
-                                funding_programme=atf3,
-                                improvement=imp,
-                                scheme_type=construction,
+                            entities.build_capital_scheme_overview(
                                 effective_date_from=local_datetime(2020, 1, 1),
                                 effective_date_to=local_datetime(2020, 2, 1),
                             ),
@@ -576,8 +554,7 @@ class TestDatabaseCapitalSchemeRepository:
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp1 := entities.build_improvement(reference="IMP00001"),
-                    imp2 := entities.build_improvement(reference="IMP00002"),
+                    imp := entities.build_improvement(reference="IMP00001"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
                     entities.build_capital_scheme(
@@ -587,7 +564,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="Wirral Package",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
-                                improvement=imp1,
+                                improvement=imp,
                                 scheme_type=construction,
                                 effective_date_from=local_datetime(2020, 1, 1),
                             )
@@ -605,7 +582,7 @@ class TestDatabaseCapitalSchemeRepository:
                                 scheme_name="School Streets",
                                 bid_submitting_authority=liv,
                                 funding_programme=atf3,
-                                improvement=imp1,
+                                improvement=imp,
                                 scheme_type=construction,
                                 effective_date_from=local_datetime(2020, 1, 1),
                             )
@@ -618,21 +595,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00003",
-                        overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Hospital Fields Road",
-                                bid_submitting_authority=wyo,
-                                funding_programme=atf3,
-                                improvement=imp2,
-                                scheme_type=construction,
-                                effective_date_from=local_datetime(2020, 1, 1),
-                            )
-                        ],
-                        scheme_statuses=[
-                            CapitalSchemeSchemeStatusEntity(
-                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
-                            )
-                        ],
+                        overviews=[entities.build_capital_scheme_overview(bid_submitting_authority=wyo)],
                     ),
                 ]
             )
@@ -684,29 +647,16 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
-                    imp1 := entities.build_improvement(reference="IMP00001"),
-                    imp2 := entities.build_improvement(reference="IMP00002"),
-                    construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Wirral Package",
+                            entities.build_capital_scheme_overview(
                                 bid_submitting_authority=liv,
-                                funding_programme=atf3,
-                                improvement=imp1,
-                                scheme_type=construction,
                                 effective_date_from=local_datetime(2020, 1, 1),
                                 effective_date_to=local_datetime(2020, 2, 1),
                             ),
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="School Streets",
-                                bid_submitting_authority=wyo,
-                                funding_programme=atf3,
-                                improvement=imp2,
-                                scheme_type=construction,
-                                effective_date_from=local_datetime(2020, 2, 1),
+                            entities.build_capital_scheme_overview(
+                                bid_submitting_authority=wyo, effective_date_from=local_datetime(2020, 2, 1)
                             ),
                         ],
                     ),
@@ -1054,21 +1004,7 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00003",
-                        overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Hospital Fields Road",
-                                bid_submitting_authority=yny,
-                                funding_programme=atf3,
-                                improvement=imp2,
-                                scheme_type=construction,
-                                effective_date_from=local_datetime(2020, 1, 1),
-                            )
-                        ],
-                        scheme_statuses=[
-                            CapitalSchemeSchemeStatusEntity(
-                                scheme_status=active, effective_date_from=local_datetime(2020, 1, 1)
-                            )
-                        ],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp2)],
                     ),
                 ]
             )
@@ -1118,8 +1054,6 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    yny := build_authority_entity(abbreviation="YNY"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
@@ -1128,26 +1062,16 @@ class TestDatabaseCapitalSchemeRepository:
                         reference="IMP00002",
                         overviews=[entities.build_improvement_overview(funding_managed_by=wyo)],
                     ),
-                    construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
                     entities.build_capital_scheme(
                         reference="ATE00001",
                         overviews=[
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="Wirral Package",
-                                bid_submitting_authority=yny,
-                                funding_programme=atf3,
+                            entities.build_capital_scheme_overview(
                                 improvement=imp1,
-                                scheme_type=construction,
                                 effective_date_from=local_datetime(2020, 1, 1),
                                 effective_date_to=local_datetime(2020, 2, 1),
                             ),
-                            CapitalSchemeOverviewEntity(
-                                scheme_name="School Streets",
-                                bid_submitting_authority=yny,
-                                funding_programme=atf3,
-                                improvement=imp2,
-                                scheme_type=construction,
-                                effective_date_from=local_datetime(2020, 2, 1),
+                            entities.build_capital_scheme_overview(
+                                improvement=imp2, effective_date_from=local_datetime(2020, 2, 1)
                             ),
                         ],
                     ),

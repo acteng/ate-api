@@ -102,6 +102,7 @@ class EntityBuilder:
         improvement: ImprovementEntity | None = None,
         type_: SchemeTypeEntity | None = None,
         effective_date_from: datetime = dummy_local_datetime,
+        effective_date_to: datetime | None = None,
     ) -> CapitalSchemeOverviewEntity:
         return CapitalSchemeOverviewEntity(
             scheme_name=name,
@@ -110,6 +111,7 @@ class EntityBuilder:
             improvement=improvement,
             scheme_type=type_ or self._dummy_scheme_type,
             effective_date_from=effective_date_from,
+            effective_date_to=effective_date_to,
         )
 
     def build_capital_scheme_scheme_status(
