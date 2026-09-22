@@ -31,6 +31,7 @@ async def engine_fixture(database_url: str, debug: bool) -> AsyncEngine:
 
 @pytest_asyncio.fixture(name="data", loop_scope="package")
 async def data_fixture(engine: AsyncEngine) -> AsyncGenerator[None]:
+    await _restart_sequences(engine)
     yield
     await _delete_all(engine)
 
@@ -49,6 +50,13 @@ async def _create_schema(engine: AsyncEngine) -> None:
         await connection.run_sync(BaseEntity.metadata.create_all)
 
 
+async def _restart_sequences(engine: AsyncEngine) -> None:
+    # offset implicit ids of test entities to reserve numeric space for explicit ids
+    restart = 100
+    async with engine.begin() as connection:
+        await connection.execute(text(f"ALTER SEQUENCE authority.authority_authority_id_seq RESTART WITH {restart}"))
+
+
 async def _delete_all(engine: AsyncEngine) -> None:
     async with engine.begin() as connection:
         await connection.execute(text("""
@@ -65,6 +73,5 @@ async def _delete_all(engine: AsyncEngine) -> None:
                 common.funding_programme,
                 common.observation_type,
                 improvement.improvement
-            RESTART IDENTITY
             CASCADE;
         """))
