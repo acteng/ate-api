@@ -36,6 +36,7 @@ async def test_get_authority(authorities: AuthorityRepository, client: TestClien
         "abbreviation": "LIV",
         "fullName": "Liverpool City Region Combined Authority",
         "bidSubmittingCapitalSchemes": f"{client.base_url}/authorities/LIV/capital-schemes/bid-submitting",
+        "fundingManagedByCapitalSchemes": f"{client.base_url}/authorities/LIV/capital-schemes/funding-managed-by",
     }
 
 
