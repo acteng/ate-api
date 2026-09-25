@@ -1334,6 +1334,20 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme_items
 
+    async def test_get_items_by_funding_managed_by_when_no_improvement(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [build_authority_entity(abbreviation="LIV"), entities.build_capital_scheme(reference="ATE00001")]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert not capital_scheme_items
+
     async def test_get_items_by_funding_managed_by_when_no_status(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
