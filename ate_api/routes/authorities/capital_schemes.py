@@ -98,44 +98,6 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
 
 
 @router.get(
-    "/bid-submitting", summary="Get authority bid submitting capital schemes", responses={HTTP_404_NOT_FOUND: {}}
-)
-async def get_authority_bid_submitting_capital_schemes(
-    authorities: Annotated[AuthorityRepository, Depends(get_authority_repository)],
-    funding_programmes: Annotated[FundingProgrammeRepository, Depends(get_funding_programme_repository)],
-    capital_schemes: Annotated[CapitalSchemeRepository, Depends(get_capital_scheme_repository)],
-    request: Request,
-    abbreviation: Annotated[str, Path(examples=["LIV"])],
-    funding_programme_codes: Annotated[
-        list[str] | None, Query(alias="funding-programme-code", examples=["ATF3"])
-    ] = None,
-    status: Annotated[StatusModel | None, Query(examples=["active"])] = None,
-) -> CapitalSchemeItemsModel:
-    """
-    Gets the capital schemes submitted by an authority.
-    """
-    if not await authorities.exists(AuthorityAbbreviation(abbreviation)):
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND)
-
-    if funding_programme_codes and not await funding_programmes.exists_all(
-        [FundingProgrammeCode(code) for code in funding_programme_codes]
-    ):
-        raise HTTPException(status_code=HTTP_422_UNPROCESSABLE_CONTENT)
-
-    capital_scheme_items = await capital_schemes.get_items_by_bid_submitting_authority(
-        AuthorityAbbreviation(abbreviation),
-        funding_programme_codes=(
-            [FundingProgrammeCode(code) for code in funding_programme_codes] if funding_programme_codes else None
-        ),
-        status=status.to_domain() if status else None,
-    )
-    capital_scheme_models = [
-        CapitalSchemeItemModel.from_domain(capital_scheme_item, request) for capital_scheme_item in capital_scheme_items
-    ]
-    return CapitalSchemeItemsModel(items=capital_scheme_models)
-
-
-@router.get(
     "/funding-managed-by",
     summary="Get authority funding managed by capital schemes",
     responses={HTTP_404_NOT_FOUND: {}},

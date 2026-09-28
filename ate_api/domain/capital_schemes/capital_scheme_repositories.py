@@ -23,14 +23,6 @@ class CapitalSchemeRepository:
     async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         raise NotImplementedError()
 
-    async def get_items_by_bid_submitting_authority(
-        self,
-        authority_abbreviation: AuthorityAbbreviation,
-        funding_programme_codes: list[FundingProgrammeCode] | None = None,
-        status: Status | None = None,
-    ) -> list[CapitalSchemeItem]:
-        raise NotImplementedError()
-
     async def get_items_by_funding_managed_by(
         self,
         authority_abbreviation: AuthorityAbbreviation,

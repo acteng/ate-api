@@ -17,25 +17,6 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
     async def get(self, reference: CapitalSchemeReference) -> CapitalScheme | None:
         return self._capital_schemes.get(reference)
 
-    async def get_items_by_bid_submitting_authority(
-        self,
-        authority_abbreviation: AuthorityAbbreviation,
-        funding_programme_codes: list[FundingProgrammeCode] | None = None,
-        status: Status | None = None,
-    ) -> list[CapitalSchemeItem]:
-        return sorted(
-            [
-                self._to_item(capital_scheme)
-                for capital_scheme in self._capital_schemes.values()
-                if capital_scheme.overview.bid_submitting_authority == authority_abbreviation
-                and (
-                    not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
-                )
-                and (not status or capital_scheme.status.status == status)
-            ],
-            key=lambda capital_scheme_item: str(capital_scheme_item.reference),
-        )
-
     async def get_items_by_funding_managed_by(
         self,
         authority_abbreviation: AuthorityAbbreviation,
