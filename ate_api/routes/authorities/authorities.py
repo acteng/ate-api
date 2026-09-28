@@ -13,7 +13,6 @@ class AuthorityModel(BaseModel):
     id: Annotated[AnyUrl | None, Field(alias="@id")] = None
     abbreviation: str
     full_name: str
-    bid_submitting_capital_schemes: AnyUrl | None = None
     funding_managed_by_capital_schemes: AnyUrl | None = None
 
     model_config = ConfigDict(
@@ -23,7 +22,6 @@ class AuthorityModel(BaseModel):
                     "@id": "https://api.activetravelengland.gov.uk/authorities/LIV",
                     "abbreviation": "LIV",
                     "fullName": "Liverpool City Region Combined Authority",
-                    "bidSubmittingCapitalSchemes": "https://api.activetravelengland.gov.uk/authorities/LIV/capital-schemes/bid-submitting",
                     "fundingManagedByCapitalSchemes": "https://api.activetravelengland.gov.uk/authorities/LIV/capital-schemes/funding-managed-by",
                 }
             ]
@@ -36,13 +34,6 @@ class AuthorityModel(BaseModel):
             id=AnyUrl(str(request.url_for("get_authority", abbreviation=str(authority.abbreviation)))),
             abbreviation=str(authority.abbreviation),
             full_name=authority.full_name,
-            bid_submitting_capital_schemes=AnyUrl(
-                str(
-                    request.url_for(
-                        "get_authority_bid_submitting_capital_schemes", abbreviation=str(authority.abbreviation)
-                    )
-                )
-            ),
             funding_managed_by_capital_schemes=AnyUrl(
                 str(
                     request.url_for(

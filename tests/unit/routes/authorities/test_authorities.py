@@ -17,7 +17,6 @@ class TestAuthorityModel:
             id=AnyUrl(f"{base_url}/authorities/LIV"),
             abbreviation="LIV",
             full_name="Liverpool City Region Combined Authority",
-            bid_submitting_capital_schemes=AnyUrl(f"{base_url}/authorities/LIV/capital-schemes/bid-submitting"),
             funding_managed_by_capital_schemes=AnyUrl(f"{base_url}/authorities/LIV/capital-schemes/funding-managed-by"),
         )
 

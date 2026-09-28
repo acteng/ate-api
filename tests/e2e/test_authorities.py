@@ -13,7 +13,6 @@ async def test_get_authority(client: AsyncClient, access_token: str, app_client:
         "@id": f"{client.base_url}/authorities/LIV",
         "abbreviation": "LIV",
         "fullName": "Liverpool City Region Combined Authority",
-        "bidSubmittingCapitalSchemes": f"{client.base_url}/authorities/LIV/capital-schemes/bid-submitting",
         "fundingManagedByCapitalSchemes": f"{client.base_url}/authorities/LIV/capital-schemes/funding-managed-by",
     }
 
