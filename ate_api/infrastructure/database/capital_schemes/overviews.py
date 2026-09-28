@@ -6,12 +6,10 @@ from typing import Self
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
-from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
@@ -45,8 +43,6 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     capital_scheme_overview_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
     scheme_name: Mapped[str]
-    bid_submitting_authority_id = mapped_column(ForeignKey(AuthorityEntity.authority_id), nullable=False)
-    bid_submitting_authority: Mapped[AuthorityEntity] = relationship(lazy="raise")
     funding_programme_id = mapped_column(ForeignKey(FundingProgrammeEntity.funding_programme_id), nullable=False)
     funding_programme: Mapped[FundingProgrammeEntity] = relationship(lazy="raise")
     improvement_id = mapped_column(ForeignKey(ImprovementEntity.improvement_id))
@@ -60,14 +56,12 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     def from_domain(
         cls,
         overview: CapitalSchemeOverview,
-        authority_ids: dict[AuthorityAbbreviation, int],
         funding_programme_ids: dict[FundingProgrammeCode, int],
         improvement_ids: dict[ImprovementReference, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
     ) -> Self:
         return cls(
             scheme_name=overview.name,
-            bid_submitting_authority_id=authority_ids[overview.bid_submitting_authority],
             funding_programme_id=funding_programme_ids[overview.funding_programme],
             improvement_id=improvement_ids[overview.improvement] if overview.improvement else None,
             scheme_type_id=scheme_type_ids[overview.type],
@@ -82,7 +76,6 @@ class CapitalSchemeOverviewEntity(BaseEntity):
                 local_to_zoned(self.effective_date_to) if self.effective_date_to else None,
             ),
             name=self.scheme_name,
-            bid_submitting_authority=AuthorityAbbreviation(self.bid_submitting_authority.authority_abbreviation),
             funding_programme=FundingProgrammeCode(self.funding_programme.funding_programme_code),
             improvement=ImprovementReference(self.improvement.improvement_reference) if self.improvement else None,
             type=self.scheme_type.scheme_type_name.to_domain(),

@@ -58,7 +58,6 @@ def build_capital_scheme_reference(reference: str = "dummy") -> CapitalSchemeRef
 def build_capital_scheme_overview(
     effective_date: DateTimeRange | None = None,
     name: str = "dummy",
-    bid_submitting_authority: AuthorityAbbreviation | None = None,
     funding_programme: FundingProgrammeCode | None = None,
     improvement: ImprovementReference | None = None,
     type_: CapitalSchemeType = _dummy_capital_scheme_type,
@@ -66,7 +65,6 @@ def build_capital_scheme_overview(
     return CapitalSchemeOverview(
         effective_date=effective_date or build_date_time_range(),
         name=name,
-        bid_submitting_authority=bid_submitting_authority or build_authority_abbreviation(),
         funding_programme=funding_programme or build_funding_programme_code(),
         improvement=improvement,
         type=type_,

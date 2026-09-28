@@ -1,7 +1,6 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
@@ -13,7 +12,6 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database import (
-    AuthorityEntity,
     CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeEntity,
     CapitalSchemeInterventionEntity,
@@ -35,7 +33,7 @@ from ate_api.infrastructure.database import (
     SchemeTypeName,
 )
 from tests.unit.dates import local_datetime
-from tests.unit.domain.builders import build_authority_abbreviation, build_capital_scheme, build_funding_programme_code
+from tests.unit.domain.builders import build_capital_scheme, build_funding_programme_code
 from tests.unit.infrastructure.database.builders import EntityBuilder
 
 
@@ -46,7 +44,6 @@ class TestCapitalSchemeEntity:
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
@@ -58,7 +55,6 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {AuthorityAbbreviation("LIV"): 1},
             {FundingProgrammeCode("ATF3"): 2},
             {ImprovementReference("IMP00001"): 3},
             {CapitalSchemeType.CONSTRUCTION: 4},
@@ -72,7 +68,6 @@ class TestCapitalSchemeEntity:
         (overview_entity,) = capital_scheme_entity.capital_scheme_overviews
         assert (
             overview_entity.scheme_name == "Wirral Package"
-            and overview_entity.bid_submitting_authority_id == 1
             and overview_entity.funding_programme_id == 2
             and overview_entity.improvement_id == 3
             and overview_entity.scheme_type_id == 4
@@ -110,7 +105,6 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {build_authority_abbreviation(): 0},
             {build_funding_programme_code(): 0},
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
@@ -149,7 +143,6 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {build_authority_abbreviation(): 0},
             {build_funding_programme_code(): 0},
             {},
             {CapitalSchemeType.DEVELOPMENT: 0},
@@ -172,7 +165,6 @@ class TestCapitalSchemeEntity:
             capital_scheme_overviews=[
                 CapitalSchemeOverviewEntity(
                     scheme_name="Wirral Package",
-                    bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
                     funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
                     improvement=entities.build_improvement(reference="IMP00001"),
                     scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
@@ -193,7 +185,6 @@ class TestCapitalSchemeEntity:
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,

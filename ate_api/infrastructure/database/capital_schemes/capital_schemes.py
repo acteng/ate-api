@@ -3,7 +3,6 @@ from typing import Self
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
@@ -34,7 +33,6 @@ class CapitalSchemeEntity(BaseEntity):
     def from_domain(
         cls,
         capital_scheme: CapitalScheme,
-        authority_ids: dict[AuthorityAbbreviation, int],
         funding_programme_ids: dict[FundingProgrammeCode, int],
         improvement_ids: dict[ImprovementReference, int],
         scheme_type_ids: dict[CapitalSchemeType, int],
@@ -47,7 +45,7 @@ class CapitalSchemeEntity(BaseEntity):
             scheme_reference=str(capital_scheme.reference),
             capital_scheme_overviews=[
                 CapitalSchemeOverviewEntity.from_domain(
-                    capital_scheme.overview, authority_ids, funding_programme_ids, improvement_ids, scheme_type_ids
+                    capital_scheme.overview, funding_programme_ids, improvement_ids, scheme_type_ids
                 )
             ],
             capital_scheme_scheme_statuses=[

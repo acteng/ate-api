@@ -39,7 +39,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": f"{client.base_url}/improvements/IMP00001",
                 "type": "construction",
@@ -56,7 +55,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
             "reference": "ATE00002",
             "overview": {
                 "name": "School Streets",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": f"{client.base_url}/improvements/IMP00001",
                 "type": "construction",
@@ -80,7 +78,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 "reference": "ATE00001",
                 "overview": {
                     "name": "Wirral Package",
-                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
@@ -93,7 +90,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 "reference": "ATE00002",
                 "overview": {
                     "name": "School Streets",
-                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",

@@ -70,7 +70,6 @@ class TestDatabaseCapitalSchemeRepository:
                     overview=CapitalSchemeOverview(
                         effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                         name="Wirral Package",
-                        bid_submitting_authority=AuthorityAbbreviation("LIV"),
                         funding_programme=FundingProgrammeCode("ATF3"),
                         improvement=ImprovementReference("IMP00001"),
                         type=CapitalSchemeType.CONSTRUCTION,
@@ -89,7 +88,6 @@ class TestDatabaseCapitalSchemeRepository:
         assert (
             overview_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and overview_row.scheme_name == "Wirral Package"
-            and overview_row.bid_submitting_authority_id == 1
             and overview_row.funding_programme_id == 2
             and overview_row.improvement_id == 3
             and overview_row.scheme_type_id == 4
@@ -202,7 +200,6 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp := entities.build_improvement(reference="IMP00001"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
@@ -212,7 +209,6 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                bid_submitting_authority=liv,
                                 funding_programme=atf3,
                                 improvement=imp,
                                 scheme_type=construction,
@@ -237,7 +233,6 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
@@ -251,7 +246,6 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    liv := build_authority_entity(abbreviation="LIV"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp := entities.build_improvement(reference="IMP00001"),
                     construction := build_scheme_type_entity(name=SchemeTypeName.CONSTRUCTION),
@@ -264,7 +258,6 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
-                                bid_submitting_authority=liv,
                                 funding_programme=atf3,
                                 improvement=imp,
                                 scheme_type=construction,
@@ -282,7 +275,6 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme and capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             name="School Streets",
-            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
@@ -553,7 +545,6 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    yny := build_authority_entity(abbreviation="YNY"),
                     atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := entities.build_improvement(
                         reference="IMP00001",
@@ -570,7 +561,6 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
@@ -588,7 +578,6 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
-                                bid_submitting_authority=yny,
                                 funding_programme=atf3,
                                 improvement=imp1,
                                 scheme_type=construction,
@@ -618,7 +607,6 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
-                    bid_submitting_authority=AuthorityAbbreviation("YNY"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                     type=CapitalSchemeType.CONSTRUCTION,
@@ -633,7 +621,6 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="School Streets",
-                    bid_submitting_authority=AuthorityAbbreviation("YNY"),
                     funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                     type=CapitalSchemeType.CONSTRUCTION,

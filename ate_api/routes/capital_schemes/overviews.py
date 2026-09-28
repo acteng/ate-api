@@ -5,7 +5,6 @@ from typing import Self
 from fastapi import Request
 from pydantic import AnyUrl
 
-from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -28,7 +27,6 @@ class CapitalSchemeTypeModel(str, Enum):
 
 class CapitalSchemeOverviewModel(BaseModel):
     name: str
-    bid_submitting_authority: AnyUrl
     funding_programme: AnyUrl
     improvement: AnyUrl | None
     type: CapitalSchemeTypeModel
@@ -37,9 +35,6 @@ class CapitalSchemeOverviewModel(BaseModel):
     def from_domain(cls, overview: CapitalSchemeOverview, request: Request) -> Self:
         return cls(
             name=overview.name,
-            bid_submitting_authority=AnyUrl(
-                str(request.url_for("get_authority", abbreviation=str(overview.bid_submitting_authority)))
-            ),
             funding_programme=AnyUrl(
                 str(request.url_for("get_funding_programme", code=str(overview.funding_programme)))
             ),
@@ -55,9 +50,6 @@ class CapitalSchemeOverviewModel(BaseModel):
         return CapitalSchemeOverview(
             effective_date=DateTimeRange(now),
             name=self.name,
-            bid_submitting_authority=AuthorityAbbreviation(
-                path_parameter_for(request, "get_authority", "abbreviation", str(self.bid_submitting_authority))
-            ),
             funding_programme=FundingProgrammeCode(
                 path_parameter_for(request, "get_funding_programme", "code", str(self.funding_programme))
             ),

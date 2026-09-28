@@ -46,7 +46,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self._session = session
 
     async def add(self, capital_scheme: CapitalScheme) -> None:
-        authority_ids = await self._get_authority_ids(capital_scheme)
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         improvement_ids = await self._get_improvement_ids(capital_scheme)
         scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
@@ -58,7 +57,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self._session.add(
             CapitalSchemeEntity.from_domain(
                 capital_scheme,
-                authority_ids,
                 funding_programme_ids,
                 improvement_ids,
                 scheme_type_ids,
@@ -75,9 +73,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current overview
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-            joinedload(
-                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
-            ),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
@@ -145,9 +140,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current overview
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-            joinedload(
-                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.bid_submitting_authority
-            ),
             # possible forward reference to funding programme filter join
             (contains_eager if funding_programme_codes else joinedload)(
                 CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
@@ -246,15 +238,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return rows.one()
-
-    async def _get_authority_ids(self, capital_scheme: CapitalScheme) -> dict[AuthorityAbbreviation, int]:
-        authority_abbreviation = str(capital_scheme.overview.bid_submitting_authority)
-        rows = await self._session.execute(
-            select(AuthorityEntity.authority_abbreviation, AuthorityEntity.authority_id).where(
-                AuthorityEntity.authority_abbreviation == authority_abbreviation
-            )
-        )
-        return {AuthorityAbbreviation(row.authority_abbreviation): row.authority_id for row in rows}
 
     async def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[FundingProgrammeCode, int]:
         funding_programme_code = str(capital_scheme.overview.funding_programme)

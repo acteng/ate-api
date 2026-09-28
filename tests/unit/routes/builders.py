@@ -11,14 +11,12 @@ def build_authority_url(base_url: str) -> AnyUrl:
 def build_capital_scheme_overview_model(
     base_url: str,
     name: str = "dummy",
-    bid_submitting_authority: AnyUrl | None = None,
     funding_programme: AnyUrl | None = None,
     improvement: AnyUrl | None = None,
     type_: CapitalSchemeTypeModel = CapitalSchemeTypeModel.DEVELOPMENT,
 ) -> CapitalSchemeOverviewModel:
     return CapitalSchemeOverviewModel(
         name=name,
-        bid_submitting_authority=bid_submitting_authority or build_authority_url(base_url),
         funding_programme=funding_programme or build_funding_programme_url(base_url),
         improvement=improvement,
         type=type_,

@@ -66,7 +66,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
         overview=CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
@@ -87,7 +86,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="School Streets",
-                bid_submitting_authority=AuthorityAbbreviation("LIV"),
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
                 type=CapitalSchemeType.CONSTRUCTION,
@@ -123,7 +121,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 "reference": "ATE00001",
                 "overview": {
                     "name": "Wirral Package",
-                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",
@@ -136,7 +133,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 "reference": "ATE00002",
                 "overview": {
                     "name": "School Streets",
-                    "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                     "improvement": f"{client.base_url}/improvements/IMP00001",
                     "type": "construction",

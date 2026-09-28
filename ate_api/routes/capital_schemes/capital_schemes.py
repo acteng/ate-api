@@ -42,7 +42,6 @@ class CapitalSchemeModel(BaseModel):
                     "reference": "ATE00001",
                     "overview": {
                         "name": "Wirral Package",
-                        "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                         "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                         "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                         "type": "construction",

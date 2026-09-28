@@ -2,13 +2,11 @@ from datetime import UTC, datetime
 
 import pytest
 
-from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.infrastructure.database import (
-    AuthorityEntity,
     CapitalSchemeOverviewEntity,
     FundingProgrammeEntity,
     SchemeTypeEntity,
@@ -16,7 +14,6 @@ from ate_api.infrastructure.database import (
 )
 from tests.unit.dates import local_datetime
 from tests.unit.domain.builders import (
-    build_authority_abbreviation,
     build_capital_scheme_overview,
     build_capital_scheme_type,
     build_funding_programme_code,
@@ -44,7 +41,6 @@ class TestCapitalSchemeOverviewEntity:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            bid_submitting_authority=AuthorityAbbreviation("LIV"),
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
             type=CapitalSchemeType.CONSTRUCTION,
@@ -52,7 +48,6 @@ class TestCapitalSchemeOverviewEntity:
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
-            {AuthorityAbbreviation("LIV"): 1},
             {FundingProgrammeCode("ATF3"): 2},
             {ImprovementReference("IMP00001"): 3},
             {CapitalSchemeType.CONSTRUCTION: 4},
@@ -60,7 +55,6 @@ class TestCapitalSchemeOverviewEntity:
 
         assert (
             overview_entity.scheme_name == "Wirral Package"
-            and overview_entity.bid_submitting_authority_id == 1
             and overview_entity.funding_programme_id == 2
             and overview_entity.improvement_id == 3
             and overview_entity.scheme_type_id == 4
@@ -73,7 +67,6 @@ class TestCapitalSchemeOverviewEntity:
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
-            {build_authority_abbreviation(): 0},
             {build_funding_programme_code(): 0},
             {},
             {build_capital_scheme_type(): 0},
@@ -88,7 +81,6 @@ class TestCapitalSchemeOverviewEntity:
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
-            {build_authority_abbreviation(): 0},
             {build_funding_programme_code(): 0},
             {},
             {build_capital_scheme_type(): 0},
@@ -103,7 +95,6 @@ class TestCapitalSchemeOverviewEntity:
 
         overview_entity = CapitalSchemeOverviewEntity.from_domain(
             overview,
-            {build_authority_abbreviation(): 0},
             {build_funding_programme_code(): 0},
             {},
             {build_capital_scheme_type(): 0},
@@ -115,7 +106,6 @@ class TestCapitalSchemeOverviewEntity:
     def test_to_domain(self, entities: EntityBuilder) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
             scheme_name="Wirral Package",
-            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             improvement=entities.build_improvement(reference="IMP00001"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
@@ -127,7 +117,6 @@ class TestCapitalSchemeOverviewEntity:
         assert (
             overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC))
             and overview.name == "Wirral Package"
-            and overview.bid_submitting_authority == AuthorityAbbreviation("LIV")
             and overview.funding_programme == FundingProgrammeCode("ATF3")
             and overview.improvement == ImprovementReference("IMP00001")
             and overview.type == CapitalSchemeType.CONSTRUCTION
@@ -136,7 +125,6 @@ class TestCapitalSchemeOverviewEntity:
     def test_to_domain_without_improvement(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
             scheme_name="Wirral Package",
-            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
             effective_date_from=local_datetime(2020, 1, 1),
@@ -149,7 +137,6 @@ class TestCapitalSchemeOverviewEntity:
     def test_to_domain_when_historic(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
             scheme_name="Wirral Package",
-            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
             effective_date_from=local_datetime(2020, 1, 1),
@@ -163,7 +150,6 @@ class TestCapitalSchemeOverviewEntity:
     def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
         overview_entity = CapitalSchemeOverviewEntity(
             scheme_name="Wirral Package",
-            bid_submitting_authority=AuthorityEntity(authority_abbreviation="LIV"),
             funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
             scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
             effective_date_from=local_datetime(2020, 6, 1, 13),

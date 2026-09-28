@@ -56,7 +56,6 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00001",
                             "overview": {
                                 "name": "Wirral Package",
-                                "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                                 "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                                 "type": "construction",
@@ -69,7 +68,6 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00002",
                             "overview": {
                                 "name": "School Streets",
-                                "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF4",
                                 "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                                 "type": "construction",
@@ -82,7 +80,6 @@ class CapitalSchemeItemsModel(CollectionModel[CapitalSchemeItemModel]):
                             "reference": "ATE00003",
                             "overview": {
                                 "name": "Hospital Fields Road",
-                                "bidSubmittingAuthority": "https://api.activetravelengland.gov.uk/authorities/LIV",
                                 "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF5",
                                 "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                                 "type": "construction",

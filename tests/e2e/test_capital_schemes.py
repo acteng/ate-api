@@ -25,7 +25,6 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": f"{client.base_url}/improvements/IMP00001",
                 "type": "construction",
@@ -72,7 +71,6 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
         "reference": "ATE00001",
         "overview": {
             "name": "Wirral Package",
-            "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
             "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
             "improvement": f"{client.base_url}/improvements/IMP00001",
             "type": "construction",
@@ -112,7 +110,6 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": None,
                 "type": "construction",
@@ -150,7 +147,6 @@ async def test_create_financial_concurrently(client: AsyncClient, access_token: 
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": None,
                 "type": "construction",
@@ -189,7 +185,6 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": None,
                 "type": "construction",
@@ -284,7 +279,6 @@ async def test_create_milestones_concurrently(client: AsyncClient, access_token:
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": None,
                 "type": "construction",
@@ -338,7 +332,6 @@ async def test_create_authority_review(client: AsyncClient, access_token: str, a
             "reference": "ATE00001",
             "overview": {
                 "name": "Wirral Package",
-                "bidSubmittingAuthority": f"{client.base_url}/authorities/LIV",
                 "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                 "improvement": None,
                 "type": "construction",
