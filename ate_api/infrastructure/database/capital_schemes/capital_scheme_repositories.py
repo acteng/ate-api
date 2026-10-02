@@ -328,7 +328,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         return {row.data_source_name.to_domain(): row.data_source_id for row in rows}
 
     @staticmethod
-    def _select_ranked_capital_scheme_authority_reviews() -> Select[tuple[CapitalSchemeAuthorityReviewEntity, int]]:
+    def _select_ranked_capital_scheme_authority_reviews() -> Select[CapitalSchemeAuthorityReviewEntity, int]:
         return select(
             CapitalSchemeAuthorityReviewEntity,
             func.rank()
@@ -343,9 +343,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         )
 
     @staticmethod
-    def _select_current_capital_scheme_interventions(
-        capital_scheme_id: int,
-    ) -> Select[tuple[CapitalSchemeInterventionEntity]]:
+    def _select_current_capital_scheme_interventions(capital_scheme_id: int) -> Select[CapitalSchemeInterventionEntity]:
         return (
             select(CapitalSchemeInterventionEntity)
             .options(
