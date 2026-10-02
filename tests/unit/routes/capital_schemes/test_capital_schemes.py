@@ -34,10 +34,7 @@ from ate_api.routes.data_sources import DataSourceModel
 from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_reference
-from tests.unit.routes.builders import (
-    build_capital_scheme_overview_model,
-    build_capital_scheme_status_model,
-)
+from tests.unit.routes.builders import build_capital_scheme_overview_model, build_capital_scheme_status_model
 
 
 class TestCapitalSchemeModel:
