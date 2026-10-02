@@ -1,11 +1,10 @@
 from datetime import datetime
-from enum import Enum
 from typing import Self
 
 from fastapi import Request
 from pydantic import AnyUrl
 
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
@@ -13,23 +12,10 @@ from ate_api.routes.base import BaseModel
 from ate_api.routes.links import path_parameter_for
 
 
-class CapitalSchemeTypeModel(str, Enum):
-    DEVELOPMENT = "development"
-    CONSTRUCTION = "construction"
-
-    @classmethod
-    def from_domain(cls, type_: CapitalSchemeType) -> Self:
-        return cls[type_.name]
-
-    def to_domain(self) -> CapitalSchemeType:
-        return CapitalSchemeType[self.name]
-
-
 class CapitalSchemeOverviewModel(BaseModel):
     name: str
     funding_programme: AnyUrl
     improvement: AnyUrl | None
-    type: CapitalSchemeTypeModel
 
     @classmethod
     def from_domain(cls, overview: CapitalSchemeOverview, request: Request) -> Self:
@@ -43,7 +29,6 @@ class CapitalSchemeOverviewModel(BaseModel):
                 if overview.improvement
                 else None
             ),
-            type=CapitalSchemeTypeModel.from_domain(overview.type),
         )
 
     def to_domain(self, now: datetime, request: Request) -> CapitalSchemeOverview:
@@ -58,5 +43,4 @@ class CapitalSchemeOverviewModel(BaseModel):
                 if self.improvement
                 else None
             ),
-            type=self.type.to_domain(),
         )

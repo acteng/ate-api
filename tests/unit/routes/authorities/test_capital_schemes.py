@@ -6,7 +6,7 @@ from pydantic import AnyUrl
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -14,7 +14,7 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.authorities.capital_schemes import CapitalSchemeItemModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
-from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
+from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 from ate_api.routes.data_sources import DataSourceModel
 from tests.unit.domain.builders import (
@@ -33,7 +33,6 @@ class TestCapitalSchemeItemModel:
                 name="Wirral Package",
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
             status=CapitalSchemeStatus(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
@@ -50,7 +49,6 @@ class TestCapitalSchemeItemModel:
                 name="Wirral Package",
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
-                type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             authority_review=None,

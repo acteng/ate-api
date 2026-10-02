@@ -9,7 +9,7 @@ from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestone, Cap
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -27,7 +27,7 @@ from ate_api.routes.capital_schemes.milestones import (
     MilestoneModel,
 )
 from ate_api.routes.capital_schemes.outputs import CapitalSchemeOutputModel, OutputMeasureModel, OutputTypeModel
-from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
+from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
@@ -49,7 +49,6 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
             status=CapitalSchemeStatus(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
@@ -67,7 +66,6 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
-                type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(items=[]),
@@ -218,7 +216,6 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
-                type=CapitalSchemeTypeModel.CONSTRUCTION,
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(items=[]),
@@ -237,7 +234,6 @@ class TestCapitalSchemeModel:
                 name="Wirral Package",
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
-                type=CapitalSchemeType.CONSTRUCTION,
             )
             and capital_scheme.status
             == CapitalSchemeStatus(effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE)

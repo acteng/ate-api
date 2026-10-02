@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -35,7 +34,6 @@ class CapitalSchemeEntity(BaseEntity):
         capital_scheme: CapitalScheme,
         funding_programme_ids: dict[FundingProgrammeCode, int],
         improvement_ids: dict[ImprovementReference, int],
-        scheme_type_ids: dict[CapitalSchemeType, int],
         scheme_status_ids: dict[Status, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
         observation_type_ids: dict[ObservationType, int],
@@ -44,9 +42,7 @@ class CapitalSchemeEntity(BaseEntity):
         return cls(
             scheme_reference=str(capital_scheme.reference),
             capital_scheme_overviews=[
-                CapitalSchemeOverviewEntity.from_domain(
-                    capital_scheme.overview, funding_programme_ids, improvement_ids, scheme_type_ids
-                )
+                CapitalSchemeOverviewEntity.from_domain(capital_scheme.overview, funding_programme_ids, improvement_ids)
             ],
             capital_scheme_scheme_statuses=[
                 CapitalSchemeSchemeStatusEntity.from_domain(capital_scheme.status, scheme_status_ids)

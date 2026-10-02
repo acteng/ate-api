@@ -25,8 +25,6 @@ from ate_api.infrastructure.database import (
     ObservationTypeName,
     SchemeStatusEntity,
     SchemeStatusName,
-    SchemeTypeEntity,
-    SchemeTypeName,
 )
 from tests.unit.dates import dummy_local_datetime
 
@@ -42,7 +40,6 @@ class EntityBuilder:
         self._dummy_data_source = build_data_source_entity()
         self._dummy_funding_programme = build_funding_programme_entity()
         self._dummy_authority = build_authority_entity()
-        self._dummy_scheme_type = build_scheme_type_entity()
         self._dummy_scheme_status = build_scheme_status_entity()
 
     def build_improvement(
@@ -99,7 +96,6 @@ class EntityBuilder:
         name: str = "dummy",
         funding_programme: FundingProgrammeEntity | None = None,
         improvement: ImprovementEntity | None = None,
-        type_: SchemeTypeEntity | None = None,
         effective_date_from: datetime = dummy_local_datetime,
         effective_date_to: datetime | None = None,
     ) -> CapitalSchemeOverviewEntity:
@@ -107,7 +103,6 @@ class EntityBuilder:
             scheme_name=name,
             funding_programme=funding_programme or self._dummy_funding_programme,
             improvement=improvement,
-            scheme_type=type_ or self._dummy_scheme_type,
             effective_date_from=effective_date_from,
             effective_date_to=effective_date_to,
         )
@@ -126,12 +121,6 @@ def build_authority_entity(
     return AuthorityEntity(
         authority_id=id_, authority_full_name=full_name or abbreviation, authority_abbreviation=abbreviation
     )
-
-
-def build_scheme_type_entity(
-    id_: int | None = None, name: SchemeTypeName = SchemeTypeName.DEVELOPMENT
-) -> SchemeTypeEntity:
-    return SchemeTypeEntity(scheme_type_id=id_, scheme_type_name=name)
 
 
 def build_scheme_status_entity(

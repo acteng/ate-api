@@ -1,12 +1,11 @@
 from collections.abc import Mapping
 from datetime import datetime
-from enum import Enum
 from typing import Self
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
@@ -14,26 +13,6 @@ from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity
-
-
-class SchemeTypeName(Enum):
-    DEVELOPMENT = "development"
-    CONSTRUCTION = "construction"
-
-    @classmethod
-    def from_domain(cls, type_: CapitalSchemeType) -> Self:
-        return cls[type_.name]
-
-    def to_domain(self) -> CapitalSchemeType:
-        return CapitalSchemeType[self.name]
-
-
-class SchemeTypeEntity(BaseEntity):
-    __tablename__ = "scheme_type"
-    __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
-
-    scheme_type_id: Mapped[int] = mapped_column(primary_key=True)
-    scheme_type_name: Mapped[SchemeTypeName] = mapped_column(unique=True)
 
 
 class CapitalSchemeOverviewEntity(BaseEntity):
@@ -47,8 +26,6 @@ class CapitalSchemeOverviewEntity(BaseEntity):
     funding_programme: Mapped[FundingProgrammeEntity] = relationship(lazy="raise")
     improvement_id = mapped_column(ForeignKey(ImprovementEntity.improvement_id))
     improvement: Mapped[ImprovementEntity | None] = relationship(lazy="raise")
-    scheme_type_id = mapped_column(ForeignKey(SchemeTypeEntity.scheme_type_id), nullable=False)
-    scheme_type: Mapped[SchemeTypeEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
     effective_date_to: Mapped[datetime | None]
 
@@ -58,13 +35,11 @@ class CapitalSchemeOverviewEntity(BaseEntity):
         overview: CapitalSchemeOverview,
         funding_programme_ids: dict[FundingProgrammeCode, int],
         improvement_ids: dict[ImprovementReference, int],
-        scheme_type_ids: dict[CapitalSchemeType, int],
     ) -> Self:
         return cls(
             scheme_name=overview.name,
             funding_programme_id=funding_programme_ids[overview.funding_programme],
             improvement_id=improvement_ids[overview.improvement] if overview.improvement else None,
-            scheme_type_id=scheme_type_ids[overview.type],
             effective_date_from=zoned_to_local(overview.effective_date.from_),
             effective_date_to=zoned_to_local(overview.effective_date.to) if overview.effective_date.to else None,
         )
@@ -78,5 +53,4 @@ class CapitalSchemeOverviewEntity(BaseEntity):
             name=self.scheme_name,
             funding_programme=FundingProgrammeCode(self.funding_programme.funding_programme_code),
             improvement=ImprovementReference(self.improvement.improvement_reference) if self.improvement else None,
-            type=self.scheme_type.scheme_type_name.to_domain(),
         )

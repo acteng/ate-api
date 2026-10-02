@@ -7,7 +7,6 @@ from ate_api.domain.authorities import AuthorityAbbreviation
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
@@ -24,11 +23,7 @@ from ate_api.infrastructure.database.capital_schemes.interventions import (
     InterventionTypeMeasureEntity,
     InterventionTypeName,
 )
-from ate_api.infrastructure.database.capital_schemes.overviews import (
-    CapitalSchemeOverviewEntity,
-    SchemeTypeEntity,
-    SchemeTypeName,
-)
+from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.capital_schemes.statuses import (
     CapitalSchemeSchemeStatusEntity,
     SchemeStatusEntity,
@@ -48,7 +43,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
     async def add(self, capital_scheme: CapitalScheme) -> None:
         funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         improvement_ids = await self._get_improvement_ids(capital_scheme)
-        scheme_type_ids = await self._get_scheme_type_ids(capital_scheme)
         scheme_status_ids = await self._get_scheme_status_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
         observation_type_ids = await self._get_observation_type_ids(capital_scheme)
@@ -59,7 +53,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
                 capital_scheme,
                 funding_programme_ids,
                 improvement_ids,
-                scheme_type_ids,
                 scheme_status_ids,
                 intervention_type_measure_ids,
                 observation_type_ids,
@@ -75,7 +68,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
-            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
         ).join(
             CapitalSchemeEntity.capital_scheme_overviews.and_(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
         )
@@ -146,7 +138,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             ),
             # forward reference to authority filter join
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
-            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.scheme_type),
         ).join(
             CapitalSchemeEntity.capital_scheme_overviews.and_(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
         )
@@ -256,15 +247,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return {ImprovementReference(row.improvement_reference): row.improvement_id for row in rows}
-
-    async def _get_scheme_type_ids(self, capital_scheme: CapitalScheme) -> dict[CapitalSchemeType, int]:
-        scheme_type_name = SchemeTypeName.from_domain(capital_scheme.overview.type)
-        rows = await self._session.execute(
-            select(SchemeTypeEntity.scheme_type_name, SchemeTypeEntity.scheme_type_id).where(
-                SchemeTypeEntity.scheme_type_name == scheme_type_name
-            )
-        )
-        return {row.scheme_type_name.to_domain(): row.scheme_type_id for row in rows}
 
     async def _get_scheme_status_ids(self, capital_scheme: CapitalScheme) -> dict[Status, int]:
         scheme_status_name = SchemeStatusName.from_domain(capital_scheme.status.status)

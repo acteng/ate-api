@@ -4,7 +4,7 @@ from decimal import Decimal
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -29,8 +29,6 @@ from ate_api.infrastructure.database import (
     ObservationTypeName,
     SchemeStatusEntity,
     SchemeStatusName,
-    SchemeTypeEntity,
-    SchemeTypeName,
 )
 from tests.unit.dates import local_datetime
 from tests.unit.domain.builders import build_capital_scheme, build_funding_programme_code
@@ -46,7 +44,6 @@ class TestCapitalSchemeEntity:
                 name="Wirral Package",
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
             status=CapitalSchemeStatus(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE
@@ -57,8 +54,7 @@ class TestCapitalSchemeEntity:
             capital_scheme,
             {FundingProgrammeCode("ATF3"): 2},
             {ImprovementReference("IMP00001"): 3},
-            {CapitalSchemeType.CONSTRUCTION: 4},
-            {Status.ACTIVE: 5},
+            {Status.ACTIVE: 4},
             {},
             {},
             {},
@@ -70,13 +66,12 @@ class TestCapitalSchemeEntity:
             overview_entity.scheme_name == "Wirral Package"
             and overview_entity.funding_programme_id == 2
             and overview_entity.improvement_id == 3
-            and overview_entity.scheme_type_id == 4
             and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
         (scheme_status_entity,) = capital_scheme_entity.capital_scheme_scheme_statuses
         assert (
-            scheme_status_entity.scheme_status_id == 5
+            scheme_status_entity.scheme_status_id == 4
             and scheme_status_entity.effective_date_from == local_datetime(2020, 3, 1)
             and not scheme_status_entity.effective_date_to
         )
@@ -107,7 +102,6 @@ class TestCapitalSchemeEntity:
             capital_scheme,
             {build_funding_programme_code(): 0},
             {},
-            {CapitalSchemeType.DEVELOPMENT: 0},
             {Status.PIPELINE: 0},
             {
                 (OutputType.WIDENING_EXISTING_FOOTWAY, OutputMeasure.MILES): 1,
@@ -145,7 +139,6 @@ class TestCapitalSchemeEntity:
             capital_scheme,
             {build_funding_programme_code(): 0},
             {},
-            {CapitalSchemeType.DEVELOPMENT: 0},
             {Status.PIPELINE: 0},
             {},
             {},
@@ -167,7 +160,6 @@ class TestCapitalSchemeEntity:
                     scheme_name="Wirral Package",
                     funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
                     improvement=entities.build_improvement(reference="IMP00001"),
-                    scheme_type=SchemeTypeEntity(scheme_type_name=SchemeTypeName.CONSTRUCTION),
                     effective_date_from=local_datetime(2020, 1, 1),
                 )
             ],
@@ -187,7 +179,6 @@ class TestCapitalSchemeEntity:
             name="Wirral Package",
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
-            type=CapitalSchemeType.CONSTRUCTION,
         )
         assert capital_scheme.status == CapitalSchemeStatus(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)), status=Status.ACTIVE

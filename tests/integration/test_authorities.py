@@ -7,7 +7,7 @@ from ate_api.domain.authorities import Authority, AuthorityAbbreviation, Authori
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -68,7 +68,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
             name="Wirral Package",
             funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
-            type=CapitalSchemeType.CONSTRUCTION,
         ),
         status=CapitalSchemeStatus(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
@@ -88,7 +87,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 name="School Streets",
                 funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
-                type=CapitalSchemeType.CONSTRUCTION,
             ),
             status=CapitalSchemeStatus(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)), status=Status.ACTIVE
@@ -123,7 +121,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                     "name": "Wirral Package",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                     "improvement": f"{client.base_url}/improvements/IMP00001",
-                    "type": "construction",
                 },
                 "status": {"status": "active"},
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
@@ -135,7 +132,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                     "name": "School Streets",
                     "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
                     "improvement": f"{client.base_url}/improvements/IMP00001",
-                    "type": "construction",
                 },
                 "status": {"status": "active"},
                 "authorityReview": None,

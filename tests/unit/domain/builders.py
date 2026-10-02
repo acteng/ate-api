@@ -2,7 +2,7 @@ from datetime import datetime
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview, CapitalSchemeType
+from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -11,7 +11,6 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.improvements.overviews import ImprovementOverview
 from tests.unit.dates import dummy_datetime
 
-_dummy_capital_scheme_type = CapitalSchemeType.DEVELOPMENT
 _dummy_data_source = DataSource.PULSE_5
 
 
@@ -60,14 +59,12 @@ def build_capital_scheme_overview(
     name: str = "dummy",
     funding_programme: FundingProgrammeCode | None = None,
     improvement: ImprovementReference | None = None,
-    type_: CapitalSchemeType = _dummy_capital_scheme_type,
 ) -> CapitalSchemeOverview:
     return CapitalSchemeOverview(
         effective_date=effective_date or build_date_time_range(),
         name=name,
         funding_programme=funding_programme or build_funding_programme_code(),
         improvement=improvement,
-        type=type_,
     )
 
 
@@ -79,10 +76,6 @@ def build_capital_scheme_status(
 
 def build_funding_programme_code(code: str = "dummy") -> FundingProgrammeCode:
     return FundingProgrammeCode(code)
-
-
-def build_capital_scheme_type() -> CapitalSchemeType:
-    return _dummy_capital_scheme_type
 
 
 def build_date_time_range(from_: datetime = dummy_datetime, to: datetime | None = None) -> DateTimeRange:

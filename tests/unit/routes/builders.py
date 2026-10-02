@@ -1,6 +1,6 @@
 from pydantic import AnyUrl
 
-from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel, CapitalSchemeTypeModel
+from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 
 
@@ -13,13 +13,9 @@ def build_capital_scheme_overview_model(
     name: str = "dummy",
     funding_programme: AnyUrl | None = None,
     improvement: AnyUrl | None = None,
-    type_: CapitalSchemeTypeModel = CapitalSchemeTypeModel.DEVELOPMENT,
 ) -> CapitalSchemeOverviewModel:
     return CapitalSchemeOverviewModel(
-        name=name,
-        funding_programme=funding_programme or build_funding_programme_url(base_url),
-        improvement=improvement,
-        type=type_,
+        name=name, funding_programme=funding_programme or build_funding_programme_url(base_url), improvement=improvement
     )
 
 

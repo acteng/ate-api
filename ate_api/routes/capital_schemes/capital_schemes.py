@@ -44,7 +44,6 @@ class CapitalSchemeModel(BaseModel):
                         "name": "Wirral Package",
                         "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
                         "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
-                        "type": "construction",
                     },
                     "status": {"status": "active"},
                     "financials": {"items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]},

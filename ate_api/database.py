@@ -9,7 +9,6 @@ from sqlalchemy.sql.ddl import CreateSchema
 
 from ate_api.domain.capital_scheme_milestones import Milestone
 from ate_api.domain.capital_schemes.outputs import OutputMeasure, OutputType
-from ate_api.domain.capital_schemes.overviews import CapitalSchemeType
 from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.financial_types import FinancialType
@@ -31,8 +30,6 @@ from ate_api.infrastructure.database import (
     ObservationTypeName,
     SchemeStatusEntity,
     SchemeStatusName,
-    SchemeTypeEntity,
-    SchemeTypeName,
 )
 from ate_api.infrastructure.database.unit_of_work import DatabaseUnitOfWork
 from ate_api.settings import Settings, get_settings
@@ -93,7 +90,6 @@ async def _create_reference_data(engine: AsyncEngine) -> None:
         session.add_all(intervention_measures.values())
         session.add_all(_create_intervention_type_measures(intervention_types, intervention_measures))
         session.add_all(_create_milestones())
-        session.add_all(_create_scheme_types())
         await session.commit()
 
 
@@ -182,7 +178,3 @@ def _create_milestones() -> list[MilestoneEntity]:
         MilestoneEntity(milestone_name=MilestoneName.from_domain(milestone), milestone_order=index)
         for index, milestone in enumerate(Milestone)
     ]
-
-
-def _create_scheme_types() -> list[SchemeTypeEntity]:
-    return [SchemeTypeEntity(scheme_type_name=SchemeTypeName.from_domain(type_)) for type_ in CapitalSchemeType]
