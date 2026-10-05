@@ -764,6 +764,44 @@ class TestDatabaseCapitalSchemeRepository:
             )
         ]
 
+    async def test_get_items_by_funding_managed_by_filters_by_current_improvement_overview(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    wyo := build_authority_entity(abbreviation="WYO"),
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[
+                            entities.build_improvement_overview(
+                                funding_managed_by=liv,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
+                            ),
+                            entities.build_improvement_overview(
+                                funding_managed_by=wyo, effective_date_from=local_datetime(2020, 2, 1)
+                            ),
+                        ],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[
+                            entities.build_capital_scheme_overview(
+                                improvement=imp, effective_date_from=local_datetime(2020, 1, 1)
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert not capital_scheme_items
+
     async def test_get_items_by_funding_managed_by_filters_by_funding_programme(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
