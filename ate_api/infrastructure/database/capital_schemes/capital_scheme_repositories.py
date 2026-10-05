@@ -244,7 +244,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # filter by authority
         statement = (
             statement.join(ImprovementEntity)
-            .join(ImprovementOverviewEntity)
+            .join(ImprovementEntity.improvement_overviews.and_(ImprovementOverviewEntity.effective_date_to.is_(None)))
             .join(AuthorityEntity)
             .where(AuthorityEntity.authority_abbreviation == str(authority_abbreviation))
         )
