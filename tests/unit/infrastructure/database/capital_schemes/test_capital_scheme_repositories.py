@@ -954,6 +954,34 @@ class TestDatabaseCapitalSchemeRepository:
 
         assert not capital_scheme_items
 
+    async def test_get_items_by_funding_managed_by_when_improvement_deleted(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv, is_deleted=True)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[
+                            entities.build_capital_scheme_overview(
+                                improvement=imp, effective_date_from=local_datetime(2020, 1, 1)
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(AuthorityAbbreviation("LIV"))
+
+        assert not capital_scheme_items
+
     async def test_get_items_by_funding_managed_by_when_no_status(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
