@@ -10,7 +10,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 
 from ate_api.auth import authorize
 from ate_api.database import create_database_schema, get_engine
-from ate_api.routes import authorities, capital_schemes, docs, funding_programmes, improvements
+from ate_api.routes import authorities, capital_schemes, docs, funding_programmes, improvements, legal
 from ate_api.settings import get_settings
 
 
@@ -45,3 +45,4 @@ router.include_router(capital_schemes.router)
 router.include_router(funding_programmes.router)
 app.include_router(router)
 app.include_router(docs.router)
+app.include_router(legal.router)
