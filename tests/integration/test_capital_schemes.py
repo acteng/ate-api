@@ -82,7 +82,7 @@ async def test_get_capital_scheme(
         },
         # Workaround: https://github.com/python/mypy/issues/19474
         "status": {"status": cast(Any, "active")},
-        "financials": {"items": []},
+        "financials": {"funding": {"items": []}, "spend": None},
         "milestones": {"currentMilestone": None, "items": []},
         "outputs": {"items": []},
         "authorityReview": None,
@@ -102,6 +102,14 @@ async def test_get_capital_scheme_with_financials(
     financials.adjust_financial(
         CapitalSchemeFinancial(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            type=FinancialType.FUNDING_ALLOCATION,
+            amount=Money(3_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+    )
+    financials.adjust_financial(
+        CapitalSchemeFinancial(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             type=FinancialType.SPEND_TO_DATE,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
@@ -114,7 +122,8 @@ async def test_get_capital_scheme_with_financials(
 
     assert response.status_code == 200
     assert response.json()["financials"] == {
-        "items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]
+        "funding": {"items": [{"amount": 3_000_000, "source": "ATF4 bid"}]},
+        "spend": {"amount": 2_000_000, "source": "ATF4 bid"},
     }
 
 

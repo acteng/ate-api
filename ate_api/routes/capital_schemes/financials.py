@@ -15,6 +15,7 @@ from ate_api.domain.capital_scheme_financials import (
 )
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.moneys import Money
 from ate_api.infrastructure.clock import Clock
 from ate_api.repositories import get_capital_scheme_financials_repository
@@ -61,10 +62,49 @@ class CreateCapitalSchemeFinancialModel(CapitalSchemeFinancialModel):
         return type_
 
 
-class CapitalSchemeFinancialsModel(CollectionModel[CapitalSchemeFinancialModel]):
+class CapitalSchemeFundingModel(BaseModel):
+    amount: int
+    source: DataSourceModel
+
+    @classmethod
+    def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
+        if financial.type != FinancialType.FUNDING_ALLOCATION:
+            raise ValueError(f"Invalid financial type: {financial.type}")
+
+        return cls(amount=financial.amount.amount, source=DataSourceModel.from_domain(financial.data_source))
+
+
+class CapitalSchemeSpendModel(BaseModel):
+    amount: int
+    source: DataSourceModel
+
+    @classmethod
+    def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
+        if financial.type != FinancialType.SPEND_TO_DATE:
+            raise ValueError(f"Invalid financial type: {financial.type}")
+
+        return cls(amount=financial.amount.amount, source=DataSourceModel.from_domain(financial.data_source))
+
+
+class CapitalSchemeFinancialsModel(BaseModel):
+    funding: CollectionModel[CapitalSchemeFundingModel]
+    spend: CapitalSchemeSpendModel | None
+
     @classmethod
     def from_domain(cls, financials: CapitalSchemeFinancials) -> Self:
-        return cls(items=[CapitalSchemeFinancialModel.from_domain(financial) for financial in financials.financials])
+        fundings = [
+            financial for financial in financials.financials if financial.type == FinancialType.FUNDING_ALLOCATION
+        ]
+        spend = next(
+            (financial for financial in financials.financials if financial.type == FinancialType.SPEND_TO_DATE), None
+        )
+
+        return cls(
+            funding=CollectionModel[CapitalSchemeFundingModel](
+                items=[CapitalSchemeFundingModel.from_domain(funding) for funding in fundings]
+            ),
+            spend=CapitalSchemeSpendModel.from_domain(spend) if spend else None,
+        )
 
 
 router = APIRouter()

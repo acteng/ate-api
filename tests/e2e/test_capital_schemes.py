@@ -29,7 +29,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
                 "improvement": f"{client.base_url}/improvements/IMP00001",
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {
                 "items": [
@@ -74,7 +74,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "improvement": f"{client.base_url}/improvements/IMP00001",
         },
         "status": {"status": "active"},
-        "financials": {"items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]},
+        "financials": {"funding": {"items": []}, "spend": {"amount": 2_000_000, "source": "ATF4 bid"}},
         "milestones": {
             "currentMilestone": "detailed design completed",
             "items": [
@@ -112,7 +112,7 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
                 "improvement": None,
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
             "authorityReview": None,
@@ -132,7 +132,8 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
     assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
     capital_scheme = await app_client.get_capital_scheme("ATE00001")
     assert capital_scheme["financials"] == {
-        "items": [{"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}]
+        "funding": {"items": []},
+        "spend": {"amount": 3_000_000, "source": "ATF4 bid"},
     }
 
 
@@ -148,7 +149,7 @@ async def test_create_financial_concurrently(client: AsyncClient, access_token: 
                 "improvement": None,
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
             "authorityReview": None,
@@ -169,7 +170,8 @@ async def test_create_financial_concurrently(client: AsyncClient, access_token: 
     assert all(response.status_code == 201 for response in responses)
     capital_scheme = await app_client.get_capital_scheme("ATE00001")
     assert capital_scheme["financials"] == {
-        "items": [{"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}]
+        "funding": {"items": []},
+        "spend": {"amount": 3_000_000, "source": "ATF4 bid"},
     }
 
 
@@ -185,7 +187,7 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
                 "improvement": None,
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
             "authorityReview": None,
@@ -278,7 +280,7 @@ async def test_create_milestones_concurrently(client: AsyncClient, access_token:
                 "improvement": None,
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
             "authorityReview": None,
@@ -330,7 +332,7 @@ async def test_create_authority_review(client: AsyncClient, access_token: str, a
                 "improvement": None,
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
             "authorityReview": None,

@@ -43,7 +43,7 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 "improvement": f"{client.base_url}/improvements/IMP00001",
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
         }
@@ -58,7 +58,7 @@ async def test_get_authority_funding_managed_by_capital_schemes(
                 "improvement": f"{client.base_url}/improvements/IMP00001",
             },
             "status": {"status": "active"},
-            "financials": {"items": []},
+            "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
             "outputs": {"items": []},
         }
