@@ -46,7 +46,10 @@ class CapitalSchemeModel(BaseModel):
                         "improvement": "https://api.activetravelengland.gov.uk/improvements/IMP00001",
                     },
                     "status": {"status": "active"},
-                    "financials": {"items": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]},
+                    "financials": {
+                        "funding": {"items": [{"amount": 3_000_000, "source": "ATF4 bid"}]},
+                        "spend": {"amount": 2_000_000, "source": "ATF4 bid"},
+                    },
                     "milestones": {
                         "currentMilestone": "detailed design completed",
                         "items": [

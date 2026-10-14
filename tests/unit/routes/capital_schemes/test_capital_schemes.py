@@ -20,7 +20,11 @@ from ate_api.domain.moneys import Money
 from ate_api.domain.observation_types import ObservationType
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
-from ate_api.routes.capital_schemes.financials import CapitalSchemeFinancialModel, CapitalSchemeFinancialsModel
+from ate_api.routes.capital_schemes.financials import (
+    CapitalSchemeFinancialsModel,
+    CapitalSchemeFundingModel,
+    CapitalSchemeSpendModel,
+)
 from ate_api.routes.capital_schemes.milestones import (
     CapitalSchemeMilestoneModel,
     CapitalSchemeMilestonesModel,
@@ -31,7 +35,6 @@ from ate_api.routes.capital_schemes.overviews import CapitalSchemeOverviewModel
 from ate_api.routes.capital_schemes.statuses import CapitalSchemeStatusModel, StatusModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.data_sources import DataSourceModel
-from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.routes.observation_types import ObservationTypeModel
 from tests.unit.domain.builders import build_capital_scheme, build_capital_scheme_reference
 from tests.unit.routes.builders import build_capital_scheme_overview_model, build_capital_scheme_status_model
@@ -65,7 +68,9 @@ class TestCapitalSchemeModel:
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
-            financials=CapitalSchemeFinancialsModel(items=[]),
+            financials=CapitalSchemeFinancialsModel(
+                funding=CollectionModel[CapitalSchemeFundingModel](items=[]), spend=None
+            ),
             milestones=CapitalSchemeMilestonesModel(current_milestone=None, items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
             authority_review=None,
@@ -95,14 +100,10 @@ class TestCapitalSchemeModel:
         capital_scheme_model = CapitalSchemeModel.from_domain(capital_scheme, financials, milestones, http_request)
 
         assert capital_scheme_model.financials == CapitalSchemeFinancialsModel(
-            items=[
-                CapitalSchemeFinancialModel(
-                    type=FinancialTypeModel.FUNDING_ALLOCATION, amount=2_000_000, source=DataSourceModel.ATF4_BID
-                ),
-                CapitalSchemeFinancialModel(
-                    type=FinancialTypeModel.SPEND_TO_DATE, amount=1_000_000, source=DataSourceModel.ATF4_BID
-                ),
-            ]
+            funding=CollectionModel[CapitalSchemeFundingModel](
+                items=[CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)]
+            ),
+            spend=CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF4_BID),
         )
 
     def test_from_domain_sets_milestones(self, http_request: Request) -> None:
@@ -215,7 +216,9 @@ class TestCapitalSchemeModel:
                 improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
-            financials=CapitalSchemeFinancialsModel(items=[]),
+            financials=CapitalSchemeFinancialsModel(
+                funding=CollectionModel[CapitalSchemeFundingModel](items=[]), spend=None
+            ),
             milestones=CapitalSchemeMilestonesModel(items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](items=[]),
             authority_review=None,
@@ -242,7 +245,9 @@ class TestCapitalSchemeModel:
             reference="ATE00001",
             overview=build_capital_scheme_overview_model(base_url),
             status=build_capital_scheme_status_model(),
-            financials=CapitalSchemeFinancialsModel(items=[]),
+            financials=CapitalSchemeFinancialsModel(
+                funding=CollectionModel[CapitalSchemeFundingModel](items=[]), spend=None
+            ),
             milestones=CapitalSchemeMilestonesModel(items=[]),
             outputs=CollectionModel[CapitalSchemeOutputModel](
                 items=[
