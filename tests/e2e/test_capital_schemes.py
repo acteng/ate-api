@@ -44,9 +44,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "authorityReview": None,
         }
     )
-    await app_client.create_capital_scheme_financial(
-        "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
-    )
+    await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF4 bid"})
     await app_client.create_capital_scheme_milestones(
         "ATE00001",
         {
@@ -100,7 +98,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
     }
 
 
-async def test_create_financial(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
+async def test_create_spend(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
@@ -118,26 +116,21 @@ async def test_create_financial(client: AsyncClient, access_token: str, app_clie
             "authorityReview": None,
         }
     )
-    await app_client.create_capital_scheme_financial(
-        "ATE00001", {"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}
-    )
+    await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF4 bid"})
 
     response = await client.post(
-        "/capital-schemes/ATE00001/financials",
+        "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
+    assert response.json() == {"amount": 3_000_000, "source": "ATF4 bid"}
     capital_scheme = await app_client.get_capital_scheme("ATE00001")
-    assert capital_scheme["financials"] == {
-        "funding": {"items": []},
-        "spend": {"amount": 3_000_000, "source": "ATF4 bid"},
-    }
+    assert capital_scheme["financials"]["spend"] == {"amount": 3_000_000, "source": "ATF4 bid"}
 
 
-async def test_create_financial_concurrently(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
+async def test_create_spend_concurrently(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
@@ -159,9 +152,9 @@ async def test_create_financial_concurrently(client: AsyncClient, access_token: 
     responses = await asyncio.gather(
         *[
             client.post(
-                "/capital-schemes/ATE00001/financials",
+                "/capital-schemes/ATE00001/financials/spend",
                 headers={"Authorization": f"Bearer {access_token}"},
-                json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+                json={"amount": 3_000_000, "source": "ATF4 bid"},
             )
             for _ in range(3)
         ]
@@ -169,10 +162,7 @@ async def test_create_financial_concurrently(client: AsyncClient, access_token: 
 
     assert all(response.status_code == 201 for response in responses)
     capital_scheme = await app_client.get_capital_scheme("ATE00001")
-    assert capital_scheme["financials"] == {
-        "funding": {"items": []},
-        "spend": {"amount": 3_000_000, "source": "ATF4 bid"},
-    }
+    assert capital_scheme["financials"]["spend"] == {"amount": 3_000_000, "source": "ATF4 bid"}
 
 
 async def test_create_milestones(client: AsyncClient, access_token: str, app_client: AppClient) -> None:

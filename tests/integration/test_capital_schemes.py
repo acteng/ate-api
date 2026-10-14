@@ -229,7 +229,7 @@ def test_get_capital_scheme_when_not_found(client: TestClient, access_token: str
 
 
 @respx.mock
-async def test_create_financial_creates_financial(
+async def test_create_spend_creates_financial(
     clock: Clock,
     unit_of_work: FakeUnitOfWork,
     capital_scheme_financials: CapitalSchemeFinancialsRepository,
@@ -240,9 +240,9 @@ async def test_create_financial_creates_financial(
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
 
     client.post(
-        "/capital-schemes/ATE00001/financials",
+        "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
@@ -258,7 +258,7 @@ async def test_create_financial_creates_financial(
 
 
 @respx.mock
-async def test_create_financial_closes_current_financial(
+async def test_create_spend_closes_current_financial(
     clock: Clock, capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
 ) -> None:
     clock.now = datetime(2020, 2, 1, tzinfo=UTC)
@@ -274,9 +274,9 @@ async def test_create_financial_closes_current_financial(
     await capital_scheme_financials.add(financials)
 
     client.post(
-        "/capital-schemes/ATE00001/financials",
+        "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     actual_financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
@@ -284,52 +284,27 @@ async def test_create_financial_closes_current_financial(
 
 
 @respx.mock
-async def test_create_financial_returns_created_financial(
+async def test_create_spend_returns_created_financial(
     capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
 ) -> None:
     await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
 
     response = client.post(
-        "/capital-schemes/ATE00001/financials",
+        "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"}
+    assert response.json() == {"amount": 3_000_000, "source": "ATF4 bid"}
 
 
 @respx.mock
-async def test_cannot_create_funding_allocation(
-    capital_scheme_financials: CapitalSchemeFinancialsRepository, client: TestClient, access_token: str
-) -> None:
-    await capital_scheme_financials.add(CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001")))
-
+def test_create_spend_when_capital_scheme_not_found(client: TestClient, access_token: str) -> None:
     response = client.post(
-        "/capital-schemes/ATE00001/financials",
+        "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "funding allocation", "amount": 3_000_000, "source": "ATF4 bid"},
-    )
-
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "input": "funding allocation",
-                "loc": ["body", "type"],
-                "msg": "Funding allocation cannot be created",
-                "type": "enum",
-            }
-        ]
-    }
-
-
-@respx.mock
-def test_create_financial_when_capital_scheme_not_found(client: TestClient, access_token: str) -> None:
-    response = client.post(
-        "/capital-schemes/ATE00001/financials",
-        headers={"Authorization": f"Bearer {access_token}"},
-        json={"type": "spend to date", "amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF4 bid"},
     )
 
     assert response.status_code == 404
