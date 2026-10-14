@@ -2,8 +2,7 @@ from datetime import datetime
 from typing import Annotated, Self
 
 from fastapi import APIRouter, Depends, HTTPException, Path
-from pydantic import ConfigDict, field_validator
-from pydantic_core import PydanticCustomError
+from pydantic import ConfigDict
 from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
 from ate_api.clock import get_clock
@@ -23,43 +22,7 @@ from ate_api.routes.base import BaseModel
 from ate_api.routes.collections import CollectionModel
 from ate_api.routes.concurrency import retry_on_serialization_failure
 from ate_api.routes.data_sources import DataSourceModel
-from ate_api.routes.financial_types import FinancialTypeModel
 from ate_api.unit_of_work import UnitOfWork
-
-
-class CapitalSchemeFinancialModel(BaseModel):
-    type: FinancialTypeModel
-    amount: int
-    source: DataSourceModel
-
-    model_config = ConfigDict(
-        json_schema_extra={"examples": [{"type": "spend to date", "amount": 2_000_000, "source": "ATF4 bid"}]}
-    )
-
-    @classmethod
-    def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
-        return cls(
-            type=FinancialTypeModel.from_domain(financial.type),
-            amount=financial.amount.amount,
-            source=DataSourceModel.from_domain(financial.data_source),
-        )
-
-    def to_domain(self, now: datetime) -> CapitalSchemeFinancial:
-        return CapitalSchemeFinancial(
-            effective_date=DateTimeRange(now),
-            type=self.type.to_domain(),
-            amount=Money(self.amount),
-            data_source=self.source.to_domain(),
-        )
-
-
-class CreateCapitalSchemeFinancialModel(CapitalSchemeFinancialModel):
-    @field_validator("type", mode="before")
-    @classmethod
-    def check_type(cls, type_: FinancialTypeModel) -> FinancialTypeModel:
-        if type_ == FinancialTypeModel.FUNDING_ALLOCATION:
-            raise PydanticCustomError("enum", "Funding allocation cannot be created")
-        return type_
 
 
 class CapitalSchemeFundingModel(BaseModel):
@@ -78,12 +41,22 @@ class CapitalSchemeSpendModel(BaseModel):
     amount: int
     source: DataSourceModel
 
+    model_config = ConfigDict(json_schema_extra={"examples": [{"amount": 2_000_000, "source": "ATF4 bid"}]})
+
     @classmethod
     def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
         if financial.type != FinancialType.SPEND_TO_DATE:
             raise ValueError(f"Invalid financial type: {financial.type}")
 
         return cls(amount=financial.amount.amount, source=DataSourceModel.from_domain(financial.data_source))
+
+    def to_domain(self, now: datetime) -> CapitalSchemeFinancial:
+        return CapitalSchemeFinancial(
+            effective_date=DateTimeRange(now),
+            type=FinancialType.SPEND_TO_DATE,
+            amount=Money(self.amount),
+            data_source=self.source.to_domain(),
+        )
 
 
 class CapitalSchemeFinancialsModel(BaseModel):
@@ -111,23 +84,23 @@ router = APIRouter()
 
 
 @router.post(
-    "/{reference}/financials",
+    "/{reference}/financials/spend",
     status_code=HTTP_201_CREATED,
-    summary="Create capital scheme financial",
+    summary="Create capital scheme spend",
     responses={HTTP_404_NOT_FOUND: {}},
 )
 @retry_on_serialization_failure(max_retries=5, jitter=0.1)
-async def create_financial(
+async def create_spend(
     clock: Annotated[Clock, Depends(get_clock)],
     capital_scheme_financials: Annotated[
         CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
     ],
     unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
     reference: Annotated[str, Path(examples=["ATE00001"])],
-    financial_model: CreateCapitalSchemeFinancialModel,
-) -> CapitalSchemeFinancialModel:
+    spend_model: CapitalSchemeSpendModel,
+) -> CapitalSchemeSpendModel:
     """
-    Creates a financial for a capital scheme.
+    Creates a spend for a capital scheme.
     """
     async with unit_of_work:
         await unit_of_work.begin_serializable()
@@ -137,9 +110,9 @@ async def create_financial(
         if not financials:
             raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-        financial = financial_model.to_domain(clock.now)
+        financial = spend_model.to_domain(clock.now)
         financials.change_financial(financial)
         await capital_scheme_financials.update(financials)
         await unit_of_work.commit()
 
-    return CapitalSchemeFinancialModel.from_domain(financial)
+    return CapitalSchemeSpendModel.from_domain(financial)
