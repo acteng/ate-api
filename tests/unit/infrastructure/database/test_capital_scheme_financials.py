@@ -1,10 +1,10 @@
 from datetime import UTC, datetime
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancial, CapitalSchemeFinancials
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFunding, CapitalSchemeSpend
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
@@ -28,17 +28,63 @@ from tests.unit.infrastructure.database.builders import (
 
 
 class TestCapitalSchemeFinancialEntity:
-    def test_from_domain(self) -> None:
-        financial = CapitalSchemeFinancial(
+    def test_from_funding_domain(self) -> None:
+        funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+
+        financial_entity = CapitalSchemeFinancialEntity.from_funding_domain(
+            funding, 1, {FinancialType.FUNDING_ALLOCATION: 2}, {DataSource.ATF4_BID: 3}
+        )
+
+        assert (
+            financial_entity.capital_scheme_id == 1
+            and financial_entity.financial_type_id == 2
+            and financial_entity.amount == 2_000_000
+            and financial_entity.effective_date_from == local_datetime(2020, 1, 1)
+            and not financial_entity.effective_date_to
+            and financial_entity.data_source_id == 3
+        )
+
+    def test_from_funding_domain_when_historic(self) -> None:
+        funding = CapitalSchemeFunding(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+
+        financial_entity = CapitalSchemeFinancialEntity.from_funding_domain(
+            funding, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
+        )
+
+        assert financial_entity.effective_date_to == local_datetime(2020, 2, 1)
+
+    def test_from_funding_domain_converts_dates_to_local_europe_london(self) -> None:
+        funding = CapitalSchemeFunding(
+            effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+
+        financial_entity = CapitalSchemeFinancialEntity.from_funding_domain(
+            funding, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
+        )
+
+        assert financial_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
+        assert financial_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
+
+    def test_from_spend_domain(self) -> None:
+        spend = CapitalSchemeSpend(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
             surrogate_id=1,
         )
 
-        financial_entity = CapitalSchemeFinancialEntity.from_domain(
-            financial, 2, {FinancialType.FUNDING_ALLOCATION: 3}, {DataSource.ATF4_BID: 4}
+        financial_entity = CapitalSchemeFinancialEntity.from_spend_domain(
+            spend, 2, {FinancialType.SPEND_TO_DATE: 3}, {DataSource.ATF4_BID: 4}
         )
 
         assert (
@@ -51,55 +97,50 @@ class TestCapitalSchemeFinancialEntity:
             and financial_entity.data_source_id == 4
         )
 
-    def test_from_domain_when_historic(self) -> None:
-        financial = CapitalSchemeFinancial(
+    def test_from_spend_domain_when_historic(self) -> None:
+        spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
 
-        financial_entity = CapitalSchemeFinancialEntity.from_domain(
-            financial, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
+        financial_entity = CapitalSchemeFinancialEntity.from_spend_domain(
+            spend, 0, {FinancialType.SPEND_TO_DATE: 0}, {DataSource.ATF4_BID: 0}
         )
 
         assert financial_entity.effective_date_to == local_datetime(2020, 2, 1)
 
-    def test_from_domain_converts_dates_to_local_europe_london(self) -> None:
-        financial = CapitalSchemeFinancial(
+    def test_from_spend_domain_converts_dates_to_local_europe_london(self) -> None:
+        spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
 
-        financial_entity = CapitalSchemeFinancialEntity.from_domain(
-            financial, 0, {FinancialType.FUNDING_ALLOCATION: 0}, {DataSource.ATF4_BID: 0}
+        financial_entity = CapitalSchemeFinancialEntity.from_spend_domain(
+            spend, 0, {FinancialType.SPEND_TO_DATE: 0}, {DataSource.ATF4_BID: 0}
         )
 
         assert financial_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
         assert financial_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
 
-    def test_to_domain(self) -> None:
+    def test_to_funding_domain(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
-            capital_scheme_financial_id=1,
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 1, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
-        financial = financial_entity.to_domain()
+        funding = financial_entity.to_funding_domain()
 
-        assert financial == CapitalSchemeFinancial(
+        assert funding == CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-            type=FinancialType.FUNDING_ALLOCATION,
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
-        assert financial.surrogate_id == 1
 
-    def test_to_domain_when_historic(self) -> None:
+    def test_to_funding_domain_when_historic(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
@@ -108,11 +149,11 @@ class TestCapitalSchemeFinancialEntity:
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
-        financial = financial_entity.to_domain()
+        funding = financial_entity.to_funding_domain()
 
-        assert financial.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
+        assert funding.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
 
-    def test_to_domain_converts_dates_from_local_europe_london(self) -> None:
+    def test_to_funding_domain_converts_dates_from_local_europe_london(self) -> None:
         financial_entity = CapitalSchemeFinancialEntity(
             financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.FUNDING_ALLOCATION),
             amount=2_000_000,
@@ -121,23 +162,92 @@ class TestCapitalSchemeFinancialEntity:
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
         )
 
-        financial = financial_entity.to_domain()
+        funding = financial_entity.to_funding_domain()
 
-        assert financial.effective_date == DateTimeRange(
+        assert funding.effective_date == DateTimeRange(
             datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
         )
+
+    def test_to_funding_domain_when_invalid_financial_type(self) -> None:
+        financial_entity = CapitalSchemeFinancialEntity(
+            capital_scheme_financial_id=1,
+            financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.EXPECTED_COST),
+            amount=2_000_000,
+            effective_date_from=local_datetime(2020, 1, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+        )
+
+        with pytest.raises(ValueError, match="Invalid financial type: FinancialType.EXPECTED_COST"):
+            financial_entity.to_funding_domain()
+
+    def test_to_spend_domain(self) -> None:
+        financial_entity = CapitalSchemeFinancialEntity(
+            capital_scheme_financial_id=1,
+            financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.SPEND_TO_DATE),
+            amount=2_000_000,
+            effective_date_from=local_datetime(2020, 1, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+        )
+
+        spend = financial_entity.to_spend_domain()
+
+        assert spend == CapitalSchemeSpend(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+        assert spend.surrogate_id == 1
+
+    def test_to_spend_domain_when_historic(self) -> None:
+        financial_entity = CapitalSchemeFinancialEntity(
+            financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.SPEND_TO_DATE),
+            amount=2_000_000,
+            effective_date_from=local_datetime(2020, 1, 1),
+            effective_date_to=local_datetime(2020, 2, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+        )
+
+        spend = financial_entity.to_spend_domain()
+
+        assert spend.effective_date.to == datetime(2020, 2, 1, tzinfo=UTC)
+
+    def test_to_spend_domain_converts_dates_from_local_europe_london(self) -> None:
+        financial_entity = CapitalSchemeFinancialEntity(
+            financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.SPEND_TO_DATE),
+            amount=2_000_000,
+            effective_date_from=local_datetime(2020, 6, 1, 13),
+            effective_date_to=local_datetime(2020, 7, 1, 13),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+        )
+
+        spend = financial_entity.to_spend_domain()
+
+        assert spend.effective_date == DateTimeRange(
+            datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)
+        )
+
+    def test_to_spend_domain_when_invalid_financial_type(self) -> None:
+        financial_entity = CapitalSchemeFinancialEntity(
+            capital_scheme_financial_id=1,
+            financial_type=FinancialTypeEntity(financial_type_name=FinancialTypeName.EXPECTED_COST),
+            amount=2_000_000,
+            effective_date_from=local_datetime(2020, 1, 1),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+        )
+
+        with pytest.raises(ValueError, match="Invalid financial type: FinancialType.EXPECTED_COST"):
+            financial_entity.to_spend_domain()
 
 
 @pytest.mark.usefixtures("data")
 @pytest.mark.asyncio(loop_scope="package")
 class TestDatabaseCapitalSchemeFinancialsRepository:
-    async def test_add_stores_financials(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+    async def test_add_stores_funding(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     build_financial_type_entity(id_=1, name=FinancialTypeName.FUNDING_ALLOCATION),
-                    build_financial_type_entity(id_=2, name=FinancialTypeName.SPEND_TO_DATE),
-                    build_data_source_entity(id_=3, name=DataSourceName.ATF4_BID),
+                    build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
                     entities.build_capital_scheme(reference="ATE00001"),
                 ]
             )
@@ -145,18 +255,16 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
             financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
-            financials.adjust_financial(
-                CapitalSchemeFinancial(
+            financials.adjust_funding(
+                CapitalSchemeFunding(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    type=FinancialType.FUNDING_ALLOCATION,
                     amount=Money(2_000_000),
                     data_source=DataSource.ATF4_BID,
                 )
             )
-            financials.adjust_financial(
-                CapitalSchemeFinancial(
+            financials.adjust_funding(
+                CapitalSchemeFunding(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                    type=FinancialType.SPEND_TO_DATE,
                     amount=Money(1_000_000),
                     data_source=DataSource.ATF4_BID,
                 )
@@ -172,15 +280,49 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             and financial_row1.amount == 2_000_000
             and financial_row1.effective_date_from == local_datetime(2020, 1, 1)
             and not financial_row1.effective_date_to
-            and financial_row1.data_source_id == 3
+            and financial_row1.data_source_id == 2
         )
         assert (
             financial_row2.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and financial_row2.financial_type_id == 2
+            and financial_row2.financial_type_id == 1
             and financial_row2.amount == 1_000_000
             and financial_row2.effective_date_from == local_datetime(2020, 1, 1)
             and not financial_row2.effective_date_to
-            and financial_row2.data_source_id == 3
+            and financial_row2.data_source_id == 2
+        )
+
+    async def test_add_stores_spend(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_financial_type_entity(id_=1, name=FinancialTypeName.SPEND_TO_DATE),
+                    build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    entities.build_capital_scheme(reference="ATE00001"),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+            financials.change_spend(
+                CapitalSchemeSpend(
+                    effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                    amount=Money(1_000_000),
+                    data_source=DataSource.ATF4_BID,
+                )
+            )
+            await capital_scheme_financials.add(financials)
+
+        async with AsyncSession(engine) as session:
+            (capital_scheme_row,) = await session.scalars(select(CapitalSchemeEntity))
+            (financial_row,) = await session.scalars(select(CapitalSchemeFinancialEntity))
+        assert (
+            financial_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
+            and financial_row.financial_type_id == 1
+            and financial_row.amount == 1_000_000
+            and financial_row.effective_date_from == local_datetime(2020, 1, 1)
+            and not financial_row.effective_date_to
+            and financial_row.data_source_id == 2
         )
 
     async def test_get(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
@@ -192,15 +334,17 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
 
         assert (
-            financials and financials.capital_scheme == CapitalSchemeReference("ATE00001") and not financials.financials
+            financials
+            and financials.capital_scheme == CapitalSchemeReference("ATE00001")
+            and not financials.fundings
+            and not financials.spend
         )
 
-    async def test_get_fetches_current_financials(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+    async def test_get_fetches_current_fundings(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
-                    spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeFinancialEntity(
@@ -218,13 +362,6 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                         effective_date_from=local_datetime(2020, 2, 1),
                         data_source=atf4_bid,
                     ),
-                    CapitalSchemeFinancialEntity(
-                        capital_scheme_id=1,
-                        financial_type=spend_to_date,
-                        amount=1_000_000,
-                        effective_date_from=local_datetime(2020, 2, 1),
-                        data_source=atf4_bid,
-                    ),
                 ]
             )
 
@@ -232,38 +369,23 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
             financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
 
-        assert financials and financials.financials == [
-            CapitalSchemeFinancial(
+        assert financials and financials.fundings == [
+            CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
                 data_source=DataSource.ATF4_BID,
-            ),
-            CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                type=FinancialType.SPEND_TO_DATE,
-                amount=Money(1_000_000),
-                data_source=DataSource.ATF4_BID,
-            ),
+            )
         ]
 
-    async def test_get_fetches_current_financials_ordered_by_financial_type_then_effective_date_from(
+    async def test_get_fetches_current_fundings_ordered_by_effective_date_from(
         self, engine: AsyncEngine, entities: EntityBuilder
     ) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
                     funding_allocation := build_financial_type_entity(name=FinancialTypeName.FUNDING_ALLOCATION),
-                    spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
                     atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
-                    CapitalSchemeFinancialEntity(
-                        capital_scheme_id=1,
-                        financial_type=spend_to_date,
-                        amount=1_000_000,
-                        effective_date_from=local_datetime(2020, 2, 1),
-                        data_source=atf4_bid,
-                    ),
                     CapitalSchemeFinancialEntity(
                         capital_scheme_id=1,
                         financial_type=funding_allocation,
@@ -285,26 +407,53 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
             financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
 
-        assert financials and financials.financials == [
-            CapitalSchemeFinancial(
+        assert financials and financials.fundings == [
+            CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
                 data_source=DataSource.ATF4_BID,
             ),
-            CapitalSchemeFinancial(
+            CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
-                type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(3_000_000),
                 data_source=DataSource.ATF4_BID,
             ),
-            CapitalSchemeFinancial(
-                effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                type=FinancialType.SPEND_TO_DATE,
-                amount=Money(1_000_000),
-                data_source=DataSource.ATF4_BID,
-            ),
         ]
+
+    async def test_get_fetches_current_spend(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    spend_to_date := build_financial_type_entity(name=FinancialTypeName.SPEND_TO_DATE),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
+                    CapitalSchemeFinancialEntity(
+                        capital_scheme_id=1,
+                        financial_type=spend_to_date,
+                        amount=2_000_000,
+                        effective_date_from=local_datetime(2020, 1, 1),
+                        effective_date_to=local_datetime(2020, 2, 1),
+                        data_source=atf4_bid,
+                    ),
+                    CapitalSchemeFinancialEntity(
+                        capital_scheme_id=1,
+                        financial_type=spend_to_date,
+                        amount=1_000_000,
+                        effective_date_from=local_datetime(2020, 2, 1),
+                        data_source=atf4_bid,
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+
+        assert financials and financials.spend == CapitalSchemeSpend(
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+            amount=Money(1_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
 
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
         async with AsyncSession(engine) as session:
@@ -313,7 +462,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
 
         assert not financials
 
-    async def test_update(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+    async def test_update_updates_spend(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
@@ -334,10 +483,9 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
             financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
             assert financials
-            financials.change_financial(
-                CapitalSchemeFinancial(
+            financials.change_spend(
+                CapitalSchemeSpend(
                     effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
-                    type=FinancialType.SPEND_TO_DATE,
                     amount=Money(2_000_000),
                     data_source=DataSource.ATF4_BID,
                 )
@@ -355,3 +503,51 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             and not financial_row2.effective_date_to
             and financial_row2.data_source_id == 3
         )
+
+    async def test_update_preserves_unchanged_spend(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    spend_to_date := build_financial_type_entity(id_=2, name=FinancialTypeName.SPEND_TO_DATE),
+                    atf4_bid := build_data_source_entity(id_=3, name=DataSourceName.ATF4_BID),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
+                    CapitalSchemeFinancialEntity(
+                        capital_scheme_id=1,
+                        financial_type=spend_to_date,
+                        amount=3_000_000,
+                        effective_date_from=local_datetime(2020, 1, 1),
+                        data_source=atf4_bid,
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+            assert financials
+            await capital_scheme_financials.update(financials)
+
+        async with AsyncSession(engine) as session:
+            (financial_row,) = await session.scalars(select(CapitalSchemeFinancialEntity))
+        assert (
+            financial_row.capital_scheme_id == 1
+            and financial_row.financial_type_id == 2
+            and financial_row.amount == 3_000_000
+            and financial_row.effective_date_from == local_datetime(2020, 1, 1)
+            and not financial_row.effective_date_to
+            and financial_row.data_source_id == 3
+        )
+
+    async def test_update_when_no_spend(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add(entities.build_capital_scheme(reference="ATE00001"))
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+            assert financials
+            await capital_scheme_financials.update(financials)
+
+        async with AsyncSession(engine) as session:
+            financial_count = await session.scalar(select(func.count()).select_from(CapitalSchemeFinancialEntity))
+        assert financial_count == 0

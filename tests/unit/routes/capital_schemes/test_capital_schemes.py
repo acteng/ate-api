@@ -4,7 +4,7 @@ from decimal import Decimal
 from fastapi import Request
 from pydantic import AnyUrl
 
-from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancial, CapitalSchemeFinancials
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFunding, CapitalSchemeSpend
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestone, CapitalSchemeMilestones, Milestone
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -13,7 +13,6 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.moneys import Money
@@ -79,18 +78,16 @@ class TestCapitalSchemeModel:
     def test_from_domain_sets_financials(self, http_request: Request) -> None:
         capital_scheme = build_capital_scheme()
         financials = CapitalSchemeFinancials(capital_scheme=build_capital_scheme_reference())
-        financials.adjust_financial(
-            CapitalSchemeFinancial(
+        financials.adjust_funding(
+            CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                type=FinancialType.FUNDING_ALLOCATION,
                 amount=Money(2_000_000),
                 data_source=DataSource.ATF4_BID,
             )
         )
-        financials.adjust_financial(
-            CapitalSchemeFinancial(
+        financials.change_spend(
+            CapitalSchemeSpend(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
-                type=FinancialType.SPEND_TO_DATE,
                 amount=Money(1_000_000),
                 data_source=DataSource.ATF4_BID,
             )

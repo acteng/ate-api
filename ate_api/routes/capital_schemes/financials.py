@@ -8,13 +8,13 @@ from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 from ate_api.clock import get_clock
 from ate_api.database import get_unit_of_work
 from ate_api.domain.capital_scheme_financials import (
-    CapitalSchemeFinancial,
     CapitalSchemeFinancials,
     CapitalSchemeFinancialsRepository,
+    CapitalSchemeFunding,
+    CapitalSchemeSpend,
 )
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.financial_types import FinancialType
 from ate_api.domain.moneys import Money
 from ate_api.infrastructure.clock import Clock
 from ate_api.repositories import get_capital_scheme_financials_repository
@@ -30,11 +30,8 @@ class CapitalSchemeFundingModel(BaseModel):
     source: DataSourceModel
 
     @classmethod
-    def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
-        if financial.type != FinancialType.FUNDING_ALLOCATION:
-            raise ValueError(f"Invalid financial type: {financial.type}")
-
-        return cls(amount=financial.amount.amount, source=DataSourceModel.from_domain(financial.data_source))
+    def from_domain(cls, funding: CapitalSchemeFunding) -> Self:
+        return cls(amount=funding.amount.amount, source=DataSourceModel.from_domain(funding.data_source))
 
 
 class CapitalSchemeSpendModel(BaseModel):
@@ -44,16 +41,12 @@ class CapitalSchemeSpendModel(BaseModel):
     model_config = ConfigDict(json_schema_extra={"examples": [{"amount": 2_000_000, "source": "ATF4 bid"}]})
 
     @classmethod
-    def from_domain(cls, financial: CapitalSchemeFinancial) -> Self:
-        if financial.type != FinancialType.SPEND_TO_DATE:
-            raise ValueError(f"Invalid financial type: {financial.type}")
+    def from_domain(cls, spend: CapitalSchemeSpend) -> Self:
+        return cls(amount=spend.amount.amount, source=DataSourceModel.from_domain(spend.data_source))
 
-        return cls(amount=financial.amount.amount, source=DataSourceModel.from_domain(financial.data_source))
-
-    def to_domain(self, now: datetime) -> CapitalSchemeFinancial:
-        return CapitalSchemeFinancial(
+    def to_domain(self, now: datetime) -> CapitalSchemeSpend:
+        return CapitalSchemeSpend(
             effective_date=DateTimeRange(now),
-            type=FinancialType.SPEND_TO_DATE,
             amount=Money(self.amount),
             data_source=self.source.to_domain(),
         )
@@ -65,18 +58,11 @@ class CapitalSchemeFinancialsModel(BaseModel):
 
     @classmethod
     def from_domain(cls, financials: CapitalSchemeFinancials) -> Self:
-        fundings = [
-            financial for financial in financials.financials if financial.type == FinancialType.FUNDING_ALLOCATION
-        ]
-        spend = next(
-            (financial for financial in financials.financials if financial.type == FinancialType.SPEND_TO_DATE), None
-        )
-
         return cls(
             funding=CollectionModel[CapitalSchemeFundingModel](
-                items=[CapitalSchemeFundingModel.from_domain(funding) for funding in fundings]
+                items=[CapitalSchemeFundingModel.from_domain(funding) for funding in financials.fundings]
             ),
-            spend=CapitalSchemeSpendModel.from_domain(spend) if spend else None,
+            spend=CapitalSchemeSpendModel.from_domain(financials.spend) if financials.spend else None,
         )
 
 
@@ -110,9 +96,9 @@ async def create_spend(
         if not financials:
             raise HTTPException(status_code=HTTP_404_NOT_FOUND)
 
-        financial = spend_model.to_domain(clock.now)
-        financials.change_financial(financial)
+        spend = spend_model.to_domain(clock.now)
+        financials.change_spend(spend)
         await capital_scheme_financials.update(financials)
         await unit_of_work.commit()
 
-    return CapitalSchemeSpendModel.from_domain(financial)
+    return CapitalSchemeSpendModel.from_domain(spend)
