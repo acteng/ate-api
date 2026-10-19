@@ -68,7 +68,6 @@ async def _delete_all(engine: AsyncEngine) -> None:
                 capital_scheme.milestone,
                 capital_scheme.scheme_status,
                 common.data_source,
-                common.financial_type,
                 common.funding_programme,
                 common.observation_type,
                 improvement.improvement

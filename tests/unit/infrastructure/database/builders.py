@@ -9,8 +9,6 @@ from ate_api.infrastructure.database import (
     CapitalSchemeSchemeStatusEntity,
     DataSourceEntity,
     DataSourceName,
-    FinancialTypeEntity,
-    FinancialTypeName,
     FundingProgrammeEntity,
     ImprovementEntity,
     ImprovementOverviewEntity,
@@ -127,12 +125,6 @@ def build_scheme_status_entity(
     id_: int | None = None, name: SchemeStatusName = SchemeStatusName.PIPELINE
 ) -> SchemeStatusEntity:
     return SchemeStatusEntity(scheme_status_id=id_, scheme_status_name=name)
-
-
-def build_financial_type_entity(
-    id_: int | None = None, name: FinancialTypeName = FinancialTypeName.EXPECTED_COST
-) -> FinancialTypeEntity:
-    return FinancialTypeEntity(financial_type_id=id_, financial_type_name=name)
 
 
 def build_data_source_entity(id_: int | None = None, name: DataSourceName = DataSourceName.PULSE_5) -> DataSourceEntity:

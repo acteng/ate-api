@@ -1,7 +1,10 @@
 from ate_api.infrastructure.database.authorities import AuthorityEntity as AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity as BaseEntity
 from ate_api.infrastructure.database.capital_scheme_financials import (
-    CapitalSchemeFinancialEntity as CapitalSchemeFinancialEntity,
+    CapitalSchemeFundingEntity as CapitalSchemeFundingEntity,
+)
+from ate_api.infrastructure.database.capital_scheme_financials import (
+    CapitalSchemeSpendEntity as CapitalSchemeSpendEntity,
 )
 from ate_api.infrastructure.database.capital_scheme_milestones import (
     CapitalSchemeMilestoneEntity as CapitalSchemeMilestoneEntity,
@@ -38,8 +41,6 @@ from ate_api.infrastructure.database.capital_schemes.statuses import SchemeStatu
 from ate_api.infrastructure.database.capital_schemes.statuses import SchemeStatusName as SchemeStatusName
 from ate_api.infrastructure.database.data_sources import DataSourceEntity as DataSourceEntity
 from ate_api.infrastructure.database.data_sources import DataSourceName as DataSourceName
-from ate_api.infrastructure.database.financial_types import FinancialTypeEntity as FinancialTypeEntity
-from ate_api.infrastructure.database.financial_types import FinancialTypeName as FinancialTypeName
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity as FundingProgrammeEntity
 from ate_api.infrastructure.database.improvements.improvements import ImprovementEntity as ImprovementEntity
 from ate_api.infrastructure.database.improvements.overviews import (
