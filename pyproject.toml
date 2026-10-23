@@ -20,7 +20,7 @@ dev = [
     "pytest~=9.1.0",
     "pytest-asyncio~=1.4.0",
     "respx~=0.23.0",
-    "ruff~=0.16.0",
+    "ruff~=0.17.0",
     "testcontainers~=4.15.0"
 ]
 
@@ -62,3 +62,14 @@ asyncio_mode = "auto"
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+extend-select = [
+    "DTZ001",
+    "DTZ005",
+    "DTZ006",
+    "DTZ007",
+    "DTZ011",
+    "DTZ012",
+    "DTZ901"
+]
