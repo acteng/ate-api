@@ -8,10 +8,12 @@ from ate_api.routes.links import path_parameter_for
 def app_fixture() -> FastAPI:
     app = FastAPI()
 
+    # simple route
     @app.get("/foo/{bar}")
     def foo(bar: str) -> None:
         pass
 
+    # route within a subrouter
     subrouter = APIRouter()
 
     @subrouter.get("/subrouter/foo/{bar}")
@@ -20,6 +22,7 @@ def app_fixture() -> FastAPI:
 
     app.include_router(subrouter)
 
+    # route with missing path
     app.host("subdomain.example.com", APIRouter(), "host")
 
     return app
