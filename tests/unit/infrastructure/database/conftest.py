@@ -22,7 +22,7 @@ def database_url_fixture() -> Generator[str]:
         yield postgres.get_connection_url(driver="asyncpg")
 
 
-@pytest.fixture(name="engine", scope="package")
+@pytest_asyncio.fixture(name="engine", scope="package", loop_scope="package")
 async def engine_fixture(database_url: str, debug: bool) -> AsyncEngine:
     engine = create_async_engine(database_url, echo=debug)
     await _create_schema(engine)
