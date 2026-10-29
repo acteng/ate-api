@@ -11,6 +11,7 @@ class CapitalSchemeFunding:
     effective_date: DateTimeRange
     amount: Money
     data_source: DataSource
+    surrogate_id: int | None = field(default=None, repr=False, compare=False)
 
 
 @dataclass(frozen=True)

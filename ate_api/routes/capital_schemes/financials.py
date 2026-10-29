@@ -33,6 +33,13 @@ class CapitalSchemeFundingModel(BaseModel):
     def from_domain(cls, funding: CapitalSchemeFunding) -> Self:
         return cls(amount=funding.amount.amount, source=DataSourceModel.from_domain(funding.data_source))
 
+    def to_domain(self, now: datetime) -> CapitalSchemeFunding:
+        return CapitalSchemeFunding(
+            effective_date=DateTimeRange(now),
+            amount=Money(self.amount),
+            data_source=self.source.to_domain(),
+        )
+
 
 class CapitalSchemeSpendModel(BaseModel):
     amount: int

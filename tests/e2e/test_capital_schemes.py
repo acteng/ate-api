@@ -44,6 +44,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "authorityReview": None,
         }
     )
+    await app_client.create_capital_scheme_funding("ATE00001", {"amount": 3_000_000, "source": "ATF4 bid"})
     await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF4 bid"})
     await app_client.create_capital_scheme_milestones(
         "ATE00001",
@@ -72,7 +73,10 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "improvement": f"{client.base_url}/improvements/IMP00001",
         },
         "status": {"status": "active"},
-        "financials": {"funding": {"items": []}, "spend": {"amount": 2_000_000, "source": "ATF4 bid"}},
+        "financials": {
+            "funding": {"items": [{"amount": 3_000_000, "source": "ATF4 bid"}]},
+            "spend": {"amount": 2_000_000, "source": "ATF4 bid"},
+        },
         "milestones": {
             "currentMilestone": "detailed design completed",
             "items": [

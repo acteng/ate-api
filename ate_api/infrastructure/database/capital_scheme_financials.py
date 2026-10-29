@@ -40,6 +40,7 @@ class CapitalSchemeFundingEntity(BaseEntity):
         cls, funding: CapitalSchemeFunding, capital_scheme_id: int, data_source_ids: dict[DataSource, int]
     ) -> Self:
         return cls(
+            capital_scheme_funding_id=funding.surrogate_id,
             capital_scheme_id=capital_scheme_id,
             amount=funding.amount.amount,
             data_source_id=data_source_ids[funding.data_source],
@@ -55,6 +56,7 @@ class CapitalSchemeFundingEntity(BaseEntity):
             ),
             amount=Money(self.amount),
             data_source=self.data_source.data_source_name.to_domain(),
+            surrogate_id=self.capital_scheme_funding_id,
         )
 
 
@@ -157,6 +159,11 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
     async def update(self, financials: CapitalSchemeFinancials) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(financials)
         data_source_ids = await self._get_data_source_ids(financials)
+
+        for financial in financials.fundings:
+            await self._session.merge(
+                CapitalSchemeFundingEntity.from_domain(financial, capital_scheme_id, data_source_ids)
+            )
 
         if financials.spend:
             spend_entity = CapitalSchemeSpendEntity.from_domain(financials.spend, capital_scheme_id, data_source_ids)

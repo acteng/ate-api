@@ -26,6 +26,17 @@ class TestCapitalSchemeFundingModel:
 
         assert funding_model == CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)
 
+    def test_to_domain(self) -> None:
+        funding_model = CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)
+
+        funding = funding_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
+
+        assert funding == CapitalSchemeFunding(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+
 
 class TestCapitalSchemeSpendModel:
     def test_from_domain(self) -> None:

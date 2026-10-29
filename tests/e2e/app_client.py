@@ -44,6 +44,10 @@ class AppClient:
         response = await self._client.post("/test/capital-schemes", json=capital_scheme)
         response.raise_for_status()
 
+    async def create_capital_scheme_funding(self, capital_scheme: str, funding: Any) -> None:
+        response = await self._client.post(f"/test/capital-schemes/{capital_scheme}/financials/funding", json=funding)
+        response.raise_for_status()
+
     async def create_capital_scheme_spend(self, capital_scheme: str, spend: Any) -> None:
         response = await self._client.post(f"/capital-schemes/{capital_scheme}/financials/spend", json=spend)
         response.raise_for_status()

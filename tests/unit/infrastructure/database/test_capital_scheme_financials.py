@@ -30,14 +30,16 @@ class TestCapitalSchemeFundingEntity:
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
+            surrogate_id=1,
         )
 
-        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 1, {DataSource.ATF4_BID: 2})
+        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 2, {DataSource.ATF4_BID: 3})
 
         assert (
-            funding_entity.capital_scheme_id == 1
+            funding_entity.capital_scheme_funding_id == 1
+            and funding_entity.capital_scheme_id == 2
             and funding_entity.amount == 2_000_000
-            and funding_entity.data_source_id == 2
+            and funding_entity.data_source_id == 3
             and funding_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not funding_entity.effective_date_to
         )
@@ -67,6 +69,7 @@ class TestCapitalSchemeFundingEntity:
 
     def test_to_domain(self) -> None:
         funding_entity = CapitalSchemeFundingEntity(
+            capital_scheme_funding_id=1,
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 1, 1),
             data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
@@ -79,6 +82,7 @@ class TestCapitalSchemeFundingEntity:
             amount=Money(2_000_000),
             data_source=DataSource.ATF4_BID,
         )
+        assert funding.surrogate_id == 1
 
     def test_to_domain_when_historic(self) -> None:
         funding_entity = CapitalSchemeFundingEntity(
@@ -402,6 +406,101 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
 
         assert not financials
+
+    async def test_update_creates_funding(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+            assert financials
+            financials.adjust_funding(
+                CapitalSchemeFunding(
+                    effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                    amount=Money(3_000_000),
+                    data_source=DataSource.ATF4_BID,
+                )
+            )
+            await capital_scheme_financials.update(financials)
+
+        async with AsyncSession(engine) as session:
+            (funding_row,) = await session.scalars(select(CapitalSchemeFundingEntity))
+        assert (
+            funding_row.capital_scheme_id == 1
+            and funding_row.amount == 3_000_000
+            and funding_row.data_source_id == 2
+            and funding_row.effective_date_from == local_datetime(2020, 2, 1)
+            and not funding_row.effective_date_to
+        )
+
+    async def test_update_preserves_current_funding(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    atf4_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
+                    CapitalSchemeFundingEntity(
+                        capital_scheme_id=1,
+                        amount=3_000_000,
+                        data_source=atf4_bid,
+                        effective_date_from=local_datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+            assert financials
+            financials.adjust_funding(
+                CapitalSchemeFunding(
+                    effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                    amount=Money(2_000_000),
+                    data_source=DataSource.ATF4_BID,
+                )
+            )
+            await capital_scheme_financials.update(financials)
+
+        async with AsyncSession(engine) as session:
+            funding_row1, _ = await session.scalars(select(CapitalSchemeFundingEntity))
+        assert funding_row1.capital_scheme_id == 1 and not funding_row1.effective_date_to
+
+    async def test_update_ignores_unchanged_funding(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    atf4_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    entities.build_capital_scheme(id_=1, reference="ATE00001"),
+                    CapitalSchemeFundingEntity(
+                        capital_scheme_id=1,
+                        amount=3_000_000,
+                        data_source=atf4_bid,
+                        effective_date_from=local_datetime(2020, 1, 1),
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session, session.begin():
+            capital_scheme_financials = DatabaseCapitalSchemeFinancialsRepository(session)
+            financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+            assert financials
+            await capital_scheme_financials.update(financials)
+
+        async with AsyncSession(engine) as session:
+            (funding_row,) = await session.scalars(select(CapitalSchemeFundingEntity))
+        assert (
+            funding_row.capital_scheme_id == 1
+            and funding_row.amount == 3_000_000
+            and funding_row.data_source_id == 2
+            and funding_row.effective_date_from == local_datetime(2020, 1, 1)
+            and not funding_row.effective_date_to
+        )
 
     async def test_update_creates_spend(self, engine: AsyncEngine, entities: EntityBuilder) -> None:
         async with AsyncSession(engine) as session, session.begin():

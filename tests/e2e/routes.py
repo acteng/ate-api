@@ -10,7 +10,9 @@ from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from ate_api.clock import get_clock
 from ate_api.database import get_session, get_unit_of_work
 from ate_api.domain.authorities import AuthorityRepository
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.clock import Clock
@@ -30,12 +32,14 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.repositories import (
     get_authority_repository,
+    get_capital_scheme_financials_repository,
     get_capital_scheme_repository,
     get_funding_programme_repository,
     get_improvement_repository,
 )
 from ate_api.routes.authorities.authorities import AuthorityModel
 from ate_api.routes.capital_schemes.capital_schemes import CapitalSchemeModel
+from ate_api.routes.capital_schemes.financials import CapitalSchemeFundingModel
 from ate_api.routes.funding_programmes import FundingProgrammeModel
 from ate_api.routes.improvements.improvements import ImprovementModel
 from ate_api.unit_of_work import UnitOfWork
@@ -146,3 +150,24 @@ async def delete_capital_schemes(
         await session.execute(delete(CapitalSchemeEntity))
         await unit_of_work.commit()
     return Response(status_code=HTTP_204_NO_CONTENT)
+
+
+@router.post("/capital-schemes/{reference}/financials/funding", status_code=HTTP_201_CREATED)
+async def create_funding(
+    clock: Annotated[Clock, Depends(get_clock)],
+    capital_scheme_financials: Annotated[
+        CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
+    ],
+    unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
+    reference: str,
+    funding_model: CapitalSchemeFundingModel,
+) -> CapitalSchemeFundingModel:
+    async with unit_of_work:
+        financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
+        assert financials
+        funding = funding_model.to_domain(clock.now)
+        financials.adjust_funding(funding)
+        await capital_scheme_financials.update(financials)
+        await unit_of_work.commit()
+
+    return CapitalSchemeFundingModel.from_domain(funding)
