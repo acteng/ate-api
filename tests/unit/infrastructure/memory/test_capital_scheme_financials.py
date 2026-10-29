@@ -70,7 +70,33 @@ class TestMemoryCapitalSchemeFinancialsRepository:
 
         assert not financials
 
-    async def test_update(self, capital_scheme_financials: MemoryCapitalSchemeFinancialsRepository) -> None:
+    async def test_update_updates_funding(
+        self, capital_scheme_financials: MemoryCapitalSchemeFinancialsRepository
+    ) -> None:
+        financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+        funding1 = CapitalSchemeFunding(
+            effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+            amount=Money(3_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+        financials.adjust_funding(funding1)
+        await capital_scheme_financials.add(financials)
+        funding2 = CapitalSchemeFunding(
+            effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
+            amount=Money(2_000_000),
+            data_source=DataSource.ATF4_BID,
+        )
+        financials.adjust_funding(funding2)
+
+        await capital_scheme_financials.update(financials)
+
+        actual_financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
+        assert actual_financials and actual_financials.capital_scheme == CapitalSchemeReference("ATE00001")
+        assert actual_financials.fundings == [funding1, funding2]
+
+    async def test_update_updates_spend(
+        self, capital_scheme_financials: MemoryCapitalSchemeFinancialsRepository
+    ) -> None:
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         financials.change_spend(
             CapitalSchemeSpend(
