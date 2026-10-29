@@ -15,12 +15,14 @@ from ate_api.domain.capital_scheme_financials import (
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.moneys import Money
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
 from ate_api.infrastructure.database.capital_schemes.overviews import CapitalSchemeOverviewEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity, DataSourceName
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
+from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
 
 
 class CapitalSchemeFundingEntity(BaseEntity):
@@ -30,6 +32,8 @@ class CapitalSchemeFundingEntity(BaseEntity):
     capital_scheme_funding_id: Mapped[int] = mapped_column(primary_key=True)
     capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
     amount: Mapped[int]
+    funding_programme_id = mapped_column(ForeignKey(FundingProgrammeEntity.funding_programme_id), nullable=False)
+    funding_programme: Mapped[FundingProgrammeEntity] = relationship(lazy="raise")
     data_source_id = mapped_column(ForeignKey(DataSourceEntity.data_source_id), nullable=False)
     data_source: Mapped[DataSourceEntity] = relationship(lazy="raise")
     effective_date_from: Mapped[datetime]
@@ -37,12 +41,17 @@ class CapitalSchemeFundingEntity(BaseEntity):
 
     @classmethod
     def from_domain(
-        cls, funding: CapitalSchemeFunding, capital_scheme_id: int, data_source_ids: dict[DataSource, int]
+        cls,
+        funding: CapitalSchemeFunding,
+        capital_scheme_id: int,
+        funding_programme_ids: dict[FundingProgrammeCode, int],
+        data_source_ids: dict[DataSource, int],
     ) -> Self:
         return cls(
             capital_scheme_funding_id=funding.surrogate_id,
             capital_scheme_id=capital_scheme_id,
             amount=funding.amount.amount,
+            funding_programme_id=funding_programme_ids[funding.funding_programme],
             data_source_id=data_source_ids[funding.data_source],
             effective_date_from=zoned_to_local(funding.effective_date.from_),
             effective_date_to=zoned_to_local(funding.effective_date.to) if funding.effective_date.to else None,
@@ -54,6 +63,7 @@ class CapitalSchemeFundingEntity(BaseEntity):
                 local_to_zoned(self.effective_date_from),
                 local_to_zoned(self.effective_date_to) if self.effective_date_to else None,
             ),
+            funding_programme=FundingProgrammeCode(self.funding_programme.funding_programme_code),
             amount=Money(self.amount),
             data_source=self.data_source.data_source_name.to_domain(),
             surrogate_id=self.capital_scheme_funding_id,
@@ -103,10 +113,11 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
 
     async def add(self, financials: CapitalSchemeFinancials) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(financials)
+        funding_programme_ids = await self._get_funding_programme_ids(financials)
         data_source_ids = await self._get_data_source_ids(financials)
 
         self._session.add_all(
-            CapitalSchemeFundingEntity.from_domain(funding, capital_scheme_id, data_source_ids)
+            CapitalSchemeFundingEntity.from_domain(funding, capital_scheme_id, funding_programme_ids, data_source_ids)
             for funding in financials.fundings
         )
         if financials.spend:
@@ -118,6 +129,7 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
         result = await self._session.execute(
             select(CapitalSchemeEntity, CapitalSchemeFundingEntity, CapitalSchemeSpendEntity)
             .options(
+                joinedload(CapitalSchemeFundingEntity.funding_programme),
                 joinedload(CapitalSchemeFundingEntity.data_source),
                 joinedload(CapitalSchemeSpendEntity.data_source),
             )
@@ -158,11 +170,14 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
 
     async def update(self, financials: CapitalSchemeFinancials) -> None:
         capital_scheme_id = await self._get_capital_scheme_id(financials)
+        funding_programme_ids = await self._get_funding_programme_ids(financials)
         data_source_ids = await self._get_data_source_ids(financials)
 
         for funding in financials.fundings:
             await self._session.merge(
-                CapitalSchemeFundingEntity.from_domain(funding, capital_scheme_id, data_source_ids)
+                CapitalSchemeFundingEntity.from_domain(
+                    funding, capital_scheme_id, funding_programme_ids, data_source_ids
+                )
             )
 
         if financials.spend:
@@ -181,6 +196,15 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
             )
         )
         return rows.one()
+
+    async def _get_funding_programme_ids(self, financials: CapitalSchemeFinancials) -> dict[FundingProgrammeCode, int]:
+        funding_programme_codes = {str(funding.funding_programme) for funding in financials.fundings}
+        rows = await self._session.execute(
+            select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
+                FundingProgrammeEntity.funding_programme_code.in_(funding_programme_codes)
+            )
+        )
+        return {FundingProgrammeCode(row.funding_programme_code): row.funding_programme_id for row in rows}
 
     async def _get_data_source_ids(self, financials: CapitalSchemeFinancials) -> dict[DataSource, int]:
         data_source_names = {DataSourceName.from_domain(funding.data_source) for funding in financials.fundings}

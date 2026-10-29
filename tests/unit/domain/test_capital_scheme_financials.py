@@ -4,6 +4,7 @@ from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, Ca
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
+from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.moneys import Money
 
 
@@ -22,6 +23,7 @@ class TestCapitalSchemeFinancials:
         financials.adjust_funding(
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF3"),
                 amount=Money(2_000_000),
                 data_source=DataSource.ATF3_BID,
             )
@@ -35,6 +37,7 @@ class TestCapitalSchemeFinancials:
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            funding_programme=FundingProgrammeCode("ATF3"),
             amount=Money(2_000_000),
             data_source=DataSource.ATF3_BID,
         )
@@ -47,6 +50,7 @@ class TestCapitalSchemeFinancials:
         financials = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
         funding1 = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            funding_programme=FundingProgrammeCode("ATF3"),
             amount=Money(2_000_000),
             data_source=DataSource.ATF3_BID,
         )
@@ -55,6 +59,7 @@ class TestCapitalSchemeFinancials:
         financials.adjust_funding(
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF3"),
                 amount=Money(1_000_000),
                 data_source=DataSource.ATF3_BID,
             )
