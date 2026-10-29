@@ -443,7 +443,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
