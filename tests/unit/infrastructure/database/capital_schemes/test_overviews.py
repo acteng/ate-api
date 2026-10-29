@@ -67,11 +67,11 @@ class TestCapitalSchemeOverviewEntity:
 
         overview = overview_entity.to_domain()
 
-        assert (
-            overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC))
-            and overview.name == "Wirral Package"
-            and overview.funding_programme == FundingProgrammeCode("ATF3")
-            and overview.improvement == ImprovementReference("IMP00001")
+        assert overview == CapitalSchemeOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="Wirral Package",
+            funding_programme=FundingProgrammeCode("ATF3"),
+            improvement=ImprovementReference("IMP00001"),
         )
 
     def test_to_domain_without_improvement(self) -> None:

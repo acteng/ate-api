@@ -98,12 +98,12 @@ class TestImprovementOverviewEntity:
 
         overview = overview_entity.to_domain()
 
-        assert (
-            overview.effective_date == DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC))
-            and overview.name == "Wirral Package"
-            and overview.description is None
-            and overview.funding_managed_by == AuthorityAbbreviation("LIV")
-            and overview.data_source == DataSource.AUTHORITY_UPDATE
+        assert overview == ImprovementOverview(
+            effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            name="Wirral Package",
+            description=None,
+            funding_managed_by=AuthorityAbbreviation("LIV"),
+            data_source=DataSource.AUTHORITY_UPDATE,
         )
 
     def test_to_domain_sets_description(self) -> None:
