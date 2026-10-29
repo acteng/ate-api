@@ -44,7 +44,10 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "authorityReview": None,
         }
     )
-    await app_client.create_capital_scheme_funding("ATE00001", {"amount": 3_000_000, "source": "ATF3 bid"})
+    await app_client.create_capital_scheme_funding(
+        "ATE00001",
+        {"fundingProgramme": f"{client.base_url}/funding-programmes/ATF3", "amount": 3_000_000, "source": "ATF3 bid"},
+    )
     await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF3 bid"})
     await app_client.create_capital_scheme_milestones(
         "ATE00001",
@@ -74,7 +77,15 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
         },
         "status": {"status": "active"},
         "financials": {
-            "funding": {"items": [{"amount": 3_000_000, "source": "ATF3 bid"}]},
+            "funding": {
+                "items": [
+                    {
+                        "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                        "amount": 3_000_000,
+                        "source": "ATF3 bid",
+                    }
+                ]
+            },
             "spend": {"amount": 2_000_000, "source": "ATF3 bid"},
         },
         "milestones": {

@@ -159,15 +159,16 @@ async def create_funding(
         CapitalSchemeFinancialsRepository, Depends(get_capital_scheme_financials_repository)
     ],
     unit_of_work: Annotated[UnitOfWork, Depends(get_unit_of_work)],
+    request: Request,
     reference: str,
     funding_model: CapitalSchemeFundingModel,
 ) -> CapitalSchemeFundingModel:
     async with unit_of_work:
         financials = await capital_scheme_financials.get(CapitalSchemeReference(reference))
         assert financials
-        funding = funding_model.to_domain(clock.now)
+        funding = funding_model.to_domain(clock.now, request)
         financials.adjust_funding(funding)
         await capital_scheme_financials.update(financials)
         await unit_of_work.commit()
 
-    return CapitalSchemeFundingModel.from_domain(funding)
+    return CapitalSchemeFundingModel.from_domain(funding, request)

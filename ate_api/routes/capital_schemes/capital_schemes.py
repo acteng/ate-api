@@ -47,7 +47,15 @@ class CapitalSchemeModel(BaseModel):
                     },
                     "status": {"status": "active"},
                     "financials": {
-                        "funding": {"items": [{"amount": 3_000_000, "source": "ATF3 bid"}]},
+                        "funding": {
+                            "items": [
+                                {
+                                    "fundingProgramme": "https://api.activetravelengland.gov.uk/funding-programmes/ATF3",
+                                    "amount": 3_000_000,
+                                    "source": "ATF3 bid",
+                                }
+                            ]
+                        },
                         "spend": {"amount": 2_000_000, "source": "ATF3 bid"},
                     },
                     "milestones": {
@@ -90,7 +98,7 @@ class CapitalSchemeModel(BaseModel):
             reference=str(capital_scheme.reference),
             overview=CapitalSchemeOverviewModel.from_domain(capital_scheme.overview, request),
             status=CapitalSchemeStatusModel.from_domain(capital_scheme.status),
-            financials=CapitalSchemeFinancialsModel.from_domain(financials),
+            financials=CapitalSchemeFinancialsModel.from_domain(financials, request),
             milestones=CapitalSchemeMilestonesModel.from_domain(milestones),
             outputs=CollectionModel[CapitalSchemeOutputModel](
                 items=[CapitalSchemeOutputModel.from_domain(output) for output in capital_scheme.outputs]

@@ -102,6 +102,7 @@ async def test_get_capital_scheme_with_financials(
     financials.adjust_funding(
         CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+            funding_programme=FundingProgrammeCode("ATF3"),
             amount=Money(3_000_000),
             data_source=DataSource.ATF3_BID,
         )
@@ -120,7 +121,15 @@ async def test_get_capital_scheme_with_financials(
 
     assert response.status_code == 200
     assert response.json()["financials"] == {
-        "funding": {"items": [{"amount": 3_000_000, "source": "ATF3 bid"}]},
+        "funding": {
+            "items": [
+                {
+                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
+                    "amount": 3_000_000,
+                    "source": "ATF3 bid",
+                }
+            ]
+        },
         "spend": {"amount": 2_000_000, "source": "ATF3 bid"},
     }
 

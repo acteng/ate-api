@@ -54,6 +54,9 @@ async def _restart_sequences(engine: AsyncEngine) -> None:
     # offset implicit ids of test entities to reserve numeric space for explicit ids
     restart = 100
     async with engine.begin() as connection:
+        await connection.execute(
+            text(f"ALTER SEQUENCE common.funding_programme_funding_programme_id_seq RESTART WITH {restart}")
+        )
         await connection.execute(text(f"ALTER SEQUENCE authority.authority_authority_id_seq RESTART WITH {restart}"))
 
 

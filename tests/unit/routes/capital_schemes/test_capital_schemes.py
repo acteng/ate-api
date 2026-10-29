@@ -75,12 +75,13 @@ class TestCapitalSchemeModel:
             authority_review=None,
         )
 
-    def test_from_domain_sets_financials(self, http_request: Request) -> None:
+    def test_from_domain_sets_financials(self, http_request: Request, base_url: str) -> None:
         capital_scheme = build_capital_scheme()
         financials = CapitalSchemeFinancials(capital_scheme=build_capital_scheme_reference())
         financials.adjust_funding(
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
+                funding_programme=FundingProgrammeCode("ATF3"),
                 amount=Money(2_000_000),
                 data_source=DataSource.ATF3_BID,
             )
@@ -98,7 +99,13 @@ class TestCapitalSchemeModel:
 
         assert capital_scheme_model.financials == CapitalSchemeFinancialsModel(
             funding=CollectionModel[CapitalSchemeFundingModel](
-                items=[CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF3_BID)]
+                items=[
+                    CapitalSchemeFundingModel(
+                        funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
+                        amount=2_000_000,
+                        source=DataSourceModel.ATF3_BID,
+                    )
+                ]
             ),
             spend=CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF3_BID),
         )
