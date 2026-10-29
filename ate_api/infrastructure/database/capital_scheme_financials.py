@@ -160,9 +160,9 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
         capital_scheme_id = await self._get_capital_scheme_id(financials)
         data_source_ids = await self._get_data_source_ids(financials)
 
-        for financial in financials.fundings:
+        for funding in financials.fundings:
             await self._session.merge(
-                CapitalSchemeFundingEntity.from_domain(financial, capital_scheme_id, data_source_ids)
+                CapitalSchemeFundingEntity.from_domain(funding, capital_scheme_id, data_source_ids)
             )
 
         if financials.spend:
@@ -183,7 +183,7 @@ class DatabaseCapitalSchemeFinancialsRepository(CapitalSchemeFinancialsRepositor
         return rows.one()
 
     async def _get_data_source_ids(self, financials: CapitalSchemeFinancials) -> dict[DataSource, int]:
-        data_source_names = {DataSourceName.from_domain(financial.data_source) for financial in financials.fundings}
+        data_source_names = {DataSourceName.from_domain(funding.data_source) for funding in financials.fundings}
         if financials.spend:
             data_source_names.add(DataSourceName.from_domain(financials.spend.data_source))
         rows = await self._session.execute(
