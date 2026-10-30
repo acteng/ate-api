@@ -7,8 +7,11 @@ from starlette.status import HTTP_404_NOT_FOUND
 
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestones, CapitalSchemeMilestonesRepository
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.repositories import (
     get_capital_scheme_financials_repository,
     get_capital_scheme_milestones_repository,

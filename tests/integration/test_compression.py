@@ -12,8 +12,7 @@ from ate_api.domain.capital_scheme_milestones import (
     CapitalSchemeMilestonesRepository,
     Milestone,
 )
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference, CapitalSchemeRepository
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.observation_types import ObservationType

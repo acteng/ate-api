@@ -8,8 +8,7 @@ from starlette.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 from ate_api.clock import get_clock
 from ate_api.database import get_unit_of_work
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference, CapitalSchemeRepository
 from ate_api.infrastructure.clock import Clock
 from ate_api.repositories import get_capital_scheme_repository
 from ate_api.routes.base import BaseModel

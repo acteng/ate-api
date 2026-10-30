@@ -9,7 +9,7 @@ from ate_api.database import get_unit_of_work
 from ate_api.domain.authorities import AuthorityRepository
 from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_scheme_milestones import CapitalSchemeMilestonesRepository
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeRepository
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.clock import Clock

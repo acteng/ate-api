@@ -5,8 +5,7 @@ from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference, CapitalSchemeRepository
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource

@@ -19,8 +19,11 @@ from ate_api.domain.capital_scheme_milestones import (
     Milestone,
 )
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.capital_schemes.outputs import CapitalSchemeOutput, OutputMeasure, OutputType
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status

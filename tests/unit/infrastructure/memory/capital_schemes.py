@@ -1,6 +1,10 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
-from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem, CapitalSchemeRepository
-from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
+from ate_api.domain.capital_schemes.capital_schemes import (
+    CapitalScheme,
+    CapitalSchemeItem,
+    CapitalSchemeReference,
+    CapitalSchemeRepository,
+)
 from ate_api.domain.capital_schemes.statuses import Status
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
