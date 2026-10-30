@@ -13,7 +13,7 @@ from tests.unit.infrastructure.database.builders import EntityBuilder
 
 @pytest.fixture(name="debug", scope="package")
 def debug_fixture() -> bool:
-    return False
+    return True
 
 
 @pytest.fixture(name="database_url", scope="package")

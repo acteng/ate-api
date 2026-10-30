@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 import pytest
 
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancials, CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeItem
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
@@ -14,10 +15,12 @@ from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import Improvement, ImprovementReference, ImprovementRepository
 from tests.unit.domain.builders import (
     build_capital_scheme,
+    build_capital_scheme_funding,
     build_capital_scheme_overview,
     build_capital_scheme_status,
     build_improvement_overview,
 )
+from tests.unit.infrastructure.memory.capital_scheme_financials import MemoryCapitalSchemeFinancialsRepository
 from tests.unit.infrastructure.memory.capital_schemes import MemoryCapitalSchemeRepository
 from tests.unit.infrastructure.memory.improvements import MemoryImprovementRepository
 
@@ -28,8 +31,14 @@ class TestMemoryCapitalSchemeRepository:
         return MemoryImprovementRepository()
 
     @pytest.fixture(name="capital_schemes")
-    def capital_schemes_fixture(self, improvements: ImprovementRepository) -> MemoryCapitalSchemeRepository:
-        return MemoryCapitalSchemeRepository(improvements)
+    def capital_schemes_fixture(
+        self, capital_scheme_financials: CapitalSchemeFinancialsRepository, improvements: ImprovementRepository
+    ) -> MemoryCapitalSchemeRepository:
+        return MemoryCapitalSchemeRepository(capital_scheme_financials, improvements)
+
+    @pytest.fixture(name="capital_scheme_financials")
+    def capital_scheme_financials_fixture(self) -> CapitalSchemeFinancialsRepository:
+        return MemoryCapitalSchemeFinancialsRepository()
 
     async def test_add(self, capital_schemes: MemoryCapitalSchemeRepository) -> None:
         overview = CapitalSchemeOverview(
@@ -167,7 +176,10 @@ class TestMemoryCapitalSchemeRepository:
         ]
 
     async def test_get_items_by_funding_managed_by_filters_by_funding_programme(
-        self, capital_schemes: MemoryCapitalSchemeRepository, improvements: MemoryImprovementRepository
+        self,
+        capital_schemes: MemoryCapitalSchemeRepository,
+        capital_scheme_financials: MemoryCapitalSchemeFinancialsRepository,
+        improvements: MemoryImprovementRepository,
     ) -> None:
         await improvements.add(
             Improvement(
@@ -178,30 +190,30 @@ class TestMemoryCapitalSchemeRepository:
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00001"),
-                overview=build_capital_scheme_overview(
-                    funding_programme=FundingProgrammeCode("ATF3"),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
             )
         )
+        financials1 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+        financials1.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF3")))
+        await capital_scheme_financials.add(financials1)
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00002"),
-                overview=build_capital_scheme_overview(
-                    funding_programme=FundingProgrammeCode("ATF4"),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
             )
         )
+        financials2 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00002"))
+        financials2.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF4")))
+        await capital_scheme_financials.add(financials2)
         await capital_schemes.add(
             build_capital_scheme(
                 reference=CapitalSchemeReference("ATE00003"),
-                overview=build_capital_scheme_overview(
-                    funding_programme=FundingProgrammeCode("ATF5"),
-                    improvement=ImprovementReference("IMP00001"),
-                ),
+                overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
             )
         )
+        financials3 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00003"))
+        financials3.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF5")))
+        await capital_scheme_financials.add(financials3)
 
         capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
             AuthorityAbbreviation("LIV"),

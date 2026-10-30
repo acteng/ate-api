@@ -10,6 +10,7 @@ from ate_api.domain.data_sources import DataSource
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
+from ate_api.infrastructure.database.capital_scheme_financials.capital_scheme_financials import CapitalSchemeFundingEntity
 from ate_api.infrastructure.database.base import BaseEntity
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.interventions import CapitalSchemeInterventionEntity
@@ -25,6 +26,7 @@ class CapitalSchemeEntity(BaseEntity):
     scheme_reference: Mapped[str] = mapped_column(unique=True)
     capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
     capital_scheme_scheme_statuses: Mapped[list[CapitalSchemeSchemeStatusEntity]] = relationship(lazy="raise")
+    capital_scheme_fundings: Mapped[list[CapitalSchemeFundingEntity]] = relationship(lazy="raise")
     capital_scheme_interventions: Mapped[list[CapitalSchemeInterventionEntity]] = relationship(lazy="raise")
     capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
 

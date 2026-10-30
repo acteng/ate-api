@@ -4,6 +4,10 @@ import respx
 from fastapi.testclient import TestClient
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation, AuthorityRepository
+from ate_api.domain.capital_scheme_financials import (
+    CapitalSchemeFinancials,
+    CapitalSchemeFinancialsRepository,
+)
 from ate_api.domain.capital_schemes.authority_reviews import CapitalSchemeAuthorityReview
 from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSchemeRepository
 from ate_api.domain.capital_schemes.capital_schemes import CapitalSchemeReference
@@ -16,6 +20,7 @@ from ate_api.domain.improvements.improvements import Improvement, ImprovementRef
 from tests.unit.domain.builders import (
     build_authority,
     build_capital_scheme,
+    build_capital_scheme_funding,
     build_capital_scheme_overview,
     build_capital_scheme_status,
     build_improvement_overview,
@@ -146,6 +151,7 @@ async def test_get_authority_funding_managed_by_capital_schemes_filters_by_fundi
     funding_programmes: FundingProgrammeRepository,
     improvements: ImprovementRepository,
     capital_schemes: CapitalSchemeRepository,
+    capital_scheme_financials: CapitalSchemeFinancialsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
@@ -161,21 +167,21 @@ async def test_get_authority_funding_managed_by_capital_schemes_filters_by_fundi
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=ImprovementReference("IMP00001"),
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
         )
     )
+    financials1 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+    financials1.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF3")))
+    await capital_scheme_financials.add(financials1)
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=build_capital_scheme_overview(
-                funding_programme=FundingProgrammeCode("ATF4"),
-                improvement=ImprovementReference("IMP00001"),
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
         )
     )
+    financials2 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00002"))
+    financials2.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF4")))
+    await capital_scheme_financials.add(financials2)
 
     response = client.get(
         "/authorities/LIV/capital-schemes/funding-managed-by",
@@ -193,6 +199,7 @@ async def test_get_authority_funding_managed_by_capital_schemes_filters_by_fundi
     funding_programmes: FundingProgrammeRepository,
     improvements: ImprovementRepository,
     capital_schemes: CapitalSchemeRepository,
+    capital_scheme_financials: CapitalSchemeFinancialsRepository,
     client: TestClient,
     access_token: str,
 ) -> None:
@@ -209,30 +216,30 @@ async def test_get_authority_funding_managed_by_capital_schemes_filters_by_fundi
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00001"),
-            overview=build_capital_scheme_overview(
-                funding_programme=FundingProgrammeCode("ATF3"),
-                improvement=ImprovementReference("IMP00001"),
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
         )
     )
+    financials1 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00001"))
+    financials1.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF3")))
+    await capital_scheme_financials.add(financials1)
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00002"),
-            overview=build_capital_scheme_overview(
-                funding_programme=FundingProgrammeCode("ATF4"),
-                improvement=ImprovementReference("IMP00001"),
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
         )
     )
+    financials2 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00002"))
+    financials2.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF4")))
+    await capital_scheme_financials.add(financials2)
     await capital_schemes.add(
         build_capital_scheme(
             reference=CapitalSchemeReference("ATE00003"),
-            overview=build_capital_scheme_overview(
-                funding_programme=FundingProgrammeCode("ATF5"),
-                improvement=ImprovementReference("IMP00001"),
-            ),
+            overview=build_capital_scheme_overview(improvement=ImprovementReference("IMP00001")),
         )
     )
+    financials3 = CapitalSchemeFinancials(capital_scheme=CapitalSchemeReference("ATE00003"))
+    financials3.adjust_funding(build_capital_scheme_funding(funding_programme=FundingProgrammeCode("ATF5")))
+    await capital_scheme_financials.add(financials3)
 
     response = client.get(
         "/authorities/LIV/capital-schemes/funding-managed-by",

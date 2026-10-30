@@ -818,15 +818,18 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf3, improvement=imp)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[entities.build_capital_scheme_funding(funding_programme=atf3)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00002",
-                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf4, improvement=imp)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[entities.build_capital_scheme_funding(funding_programme=atf4)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00003",
-                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf5, improvement=imp)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[entities.build_capital_scheme_funding(funding_programme=atf5)],
                     ),
                 ]
             )

@@ -4,6 +4,7 @@ from ate_api.infrastructure.database import (
     AuthorityEntity,
     CapitalSchemeAuthorityReviewEntity,
     CapitalSchemeEntity,
+    CapitalSchemeFundingEntity,
     CapitalSchemeInterventionEntity,
     CapitalSchemeOverviewEntity,
     CapitalSchemeSchemeStatusEntity,
@@ -75,6 +76,7 @@ class EntityBuilder:
         reference: str = "dummy",
         overviews: list[CapitalSchemeOverviewEntity] | None = None,
         scheme_statuses: list[CapitalSchemeSchemeStatusEntity] | None = None,
+        fundings: list[CapitalSchemeFundingEntity] | None = None,
         interventions: list[CapitalSchemeInterventionEntity] | None = None,
         authority_reviews: list[CapitalSchemeAuthorityReviewEntity] | None = None,
     ) -> CapitalSchemeEntity:
@@ -85,6 +87,7 @@ class EntityBuilder:
             capital_scheme_scheme_statuses=(
                 scheme_statuses if scheme_statuses is not None else [self.build_capital_scheme_scheme_status()]
             ),
+            capital_scheme_fundings=fundings or [],
             capital_scheme_interventions=interventions or [],
             capital_scheme_authority_reviews=authority_reviews or [],
         )
@@ -110,6 +113,22 @@ class EntityBuilder:
     ) -> CapitalSchemeSchemeStatusEntity:
         return CapitalSchemeSchemeStatusEntity(
             scheme_status=scheme_status or self._dummy_scheme_status, effective_date_from=effective_date_from
+        )
+
+    def build_capital_scheme_funding(
+        self,
+        amount: int = 0,
+        funding_programme: FundingProgrammeEntity | None = None,
+        data_source: DataSourceEntity | None = None,
+        effective_date_from: datetime = dummy_local_datetime,
+        effective_date_to: datetime | None = None,
+    ) -> CapitalSchemeFundingEntity:
+        return CapitalSchemeFundingEntity(
+            amount=amount,
+            funding_programme=funding_programme or self._dummy_funding_programme,
+            data_source=data_source or self._dummy_data_source,
+            effective_date_from=effective_date_from,
+            effective_date_to=effective_date_to,
         )
 
 

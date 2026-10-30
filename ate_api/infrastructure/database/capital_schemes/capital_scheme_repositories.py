@@ -1,3 +1,4 @@
+from ate_api.infrastructure.database import CapitalSchemeFundingEntity
 from sqlalchemy import ColumnElement, Select, and_, false, func, or_, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, contains_eager, joinedload
@@ -132,10 +133,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current overview
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-            # possible forward reference to funding programme filter join
-            (contains_eager if funding_programme_codes else joinedload)(
-                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
-            ),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
             # forward reference to authority filter join
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
         ).join(
@@ -192,9 +190,11 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         # filter by funding programme
         if funding_programme_codes:
-            statement = statement.join(FundingProgrammeEntity).where(
+            statement = (statement.join(CapitalSchemeFundingEntity)
+            .join(FundingProgrammeEntity)
+            .where(
                 FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
-            )
+            ))
 
         # filter by scheme status
         if status:

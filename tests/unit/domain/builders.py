@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from ate_api.domain.authorities import Authority, AuthorityAbbreviation
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFunding
 from ate_api.domain.capital_schemes.capital_schemes import CapitalScheme, CapitalSchemeReference
 from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
@@ -9,6 +10,7 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.improvements.overviews import ImprovementOverview
+from ate_api.domain.moneys import Money
 from tests.unit.dates import dummy_datetime
 
 _dummy_data_source = DataSource.PULSE_5
@@ -72,6 +74,20 @@ def build_capital_scheme_status(
     effective_date: DateTimeRange | None = None, status: Status = Status.PIPELINE
 ) -> CapitalSchemeStatus:
     return CapitalSchemeStatus(effective_date=effective_date or build_date_time_range(), status=status)
+
+
+def build_capital_scheme_funding(
+    effective_date: DateTimeRange | None = None,
+    funding_programme: FundingProgrammeCode | None = None,
+    amount: Money | None = None,
+    data_source: DataSource = _dummy_data_source,
+) -> CapitalSchemeFunding:
+    return CapitalSchemeFunding(
+        effective_date=effective_date or build_date_time_range(),
+        funding_programme=funding_programme or build_funding_programme_code(),
+        amount=amount or Money(0),
+        data_source=data_source,
+    )
 
 
 def build_funding_programme_code(code: str = "dummy") -> FundingProgrammeCode:
