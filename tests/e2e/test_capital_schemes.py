@@ -44,8 +44,8 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
             "authorityReview": None,
         }
     )
-    await app_client.create_capital_scheme_funding("ATE00001", {"amount": 3_000_000, "source": "ATF4 bid"})
-    await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF4 bid"})
+    await app_client.create_capital_scheme_funding("ATE00001", {"amount": 3_000_000, "source": "ATF3 bid"})
+    await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF3 bid"})
     await app_client.create_capital_scheme_milestones(
         "ATE00001",
         {
@@ -54,7 +54,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 }
             ]
         },
@@ -74,8 +74,8 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
         },
         "status": {"status": "active"},
         "financials": {
-            "funding": {"items": [{"amount": 3_000_000, "source": "ATF4 bid"}]},
-            "spend": {"amount": 2_000_000, "source": "ATF4 bid"},
+            "funding": {"items": [{"amount": 3_000_000, "source": "ATF3 bid"}]},
+            "spend": {"amount": 2_000_000, "source": "ATF3 bid"},
         },
         "milestones": {
             "currentMilestone": "detailed design completed",
@@ -84,7 +84,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 }
             ],
         },
@@ -120,18 +120,18 @@ async def test_create_spend(client: AsyncClient, access_token: str, app_client: 
             "authorityReview": None,
         }
     )
-    await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF4 bid"})
+    await app_client.create_capital_scheme_spend("ATE00001", {"amount": 2_000_000, "source": "ATF3 bid"})
 
     response = await client.post(
         "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF3 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {"amount": 3_000_000, "source": "ATF4 bid"}
+    assert response.json() == {"amount": 3_000_000, "source": "ATF3 bid"}
     capital_scheme = await app_client.get_capital_scheme("ATE00001")
-    assert capital_scheme["financials"]["spend"] == {"amount": 3_000_000, "source": "ATF4 bid"}
+    assert capital_scheme["financials"]["spend"] == {"amount": 3_000_000, "source": "ATF3 bid"}
 
 
 async def test_create_spend_concurrently(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
@@ -158,7 +158,7 @@ async def test_create_spend_concurrently(client: AsyncClient, access_token: str,
             client.post(
                 "/capital-schemes/ATE00001/financials/spend",
                 headers={"Authorization": f"Bearer {access_token}"},
-                json={"amount": 3_000_000, "source": "ATF4 bid"},
+                json={"amount": 3_000_000, "source": "ATF3 bid"},
             )
             for _ in range(3)
         ]
@@ -166,7 +166,7 @@ async def test_create_spend_concurrently(client: AsyncClient, access_token: str,
 
     assert all(response.status_code == 201 for response in responses)
     capital_scheme = await app_client.get_capital_scheme("ATE00001")
-    assert capital_scheme["financials"]["spend"] == {"amount": 3_000_000, "source": "ATF4 bid"}
+    assert capital_scheme["financials"]["spend"] == {"amount": 3_000_000, "source": "ATF3 bid"}
 
 
 async def test_create_milestones(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
@@ -195,13 +195,13 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-02-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
                 {
                     "milestone": "construction started",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
             ]
         },
@@ -216,13 +216,13 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2021-02-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
                 {
                     "milestone": "construction started",
                     "observationType": "actual",
                     "statusDate": "2021-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
             ]
         },
@@ -235,13 +235,13 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
                 "milestone": "detailed design completed",
                 "observationType": "actual",
                 "statusDate": "2021-02-01",
-                "source": "ATF4 bid",
+                "source": "ATF3 bid",
             },
             {
                 "milestone": "construction started",
                 "observationType": "actual",
                 "statusDate": "2021-03-01",
-                "source": "ATF4 bid",
+                "source": "ATF3 bid",
             },
         ]
     }
@@ -251,13 +251,13 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
             "milestone": "detailed design completed",
             "observationType": "actual",
             "statusDate": "2021-02-01",
-            "source": "ATF4 bid",
+            "source": "ATF3 bid",
         },
         {
             "milestone": "construction started",
             "observationType": "actual",
             "statusDate": "2021-03-01",
-            "source": "ATF4 bid",
+            "source": "ATF3 bid",
         },
     ]
 
@@ -292,7 +292,7 @@ async def test_create_milestones_concurrently(client: AsyncClient, access_token:
                             "milestone": "detailed design completed",
                             "observationType": "actual",
                             "statusDate": "2021-02-01",
-                            "source": "ATF4 bid",
+                            "source": "ATF3 bid",
                         }
                     ]
                 },
@@ -308,7 +308,7 @@ async def test_create_milestones_concurrently(client: AsyncClient, access_token:
             "milestone": "detailed design completed",
             "observationType": "actual",
             "statusDate": "2021-02-01",
-            "source": "ATF4 bid",
+            "source": "ATF3 bid",
         }
     ]
 
@@ -332,7 +332,7 @@ async def test_create_authority_review(client: AsyncClient, access_token: str, a
             "authorityReview": None,
         }
     )
-    await app_client.create_capital_scheme_authority_review("ATE00001", {"source": "ATF4 bid"})
+    await app_client.create_capital_scheme_authority_review("ATE00001", {"source": "ATF3 bid"})
     await app_client.set_clock("2021-02-01T00:00:00Z")
 
     response = await client.post(

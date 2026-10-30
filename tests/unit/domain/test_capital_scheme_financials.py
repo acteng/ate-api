@@ -23,7 +23,7 @@ class TestCapitalSchemeFinancials:
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 amount=Money(2_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -36,7 +36,7 @@ class TestCapitalSchemeFinancials:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         financials.adjust_funding(funding)
@@ -48,7 +48,7 @@ class TestCapitalSchemeFinancials:
         funding1 = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.adjust_funding(funding1)
 
@@ -56,7 +56,7 @@ class TestCapitalSchemeFinancials:
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 amount=Money(1_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -67,7 +67,7 @@ class TestCapitalSchemeFinancials:
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         financials.change_spend(spend)

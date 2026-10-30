@@ -103,14 +103,14 @@ async def test_get_capital_scheme_with_financials(
         CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(3_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
     )
     financials.change_spend(
         CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
     )
     await capital_scheme_financials.add(financials)
@@ -120,8 +120,8 @@ async def test_get_capital_scheme_with_financials(
 
     assert response.status_code == 200
     assert response.json()["financials"] == {
-        "funding": {"items": [{"amount": 3_000_000, "source": "ATF4 bid"}]},
-        "spend": {"amount": 2_000_000, "source": "ATF4 bid"},
+        "funding": {"items": [{"amount": 3_000_000, "source": "ATF3 bid"}]},
+        "spend": {"amount": 2_000_000, "source": "ATF3 bid"},
     }
 
 
@@ -142,7 +142,7 @@ async def test_get_capital_scheme_with_milestones(
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
     )
     await capital_scheme_milestones.add(milestones)
@@ -157,7 +157,7 @@ async def test_get_capital_scheme_with_milestones(
                 "milestone": "detailed design completed",
                 "observationType": "actual",
                 "statusDate": "2020-02-01",
-                "source": "ATF4 bid",
+                "source": "ATF3 bid",
             }
         ],
     }
@@ -240,14 +240,14 @@ async def test_create_spend_creates_spend(
     client.post(
         "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF3 bid"},
     )
 
     financials = await capital_scheme_financials.get(CapitalSchemeReference("ATE00001"))
     assert financials and financials.spend == CapitalSchemeSpend(
         effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
         amount=Money(3_000_000),
-        data_source=DataSource.ATF4_BID,
+        data_source=DataSource.ATF3_BID,
     )
     assert unit_of_work.committed
 
@@ -261,11 +261,11 @@ async def test_create_spend_returns_created_spend(
     response = client.post(
         "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF3 bid"},
     )
 
     assert response.status_code == 201
-    assert response.json() == {"amount": 3_000_000, "source": "ATF4 bid"}
+    assert response.json() == {"amount": 3_000_000, "source": "ATF3 bid"}
 
 
 @respx.mock
@@ -273,7 +273,7 @@ def test_create_spend_when_capital_scheme_not_found(client: TestClient, access_t
     response = client.post(
         "/capital-schemes/ATE00001/financials/spend",
         headers={"Authorization": f"Bearer {access_token}"},
-        json={"amount": 3_000_000, "source": "ATF4 bid"},
+        json={"amount": 3_000_000, "source": "ATF3 bid"},
     )
 
     assert response.status_code == 404
@@ -299,13 +299,13 @@ async def test_create_milestones_creates_milestones(
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-02-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
                 {
                     "milestone": "construction started",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
             ]
         },
@@ -318,14 +318,14 @@ async def test_create_milestones_creates_milestones(
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         ),
         CapitalSchemeMilestone(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         ),
     ]
     assert unit_of_work.serializable and unit_of_work.committed
@@ -343,7 +343,7 @@ async def test_create_milestones_closes_current_milestones(
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
     )
     await capital_scheme_milestones.add(milestones)
@@ -357,7 +357,7 @@ async def test_create_milestones_closes_current_milestones(
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-04-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 }
             ]
         },
@@ -382,13 +382,13 @@ async def test_create_milestones_returns_created_milestones(
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-02-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
                 {
                     "milestone": "construction started",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
             ]
         },
@@ -401,13 +401,13 @@ async def test_create_milestones_returns_created_milestones(
                 "milestone": "detailed design completed",
                 "observationType": "actual",
                 "statusDate": "2020-02-01",
-                "source": "ATF4 bid",
+                "source": "ATF3 bid",
             },
             {
                 "milestone": "construction started",
                 "observationType": "actual",
                 "statusDate": "2020-03-01",
-                "source": "ATF4 bid",
+                "source": "ATF3 bid",
             },
         ]
     }
@@ -424,13 +424,13 @@ def test_create_milestones_when_capital_scheme_not_found(client: TestClient, acc
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-02-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
                 {
                     "milestone": "construction started",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 },
             ]
         },

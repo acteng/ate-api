@@ -65,7 +65,7 @@ def add_large_capital_scheme(
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         milestones.change_milestone(
@@ -74,7 +74,7 @@ def add_large_capital_scheme(
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         await capital_scheme_milestones.add(milestones)

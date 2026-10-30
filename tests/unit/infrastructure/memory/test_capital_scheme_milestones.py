@@ -22,7 +22,7 @@ class TestMemoryCapitalSchemeMilestonesRepository:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone1)
         milestone2 = CapitalSchemeMilestone(
@@ -30,7 +30,7 @@ class TestMemoryCapitalSchemeMilestonesRepository:
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone2)
 
@@ -50,7 +50,7 @@ class TestMemoryCapitalSchemeMilestonesRepository:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone1)
         milestone2 = CapitalSchemeMilestone(
@@ -58,7 +58,7 @@ class TestMemoryCapitalSchemeMilestonesRepository:
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone2)
         await capital_scheme_milestones.add(milestones)
@@ -84,7 +84,7 @@ class TestMemoryCapitalSchemeMilestonesRepository:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         await capital_scheme_milestones.add(milestones)
@@ -93,7 +93,7 @@ class TestMemoryCapitalSchemeMilestonesRepository:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2021, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone2)
 

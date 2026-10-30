@@ -20,7 +20,7 @@ class TestCapitalSchemeMilestone:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         assert milestone.is_open == expected_is_open
@@ -31,7 +31,7 @@ class TestCapitalSchemeMilestone:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
             surrogate_id=1,
         )
 
@@ -42,7 +42,7 @@ class TestCapitalSchemeMilestone:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         assert closed_milestone.surrogate_id == 1
 
@@ -52,7 +52,7 @@ class TestCapitalSchemeMilestone:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         with pytest.raises(ValueError, match="Capital scheme milestone is already closed"):
@@ -73,7 +73,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -89,7 +89,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.PLANNED,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         milestones.change_milestone(
@@ -98,7 +98,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -112,7 +112,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         milestones.change_milestone(
@@ -121,7 +121,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -139,7 +139,7 @@ class TestCapitalSchemeMilestones:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         milestones.change_milestone(milestone)
@@ -154,7 +154,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -164,7 +164,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -177,7 +177,7 @@ class TestCapitalSchemeMilestones:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone1)
 
@@ -187,7 +187,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -200,7 +200,7 @@ class TestCapitalSchemeMilestones:
             milestone=Milestone.DETAILED_DESIGN_COMPLETED,
             observation_type=ObservationType.ACTUAL,
             status_date=date(2020, 2, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone1)
         milestone2 = CapitalSchemeMilestone(
@@ -208,7 +208,7 @@ class TestCapitalSchemeMilestones:
             milestone=Milestone.CONSTRUCTION_STARTED,
             observation_type=ObservationType.PLANNED,
             status_date=date(2020, 3, 1),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         milestones.change_milestone(milestone2)
 
@@ -218,7 +218,7 @@ class TestCapitalSchemeMilestones:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 4, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 

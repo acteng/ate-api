@@ -82,14 +82,14 @@ class TestCapitalSchemeModel:
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 amount=Money(2_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         financials.change_spend(
             CapitalSchemeSpend(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 amount=Money(1_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         milestones = CapitalSchemeMilestones(capital_scheme=build_capital_scheme_reference())
@@ -98,9 +98,9 @@ class TestCapitalSchemeModel:
 
         assert capital_scheme_model.financials == CapitalSchemeFinancialsModel(
             funding=CollectionModel[CapitalSchemeFundingModel](
-                items=[CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)]
+                items=[CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF3_BID)]
             ),
-            spend=CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF4_BID),
+            spend=CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF3_BID),
         )
 
     def test_from_domain_sets_milestones(self, http_request: Request) -> None:
@@ -113,7 +113,7 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.DETAILED_DESIGN_COMPLETED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 2, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         milestones.change_milestone(
@@ -122,7 +122,7 @@ class TestCapitalSchemeModel:
                 milestone=Milestone.CONSTRUCTION_STARTED,
                 observation_type=ObservationType.ACTUAL,
                 status_date=date(2020, 3, 1),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -135,13 +135,13 @@ class TestCapitalSchemeModel:
                     milestone=MilestoneModel.DETAILED_DESIGN_COMPLETED,
                     observation_type=ObservationTypeModel.ACTUAL,
                     status_date=date(2020, 2, 1),
-                    source=DataSourceModel.ATF4_BID,
+                    source=DataSourceModel.ATF3_BID,
                 ),
                 CapitalSchemeMilestoneModel(
                     milestone=MilestoneModel.CONSTRUCTION_STARTED,
                     observation_type=ObservationTypeModel.ACTUAL,
                     status_date=date(2020, 3, 1),
-                    source=DataSourceModel.ATF4_BID,
+                    source=DataSourceModel.ATF3_BID,
                 ),
             ],
         )

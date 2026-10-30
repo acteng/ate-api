@@ -29,11 +29,11 @@ class TestCapitalSchemeFundingEntity:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
             surrogate_id=1,
         )
 
-        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 2, {DataSource.ATF4_BID: 3})
+        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 2, {DataSource.ATF3_BID: 3})
 
         assert (
             funding_entity.capital_scheme_funding_id == 1
@@ -48,10 +48,10 @@ class TestCapitalSchemeFundingEntity:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
-        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 0, {DataSource.ATF4_BID: 0})
+        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 0, {DataSource.ATF3_BID: 0})
 
         assert funding_entity.effective_date_to == local_datetime(2020, 2, 1)
 
@@ -59,10 +59,10 @@ class TestCapitalSchemeFundingEntity:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
-        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 0, {DataSource.ATF4_BID: 0})
+        funding_entity = CapitalSchemeFundingEntity.from_domain(funding, 0, {DataSource.ATF3_BID: 0})
 
         assert funding_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
         assert funding_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
@@ -72,7 +72,7 @@ class TestCapitalSchemeFundingEntity:
             capital_scheme_funding_id=1,
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 1, 1),
-            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF3_BID),
         )
 
         funding = funding_entity.to_domain()
@@ -80,7 +80,7 @@ class TestCapitalSchemeFundingEntity:
         assert funding == CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         assert funding.surrogate_id == 1
 
@@ -89,7 +89,7 @@ class TestCapitalSchemeFundingEntity:
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 1, 1),
             effective_date_to=local_datetime(2020, 2, 1),
-            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF3_BID),
         )
 
         funding = funding_entity.to_domain()
@@ -101,7 +101,7 @@ class TestCapitalSchemeFundingEntity:
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 6, 1, 13),
             effective_date_to=local_datetime(2020, 7, 1, 13),
-            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF3_BID),
         )
 
         funding = funding_entity.to_domain()
@@ -116,11 +116,11 @@ class TestCapitalSchemeSpendEntity:
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
             surrogate_id=1,
         )
 
-        spend_entity = CapitalSchemeSpendEntity.from_domain(spend, 2, {DataSource.ATF4_BID: 3})
+        spend_entity = CapitalSchemeSpendEntity.from_domain(spend, 2, {DataSource.ATF3_BID: 3})
 
         assert (
             spend_entity.capital_scheme_spend_id == 1
@@ -135,10 +135,10 @@ class TestCapitalSchemeSpendEntity:
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC), datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
-        spend_entity = CapitalSchemeSpendEntity.from_domain(spend, 0, {DataSource.ATF4_BID: 0})
+        spend_entity = CapitalSchemeSpendEntity.from_domain(spend, 0, {DataSource.ATF3_BID: 0})
 
         assert spend_entity.effective_date_to == local_datetime(2020, 2, 1)
 
@@ -146,10 +146,10 @@ class TestCapitalSchemeSpendEntity:
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 6, 1, 12, tzinfo=UTC), datetime(2020, 7, 1, 12, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
-        spend_entity = CapitalSchemeSpendEntity.from_domain(spend, 0, {DataSource.ATF4_BID: 0})
+        spend_entity = CapitalSchemeSpendEntity.from_domain(spend, 0, {DataSource.ATF3_BID: 0})
 
         assert spend_entity.effective_date_from == local_datetime(2020, 6, 1, 13)
         assert spend_entity.effective_date_to == local_datetime(2020, 7, 1, 13)
@@ -159,7 +159,7 @@ class TestCapitalSchemeSpendEntity:
             capital_scheme_spend_id=1,
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 1, 1),
-            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF3_BID),
         )
 
         spend = spend_entity.to_domain()
@@ -167,7 +167,7 @@ class TestCapitalSchemeSpendEntity:
         assert spend == CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         assert spend.surrogate_id == 1
 
@@ -176,7 +176,7 @@ class TestCapitalSchemeSpendEntity:
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 1, 1),
             effective_date_to=local_datetime(2020, 2, 1),
-            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF3_BID),
         )
 
         spend = spend_entity.to_domain()
@@ -188,7 +188,7 @@ class TestCapitalSchemeSpendEntity:
             amount=2_000_000,
             effective_date_from=local_datetime(2020, 6, 1, 13),
             effective_date_to=local_datetime(2020, 7, 1, 13),
-            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF4_BID),
+            data_source=DataSourceEntity(data_source_name=DataSourceName.ATF3_BID),
         )
 
         spend = spend_entity.to_domain()
@@ -205,7 +205,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_data_source_entity(id_=1, name=DataSourceName.ATF4_BID),
+                    build_data_source_entity(id_=1, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(reference="ATE00001"),
                 ]
             )
@@ -217,14 +217,14 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 CapitalSchemeFunding(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     amount=Money(2_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             financials.adjust_funding(
                 CapitalSchemeFunding(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     amount=Money(1_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             await capital_scheme_financials.add(financials)
@@ -251,7 +251,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_data_source_entity(id_=1, name=DataSourceName.ATF4_BID),
+                    build_data_source_entity(id_=1, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(reference="ATE00001"),
                 ]
             )
@@ -263,7 +263,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 CapitalSchemeSpend(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     amount=Money(1_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             await capital_scheme_financials.add(financials)
@@ -298,19 +298,19 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
                         amount=3_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 1, 1),
                         effective_date_to=local_datetime(2020, 2, 1),
                     ),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
                         amount=2_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 2, 1),
                     ),
                 ]
@@ -324,7 +324,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 amount=Money(2_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         ]
 
@@ -334,18 +334,18 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
                         amount=3_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 3, 1),
                     ),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
                         amount=2_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 2, 1),
                     ),
                 ]
@@ -359,12 +359,12 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 amount=Money(2_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             ),
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
                 amount=Money(3_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             ),
         ]
 
@@ -372,19 +372,19 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeSpendEntity(
                         capital_scheme_id=1,
                         amount=2_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 1, 1),
                         effective_date_to=local_datetime(2020, 2, 1),
                     ),
                     CapitalSchemeSpendEntity(
                         capital_scheme_id=1,
                         amount=1_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 2, 1),
                     ),
                 ]
@@ -397,7 +397,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         assert financials and financials.spend == CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(1_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
     async def test_get_when_not_found(self, engine: AsyncEngine) -> None:
@@ -411,7 +411,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    build_data_source_entity(id_=2, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                 ]
             )
@@ -424,7 +424,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 CapitalSchemeFunding(
                     effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                     amount=Money(3_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             await capital_scheme_financials.update(financials)
@@ -443,12 +443,12 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
                         amount=3_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
@@ -462,7 +462,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 CapitalSchemeFunding(
                     effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                     amount=Money(2_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             await capital_scheme_financials.update(financials)
@@ -475,12 +475,12 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeFundingEntity(
                         capital_scheme_id=1,
                         amount=3_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
@@ -506,7 +506,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    build_data_source_entity(id_=2, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                 ]
             )
@@ -519,7 +519,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 CapitalSchemeSpend(
                     effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                     amount=Money(2_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             await capital_scheme_financials.update(financials)
@@ -538,12 +538,12 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeSpendEntity(
                         capital_scheme_id=1,
                         amount=3_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]
@@ -557,7 +557,7 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
                 CapitalSchemeSpend(
                     effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                     amount=Money(2_000_000),
-                    data_source=DataSource.ATF4_BID,
+                    data_source=DataSource.ATF3_BID,
                 )
             )
             await capital_scheme_financials.update(financials)
@@ -570,12 +570,12 @@ class TestDatabaseCapitalSchemeFinancialsRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf4_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF4_BID),
+                    atf3_bid := build_data_source_entity(id_=2, name=DataSourceName.ATF3_BID),
                     entities.build_capital_scheme(id_=1, reference="ATE00001"),
                     CapitalSchemeSpendEntity(
                         capital_scheme_id=1,
                         amount=3_000_000,
-                        data_source=atf4_bid,
+                        data_source=atf3_bid,
                         effective_date_from=local_datetime(2020, 1, 1),
                     ),
                 ]

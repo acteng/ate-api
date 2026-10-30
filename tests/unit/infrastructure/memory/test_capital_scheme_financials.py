@@ -20,13 +20,13 @@ class TestMemoryCapitalSchemeFinancialsRepository:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.adjust_funding(funding)
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(1_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.change_spend(spend)
 
@@ -45,13 +45,13 @@ class TestMemoryCapitalSchemeFinancialsRepository:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.adjust_funding(funding)
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(1_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.change_spend(spend)
         await capital_scheme_financials.add(financials)
@@ -77,14 +77,14 @@ class TestMemoryCapitalSchemeFinancialsRepository:
         funding1 = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             amount=Money(3_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.adjust_funding(funding1)
         await capital_scheme_financials.add(financials)
         funding2 = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.adjust_funding(funding2)
 
@@ -102,14 +102,14 @@ class TestMemoryCapitalSchemeFinancialsRepository:
             CapitalSchemeSpend(
                 effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
                 amount=Money(3_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         await capital_scheme_financials.add(financials)
         spend2 = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 3, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
         financials.change_spend(spend2)
 

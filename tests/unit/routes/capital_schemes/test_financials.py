@@ -19,22 +19,22 @@ class TestCapitalSchemeFundingModel:
         funding = CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         funding_model = CapitalSchemeFundingModel.from_domain(funding)
 
-        assert funding_model == CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)
+        assert funding_model == CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF3_BID)
 
     def test_to_domain(self) -> None:
-        funding_model = CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)
+        funding_model = CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF3_BID)
 
         funding = funding_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert funding == CapitalSchemeFunding(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(2_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
 
@@ -43,22 +43,22 @@ class TestCapitalSchemeSpendModel:
         spend = CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(1_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
         spend_model = CapitalSchemeSpendModel.from_domain(spend)
 
-        assert spend_model == CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF4_BID)
+        assert spend_model == CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF3_BID)
 
     def test_to_domain(self) -> None:
-        spend_model = CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF4_BID)
+        spend_model = CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF3_BID)
 
         spend = spend_model.to_domain(datetime(2020, 1, 1, tzinfo=UTC))
 
         assert spend == CapitalSchemeSpend(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             amount=Money(1_000_000),
-            data_source=DataSource.ATF4_BID,
+            data_source=DataSource.ATF3_BID,
         )
 
 
@@ -69,14 +69,14 @@ class TestCapitalSchemeFinancialsModel:
             CapitalSchemeFunding(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 amount=Money(2_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
         financials.change_spend(
             CapitalSchemeSpend(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 amount=Money(1_000_000),
-                data_source=DataSource.ATF4_BID,
+                data_source=DataSource.ATF3_BID,
             )
         )
 
@@ -84,9 +84,9 @@ class TestCapitalSchemeFinancialsModel:
 
         assert financials_model == CapitalSchemeFinancialsModel(
             funding=CollectionModel[CapitalSchemeFundingModel](
-                items=[CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF4_BID)]
+                items=[CapitalSchemeFundingModel(amount=2_000_000, source=DataSourceModel.ATF3_BID)]
             ),
-            spend=CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF4_BID),
+            spend=CapitalSchemeSpendModel(amount=1_000_000, source=DataSourceModel.ATF3_BID),
         )
 
     def test_from_domain_when_no_spend(self) -> None:
