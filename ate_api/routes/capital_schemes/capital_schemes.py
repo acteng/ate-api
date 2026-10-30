@@ -47,8 +47,8 @@ class CapitalSchemeModel(BaseModel):
                     },
                     "status": {"status": "active"},
                     "financials": {
-                        "funding": {"items": [{"amount": 3_000_000, "source": "ATF4 bid"}]},
-                        "spend": {"amount": 2_000_000, "source": "ATF4 bid"},
+                        "funding": {"items": [{"amount": 3_000_000, "source": "ATF3 bid"}]},
+                        "spend": {"amount": 2_000_000, "source": "ATF3 bid"},
                     },
                     "milestones": {
                         "currentMilestone": "detailed design completed",
@@ -57,7 +57,7 @@ class CapitalSchemeModel(BaseModel):
                                 "milestone": "detailed design completed",
                                 "observationType": "actual",
                                 "statusDate": "2020-03-01",
-                                "source": "ATF4 bid",
+                                "source": "ATF3 bid",
                             }
                         ],
                     },

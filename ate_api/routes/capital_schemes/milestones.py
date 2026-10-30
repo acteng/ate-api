@@ -61,7 +61,7 @@ class CapitalSchemeMilestoneModel(BaseModel):
                     "milestone": "detailed design completed",
                     "observationType": "actual",
                     "statusDate": "2020-03-01",
-                    "source": "ATF4 bid",
+                    "source": "ATF3 bid",
                 }
             ]
         }

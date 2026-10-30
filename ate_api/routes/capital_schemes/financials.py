@@ -45,7 +45,7 @@ class CapitalSchemeSpendModel(BaseModel):
     amount: int
     source: DataSourceModel
 
-    model_config = ConfigDict(json_schema_extra={"examples": [{"amount": 2_000_000, "source": "ATF4 bid"}]})
+    model_config = ConfigDict(json_schema_extra={"examples": [{"amount": 2_000_000, "source": "ATF3 bid"}]})
 
     @classmethod
     def from_domain(cls, spend: CapitalSchemeSpend) -> Self:
