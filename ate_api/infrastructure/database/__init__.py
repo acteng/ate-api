@@ -1,9 +1,9 @@
 from ate_api.infrastructure.database.authorities import AuthorityEntity as AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity as BaseEntity
-from ate_api.infrastructure.database.capital_scheme_financials import (
+from ate_api.infrastructure.database.capital_scheme_financials.capital_scheme_financials import (
     CapitalSchemeFundingEntity as CapitalSchemeFundingEntity,
 )
-from ate_api.infrastructure.database.capital_scheme_financials import (
+from ate_api.infrastructure.database.capital_scheme_financials.capital_scheme_financials import (
     CapitalSchemeSpendEntity as CapitalSchemeSpendEntity,
 )
 from ate_api.infrastructure.database.capital_scheme_milestones import (
