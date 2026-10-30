@@ -11,7 +11,9 @@ from ate_api.domain.capital_schemes.capital_scheme_repositories import CapitalSc
 from ate_api.domain.funding_programmes import FundingProgrammeRepository
 from ate_api.domain.improvements.improvements import ImprovementRepository
 from ate_api.infrastructure.database.authorities import DatabaseAuthorityRepository
-from ate_api.infrastructure.database.capital_scheme_financials import DatabaseCapitalSchemeFinancialsRepository
+from ate_api.infrastructure.database.capital_scheme_financials.capital_scheme_financials_repositories import (
+    DatabaseCapitalSchemeFinancialsRepository,
+)
 from ate_api.infrastructure.database.capital_scheme_milestones import DatabaseCapitalSchemeMilestonesRepository
 from ate_api.infrastructure.database.capital_schemes.capital_scheme_repositories import DatabaseCapitalSchemeRepository
 from ate_api.infrastructure.database.funding_programmes import DatabaseFundingProgrammeRepository
