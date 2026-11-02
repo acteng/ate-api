@@ -21,6 +21,9 @@ from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from ate_api.infrastructure.database.authorities import AuthorityEntity
 from ate_api.infrastructure.database.base import BaseEntity
+from ate_api.infrastructure.database.capital_scheme_financials.capital_scheme_financials import (
+    CapitalSchemeFundingEntity,
+)
 from ate_api.infrastructure.database.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewEntity
 from ate_api.infrastructure.database.capital_schemes.interventions import (
     CapitalSchemeInterventionEntity,
@@ -51,6 +54,7 @@ class CapitalSchemeEntity(BaseEntity):
     scheme_reference: Mapped[str] = mapped_column(unique=True)
     capital_scheme_overviews: Mapped[list[CapitalSchemeOverviewEntity]] = relationship(lazy="raise")
     capital_scheme_scheme_statuses: Mapped[list[CapitalSchemeSchemeStatusEntity]] = relationship(lazy="raise")
+    capital_scheme_fundings: Mapped[list[CapitalSchemeFundingEntity]] = relationship(lazy="raise")
     capital_scheme_interventions: Mapped[list[CapitalSchemeInterventionEntity]] = relationship(lazy="raise")
     capital_scheme_authority_reviews: Mapped[list[CapitalSchemeAuthorityReviewEntity]] = relationship(lazy="raise")
 
@@ -199,10 +203,7 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current overview
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-            # possible forward reference to funding programme filter join
-            (contains_eager if funding_programme_codes else joinedload)(
-                CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme
-            ),
+            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
             # forward reference to authority filter join
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
         ).join(
@@ -259,8 +260,14 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
 
         # filter by funding programme
         if funding_programme_codes:
-            statement = statement.join(FundingProgrammeEntity).where(
-                FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes)
+            statement = (
+                statement.join(
+                    CapitalSchemeEntity.capital_scheme_fundings.and_(
+                        CapitalSchemeFundingEntity.effective_date_to.is_(None)
+                    )
+                )
+                .join(FundingProgrammeEntity)
+                .where(FundingProgrammeEntity.funding_programme_code.in_(str(code) for code in funding_programme_codes))
             )
 
         # filter by scheme status

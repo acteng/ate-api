@@ -1,4 +1,5 @@
 from ate_api.domain.authorities import AuthorityAbbreviation
+from ate_api.domain.capital_scheme_financials import CapitalSchemeFinancialsRepository
 from ate_api.domain.capital_schemes.capital_schemes import (
     CapitalScheme,
     CapitalSchemeItem,
@@ -11,7 +12,10 @@ from ate_api.domain.improvements.improvements import Improvement, ImprovementRef
 
 
 class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
-    def __init__(self, improvements: ImprovementRepository) -> None:
+    def __init__(
+        self, capital_scheme_financials: CapitalSchemeFinancialsRepository, improvements: ImprovementRepository
+    ) -> None:
+        self._capital_scheme_financials = capital_scheme_financials
         self._improvements = improvements
         self._capital_schemes: dict[CapitalSchemeReference, CapitalScheme] = {}
 
@@ -34,7 +38,9 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
                 if (await self._get_improvement(capital_scheme.overview.improvement)).overview.funding_managed_by
                 == authority_abbreviation
                 and (
-                    not funding_programme_codes or capital_scheme.overview.funding_programme in funding_programme_codes
+                    not funding_programme_codes
+                    or (await self._get_funding_programme_codes(capital_scheme.reference))
+                    & set(funding_programme_codes)
                 )
                 and (not status or capital_scheme.status.status == status)
             ],
@@ -58,3 +64,8 @@ class MemoryCapitalSchemeRepository(CapitalSchemeRepository):
         improvement = await self._improvements.get(improvement_reference)
         assert improvement
         return improvement
+
+    async def _get_funding_programme_codes(self, reference: CapitalSchemeReference) -> set[FundingProgrammeCode]:
+        financials = await self._capital_scheme_financials.get(reference)
+        assert financials
+        return {funding.funding_programme for funding in financials.fundings}

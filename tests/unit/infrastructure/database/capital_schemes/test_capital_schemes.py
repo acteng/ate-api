@@ -1044,15 +1044,18 @@ class TestDatabaseCapitalSchemeRepository:
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00001",
-                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf3, improvement=imp)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[entities.build_capital_scheme_funding(funding_programme=atf3)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00002",
-                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf4, improvement=imp)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[entities.build_capital_scheme_funding(funding_programme=atf4)],
                     ),
                     entities.build_capital_scheme(
                         reference="ATE00003",
-                        overviews=[entities.build_capital_scheme_overview(funding_programme=atf5, improvement=imp)],
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[entities.build_capital_scheme_funding(funding_programme=atf5)],
                     ),
                 ]
             )
@@ -1067,6 +1070,77 @@ class TestDatabaseCapitalSchemeRepository:
         assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
             CapitalSchemeReference("ATE00001"),
             CapitalSchemeReference("ATE00002"),
+        ]
+
+    async def test_get_items_by_funding_managed_by_filters_by_current_funding_programme(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    atf3 := build_funding_programme_entity(code="ATF3"),
+                    atf4 := build_funding_programme_entity(code="ATF4"),
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[
+                            entities.build_capital_scheme_funding(
+                                funding_programme=atf3,
+                                effective_date_from=local_datetime(2020, 1, 1),
+                                effective_date_to=local_datetime(2020, 2, 1),
+                            ),
+                            entities.build_capital_scheme_funding(
+                                funding_programme=atf4, effective_date_from=local_datetime(2020, 2, 1)
+                            ),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
+                AuthorityAbbreviation("LIV"), funding_programme_codes=[FundingProgrammeCode("ATF3")]
+            )
+
+        assert not capital_scheme_items
+
+    async def test_get_items_by_funding_managed_by_when_multiple_current_fundings(
+        self, engine: AsyncEngine, entities: EntityBuilder
+    ) -> None:
+        async with AsyncSession(engine) as session, session.begin():
+            session.add_all(
+                [
+                    liv := build_authority_entity(abbreviation="LIV"),
+                    atf3 := build_funding_programme_entity(code="ATF3"),
+                    imp := entities.build_improvement(
+                        reference="IMP00001",
+                        overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
+                    ),
+                    entities.build_capital_scheme(
+                        reference="ATE00001",
+                        overviews=[entities.build_capital_scheme_overview(improvement=imp)],
+                        fundings=[
+                            entities.build_capital_scheme_funding(funding_programme=atf3),
+                            entities.build_capital_scheme_funding(funding_programme=atf3),
+                        ],
+                    ),
+                ]
+            )
+
+        async with AsyncSession(engine) as session:
+            capital_schemes = DatabaseCapitalSchemeRepository(session)
+            capital_scheme_items = await capital_schemes.get_items_by_funding_managed_by(
+                AuthorityAbbreviation("LIV"), funding_programme_codes=[FundingProgrammeCode("ATF3")]
+            )
+
+        assert [capital_scheme_item.reference for capital_scheme_item in capital_scheme_items] == [
+            CapitalSchemeReference("ATE00001")
         ]
 
     async def test_get_items_by_funding_managed_by_filters_by_current_status(

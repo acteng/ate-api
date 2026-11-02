@@ -11,7 +11,6 @@ from ate_api.domain.dates import DateTimeRange
 from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.moneys import Money
 from ate_api.infrastructure.database.base import BaseEntity
-from ate_api.infrastructure.database.capital_schemes.capital_schemes import CapitalSchemeEntity
 from ate_api.infrastructure.database.data_sources import DataSourceEntity
 from ate_api.infrastructure.database.dates import local_to_zoned, zoned_to_local
 from ate_api.infrastructure.database.funding_programmes import FundingProgrammeEntity
@@ -22,7 +21,7 @@ class CapitalSchemeFundingEntity(BaseEntity):
     __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_funding_id: Mapped[int] = mapped_column(primary_key=True)
-    capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
+    capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
     amount: Mapped[int]
     funding_programme_id = mapped_column(ForeignKey(FundingProgrammeEntity.funding_programme_id), nullable=False)
     funding_programme: Mapped[FundingProgrammeEntity] = relationship(lazy="raise")
@@ -67,7 +66,7 @@ class CapitalSchemeSpendEntity(BaseEntity):
     __table_args__: Mapping[str, str] = {"schema": "capital_scheme"}
 
     capital_scheme_spend_id: Mapped[int] = mapped_column(primary_key=True)
-    capital_scheme_id = mapped_column(ForeignKey(CapitalSchemeEntity.capital_scheme_id), nullable=False)
+    capital_scheme_id = mapped_column(ForeignKey("capital_scheme.capital_scheme.capital_scheme_id"), nullable=False)
     amount: Mapped[int]
     data_source_id = mapped_column(ForeignKey(DataSourceEntity.data_source_id), nullable=False)
     data_source: Mapped[DataSourceEntity] = relationship(lazy="raise")
