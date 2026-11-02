@@ -61,7 +61,6 @@ async def test_get_capital_scheme(
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
-                funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
             ),
             status=CapitalSchemeStatus(
@@ -78,11 +77,7 @@ async def test_get_capital_scheme(
     assert response.json() == {
         "@id": f"{client.base_url}/capital-schemes/ATE00001",
         "reference": "ATE00001",
-        "overview": {
-            "name": "Wirral Package",
-            "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-            "improvement": f"{client.base_url}/improvements/IMP00001",
-        },
+        "overview": {"name": "Wirral Package", "improvement": f"{client.base_url}/improvements/IMP00001"},
         # Workaround: https://github.com/python/mypy/issues/19474
         "status": {"status": cast(Any, "active")},
         "financials": {"funding": {"items": []}, "spend": None},

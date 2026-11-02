@@ -9,7 +9,6 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.routes.authorities.capital_schemes import CapitalSchemeItemModel
 from ate_api.routes.capital_schemes.authority_reviews import CapitalSchemeAuthorityReviewModel
@@ -30,7 +29,6 @@ class TestCapitalSchemeItemModel:
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
-                funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
             ),
             status=CapitalSchemeStatus(
@@ -45,9 +43,7 @@ class TestCapitalSchemeItemModel:
             id=AnyUrl(f"{base_url}/capital-schemes/ATE00001"),
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
-                name="Wirral Package",
-                funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-                improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
+                name="Wirral Package", improvement=AnyUrl(f"{base_url}/improvements/IMP00001")
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             authority_review=None,

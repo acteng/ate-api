@@ -24,7 +24,6 @@ from ate_api.infrastructure.database import (
     CapitalSchemeSchemeStatusEntity,
     DataSourceEntity,
     DataSourceName,
-    FundingProgrammeEntity,
     InterventionMeasureEntity,
     InterventionMeasureName,
     InterventionTypeEntity,
@@ -37,7 +36,7 @@ from ate_api.infrastructure.database import (
 )
 from ate_api.infrastructure.database.capital_schemes.capital_schemes import DatabaseCapitalSchemeRepository
 from tests.unit.dates import local_datetime
-from tests.unit.domain.builders import build_capital_scheme, build_funding_programme_code
+from tests.unit.domain.builders import build_capital_scheme
 from tests.unit.infrastructure.database.builders import (
     EntityBuilder,
     build_authority_entity,
@@ -58,7 +57,6 @@ class TestCapitalSchemeEntity:
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
-                funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
             ),
             status=CapitalSchemeStatus(
@@ -68,9 +66,8 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {FundingProgrammeCode("ATF3"): 2},
-            {ImprovementReference("IMP00001"): 3},
-            {Status.ACTIVE: 4},
+            {ImprovementReference("IMP00001"): 2},
+            {Status.ACTIVE: 3},
             {},
             {},
             {},
@@ -80,14 +77,13 @@ class TestCapitalSchemeEntity:
         (overview_entity,) = capital_scheme_entity.capital_scheme_overviews
         assert (
             overview_entity.scheme_name == "Wirral Package"
-            and overview_entity.funding_programme_id == 2
-            and overview_entity.improvement_id == 3
+            and overview_entity.improvement_id == 2
             and overview_entity.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_entity.effective_date_to
         )
         (scheme_status_entity,) = capital_scheme_entity.capital_scheme_scheme_statuses
         assert (
-            scheme_status_entity.scheme_status_id == 4
+            scheme_status_entity.scheme_status_id == 3
             and scheme_status_entity.effective_date_from == local_datetime(2020, 3, 1)
             and not scheme_status_entity.effective_date_to
         )
@@ -116,7 +112,6 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {build_funding_programme_code(): 0},
             {},
             {Status.PIPELINE: 0},
             {
@@ -153,7 +148,6 @@ class TestCapitalSchemeEntity:
 
         capital_scheme_entity = CapitalSchemeEntity.from_domain(
             capital_scheme,
-            {build_funding_programme_code(): 0},
             {},
             {Status.PIPELINE: 0},
             {},
@@ -174,7 +168,6 @@ class TestCapitalSchemeEntity:
             capital_scheme_overviews=[
                 CapitalSchemeOverviewEntity(
                     scheme_name="Wirral Package",
-                    funding_programme=FundingProgrammeEntity(funding_programme_code="ATF3"),
                     improvement=entities.build_improvement(reference="IMP00001"),
                     effective_date_from=local_datetime(2020, 1, 1),
                 )
@@ -193,7 +186,6 @@ class TestCapitalSchemeEntity:
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         assert capital_scheme.status == CapitalSchemeStatus(
@@ -279,9 +271,8 @@ class TestDatabaseCapitalSchemeRepository:
             session.add_all(
                 [
                     build_authority_entity(id_=1, abbreviation="LIV"),
-                    build_funding_programme_entity(id_=2, code="ATF3"),
-                    entities.build_improvement(id_=3, reference="IMP00001"),
-                    build_scheme_status_entity(id_=4, name=SchemeStatusName.ACTIVE),
+                    entities.build_improvement(id_=2, reference="IMP00001"),
+                    build_scheme_status_entity(id_=3, name=SchemeStatusName.ACTIVE),
                 ]
             )
 
@@ -293,7 +284,6 @@ class TestDatabaseCapitalSchemeRepository:
                     overview=CapitalSchemeOverview(
                         effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                         name="Wirral Package",
-                        funding_programme=FundingProgrammeCode("ATF3"),
                         improvement=ImprovementReference("IMP00001"),
                     ),
                     status=CapitalSchemeStatus(
@@ -310,14 +300,13 @@ class TestDatabaseCapitalSchemeRepository:
         assert (
             overview_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
             and overview_row.scheme_name == "Wirral Package"
-            and overview_row.funding_programme_id == 2
-            and overview_row.improvement_id == 3
+            and overview_row.improvement_id == 2
             and overview_row.effective_date_from == local_datetime(2020, 1, 1)
             and not overview_row.effective_date_to
         )
         assert (
             scheme_status_row.capital_scheme_id == capital_scheme_row.capital_scheme_id
-            and scheme_status_row.scheme_status_id == 4
+            and scheme_status_row.scheme_status_id == 3
             and scheme_status_row.effective_date_from == local_datetime(2020, 3, 1)
             and not scheme_status_row.effective_date_to
         )
@@ -419,7 +408,6 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     imp := entities.build_improvement(reference="IMP00001"),
                     active := build_scheme_status_entity(name=SchemeStatusName.ACTIVE),
                     CapitalSchemeEntity(
@@ -427,7 +415,6 @@ class TestDatabaseCapitalSchemeRepository:
                         capital_scheme_overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                funding_programme=atf3,
                                 improvement=imp,
                                 effective_date_from=local_datetime(2020, 1, 1),
                             )
@@ -450,7 +437,6 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         assert capital_scheme.status == CapitalSchemeStatus(
@@ -462,7 +448,6 @@ class TestDatabaseCapitalSchemeRepository:
         async with AsyncSession(engine) as session, session.begin():
             session.add_all(
                 [
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     imp := entities.build_improvement(reference="IMP00001"),
                     entities.build_capital_scheme(
                         reference="ATE00001",
@@ -473,7 +458,6 @@ class TestDatabaseCapitalSchemeRepository:
                             ),
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
-                                funding_programme=atf3,
                                 improvement=imp,
                                 effective_date_from=local_datetime(2020, 2, 1),
                             ),
@@ -489,7 +473,6 @@ class TestDatabaseCapitalSchemeRepository:
         assert capital_scheme and capital_scheme.overview == CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 2, 1, tzinfo=UTC)),
             name="School Streets",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
 
@@ -758,7 +741,6 @@ class TestDatabaseCapitalSchemeRepository:
                 [
                     liv := build_authority_entity(abbreviation="LIV"),
                     wyo := build_authority_entity(abbreviation="WYO"),
-                    atf3 := build_funding_programme_entity(code="ATF3"),
                     imp1 := entities.build_improvement(
                         reference="IMP00001",
                         overviews=[entities.build_improvement_overview(funding_managed_by=liv)],
@@ -773,7 +755,6 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="Wirral Package",
-                                funding_programme=atf3,
                                 improvement=imp1,
                                 effective_date_from=local_datetime(2020, 1, 1),
                             )
@@ -789,7 +770,6 @@ class TestDatabaseCapitalSchemeRepository:
                         overviews=[
                             CapitalSchemeOverviewEntity(
                                 scheme_name="School Streets",
-                                funding_programme=atf3,
                                 improvement=imp1,
                                 effective_date_from=local_datetime(2020, 1, 1),
                             )
@@ -817,7 +797,6 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="Wirral Package",
-                    funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                 ),
                 status=CapitalSchemeStatus(
@@ -830,7 +809,6 @@ class TestDatabaseCapitalSchemeRepository:
                 overview=CapitalSchemeOverview(
                     effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                     name="School Streets",
-                    funding_programme=FundingProgrammeCode("ATF3"),
                     improvement=ImprovementReference("IMP00001"),
                 ),
                 status=CapitalSchemeStatus(

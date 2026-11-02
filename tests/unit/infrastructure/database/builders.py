@@ -95,14 +95,12 @@ class EntityBuilder:
     def build_capital_scheme_overview(
         self,
         name: str = "dummy",
-        funding_programme: FundingProgrammeEntity | None = None,
         improvement: ImprovementEntity | None = None,
         effective_date_from: datetime = dummy_local_datetime,
         effective_date_to: datetime | None = None,
     ) -> CapitalSchemeOverviewEntity:
         return CapitalSchemeOverviewEntity(
             scheme_name=name,
-            funding_programme=funding_programme or self._dummy_funding_programme,
             improvement=improvement,
             effective_date_from=effective_date_from,
             effective_date_to=effective_date_to,

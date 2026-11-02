@@ -43,7 +43,6 @@ class TestMemoryCapitalSchemeRepository:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         status = CapitalSchemeStatus(
@@ -66,7 +65,6 @@ class TestMemoryCapitalSchemeRepository:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         status = CapitalSchemeStatus(
@@ -102,7 +100,6 @@ class TestMemoryCapitalSchemeRepository:
         overview1 = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         status1 = CapitalSchemeStatus(
@@ -114,7 +111,6 @@ class TestMemoryCapitalSchemeRepository:
         overview2 = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="School Streets",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         status2 = CapitalSchemeStatus(

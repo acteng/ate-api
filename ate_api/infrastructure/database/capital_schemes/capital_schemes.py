@@ -62,7 +62,6 @@ class CapitalSchemeEntity(BaseEntity):
     def from_domain(
         cls,
         capital_scheme: CapitalScheme,
-        funding_programme_ids: dict[FundingProgrammeCode, int],
         improvement_ids: dict[ImprovementReference, int],
         scheme_status_ids: dict[Status, int],
         intervention_type_measure_ids: dict[tuple[OutputType, OutputMeasure], int],
@@ -72,7 +71,7 @@ class CapitalSchemeEntity(BaseEntity):
         return cls(
             scheme_reference=str(capital_scheme.reference),
             capital_scheme_overviews=[
-                CapitalSchemeOverviewEntity.from_domain(capital_scheme.overview, funding_programme_ids, improvement_ids)
+                CapitalSchemeOverviewEntity.from_domain(capital_scheme.overview, improvement_ids)
             ],
             capital_scheme_scheme_statuses=[
                 CapitalSchemeSchemeStatusEntity.from_domain(capital_scheme.status, scheme_status_ids)
@@ -112,7 +111,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self._session = session
 
     async def add(self, capital_scheme: CapitalScheme) -> None:
-        funding_programme_ids = await self._get_funding_programme_ids(capital_scheme)
         improvement_ids = await self._get_improvement_ids(capital_scheme)
         scheme_status_ids = await self._get_scheme_status_ids(capital_scheme)
         intervention_type_measure_ids = await self._get_intervention_type_measure_ids(capital_scheme)
@@ -122,7 +120,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         self._session.add(
             CapitalSchemeEntity.from_domain(
                 capital_scheme,
-                funding_programme_ids,
                 improvement_ids,
                 scheme_status_ids,
                 intervention_type_measure_ids,
@@ -137,7 +134,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current overview
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
             joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
         ).join(
             CapitalSchemeEntity.capital_scheme_overviews.and_(CapitalSchemeOverviewEntity.effective_date_to.is_(None))
@@ -203,7 +199,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
         # fetch current overview
         statement = statement.options(
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews),
-            joinedload(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.funding_programme),
             # forward reference to authority filter join
             contains_eager(CapitalSchemeEntity.capital_scheme_overviews, CapitalSchemeOverviewEntity.improvement),
         ).join(
@@ -307,15 +302,6 @@ class DatabaseCapitalSchemeRepository(CapitalSchemeRepository):
             )
         )
         return rows.one()
-
-    async def _get_funding_programme_ids(self, capital_scheme: CapitalScheme) -> dict[FundingProgrammeCode, int]:
-        funding_programme_code = str(capital_scheme.overview.funding_programme)
-        rows = await self._session.execute(
-            select(FundingProgrammeEntity.funding_programme_code, FundingProgrammeEntity.funding_programme_id).where(
-                FundingProgrammeEntity.funding_programme_code == funding_programme_code
-            )
-        )
-        return {FundingProgrammeCode(row.funding_programme_code): row.funding_programme_id for row in rows}
 
     async def _get_improvement_ids(self, capital_scheme: CapitalScheme) -> dict[ImprovementReference, int]:
         improvement_reference = str(capital_scheme.overview.improvement)

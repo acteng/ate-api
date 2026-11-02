@@ -8,7 +8,6 @@ from ate_api.domain.capital_schemes.overviews import CapitalSchemeOverview
 from ate_api.domain.capital_schemes.statuses import CapitalSchemeStatus, Status
 from ate_api.domain.data_sources import DataSource
 from ate_api.domain.dates import DateTimeRange
-from ate_api.domain.funding_programmes import FundingProgrammeCode
 from ate_api.domain.improvements.improvements import ImprovementReference
 from ate_api.domain.observation_types import ObservationType
 from tests.unit.domain.builders import build_capital_scheme
@@ -60,7 +59,6 @@ class TestCapitalScheme:
         overview = CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         )
         status = CapitalSchemeStatus(

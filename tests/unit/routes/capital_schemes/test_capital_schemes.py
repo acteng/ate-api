@@ -46,7 +46,6 @@ class TestCapitalSchemeModel:
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
-                funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
             ),
             status=CapitalSchemeStatus(
@@ -62,9 +61,7 @@ class TestCapitalSchemeModel:
             id=AnyUrl(f"{base_url}/capital-schemes/ATE00001"),
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
-                name="Wirral Package",
-                funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-                improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
+                name="Wirral Package", improvement=AnyUrl(f"{base_url}/improvements/IMP00001")
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(
@@ -215,9 +212,7 @@ class TestCapitalSchemeModel:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
             overview=CapitalSchemeOverviewModel(
-                name="Wirral Package",
-                funding_programme=AnyUrl(f"{base_url}/funding-programmes/ATF3"),
-                improvement=AnyUrl(f"{base_url}/improvements/IMP00001"),
+                name="Wirral Package", improvement=AnyUrl(f"{base_url}/improvements/IMP00001")
             ),
             status=CapitalSchemeStatusModel(status=StatusModel.ACTIVE),
             financials=CapitalSchemeFinancialsModel(
@@ -236,7 +231,6 @@ class TestCapitalSchemeModel:
             == CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="Wirral Package",
-                funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
             )
             and capital_scheme.status
@@ -244,10 +238,10 @@ class TestCapitalSchemeModel:
             and not capital_scheme.authority_review
         )
 
-    def test_to_domain_sets_outputs(self, http_request: Request, base_url: str) -> None:
+    def test_to_domain_sets_outputs(self, http_request: Request) -> None:
         capital_scheme_model = CapitalSchemeModel(
             reference="ATE00001",
-            overview=build_capital_scheme_overview_model(base_url),
+            overview=build_capital_scheme_overview_model(),
             status=build_capital_scheme_status_model(),
             financials=CapitalSchemeFinancialsModel(
                 funding=CollectionModel[CapitalSchemeFundingModel](items=[]), spend=None

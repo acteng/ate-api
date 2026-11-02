@@ -59,14 +59,10 @@ def build_capital_scheme_reference(reference: str = "dummy") -> CapitalSchemeRef
 def build_capital_scheme_overview(
     effective_date: DateTimeRange | None = None,
     name: str = "dummy",
-    funding_programme: FundingProgrammeCode | None = None,
     improvement: ImprovementReference | None = None,
 ) -> CapitalSchemeOverview:
     return CapitalSchemeOverview(
-        effective_date=effective_date or build_date_time_range(),
-        name=name,
-        funding_programme=funding_programme or build_funding_programme_code(),
-        improvement=improvement,
+        effective_date=effective_date or build_date_time_range(), name=name, improvement=improvement
     )
 
 

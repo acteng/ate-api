@@ -70,7 +70,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
         overview=CapitalSchemeOverview(
             effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
             name="Wirral Package",
-            funding_programme=FundingProgrammeCode("ATF3"),
             improvement=ImprovementReference("IMP00001"),
         ),
         status=CapitalSchemeStatus(
@@ -89,7 +88,6 @@ async def test_get_authority_funding_managed_by_capital_schemes(
             overview=CapitalSchemeOverview(
                 effective_date=DateTimeRange(datetime(2020, 1, 1, tzinfo=UTC)),
                 name="School Streets",
-                funding_programme=FundingProgrammeCode("ATF3"),
                 improvement=ImprovementReference("IMP00001"),
             ),
             status=CapitalSchemeStatus(
@@ -121,22 +119,14 @@ async def test_get_authority_funding_managed_by_capital_schemes(
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00001",
                 "reference": "ATE00001",
-                "overview": {
-                    "name": "Wirral Package",
-                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                    "improvement": f"{client.base_url}/improvements/IMP00001",
-                },
+                "overview": {"name": "Wirral Package", "improvement": f"{client.base_url}/improvements/IMP00001"},
                 "status": {"status": "active"},
                 "authorityReview": {"reviewDate": "2020-02-01T00:00:00Z", "source": "authority update"},
             },
             {
                 "@id": f"{client.base_url}/capital-schemes/ATE00002",
                 "reference": "ATE00002",
-                "overview": {
-                    "name": "School Streets",
-                    "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                    "improvement": f"{client.base_url}/improvements/IMP00001",
-                },
+                "overview": {"name": "School Streets", "improvement": f"{client.base_url}/improvements/IMP00001"},
                 "status": {"status": "active"},
                 "authorityReview": None,
             },

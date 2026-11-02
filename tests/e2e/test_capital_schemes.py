@@ -23,11 +23,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
-            "overview": {
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                "improvement": f"{client.base_url}/improvements/IMP00001",
-            },
+            "overview": {"name": "Wirral Package", "improvement": f"{client.base_url}/improvements/IMP00001"},
             "status": {"status": "active"},
             "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
@@ -70,11 +66,7 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
     assert response.json() == {
         "@id": f"{client.base_url}/capital-schemes/ATE00001",
         "reference": "ATE00001",
-        "overview": {
-            "name": "Wirral Package",
-            "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-            "improvement": f"{client.base_url}/improvements/IMP00001",
-        },
+        "overview": {"name": "Wirral Package", "improvement": f"{client.base_url}/improvements/IMP00001"},
         "status": {"status": "active"},
         "financials": {
             "funding": {
@@ -114,16 +106,11 @@ async def test_get_capital_scheme(client: AsyncClient, access_token: str, app_cl
 
 
 async def test_create_spend(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
-            "overview": {
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                "improvement": None,
-            },
+            "overview": {"name": "Wirral Package", "improvement": None},
             "status": {"status": "active"},
             "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
@@ -146,16 +133,11 @@ async def test_create_spend(client: AsyncClient, access_token: str, app_client: 
 
 
 async def test_create_spend_concurrently(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
-            "overview": {
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                "improvement": None,
-            },
+            "overview": {"name": "Wirral Package", "improvement": None},
             "status": {"status": "active"},
             "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
@@ -181,16 +163,11 @@ async def test_create_spend_concurrently(client: AsyncClient, access_token: str,
 
 
 async def test_create_milestones(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
-            "overview": {
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                "improvement": None,
-            },
+            "overview": {"name": "Wirral Package", "improvement": None},
             "status": {"status": "active"},
             "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
@@ -274,16 +251,11 @@ async def test_create_milestones(client: AsyncClient, access_token: str, app_cli
 
 
 async def test_create_milestones_concurrently(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
-    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": False})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
-            "overview": {
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                "improvement": None,
-            },
+            "overview": {"name": "Wirral Package", "improvement": None},
             "status": {"status": "active"},
             "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
@@ -326,16 +298,11 @@ async def test_create_milestones_concurrently(client: AsyncClient, access_token:
 
 async def test_create_authority_review(client: AsyncClient, access_token: str, app_client: AppClient) -> None:
     await app_client.set_clock("2020-02-01T00:00:00Z")
-    await app_client.create_funding_programme({"code": "ATF3", "eligibleForAuthorityUpdate": True})
     await app_client.create_authority({"abbreviation": "LIV", "fullName": "Liverpool City Region Combined Authority"})
     await app_client.create_capital_scheme(
         {
             "reference": "ATE00001",
-            "overview": {
-                "name": "Wirral Package",
-                "fundingProgramme": f"{client.base_url}/funding-programmes/ATF3",
-                "improvement": None,
-            },
+            "overview": {"name": "Wirral Package", "improvement": None},
             "status": {"status": "active"},
             "financials": {"funding": {"items": []}, "spend": None},
             "milestones": {"items": []},
